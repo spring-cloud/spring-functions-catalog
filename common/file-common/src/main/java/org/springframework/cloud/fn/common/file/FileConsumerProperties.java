@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.fn.supplier.file;
+package org.springframework.cloud.fn.common.file;
 
 import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
@@ -23,9 +23,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * TODO: This will be used in other apps like (S)FTP and S3. Therefore, it might be moved to a common place.
  *
- * @author David Turanski
+ *  @author David Turanski
  * @author Artem Bilan
  */
 @ConfigurationProperties("file.consumer")

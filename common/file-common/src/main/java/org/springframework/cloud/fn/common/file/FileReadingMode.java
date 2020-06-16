@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.fn.supplier.file;
+package org.springframework.cloud.fn.common.file;
 
 /**
  * Defines the supported modes of reading and processing files.
