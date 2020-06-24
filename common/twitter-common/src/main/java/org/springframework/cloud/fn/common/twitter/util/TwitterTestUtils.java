@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.springframework.cloud.fn.supplier.twitter.status.stream;
+package org.springframework.cloud.fn.common.twitter.util;
 
 
 import java.io.IOException;
