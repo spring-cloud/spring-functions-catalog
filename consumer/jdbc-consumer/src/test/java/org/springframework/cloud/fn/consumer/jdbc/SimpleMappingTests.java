@@ -44,7 +44,7 @@ public class SimpleMappingTests extends JdbcConsumerApplicationTests {
 		jdbcConsumer.accept(message);
 		Payload result = jdbcOperations
 				.query("select a, b from messages", new BeanPropertyRowMapper<>(Payload.class)).get(0);
-		assertThat(result).isEqualToComparingFieldByField(sent);
+		assertThat(result).usingRecursiveComparison().isEqualTo(sent);
 	}
 
 }

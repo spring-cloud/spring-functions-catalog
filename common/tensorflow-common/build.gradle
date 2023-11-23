@@ -1,0 +1,15 @@
+ext {
+    tensorflowVersion='1.15.0'
+    commonsCompressVersion='1.25.0'
+    commonsIoVersion='2.15.0'
+    pcollectionsVersion='4.0.1'
+}
+
+dependencies {
+    api "org.tensorflow:tensorflow:$tensorflowVersion"
+    api "org.tensorflow:proto:$tensorflowVersion"
+    api "org.apache.commons:commons-compress:$commonsCompressVersion"
+    api "commons-io:commons-io:$commonsIoVersion"
+    api 'org.apache.commons:commons-lang3'
+    api "org.pcollections:pcollections:$pcollectionsVersion"
+}

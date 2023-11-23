@@ -91,7 +91,7 @@ public class KafkaPublisherConfiguration {
 			kafkaProducerSpecComponentCustomizer.customize(kafkaProducerMessageHandlerSpec);
 		}
 
-		return kafkaProducerMessageHandlerSpec.get();
+		return kafkaProducerMessageHandlerSpec.getObject();
 	}
 
 	/**

@@ -42,6 +42,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @TestPropertySource(properties = "aggregator.message-store-type=redis")
 public class RedisMessageStoreAggregatorTests extends AbstractAggregatorFunctionTests implements RedisTestContainerSupport {
+
 	@DynamicPropertySource
 	static void redisProperties(DynamicPropertyRegistry registry) {
 		registry.add("spring.data.redis.url", RedisTestContainerSupport::getUri);

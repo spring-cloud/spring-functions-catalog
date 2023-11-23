@@ -1,0 +1,10 @@
+ext {
+    greenmailVersion='2.1.0-alpha-3'
+}
+
+dependencies {
+    api 'org.springframework.integration:spring-integration-mail'
+    api 'org.eclipse.angus:jakarta.mail:2.0.2'
+
+    testImplementation "com.icegreen:greenmail:$greenmailVersion"
+}

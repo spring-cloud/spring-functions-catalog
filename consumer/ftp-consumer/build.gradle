@@ -1,0 +1,6 @@
+dependencies {
+    api project(':ftp-common')
+
+    testImplementation project(':function-test-support')
+    testImplementation "org.apache.ftpserver:ftpserver-core:$ftpServerVersion"
+}

@@ -17,6 +17,7 @@
 package org.springframework.cloud.fn.consumer.s3;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -69,7 +70,7 @@ public class AmazonS3UploadInputStreamTests extends AbstractAwsS3ConsumerMockTes
 
 
 		AsyncRequestBody asyncRequestBody = asyncRequestBodyArgumentCaptor.getValue();
-		StepVerifier.create(asyncRequestBody.map(buffer -> new String(buffer.array())))
+		StepVerifier.create(asyncRequestBody.map(buffer -> StandardCharsets.UTF_8.decode(buffer).toString()))
 				.expectNext("a")
 				.expectComplete()
 				.verify();

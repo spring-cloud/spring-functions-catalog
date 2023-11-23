@@ -20,7 +20,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.function.Supplier;
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -32,7 +31,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.fn.common.config.SpelExpressionConverterConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.messaging.Message;
 
 /**
@@ -40,11 +39,8 @@ import org.springframework.messaging.Message;
  *
  * @since 4.0
  */
+@EmbeddedKafka(partitions = 1, controlledShutdown = true)
 public class KafkaSupplierTests {
-
-	static final EmbeddedKafkaBroker EMBEDDED_KAFKA =
-			new EmbeddedKafkaBroker(1, true, 1)
-					.brokerListProperty("spring.kafka.bootstrap-servers");
 
 	final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 			.withConfiguration(AutoConfigurations.of(
@@ -52,11 +48,6 @@ public class KafkaSupplierTests {
 					KafkaAutoConfiguration.class,
 					KafkaSupplierConfiguration.class,
 					SpelExpressionConverterConfiguration.class));
-
-	@BeforeAll
-	static void initializeEmbeddedKafka() {
-		EMBEDDED_KAFKA.afterPropertiesSet();
-	}
 
 	@Test
 	void recordModeAndTopicPattern() {

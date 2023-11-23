@@ -1,0 +1,5 @@
+dependencies {
+    api project(':aws-s3-common')
+    api project(':file-common')
+    api project(':metadata-store-common')
+}

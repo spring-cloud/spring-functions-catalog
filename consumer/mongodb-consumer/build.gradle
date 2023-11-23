@@ -1,0 +1,6 @@
+dependencies {
+    api 'org.springframework.integration:spring-integration-mongodb'
+    api 'org.mongodb:mongodb-driver-reactivestreams'
+
+    testImplementation 'org.testcontainers:mongodb'
+}

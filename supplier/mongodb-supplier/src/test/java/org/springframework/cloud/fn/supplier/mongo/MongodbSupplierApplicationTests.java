@@ -32,7 +32,7 @@ import reactor.test.StepVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.cloud.fn.common.mongo.MongoDbTestContainerSupport;
+import org.springframework.cloud.fn.consumer.mongo.MongoDbTestContainerSupport;
 import org.springframework.messaging.Message;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -95,6 +95,7 @@ class MongodbSupplierApplicationTests implements MongoDbTestContainerSupport {
 		assertThat(this.mongodbSupplier.get().collectList().block()).isEmpty();
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<String, Object> toMap(Message<?> message) {
 		Map<String, Object> map = null;
 		try {

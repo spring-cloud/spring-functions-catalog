@@ -33,7 +33,7 @@ abstract class KeyValueListParser {
 	static Map<String, String> parseCommaDelimitedKeyValuePairs(String value) {
 		Map<String, String> keyValuePairs = new HashMap<>();
 
-		if (StringUtils.isEmpty(value)) {
+		if (!StringUtils.hasText(value)) {
 			return keyValuePairs;
 		}
 

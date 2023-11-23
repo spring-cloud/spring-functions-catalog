@@ -47,7 +47,7 @@ public class ExplicitTableCreationTests extends JdbcConsumerApplicationTests {
 		Payload result =
 				jdbcOperations.query("select a, b from foobar", new BeanPropertyRowMapper<>(Payload.class))
 						.get(0);
-		assertThat(result).isEqualToComparingFieldByField(sent);
+		assertThat(result).usingRecursiveComparison().isEqualTo(sent);
 	}
 
 }

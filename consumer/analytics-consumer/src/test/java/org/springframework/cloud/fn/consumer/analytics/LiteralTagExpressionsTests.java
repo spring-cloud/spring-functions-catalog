@@ -38,8 +38,7 @@ public class LiteralTagExpressionsTests extends AnalyticsConsumerParentTest {
 
 	@Test
 	void testCounterSink() {
-
-		IntStream.range(0, 13).forEach(i -> analyticsConsumer.accept(new GenericMessage("hello")));
+		IntStream.range(0, 13).forEach(i -> analyticsConsumer.accept(new GenericMessage<>("hello")));
 
 		Counter fooCounter = meterRegistry.find("counter666").tag("foo", "bar").counter();
 		assertThat(fooCounter.count()).isEqualTo(13.0);
@@ -49,4 +48,5 @@ public class LiteralTagExpressionsTests extends AnalyticsConsumerParentTest {
 
 		assertThat(fooCounter.getId()).isEqualTo(gorkCounter.getId());
 	}
+
 }

@@ -35,20 +35,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 class GaugeWithAmountTest extends AnalyticsConsumerParentTest {
 
 	@Test
-	void testАnalyticsSink() {
+	void testAnalyticsSink() {
 		String messageSmall = "hello";
-		analyticsConsumer.accept(new GenericMessage(messageSmall));
+		analyticsConsumer.accept(new GenericMessage<>(messageSmall));
 		assertThat(meterRegistry.find("myGauge").gauge().value()).isEqualTo(size(messageSmall));
 
 		assertThat(meterRegistry.find("myGauge").gauge().getId().getTags()).hasSize(1);
 		assertThat(meterRegistry.find("myGauge").gauge().getId().getTag("foo")).isEqualTo("bar");
 
 		String messageMiddle = "hello world";
-		analyticsConsumer.accept(new GenericMessage(messageMiddle));
+		analyticsConsumer.accept(new GenericMessage<>(messageMiddle));
 		assertThat(meterRegistry.find("myGauge").gauge().value()).isEqualTo(size(messageMiddle));
 
 		String messageLarge = "hello world, hello people!";
-		analyticsConsumer.accept(new GenericMessage(messageLarge));
+		analyticsConsumer.accept(new GenericMessage<>(messageLarge));
 		assertThat(meterRegistry.find("myGauge").gauge().value()).isEqualTo(size(messageLarge));
 
 	}
@@ -56,4 +56,5 @@ class GaugeWithAmountTest extends AnalyticsConsumerParentTest {
 	private double size(String msg) {
 		return Long.valueOf(msg.length()).doubleValue();
 	}
+
 }

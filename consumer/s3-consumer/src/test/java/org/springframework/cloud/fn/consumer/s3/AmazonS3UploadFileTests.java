@@ -69,7 +69,7 @@ public class AmazonS3UploadFileTests extends AbstractAwsS3ConsumerMockTests {
 
 		AsyncRequestBody asyncRequestBody = asyncRequestBodyArgumentCaptor.getValue();
 		StepVerifier.create(asyncRequestBody)
-				.assertNext(buffer -> assertThat(buffer.array()).isEmpty())
+				.assertNext(buffer -> assertThat(TestUtils.getPropertyValue(buffer, "hb", byte[].class)).isEmpty())
 				.expectComplete()
 				.verify();
 

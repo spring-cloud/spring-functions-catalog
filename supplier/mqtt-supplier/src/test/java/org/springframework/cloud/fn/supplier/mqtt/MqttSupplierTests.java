@@ -58,7 +58,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 				"mqtt.ssl-properties.com.ibm.ssl.protocol=TLS",
 				"mqtt.ssl-properties.com.ibm.ssl.keyStoreType=TEST"})
 @DirtiesContext
-@Tag("integration")
 public class MqttSupplierTests {
 
 	static {

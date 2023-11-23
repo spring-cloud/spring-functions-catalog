@@ -1,0 +1,5 @@
+dependencies {
+    api 'org.springframework.integration:spring-integration-kafka'
+
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+}

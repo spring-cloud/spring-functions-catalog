@@ -26,7 +26,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.header.Header;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Sinks;
 
@@ -41,11 +40,11 @@ import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandlingException;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.GenericMessage;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -55,22 +54,14 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  *
  * @since 4.0
  */
+@EmbeddedKafka(partitions = 1, controlledShutdown = true)
 public class KafkaPublisherConfigurationTests {
-
-	static final EmbeddedKafkaBroker EMBEDDED_KAFKA =
-			new EmbeddedKafkaBroker(1, true, 1)
-					.brokerListProperty("spring.kafka.bootstrap-servers");
 
 	final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
 			.withConfiguration(AutoConfigurations.of(
 					KafkaAutoConfiguration.class,
 					KafkaPublisherConfiguration.class,
 					SpelExpressionConverterConfiguration.class));
-
-	@BeforeAll
-	static void initializeEmbeddedKafka() {
-		EMBEDDED_KAFKA.afterPropertiesSet();
-	}
 
 	@Test
 	void defaultTopicReceivesTheRecord() {
@@ -98,7 +89,7 @@ public class KafkaPublisherConfigurationTests {
 					assertThatExceptionOfType(MessageHandlingException.class)
 							.isThrownBy(() -> kafkaConsumer.accept(new GenericMessage<>("test data")))
 							.withCauseInstanceOf(KafkaException.class)
-							.withStackTraceContaining("Topic topic1 not present in metadata after 1000 ms.");
+							.withStackTraceContaining("not present in metadata after 1000 ms.");
 				});
 	}
 

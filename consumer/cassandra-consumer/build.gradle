@@ -1,0 +1,6 @@
+dependencies {
+    api 'org.springframework.integration:spring-integration-cassandra'
+    api 'org.springframework.boot:spring-boot-starter-data-cassandra-reactive'
+
+    testImplementation 'org.testcontainers:cassandra'
+}

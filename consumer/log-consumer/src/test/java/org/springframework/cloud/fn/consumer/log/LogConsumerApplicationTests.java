@@ -62,6 +62,7 @@ class LogConsumerApplicationTests {
 		testMessage(message, "{\"foo\":\"bar\"}");
 	}
 
+	@SuppressWarnings("unchecked")
 	private void testMessage(Message<?> message, String expectedPayload) {
 		assertThat(this.loggingHandler.getLevel()).isEqualTo(LoggingHandler.Level.WARN);
 		LogAccessor logger = TestUtils.getPropertyValue(this.loggingHandler, "messageLogger", LogAccessor.class);

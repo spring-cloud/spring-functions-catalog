@@ -44,7 +44,7 @@ import static java.awt.image.BufferedImage.TYPE_3BYTE_BGR;
 
 /**
  *
- * Semantic image segmentation - the task of assigning a semantic label, such as “road”, “sky”, “person”, “dog”, to
+ * Semantic image segmentation - the task of assigning a semantic label, such as "road", "sky", "person", "dog", to
  * every pixel in an image.
  *
  * https://ai.googleblog.com/2018/03/semantic-image-segmentation-with.html

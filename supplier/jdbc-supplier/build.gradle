@@ -1,0 +1,12 @@
+dependencies {
+    api project(':splitter-function')
+    api 'org.springframework.integration:spring-integration-jdbc'
+    api 'org.springframework.boot:spring-boot-starter-jdbc'
+    api 'org.springframework.cloud:spring-cloud-function-context'
+
+    runtimeOnly 'org.hsqldb:hsqldb'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+    runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
+}

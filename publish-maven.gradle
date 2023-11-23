@@ -1,0 +1,72 @@
+apply plugin: 'maven-publish'
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			pom {
+				afterEvaluate {
+					name = project.description
+					description = project.description
+				}
+				url = 'https://github.com/spring-cloud/spring-functions-catalog'
+				organization {
+					name = 'Spring IO'
+					url = 'https://spring.io/projects/spring-functions-catalog'
+				}
+				licenses {
+					license {
+						name = 'Apache License, Version 2.0'
+						url = 'https://www.apache.org/licenses/LICENSE-2.0.txt'
+						distribution = 'repo'
+					}
+				}
+				scm {
+					url = 'https://github.com/spring-cloud/spring-functions-catalog'
+					connection = 'https://github.com/spring-cloud/spring-functions-catalog.git'
+					developerConnection = 'git@github.com/spring-cloud/spring-functions-catalog.git'
+				}
+				developers {
+					developer {
+						id = 'artembilan'
+						name = 'Artem Bilan'
+						email = 'abilan@vmware.com'
+						roles = ['project lead']
+					}
+					developer {
+						id = 'corneil'
+						name = 'Corneil du Plessis'
+						email = 'pcorneil@vmware.com'
+					}
+					developer {
+						id = 'sobychacko'
+						name = 'Soby Chacko'
+						email = 'chackos@vmware.com'
+					}
+					developer {
+						id = 'onobc'
+						name = 'Chris Bono'
+						email = 'cbono@vmware.com'
+					}
+					developer {
+						id = 'tzolov'
+						name = 'Christian Tzolov'
+						email = 'ctzolov@vmware.com'
+					}
+				}
+				issueManagement {
+					system = 'GitHub'
+					url = 'https://github.com/spring-cloud/spring-functions-catalog/issues'
+				}
+			}
+			versionMapping {
+				usage('java-api') {
+					fromResolutionResult()
+				}
+				usage('java-runtime') {
+					fromResolutionResult()
+				}
+			}
+		}
+	}
+}
+

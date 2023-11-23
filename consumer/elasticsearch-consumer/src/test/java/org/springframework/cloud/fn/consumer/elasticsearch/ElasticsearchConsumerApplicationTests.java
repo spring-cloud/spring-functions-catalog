@@ -60,6 +60,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 @Tag("integration")
 @Testcontainers(disabledWithoutDocker = true)
 public class ElasticsearchConsumerApplicationTests {
+
 	private static final Logger log = LoggerFactory.getLogger(ElasticsearchConsumerApplicationTests.class);
 
 	@Container
@@ -73,6 +74,7 @@ public class ElasticsearchConsumerApplicationTests {
 		.withUserConfiguration(ElasticsearchConsumerTestApplication.class, SpelExpressionConverterConfiguration.class);
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testBasicJsonString() {
 		this.contextRunner
 			.withPropertyValues("elasticsearch.consumer.index=foo", "elasticsearch.consumer.id=1",
@@ -96,6 +98,7 @@ public class ElasticsearchConsumerApplicationTests {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testIdPassedAsMessageHeader() {
 		this.contextRunner
 			.withPropertyValues("elasticsearch.consumer.index=foo",
@@ -121,6 +124,7 @@ public class ElasticsearchConsumerApplicationTests {
 	}
 
 	@Test
+	@SuppressWarnings({ "unchecked", "rawtypes"})
 	public void testJsonAsMap() {
 		this.contextRunner
 			.withPropertyValues("elasticsearch.consumer.index=foo", "elasticsearch.consumer.id=3",
@@ -152,6 +156,7 @@ public class ElasticsearchConsumerApplicationTests {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testAsyncIndexing() {
 		this.contextRunner
 			.withPropertyValues("elasticsearch.consumer.index=foo", "elasticsearch.consumer.async=true",
@@ -177,6 +182,7 @@ public class ElasticsearchConsumerApplicationTests {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testBulkIndexingWithIdFromHeader() {
 		this.contextRunner
 			.withPropertyValues("elasticsearch.consumer.index=foo_" + UUID.randomUUID(), "elasticsearch.consumer.batch-size=10",
@@ -216,6 +222,7 @@ public class ElasticsearchConsumerApplicationTests {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testBulkIndexingItemFailure() {
 		this.contextRunner
 			.withPropertyValues("elasticsearch.consumer.index=foo_" + UUID.randomUUID(), "elasticsearch.consumer.batch-size=10",
@@ -260,6 +267,7 @@ public class ElasticsearchConsumerApplicationTests {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testIndexFromMessageHeader() {
 		this.contextRunner
 			.withPropertyValues("elasticsearch.consumer.index=foo",

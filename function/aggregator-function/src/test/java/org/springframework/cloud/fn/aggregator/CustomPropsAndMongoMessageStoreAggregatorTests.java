@@ -24,7 +24,7 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
-import org.springframework.cloud.fn.common.mongo.MongoDbTestContainerSupport;
+import org.springframework.cloud.fn.consumer.mongo.MongoDbTestContainerSupport;
 import org.springframework.integration.mongodb.store.ConfigurableMongoDbMessageStore;
 import org.springframework.integration.test.util.TestUtils;
 import org.springframework.messaging.Message;

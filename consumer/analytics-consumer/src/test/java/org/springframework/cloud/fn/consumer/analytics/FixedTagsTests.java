@@ -38,8 +38,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class FixedTagsTests extends AnalyticsConsumerParentTest {
 
 	@Test
-	void testАnalyticsSink() {
-		IntStream.range(0, 13).forEach(i -> analyticsConsumer.accept(new GenericMessage("hello")));
+	void testAnalyticsSink() {
+		IntStream.range(0, 13).forEach(i -> analyticsConsumer.accept(new GenericMessage<>("hello")));
 		Meter counterMeter = meterRegistry.find("counter666").meter();
 		assertThat(StreamSupport.stream(counterMeter.measure().spliterator(), false)
 				.mapToDouble(m -> m.getValue()).sum()).isEqualTo(13.0);

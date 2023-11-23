@@ -43,6 +43,7 @@ public class NonSplitJdbcSupplierTests {
 	Supplier<Message<?>> jdbcSupplier;
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void testExtraction() {
 		final Message<?> message = jdbcSupplier.get();
 		final List<Map<?, ?>> payload = (List<Map<?, ?>>) message.getPayload();

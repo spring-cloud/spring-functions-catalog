@@ -79,11 +79,12 @@ public class RsocketConsumerTests {
 	@SpringBootConfiguration
 	@Controller
 	static class RSocketserverApplication {
+
 		static final ReplayProcessor<String> fireForgetPayloads = ReplayProcessor.create();
 
 		@MessageMapping("test-route")
 		void someMethod(String payload) {
-			this.fireForgetPayloads.onNext(payload);
+			fireForgetPayloads.onNext(payload);
 		}
 	}
 }

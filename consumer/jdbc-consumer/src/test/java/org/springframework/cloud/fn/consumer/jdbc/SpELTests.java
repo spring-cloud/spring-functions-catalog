@@ -46,7 +46,7 @@ public class SpELTests extends JdbcConsumerApplicationTests {
 		Payload expected = new Payload("hell", 666);
 		Payload result = jdbcOperations
 				.query("select a, b from messages", new BeanPropertyRowMapper<>(Payload.class)).get(0);
-		assertThat(result).isEqualToComparingFieldByField(expected);
+		assertThat(result).usingRecursiveComparison().isEqualTo(expected);
 	}
 
 }

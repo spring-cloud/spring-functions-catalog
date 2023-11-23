@@ -1,0 +1,6 @@
+dependencies {
+    api project(':payload-converter-function')
+    api 'org.springframework.boot:spring-boot-starter-data-elasticsearch'
+
+    testImplementation 'org.testcontainers:elasticsearch'
+}

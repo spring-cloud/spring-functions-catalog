@@ -35,7 +35,7 @@ public class ExpressionCounterNameTests extends AnalyticsConsumerParentTest {
 
 	@Test
 	void testCounterSink() {
-		IntStream.range(0, 13).forEach(i -> analyticsConsumer.accept(new GenericMessage("hello")));
+		IntStream.range(0, 13).forEach(i -> analyticsConsumer.accept(new GenericMessage<>("hello")));
 		assertThat(meterRegistry.find("hello").counter().count()).isEqualTo(13.0);
 	}
 }

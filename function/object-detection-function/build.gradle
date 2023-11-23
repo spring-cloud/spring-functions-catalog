@@ -1,0 +1,18 @@
+plugins {
+    id 'com.google.protobuf' version '0.9.4'
+}
+
+ext {
+    protobufVersion='3.25.1'
+}
+
+dependencies {
+    api project(':tensorflow-common')
+    api "com.google.protobuf:protobuf-java:$protobufVersion"
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:$protobufVersion"
+    }
+}

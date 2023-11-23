@@ -1,0 +1,173 @@
+buildscript {
+	ext.isCI = System.getenv('GITHUB_ACTION')
+}
+
+plugins {
+	id 'base'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+description = 'Spring Functions Catlog'
+
+ext {
+	javaProjects = subprojects - project(':function-dependencies')
+}
+
+allprojects {
+	group = 'org.springframework.cloud.fn'
+
+	repositories {
+		mavenCentral()
+		maven { url 'https://repo.spring.io/milestone' }
+		if (version.endsWith('SNAPSHOT')) {
+			maven { url 'https://repo.spring.io/snapshot' }
+		}
+//		maven { url 'https://repo.spring.io/libs-staging-local' }
+	}
+
+	ext.javadocLinks = [
+			'https://docs.oracle.com/en/java/javase/17/docs/api/',
+			'https://jakarta.ee/specifications/platform/10/apidocs/',
+			'https://docs.spring.io/spring-framework/docs/current/javadoc-api',
+			'https://docs.spring.io/spring-integration/docs/current/api/'
+	] as String[]
+
+	apply plugin: 'io.spring.dependency-management'
+
+	dependencyManagement {
+		resolutionStrategy {
+			cacheChangingModulesFor 0, 'seconds'
+		}
+		applyMavenExclusions = false
+		generatedPomCustomization {
+			enabled = false
+		}
+
+		imports {
+			mavenBom "org.springframework.boot:spring-boot-dependencies:${property('spring-boot.version')}"
+			mavenBom "org.springframework.cloud:spring-cloud-dependencies:${property('spring-cloud.version')}"
+			mavenBom "software.amazon.awssdk:bom:${property('aws-sdk.version')}"
+			mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${property('spring-cloud-aws.version')}"
+		}
+
+	}
+
+}
+
+configure(javaProjects) { subproject ->
+	apply plugin: 'java-library'
+	apply plugin: 'eclipse'
+	apply plugin: 'idea'
+
+	apply from: "${rootDir}/publish-maven.gradle"
+
+	sourceSets {
+		test {
+			resources {
+				srcDirs = ['src/test/resources', 'src/test/java']
+			}
+		}
+	}
+
+	java {
+		withJavadocJar()
+		withSourcesJar()
+		registerFeature('optional') {
+			usingSourceSet(sourceSets.main)
+		}
+		registerFeature('provided') {
+			usingSourceSet(sourceSets.main)
+		}
+	}
+
+	compileJava {
+		options.release = 17
+		options.compilerArgs << '-parameters'
+	}
+
+	compileTestJava {
+		sourceCompatibility = JavaVersion.VERSION_17
+		targetCompatibility = JavaVersion.VERSION_17
+		options.encoding = 'UTF-8'
+	}
+
+	tasks.withType(JavaCompile).configureEach {
+		options.fork = true
+	}
+
+	tasks.withType(Javadoc) {
+		options.addBooleanOption('Xdoclint:syntax', true) // only check syntax with doclint
+	}
+
+	eclipse {
+		project {
+			natures += 'org.springframework.ide.eclipse.core.springnature'
+		}
+	}
+
+	// dependencies that are common across all java projects
+	dependencies {
+		providedImplementation 'org.springframework.boot:spring-boot-configuration-processor'
+
+		if (subproject.name != 'config-common') {
+			api project(':config-common')
+		}
+
+		api 'org.springframework.boot:spring-boot-starter-validation'
+		api 'org.springframework.boot:spring-boot-starter-json'
+		api 'org.springframework.boot:spring-boot-starter-integration'
+		api 'com.jayway.jsonpath:json-path'
+
+		testImplementation 'org.springframework.boot:spring-boot-starter-test'
+		testImplementation 'org.springframework.integration:spring-integration-test'
+		testImplementation 'io.projectreactor:reactor-test'
+		testImplementation 'org.awaitility:awaitility'
+		testImplementation 'org.testcontainers:junit-jupiter'
+
+		testRuntimeOnly 'org.apache.logging.log4j:log4j-core'
+		testRuntimeOnly 'org.apache.logging.log4j:log4j-jcl'
+	}
+
+	// enable all compiler warnings; individual projects may customize further
+	ext.xLintArg = '-Xlint:all,-options,-processing'
+	[compileJava, compileTestJava]*.options*.compilerArgs = [xLintArg, '-parameters']
+
+	test {
+		maxHeapSize = '2g'
+		jvmArgs '-XX:+HeapDumpOnOutOfMemoryError'
+		useJUnitPlatform()
+
+		enableAssertions = false
+
+		logging.captureStandardOutput(LogLevel.INFO)
+	}
+
+	jar {
+		manifest {
+			attributes(
+					'Implementation-Version': project.version,
+					'Created-By': "JDK ${System.properties['java.version']} (${System.properties['java.specification.vendor']})",
+					'Implementation-Title': subproject.name,
+					'Implementation-Vendor-Id': subproject.group,
+					'Implementation-Vendor': 'Pivotal Software, Inc.',
+					'Implementation-URL': 'https://spring.io/projects/spring-functions-catalog',
+					'Automatic-Module-Name': subproject.name.replace('-', '.')
+			)
+		}
+
+		from("${rootProject.projectDir}") {
+			include 'LICENSE.txt'
+			into 'META-INF'
+		}
+	}
+
+	publishing {
+		publications {
+			mavenJava(MavenPublication) {
+				suppressAllPomMetadataWarnings()
+				from components.java
+			}
+		}
+	}
+
+}

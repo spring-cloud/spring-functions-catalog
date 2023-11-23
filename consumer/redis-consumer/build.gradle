@@ -1,0 +1,4 @@
+dependencies {
+    api 'org.springframework.integration:spring-integration-redis'
+    api 'org.springframework.boot:spring-boot-starter-data-redis'
+}

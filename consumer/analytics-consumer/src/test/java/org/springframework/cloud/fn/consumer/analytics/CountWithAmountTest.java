@@ -37,7 +37,7 @@ class CountWithAmountTest extends AnalyticsConsumerParentTest {
 	void testCounterSink() {
 		String message = "hello world message";
 		double messageSize = Long.valueOf(message.length()).doubleValue();
-		analyticsConsumer.accept(new GenericMessage(message));
+		analyticsConsumer.accept(new GenericMessage<>(message));
 		assertThat(meterRegistry.find("counter666").counter().count()).isEqualTo(messageSize);
 	}
 }

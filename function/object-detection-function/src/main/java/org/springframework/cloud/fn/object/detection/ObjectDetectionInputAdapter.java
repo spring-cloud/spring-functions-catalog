@@ -62,7 +62,7 @@ public class ObjectDetectionInputAdapter implements Function<byte[], Map<String,
 
 	@Override
 	public Map<String, Tensor<?>> apply(byte[] inputImage) {
-		try (Tensor inputTensor = Tensor.create(inputImage)) {
+		try (Tensor<?> inputTensor = Tensor.<Object>create(inputImage)) {
 			return this.imageLoaderGraph.apply(Collections.singletonMap(RAW_IMAGE, inputTensor));
 		}
 	}

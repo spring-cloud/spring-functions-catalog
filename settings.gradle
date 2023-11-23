@@ -1,0 +1,17 @@
+plugins {
+    id 'com.gradle.enterprise' version '3.15.1'
+    id 'io.spring.ge.conventions' version '0.0.13'
+}
+
+rootProject.name = 'spring-functions-catalog'
+
+include 'function-dependencies'
+
+['common', 'consumer', 'function', 'supplier'].each { group ->
+    def groupDir = file(group)
+    groupDir.eachDir { subProject ->
+        include "${subProject.name}"
+        project(":${subProject.name}").projectDir = new File(groupDir.absolutePath, subProject.name)
+    }
+}
+

@@ -1,0 +1,19 @@
+repositories {
+    maven { url 'https://maven.scijava.org/content/repositories/public/' }
+}
+
+dependencies {
+    api project(':debezium-autoconfigure')
+    api "io.debezium:debezium-connector-mysql:$debeziumVersion"
+    api "io.debezium:debezium-connector-mongodb:$debeziumVersion"
+    api "io.debezium:debezium-connector-postgres:$debeziumVersion"
+    api "io.debezium:debezium-connector-oracle:$debeziumVersion"
+    api "io.debezium:debezium-connector-sqlserver:$debeziumVersion"
+    api "io.debezium:debezium-connector-db2:$debeziumVersion"
+    api "io.debezium:debezium-connector-vitess:$debeziumVersion"
+    api "io.debezium:debezium-connector-spanner:$debeziumVersion"
+    api "io.debezium:debezium-connector-spanner:$debeziumVersion"
+
+    testImplementation 'com.zaxxer:HikariCP'
+    testImplementation 'org.springframework:spring-jdbc'
+}

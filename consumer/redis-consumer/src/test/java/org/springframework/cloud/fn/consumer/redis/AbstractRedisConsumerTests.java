@@ -18,8 +18,6 @@ package org.springframework.cloud.fn.consumer.redis;
 
 import java.util.function.Consumer;
 
-import org.junit.jupiter.api.Tag;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -36,7 +34,6 @@ import org.springframework.test.context.DynamicPropertySource;
  */
 @SpringBootTest
 @DirtiesContext
-@Tag("integration")
 public class AbstractRedisConsumerTests implements RedisTestContainerSupport {
 
 	@DynamicPropertySource

@@ -108,7 +108,7 @@ public class ObjectDetectionOutputConverter implements Function<Map<String, Tens
 
 			String[] labelIdToNameMap = new String[maxLabelId + 1];
 			for (StringIntLabelMapOuterClass.StringIntLabelMapItem item : proto.getItemList()) {
-				if (!StringUtils.isEmpty(item.getDisplayName())) {
+				if (StringUtils.hasText(item.getDisplayName())) {
 					labelIdToNameMap[item.getId()] = item.getDisplayName();
 				}
 				else {

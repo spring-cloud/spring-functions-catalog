@@ -46,6 +46,7 @@ public class DefaultJdbcSupplierTests {
 	JdbcTemplate jdbcTemplate;
 
 	@Test
+	@SuppressWarnings({ "unchecked", "rawtypes"})
 	void testExtraction() {
 		final Flux<Message<?>> messageFlux = jdbcSupplier.get();
 		StepVerifier stepVerifier =

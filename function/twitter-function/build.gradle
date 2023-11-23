@@ -1,0 +1,10 @@
+ext {
+    mockserverVersion='5.13.2'
+}
+
+dependencies {
+    api project(':twitter-common')
+
+    testImplementation "org.mock-server:mockserver-netty:$mockserverVersion"
+    testImplementation "org.mock-server:mockserver-client-java:$mockserverVersion"
+}

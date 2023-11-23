@@ -1,0 +1,20 @@
+ext {
+    curatorVersion = '5.5.0'
+}
+
+dependencies {
+    optionalApi 'org.springframework.integration:spring-integration-redis'
+    optionalApi 'org.springframework.boot:spring-boot-starter-data-redis'
+    optionalApi 'org.springframework.integration:spring-integration-mongodb'
+    optionalApi 'org.springframework.boot:spring-boot-starter-data-mongodb'
+    optionalApi 'org.springframework.integration:spring-integration-jdbc'
+    optionalApi 'org.springframework.boot:spring-boot-starter-data-jdbc'
+    optionalApi 'io.awspring.cloud:spring-cloud-aws-starter'
+    optionalApi 'org.springframework.integration:spring-integration-zookeeper'
+    optionalApi 'org.springframework.integration:spring-integration-hazelcast'
+    optionalApi "org.springframework.integration:spring-integration-aws:${property('spring-integration-aws.version')}"
+    api 'software.amazon.awssdk:dynamodb'
+
+    testImplementation 'org.hsqldb:hsqldb'
+    testImplementation "org.apache.curator:curator-test:$curatorVersion"
+}

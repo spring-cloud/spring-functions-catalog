@@ -1,0 +1,4 @@
+dependencies {
+    api project(':twitter-common')
+    api project(':payload-converter-function')
+}

@@ -1,0 +1,8 @@
+dependencies {
+    api 'org.springframework.integration:spring-integration-jms'
+
+    providedImplementation 'jakarta.jms:jakarta.jms-api'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-artemis'
+    testImplementation 'org.apache.activemq:artemis-jakarta-server'
+}

@@ -61,6 +61,7 @@ import org.springframework.integration.handler.MessageProcessor;
 import org.springframework.integration.metadata.ConcurrentMetadataStore;
 import org.springframework.integration.sftp.dsl.Sftp;
 import org.springframework.integration.sftp.dsl.SftpInboundChannelAdapterSpec;
+import org.springframework.integration.sftp.dsl.SftpStreamingInboundChannelAdapterSpec;
 import org.springframework.integration.sftp.dsl.SftpOutboundGatewaySpec;
 import org.springframework.integration.sftp.filters.SftpPersistentAcceptOnceFileListFilter;
 import org.springframework.integration.sftp.filters.SftpRegexPatternFileListFilter;
@@ -193,7 +194,7 @@ public class SftpSupplierConfiguration {
 		 * @return a {@link MessageSource}.
 		 */
 		@Bean
-		public MessageSource<?> targetMessageSource(SftpRemoteFileTemplate sftpTemplate,
+		public SftpStreamingInboundChannelAdapterSpec targetMessageSource(SftpRemoteFileTemplate sftpTemplate,
 				SftpSupplierProperties sftpSupplierProperties,
 				FileListFilter<SftpClient.DirEntry> fileListFilter) {
 
@@ -201,7 +202,7 @@ public class SftpSupplierConfiguration {
 					.remoteDirectory(remoteDirectory(sftpSupplierProperties))
 					.remoteFileSeparator(sftpSupplierProperties.getRemoteFileSeparator())
 					.filter(fileListFilter)
-					.maxFetchSize(sftpSupplierProperties.getMaxFetch()).get();
+					.maxFetchSize(sftpSupplierProperties.getMaxFetch());
 		}
 
 		@Bean
