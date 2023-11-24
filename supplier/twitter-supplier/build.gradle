@@ -5,8 +5,7 @@ ext {
 dependencies {
     api project(':twitter-common')
     api 'org.springframework.integration:spring-integration-jms'
-
-    providedImplementation 'jakarta.jms:jakarta.jms-api'
+    api 'jakarta.jms:jakarta.jms-api'
 
     testImplementation "org.mock-server:mockserver-netty:$mockserverVersion"
     testImplementation "org.mock-server:mockserver-client-java:$mockserverVersion"

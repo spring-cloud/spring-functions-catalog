@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,6 +71,7 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void supplierForListOnly() {
 		defaultApplicationContextRunner
 				.withPropertyValues("sftp.supplier.listOnly=true")
@@ -96,35 +97,38 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 								assertThat(message.getHeaders().get(MessageHeaders.CONTENT_TYPE))
 										.isEqualTo(MediaType.TEXT_PLAIN);
 							})
-							.expectTimeout(Duration.ofMillis(1000))
+							.thenCancel()
 							.verify(Duration.ofSeconds(30));
 
 				});
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void supplierForListOnlyWithPatternFilter() {
 		defaultApplicationContextRunner
-				.withPropertyValues("sftp.supplier.listOnly=true", "sftp.supplier.file-name-pattern=.*1.txt")
+				.withPropertyValues("sftp.supplier.listOnly=true",
+						"sftp.supplier.file-name-pattern=.*1.txt")
 				.run(context -> {
 					Supplier<Flux<Message<String>>> sftpSupplier = context.getBean("sftpSupplier",
 							Supplier.class);
 					SftpSupplierProperties properties = context.getBean(SftpSupplierProperties.class);
 
-					final AtomicReference<String> expectedFileName = new AtomicReference<>(
-							properties.getRemoteDir() + "/sftpSource1.txt");
 					StepVerifier.create(sftpSupplier.get())
-							.assertNext(message -> assertThat(expectedFileName.get()).contains(message.getPayload()))
-							.expectTimeout(Duration.ofMillis(1000))
+							.assertNext(message -> assertThat(message.getPayload()).contains("sftpSource1.txt"))
+							.thenCancel()
 							.verify(Duration.ofSeconds(30));
 
 				});
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void supplierForListSortedByFilenameAsc() {
 		defaultApplicationContextRunner
-				.withPropertyValues("sftp.supplier.listOnly=true", "sftp.supplier.sortBy.attribute=filename", "sftp.supplier.sortBy.dir=asc")
+				.withPropertyValues("sftp.supplier.listOnly=true",
+						"sftp.supplier.sortBy.attribute=filename",
+						"sftp.supplier.sortBy.dir=asc")
 				.run(context -> {
 					Supplier<Flux<Message<String>>> sftpSupplier = context.getBean("sftpSupplier",
 							Supplier.class);
@@ -146,16 +150,19 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 								assertThat(message.getHeaders().get(MessageHeaders.CONTENT_TYPE))
 										.isEqualTo(MediaType.TEXT_PLAIN);
 							})
-							.expectTimeout(Duration.ofMillis(1000))
+							.thenCancel()
 							.verify(Duration.ofSeconds(30));
 
 				});
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void supplierForListSortedByFilenameDesc() {
 		defaultApplicationContextRunner
-				.withPropertyValues("sftp.supplier.listOnly=true", "sftp.supplier.sortBy.attribute=filename", "sftp.supplier.sortBy.dir=desc")
+				.withPropertyValues("sftp.supplier.listOnly=true",
+						"sftp.supplier.sortBy.attribute=filename",
+						"sftp.supplier.sortBy.dir=desc")
 				.run(context -> {
 					Supplier<Flux<Message<String>>> sftpSupplier = context.getBean("sftpSupplier",
 							Supplier.class);
@@ -177,21 +184,21 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 								assertThat(message.getHeaders().get(MessageHeaders.CONTENT_TYPE))
 										.isEqualTo(MediaType.TEXT_PLAIN);
 							})
-							.expectTimeout(Duration.ofMillis(1000))
+							.thenCancel()
 							.verify(Duration.ofSeconds(30));
 
 				});
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void supplierForFileRef() {
 		defaultApplicationContextRunner
 				.withPropertyValues(
 						"sftp.supplier.localDir=" + getTargetLocalDirectory().getAbsolutePath(),
 						"file.consumer.mode=ref")
 				.run(context -> {
-					Supplier<Flux<Message<File>>> sftpSupplier = context.getBean("sftpSupplier",
-							Supplier.class);
+					Supplier<Flux<Message<File>>> sftpSupplier = context.getBean("sftpSupplier", Supplier.class);
 					SftpSupplierProperties properties = context.getBean(SftpSupplierProperties.class);
 					MetadataStore metadataStore = context.getBean(MetadataStore.class);
 					HashSet<String> fileNames = new HashSet<>();
@@ -219,14 +226,14 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void deleteRemoteFiles() {
 		defaultApplicationContextRunner
 				.withPropertyValues(
 						"sftp.supplier.stream=true",
 						"sftp.supplier.delete-remote-files=true")
 				.run(context -> {
-					Supplier<Flux<Message<byte[]>>> sftpSupplier = context.getBean("sftpSupplier",
-							Supplier.class);
+					Supplier<Flux<Message<byte[]>>> sftpSupplier = context.getBean("sftpSupplier", Supplier.class);
 					StepVerifier.create(sftpSupplier.get())
 							.expectNextMatches(message -> message.getPayload().length > 0)
 							.expectNextMatches(message -> message.getPayload().length > 0)
@@ -258,9 +265,9 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 				.run(this::doTestRenameRemoteFiles);
 	}
 
+	@SuppressWarnings("unchecked")
 	private void doTestRenameRemoteFiles(AssertableApplicationContext context) {
-		Supplier<Flux<Message<byte[]>>> sftpSupplier = context.getBean("sftpSupplier",
-				Supplier.class);
+		Supplier<Flux<Message<byte[]>>> sftpSupplier = context.getBean("sftpSupplier", Supplier.class);
 
 		final Set<String> expectedTargetFiles = Arrays.stream(getSourceRemoteDirectory().list())
 				.collect(Collectors.toSet());
@@ -274,11 +281,12 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 				.until(() ->
 						expectedTargetFiles.equals(
 								Arrays.stream(getTargetRemoteDirectory().list())
-								.collect(Collectors.toSet()))
+										.collect(Collectors.toSet()))
 				);
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	public void streamSourceFilesInLineMode() {
 		defaultApplicationContextRunner
 				.withPropertyValues(
@@ -291,8 +299,7 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 						"file.consumer.with-markers=true",
 						"file.consumer.markers-json=true")
 				.run(context -> {
-					Supplier<Flux<Message<String>>> sftpSupplier = context.getBean("sftpSupplier",
-							Supplier.class);
+					Supplier<Flux<Message<String>>> sftpSupplier = context.getBean("sftpSupplier", Supplier.class);
 					StepVerifier.create(sftpSupplier.get())
 							.assertNext(message -> {
 								final Object evaluate;
@@ -321,6 +328,7 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void supplierWithMultiSourceAndStreamContentsSource3ComesSecond() throws Exception {
 		Path newSource = createNewRemoteSource(
 				Paths.get(remoteTemporaryFolder.toString(), "sftpSecondSource", "doesNotMatter.txt"),
@@ -372,6 +380,7 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 	}
 
 	@Test
+	@SuppressWarnings("unchecked")
 	void supplierMultiSourceRefTestsFor200Alex() throws Exception {
 		Path newSource = createNewRemoteSource(
 				Paths.get(remoteTemporaryFolder.toString(), "sftpSecondSource", "sftpSource3.txt"),

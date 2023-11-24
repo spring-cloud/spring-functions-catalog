@@ -9,6 +9,11 @@ plugins {
 
 description = 'Spring Functions Catlog'
 
+
+if (tasks.findByName('artifactoryPublish')) {
+	artifactoryPublish.skip = true
+}
+
 ext {
 	javaProjects = subprojects - project(':function-dependencies')
 }
@@ -46,7 +51,6 @@ allprojects {
 		imports {
 			mavenBom "org.springframework.boot:spring-boot-dependencies:${property('spring-boot.version')}"
 			mavenBom "org.springframework.cloud:spring-cloud-dependencies:${property('spring-cloud.version')}"
-			mavenBom "software.amazon.awssdk:bom:${property('aws-sdk.version')}"
 			mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:${property('spring-cloud-aws.version')}"
 		}
 
@@ -75,14 +79,10 @@ configure(javaProjects) { subproject ->
 		registerFeature('optional') {
 			usingSourceSet(sourceSets.main)
 		}
-		registerFeature('provided') {
-			usingSourceSet(sourceSets.main)
-		}
 	}
 
 	compileJava {
 		options.release = 17
-		options.compilerArgs << '-parameters'
 	}
 
 	compileTestJava {
@@ -107,7 +107,7 @@ configure(javaProjects) { subproject ->
 
 	// dependencies that are common across all java projects
 	dependencies {
-		providedImplementation 'org.springframework.boot:spring-boot-configuration-processor'
+		annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
 		if (subproject.name != 'config-common') {
 			api project(':config-common')
@@ -128,9 +128,7 @@ configure(javaProjects) { subproject ->
 		testRuntimeOnly 'org.apache.logging.log4j:log4j-jcl'
 	}
 
-	// enable all compiler warnings; individual projects may customize further
-	ext.xLintArg = '-Xlint:all,-options,-processing'
-	[compileJava, compileTestJava]*.options*.compilerArgs = [xLintArg, '-parameters']
+	[compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:all,-options,-processing', '-parameters']
 
 	test {
 		maxHeapSize = '2g'
@@ -149,7 +147,7 @@ configure(javaProjects) { subproject ->
 					'Created-By': "JDK ${System.properties['java.version']} (${System.properties['java.specification.vendor']})",
 					'Implementation-Title': subproject.name,
 					'Implementation-Vendor-Id': subproject.group,
-					'Implementation-Vendor': 'Pivotal Software, Inc.',
+					'Implementation-Vendor': 'VMware, Inc.',
 					'Implementation-URL': 'https://spring.io/projects/spring-functions-catalog',
 					'Automatic-Module-Name': subproject.name.replace('-', '.')
 			)
