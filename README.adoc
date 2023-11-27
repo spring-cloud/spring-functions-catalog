@@ -1,11 +1,16 @@
-# Spring Functions Catalog
+= Spring Functions Catalog
 
 
 In this repository, you will find a collection of components that can meet various data integration use cases and requirements.
 
 The repository's primary focus is to provide a set of standalone Java functions that can be useful in the end-user applications as-is.
 
-=== Reusable Functions
+Most of these functions are, essentially, auto-configurations for specific https://docs.spring.io/spring-integration/reference/endpoint-summary.html#endpoint-summary[Spring Integration Channel Adapter].
+These functions can be consumed in the target project any possible way, for example, the `FunctionFlowBuilder` from https://docs.spring.io/spring-cloud-function/docs/current/reference/html/spring-integration.html#spring-integration[Spring Cloud Function Integration] module can be used to compose an `IntegrationFlow` for any complex solution.
+
+This functions catalog is also a foundation for https://spring.io/projects/spring-cloud-stream-applications[Spring Cloud Stream Applications] project.
+
+== Reusable Functions
 
 |===
 | `java.util.Supplier` | `java.util.Function` | `java.util.Consumer`
