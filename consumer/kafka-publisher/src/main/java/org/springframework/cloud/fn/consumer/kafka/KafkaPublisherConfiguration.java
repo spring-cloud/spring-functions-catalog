@@ -59,7 +59,7 @@ public class KafkaPublisherConfiguration {
 	}
 
 	@Bean
-	public KafkaProducerMessageHandler<?, ?> kafkaProducerMessageHandlerSpec(KafkaTemplate<?, ?> kafkaTemplate,
+	public KafkaProducerMessageHandlerSpec<?, ?, ?> kafkaProducerMessageHandlerSpec(KafkaTemplate<?, ?> kafkaTemplate,
 			KafkaPublisherProperties kafkaPublisherProperties,
 			PublishSubscribeChannel kafkaPublisherSuccessChannel,
 			PublishSubscribeChannel kafkaPublisherFailureChannel,
@@ -91,7 +91,7 @@ public class KafkaPublisherConfiguration {
 			kafkaProducerSpecComponentCustomizer.customize(kafkaProducerMessageHandlerSpec);
 		}
 
-		return kafkaProducerMessageHandlerSpec.getObject();
+		return kafkaProducerMessageHandlerSpec;
 	}
 
 	/**
