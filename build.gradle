@@ -9,11 +9,6 @@ plugins {
 
 description = 'Spring Functions Catlog'
 
-
-if (tasks.findByName('artifactoryPublish')) {
-	artifactoryPublish.skip = true
-}
-
 ext {
 	javaProjects = subprojects - project(':function-dependencies')
 }
