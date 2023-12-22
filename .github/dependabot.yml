@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "sunday"
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
+    open-pull-requests-limit: 10
+    labels: ["type: dependency-upgrade"]
+    groups:
+      development-dependencies:
+        update-types: ["patch"]
+        patterns:
+          - "com.gradle.enterprise"
+          - "com.github.spotbugs"
+          - "io.spring.*"
+          - "org.ajoberstar.grgit"
+          - "com.icegreen:greenmail"
+          - "org.mock-server*"
