@@ -5,7 +5,7 @@ ext {
 dependencies {
     api 'org.springframework.integration:spring-integration-mail'
     api 'org.springframework.boot:spring-boot-starter-mail'
-    api 'org.eclipse.angus:jakarta.mail:2.0.2'
+    api "org.eclipse.angus:jakarta.mail:${property('angus-mail.version')}"
 
     testImplementation "com.icegreen:greenmail:$greenmailVersion"
 }
