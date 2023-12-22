@@ -1,7 +1,3 @@
-ext {
-    curatorVersion = '5.5.0'
-}
-
 dependencies {
     optionalApi 'org.springframework.integration:spring-integration-redis'
     optionalApi 'org.springframework.boot:spring-boot-starter-data-redis'
@@ -12,9 +8,9 @@ dependencies {
     optionalApi 'io.awspring.cloud:spring-cloud-aws-starter'
     optionalApi 'org.springframework.integration:spring-integration-zookeeper'
     optionalApi 'org.springframework.integration:spring-integration-hazelcast'
-    optionalApi "org.springframework.integration:spring-integration-aws:${property('spring-integration-aws.version')}"
+    optionalApi "org.springframework.integration:spring-integration-aws:$springIntegrationAwsVersion"
     api 'software.amazon.awssdk:dynamodb'
 
     testImplementation 'org.hsqldb:hsqldb'
-    testImplementation "org.apache.curator:curator-test:$curatorVersion"
+    testImplementation 'org.apache.curator:curator-test:5.5.0'
 }
