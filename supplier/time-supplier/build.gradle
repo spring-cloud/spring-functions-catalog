@@ -1,3 +1,0 @@
-dependencies {
-    api 'org.apache.commons:commons-lang3'
-}

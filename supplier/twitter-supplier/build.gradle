@@ -3,6 +3,5 @@ dependencies {
     api 'org.springframework.integration:spring-integration-jms'
     api 'jakarta.jms:jakarta.jms-api'
 
-    testImplementation "org.mock-server:mockserver-netty:$mockserverVersion"
-    testImplementation "org.mock-server:mockserver-client-java:$mockserverVersion"
+    testImplementation mockserverNetty
 }

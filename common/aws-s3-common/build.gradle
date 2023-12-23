@@ -1,5 +1,5 @@
 dependencies {
-    api "org.springframework.integration:spring-integration-aws:$springIntegrationAwsVersion"
+    api springIntegrationAws
     api 'io.awspring.cloud:spring-cloud-aws-starter-s3'
     api 'software.amazon.awssdk:aws-crt-client'
     api 'org.springframework.integration:spring-integration-file'

@@ -1,4 +1,4 @@
 dependencies {
-    api 'org.twitter4j:twitter4j-stream:4.0.7'
+    api twitter4jStream
     api 'org.springframework.integration:spring-integration-ip'
 }

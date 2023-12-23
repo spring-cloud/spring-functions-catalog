@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2023 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,26 +16,26 @@
 
 package org.springframework.cloud.fn.supplier.time;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.function.Supplier;
 
-import org.apache.commons.lang3.time.FastDateFormat;
-
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 
 /**
  * @author Soby Chacko
+ * @author Artem Bilan
  */
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties(TimeSupplierProperties.class)
 public class TimeSupplierConfiguration {
 
 	@Bean
 	public Supplier<String> timeSupplier(TimeSupplierProperties timeSupplierProperties) {
-		FastDateFormat fastDateFormat = FastDateFormat.getInstance(timeSupplierProperties.getDateFormat());
-		return () -> fastDateFormat.format(new Date());
+		DateTimeFormatter fastDateFormat = DateTimeFormatter.ofPattern(timeSupplierProperties.getDateFormat());
+		return () -> fastDateFormat.format(LocalDateTime.now());
 	}
 
 }

@@ -1,14 +1,8 @@
-plugins {
-    id 'com.google.protobuf' version '0.9.4'
-}
-
-ext {
-    protobufVersion='3.25.1'
-}
+apply plugin: 'com.google.protobuf'
 
 dependencies {
     api project(':tensorflow-common')
-    api "com.google.protobuf:protobuf-java:$protobufVersion"
+    api protobufJava
 }
 
 protobuf {

@@ -1,17 +1,13 @@
-ext {
-    apicurioVersion = '2.5.1.Final'
-}
-
 repositories {
     maven { url 'https://maven.scijava.org/content/repositories/public/' }
 }
 
 dependencies {
     api 'org.springframework.integration:spring-integration-debezium'
-    api "io.apicurio:apicurio-registry-utils-converter:$apicurioVersion"
-    api "io.apicurio:apicurio-registry-client:$apicurioVersion"
+    api 'io.apicurio:apicurio-registry-utils-converter'
+    api 'io.apicurio:apicurio-registry-client'
 
-    testImplementation "io.debezium:debezium-connector-mysql:$debeziumVersion"
+    testImplementation 'io.debezium:debezium-connector-mysql'
     testImplementation 'org.springframework:spring-jdbc'
     testImplementation 'com.zaxxer:HikariCP'
 }

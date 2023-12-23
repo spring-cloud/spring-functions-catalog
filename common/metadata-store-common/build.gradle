@@ -8,7 +8,7 @@ dependencies {
     optionalApi 'io.awspring.cloud:spring-cloud-aws-starter'
     optionalApi 'org.springframework.integration:spring-integration-zookeeper'
     optionalApi 'org.springframework.integration:spring-integration-hazelcast'
-    optionalApi "org.springframework.integration:spring-integration-aws:$springIntegrationAwsVersion"
+    optionalApi springIntegrationAws
     api 'software.amazon.awssdk:dynamodb'
 
     testImplementation 'org.hsqldb:hsqldb'

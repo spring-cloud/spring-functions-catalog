@@ -2,7 +2,7 @@ dependencies {
     api 'org.junit.jupiter:junit-jupiter-api'
     api 'org.testcontainers:junit-jupiter'
 
-    optionalApi "org.apache.ftpserver:ftpserver-core:$ftpServerVersion"
+    optionalApi ftpserverCore
     optionalApi 'org.springframework.integration:spring-integration-sftp'
     optionalApi 'org.springframework:spring-websocket'
 }
