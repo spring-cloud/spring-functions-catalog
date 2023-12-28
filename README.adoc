@@ -15,84 +15,84 @@ This functions catalog is also a foundation for https://spring.io/projects/sprin
 |===
 | `java.util.Supplier` | `java.util.Function` | `java.util.Consumer`
 
-|link:supplier/debezium-supplier/README.adoc[Debezium supplier]
-|link:function/aggregator-function/README.adoc[Aggregator]
-|link:consumer/analytics-consumer/README.adoc[Analytics]
+|link:supplier/spring-debezium-supplier/README.adoc[Debezium supplier]
+|link:function/spring-aggregator-function/README.adoc[Aggregator]
+|link:consumer/spring-analytics-consumer/README.adoc[Analytics]
 
-|link:supplier/file-supplier/README.adoc[File]
-|link:function/filter-function/README.adoc[Filter]
-|link:consumer/cassandra-consumer/README.adoc[Cassandra]
+|link:supplier/spring-file-supplier/README.adoc[File]
+|link:function/spring-filter-function/README.adoc[Filter]
+|link:consumer/spring-cassandra-consumer/README.adoc[Cassandra]
 
-|link:supplier/ftp-supplier/README.adoc[FTP]
-|link:function/header-enricher-function/README.adoc[Header-Enricher]
-|link:consumer/elasticsearch-consumer/README.adoc[Elasticsearch]
+|link:supplier/spring-ftp-supplier/README.adoc[FTP]
+|link:function/spring-header-enricher-function/README.adoc[Header-Enricher]
+|link:consumer/spring-elasticsearch-consumer/README.adoc[Elasticsearch]
 |
-|link:function/header-filter-function/README.adoc[Header-Filter]
-|link:consumer/file-consumer/README.adoc[File]
+|link:function/spring-header-filter-function/README.adoc[Header-Filter]
+|link:consumer/spring-file-consumer/README.adoc[File]
 
-|link:supplier/http-supplier/README.adoc[HTTP]
-|link:function/http-request-function/README.adoc[HTTP Request]
-|link:consumer/ftp-consumer/README.adoc[FTP]
+|link:supplier/spring-http-supplier/README.adoc[HTTP]
+|link:function/spring-http-request-function/README.adoc[HTTP Request]
+|link:consumer/spring-ftp-consumer/README.adoc[FTP]
 
-|link:supplier/jdbc-supplier/README.adoc[JDBC]
-|link:function/image-recognition-function/README.adoc[Image Recognition(Tensorflow)]
+|link:supplier/spring-jdbc-supplier/README.adoc[JDBC]
+|link:function/spring-image-recognition-function/README.adoc[Image Recognition(Tensorflow)]
 |
-|link:supplier/jms-supplier/README.adoc[JMS]
+|link:supplier/spring-jms-supplier/README.adoc[JMS]
 
-|link:function/object-detection-function/README.adoc[Object Detection(Tensorflow)]
-|link:consumer/jdbc-consumer/README.adoc[JDBC]
+|link:function/spring-object-detection-function/README.adoc[Object Detection(Tensorflow)]
+|link:consumer/spring-jdbc-consumer/README.adoc[JDBC]
 
-|link:supplier/mail-supplier/README.adoc[Mail]
+|link:supplier/spring-mail-supplier/README.adoc[Mail]
 
-|link:function/semantic-segmentation-function/README.adoc[Semantic Segmentation(Tensorflow)]
-|link:consumer/log-consumer/README.adoc[Log]
+|link:function/spring-semantic-segmentation-function/README.adoc[Semantic Segmentation(Tensorflow)]
+|link:consumer/spring-log-consumer/README.adoc[Log]
 
-|link:supplier/mongodb-supplier/README.adoc[MongoDB]
+|link:supplier/spring-mongodb-supplier/README.adoc[MongoDB]
 
-|link:function/spel-function/README.adoc[SpEL]
-|link:consumer/mongodb-consumer/README.adoc[MongoDB]
+|link:function/spring-spel-function/README.adoc[SpEL]
+|link:consumer/spring-mongodb-consumer/README.adoc[MongoDB]
 
-|link:supplier/mqtt-supplier/README.adoc[MQTT]
+|link:supplier/spring-mqtt-supplier/README.adoc[MQTT]
 
-|link:function/splitter-function/README.adoc[Splitter]
-|link:consumer/mqtt-consumer/README.adoc[MQTT]
+|link:function/spring-splitter-function/README.adoc[Splitter]
+|link:consumer/spring-mqtt-consumer/README.adoc[MQTT]
 
-|link:supplier/rabbit-supplier/README.adoc[RabbitMQ]
-|link:function/task-launch-request-function/README.adoc[Task Launch Request]
-|link:consumer/rabbit-consumer/README.adoc[RabbitMQ]
+|link:supplier/spring-rabbit-supplier/README.adoc[RabbitMQ]
+|link:function/spring-task-launch-request-function/README.adoc[Task Launch Request]
+|link:consumer/spring-rabbit-consumer/README.adoc[RabbitMQ]
 
-|link:supplier/s3-supplier/README.adoc[AWS S3]
+|link:supplier/spring-s3-supplier/README.adoc[AWS S3]
 |
-|link:consumer/redis-consumer/README.adoc[Redis]
+|link:consumer/spring-redis-consumer/README.adoc[Redis]
 
-|link:supplier/sftp-supplier/README.adoc[SFTP]
+|link:supplier/spring-sftp-supplier/README.adoc[SFTP]
 |
-|link:consumer/rsocket-consumer/README.adoc[RSocket]
+|link:consumer/spring-rsocket-consumer/README.adoc[RSocket]
 
-|link:supplier/syslog-supplier/README.adoc[Syslog]
+|link:supplier/spring-syslog-supplier/README.adoc[Syslog]
 |
-|link:consumer/s3-consumer/README.adoc[AWS S3]
+|link:consumer/spring-s3-consumer/README.adoc[AWS S3]
 
-|link:supplier/tcp-supplier/README.adoc[TCP]
+|link:supplier/spring-tcp-supplier/README.adoc[TCP]
 |
-|link:consumer/sftp-consumer/README.adoc[SFTP]
+|link:consumer/spring-sftp-consumer/README.adoc[SFTP]
 
-|link:supplier/time-supplier/README.adoc[Time]
+|link:supplier/spring-time-supplier/README.adoc[Time]
 |
-|link:consumer/tcp-consumer/README.adoc[TCP]
+|link:consumer/spring-tcp-consumer/README.adoc[TCP]
 
-|link:supplier/twitter-supplier/README.adoc[Twitter]
-|link:function/twitter-function/README.adoc[Twitter]
-|link:consumer/twitter-consumer/README.adoc[Twitter]
+|link:supplier/spring-twitter-supplier/README.adoc[Twitter]
+|link:function/spring-twitter-function/README.adoc[Twitter]
+|link:consumer/spring-twitter-consumer/README.adoc[Twitter]
 
-|link:supplier/websocket-supplier/README.adoc[Websocket]
+|link:supplier/spring-websocket-supplier/README.adoc[Websocket]
 |
-|link:consumer/websocket-consumer/README.adoc[Websocket]
+|link:consumer/spring-websocket-consumer/README.adoc[Websocket]
 
 |
 |
-|link:consumer/wavefront-consumer/README.adoc[Wavefront]
-|link:supplier/xmpp-supplier/README.adoc[XMPP]
+|link:consumer/spring-wavefront-consumer/README.adoc[Wavefront]
+|link:supplier/spring-xmpp-supplier/README.adoc[XMPP]
 |
-|link:consumer/xmpp-consumer/README.adoc[XMPP]
+|link:consumer/spring-xmpp-consumer/README.adoc[XMPP]
 |===
