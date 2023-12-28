@@ -12,7 +12,7 @@ plugins {
 description = 'Spring Functions Catlog'
 
 ext {
-	javaProjects = subprojects - project(':function-dependencies')
+	javaProjects = subprojects - project(':spring-function-dependencies')
 }
 
 apply from: 'dependencies.gradle'
@@ -109,8 +109,8 @@ configure(javaProjects) { subproject ->
 	dependencies {
 		annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 
-		if (subproject.name != 'config-common') {
-			api project(':config-common')
+		if (subproject.name != 'spring-config-common') {
+			api project(':spring-config-common')
 		}
 
 		api 'org.springframework.boot:spring-boot-starter-validation'

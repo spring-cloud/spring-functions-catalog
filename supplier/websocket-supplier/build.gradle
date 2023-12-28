@@ -1,7 +1,0 @@
-dependencies {
-    api 'org.springframework.integration:spring-integration-websocket'
-
-    testImplementation 'org.springframework.boot:spring-boot-starter-web'
-    testImplementation 'org.springframework.boot:spring-boot-starter-security'
-    testImplementation project(':function-test-support')
-}

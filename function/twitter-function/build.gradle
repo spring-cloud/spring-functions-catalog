@@ -1,5 +1,0 @@
-dependencies {
-    api project(':twitter-common')
-
-    testImplementation mockserverNetty
-}

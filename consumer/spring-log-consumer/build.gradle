@@ -1,0 +1,5 @@
+dependencies {
+    api project(':spring-payload-converter-function')
+
+    optionalApi 'org.hibernate.validator:hibernate-validator'
+}

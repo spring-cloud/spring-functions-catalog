@@ -1,0 +1,11 @@
+dependencies {
+    api project(':spring-aws-s3-common')
+    api project(':spring-file-common')
+    api 'software.amazon.awssdk:s3-transfer-manager'
+
+    testImplementation 'org.springframework:spring-web'
+}
+
+tasks.withType(JavaForkOptions) {
+    jvmArgs '--add-opens', 'java.base/java.nio=ALL-UNNAMED'
+}

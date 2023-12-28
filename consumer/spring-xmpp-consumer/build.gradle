@@ -1,0 +1,5 @@
+dependencies {
+    api project(':spring-xmpp-common')
+
+    testImplementation project(':spring-function-test-support')
+}

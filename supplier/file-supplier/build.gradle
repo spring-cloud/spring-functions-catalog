@@ -1,8 +1,0 @@
-dependencies {
-    api project(':file-common')
-    api project(':metadata-store-common')
-
-    testImplementation 'org.springframework.integration:spring-integration-jdbc'
-    testImplementation 'org.springframework.boot:spring-boot-starter-jdbc'
-    testImplementation 'org.hsqldb:hsqldb'
-}
