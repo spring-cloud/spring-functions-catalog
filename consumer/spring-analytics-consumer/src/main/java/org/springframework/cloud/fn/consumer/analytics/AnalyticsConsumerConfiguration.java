@@ -62,20 +62,24 @@ public class AnalyticsConsumerConfiguration {
 	private final Map<Meter.Id, AtomicLong> gaugeValues = new ConcurrentHashMap<>();
 
 	@Bean(name = "analyticsConsumer")
-	public Consumer<Message<?>> analyticsConsumer(AnalyticsConsumerProperties properties, MeterRegistry[] meterRegistries,
+	public Consumer<Message<?>> analyticsConsumer(AnalyticsConsumerProperties properties,
+			MeterRegistry[] meterRegistries,
 			@Lazy @Qualifier(SpelExpressionConverterConfiguration.INTEGRATION_EVALUATION_CONTEXT) EvaluationContext context) {
 
-		// If the CompositeMeterRegistry is present the it already contains all non-composite registries.
-		// In this case we override the input meterRegistries to use the CompositeMeterRegistry only.
+		// If the CompositeMeterRegistry is present the it already contains all
+		// non-composite registries.
+		// In this case we override the input meterRegistries to use the
+		// CompositeMeterRegistry only.
 		final MeterRegistry[] finalMeterRegistries = Stream.of(meterRegistries)
-				.filter(CompositeMeterRegistry.class::isInstance)
-				.findFirst()
-				.map(meterRegistry -> new MeterRegistry[] { meterRegistry })
-				.orElse(meterRegistries);
+			.filter(CompositeMeterRegistry.class::isInstance)
+			.findFirst()
+			.map(meterRegistry -> new MeterRegistry[] { meterRegistry })
+			.orElse(meterRegistries);
 
 		return message -> {
 
-			CharSequence meterNameRaw = properties.getComputedNameExpression().getValue(context, message, CharSequence.class);
+			CharSequence meterNameRaw = properties.getComputedNameExpression()
+				.getValue(context, message, CharSequence.class);
 			String meterName = StringUtils.isEmpty(meterNameRaw) ? "empty" : meterNameRaw.toString();
 
 			// All fixed tags together are passed with every meter update.
@@ -87,46 +91,52 @@ public class AnalyticsConsumerConfiguration {
 			// Tag Expressions
 			if (properties.getTag().getExpression() != null) {
 
-				Map<String, List<Tag>> groupedTags = properties.getTag().getExpression().entrySet().stream()
-						// maps a <name, expr> pair into [<name, expr#val_1>, ... <name, expr#val_N>] Tag array.
-						.map(namedExpression ->
-								toList(namedExpression.getValue().getValue(context, message)).stream()
-										.map(tagValue -> Tag.of(namedExpression.getKey(), tagValue))
-										.collect(Collectors.toList())).flatMap(List::stream)
-						.collect(Collectors.groupingBy(Tag::getKey, Collectors.toList()));
+				Map<String, List<Tag>> groupedTags = properties.getTag()
+					.getExpression()
+					.entrySet()
+					.stream()
+					// maps a <name, expr> pair into [<name, expr#val_1>, ... <name,
+					// expr#val_N>] Tag array.
+					.map(namedExpression -> toList(namedExpression.getValue().getValue(context, message)).stream()
+						.map(tagValue -> Tag.of(namedExpression.getKey(), tagValue))
+						.collect(Collectors.toList()))
+					.flatMap(List::stream)
+					.collect(Collectors.groupingBy(Tag::getKey, Collectors.toList()));
 				allGroupedTags.putAll(groupedTags);
 			}
 
-			this.recordMetrics(finalMeterRegistries, meterName, fixedTags, allGroupedTags, amount, properties.getMeterType());
+			this.recordMetrics(finalMeterRegistries, meterName, fixedTags, allGroupedTags, amount,
+					properties.getMeterType());
 		};
 	}
 
 	/**
-	 * Converts a key/value Map into Tag(key,value) list. Filters out the empty key/value pairs.
-	 *
+	 * Converts a key/value Map into Tag(key,value) list. Filters out the empty key/value
+	 * pairs.
 	 * @param keyValueMap key/value map to convert into tags.
 	 * @return Returns Tags list representing every non-empty key/value pair.
 	 */
 	protected Tags toTags(Map<String, String> keyValueMap) {
-		return CollectionUtils.isEmpty(keyValueMap) ? Tags.empty() :
-				Tags.of(keyValueMap.entrySet().stream()
-						.filter(e -> StringUtils.hasText(e.getKey()) && StringUtils.hasText(e.getValue()))
-						.map(e -> Tag.of(e.getKey(), e.getValue()))
-						.collect(Collectors.toList()));
+		return CollectionUtils.isEmpty(keyValueMap) ? Tags.empty()
+				: Tags.of(keyValueMap.entrySet()
+					.stream()
+					.filter(e -> StringUtils.hasText(e.getKey()) && StringUtils.hasText(e.getValue()))
+					.map(e -> Tag.of(e.getKey(), e.getValue()))
+					.collect(Collectors.toList()));
 	}
 
 	/**
-	 * Converts the input value into an list of values. If the value is not a collection/array type the result
-	 * is a single element list. For collection/array input value the result is the list of stringified content of
-	 * this collection.
-	 *
+	 * Converts the input value into an list of values. If the value is not a
+	 * collection/array type the result is a single element list. For collection/array
+	 * input value the result is the list of stringified content of this collection.
 	 * @param value input value can be array, collection or single value.
 	 * @return Returns value list.
 	 */
 	protected List<String> toList(Object value) {
 		if (value == null) {
 			// Ensure that the tag is present in the meter metrics, even if empty.
-			// TSDB as Prometheus do not tolerate same meters to have different tags signatures.
+			// TSDB as Prometheus do not tolerate same meters to have different tags
+			// signatures.
 			return Collections.singletonList(UNAVAILABLE_TAG);
 		}
 
@@ -135,10 +145,10 @@ public class AnalyticsConsumerConfiguration {
 			Collection<?> valueCollection = (value instanceof Collection) ? (Collection<?>) value
 					: Arrays.asList(ObjectUtils.toObjectArray(value));
 			List<String> list = valueCollection.stream()
-					.filter(Objects::nonNull)
-					.map(Object::toString)
-					.filter(StringUtils::hasText)
-					.collect(Collectors.toList());
+				.filter(Objects::nonNull)
+				.map(Object::toString)
+				.filter(StringUtils::hasText)
+				.collect(Collectors.toList());
 			return CollectionUtils.isEmpty(list) ? Collections.singletonList(UNAVAILABLE_TAG) : list;
 		}
 		else {
@@ -149,21 +159,18 @@ public class AnalyticsConsumerConfiguration {
 	private void recordMetrics(MeterRegistry[] meterRegistries, String meterName, Tags fixedTags,
 			Map<String, List<Tag>> groupedTags, double amount, AnalyticsConsumerProperties.MeterType meterType) {
 		if (!CollectionUtils.isEmpty(groupedTags)) {
-			groupedTags.values().stream().map(List::size).max(Integer::compareTo).ifPresent(
-					max -> {
-						for (int i = 0; i < max; i++) {
-							Tags currentTags = Tags.of(fixedTags);
-							for (Map.Entry<String, List<Tag>> e : groupedTags.entrySet()) {
-								currentTags = (e.getValue().size() > i) ?
-										currentTags.and(e.getValue().get(i)) :
-										currentTags.and(Tags.of(e.getKey(), ""));
-							}
-
-							// Update the meterName for every configured MaterRegistry.
-							record(meterRegistries, meterName, currentTags, amount, meterType);
-						}
+			groupedTags.values().stream().map(List::size).max(Integer::compareTo).ifPresent(max -> {
+				for (int i = 0; i < max; i++) {
+					Tags currentTags = Tags.of(fixedTags);
+					for (Map.Entry<String, List<Tag>> e : groupedTags.entrySet()) {
+						currentTags = (e.getValue().size() > i) ? currentTags.and(e.getValue().get(i))
+								: currentTags.and(Tags.of(e.getKey(), ""));
 					}
-			);
+
+					// Update the meterName for every configured MaterRegistry.
+					record(meterRegistries, meterName, currentTags, amount, meterType);
+				}
+			});
 		}
 		else {
 			// Update the meterName for every configured MaterRegistry.
@@ -171,8 +178,8 @@ public class AnalyticsConsumerConfiguration {
 		}
 	}
 
-	private void record(MeterRegistry[] meterRegistries, String meterName,
-			Iterable<Tag> tags, double meterAmount, AnalyticsConsumerProperties.MeterType meterType) {
+	private void record(MeterRegistry[] meterRegistries, String meterName, Iterable<Tag> tags, double meterAmount,
+			AnalyticsConsumerProperties.MeterType meterType) {
 
 		for (MeterRegistry meterRegistry : meterRegistries) {
 			if (meterType == AnalyticsConsumerProperties.MeterType.gauge) {
@@ -197,8 +204,7 @@ public class AnalyticsConsumerConfiguration {
 	}
 
 	private boolean isMeterRegistryContainsGauge(MeterRegistry meterRegistry, Meter.Id gaugeId) {
-		return meterRegistry.find(gaugeId.getName()).gauges().stream()
-				.anyMatch(gauge -> gauge.getId().equals(gaugeId));
+		return meterRegistry.find(gaugeId.getName()).gauges().stream().anyMatch(gauge -> gauge.getId().equals(gaugeId));
 	}
 
 	@Bean
@@ -206,4 +212,5 @@ public class AnalyticsConsumerConfiguration {
 	public SimpleMeterRegistry simpleMeterRegistry() {
 		return new SimpleMeterRegistry();
 	}
+
 }

@@ -21,4 +21,5 @@ import java.util.Collection;
 import org.springframework.integration.handler.MessageProcessor;
 
 public interface CommandLineArgumentsMessageMapper extends MessageProcessor<Collection<String>> {
+
 }

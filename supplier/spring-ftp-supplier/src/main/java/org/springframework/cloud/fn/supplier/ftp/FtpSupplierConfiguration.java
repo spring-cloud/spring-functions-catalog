@@ -80,8 +80,7 @@ public class FtpSupplierConfiguration {
 	private FtpInboundFileSynchronizingMessageSource ftpMessageSource;
 
 	public FtpSupplierConfiguration(FtpSupplierProperties ftpSupplierProperties,
-			FileConsumerProperties fileConsumerProperties,
-			ConcurrentMetadataStore metadataStore,
+			FileConsumerProperties fileConsumerProperties, ConcurrentMetadataStore metadataStore,
 			SessionFactory<FTPFile> ftpSessionFactory) {
 
 		this.ftpSupplierProperties = ftpSupplierProperties;
@@ -95,13 +94,13 @@ public class FtpSupplierConfiguration {
 			@Nullable ComponentCustomizer<FtpInboundChannelAdapterSpec> ftpInboundChannelAdapterSpecCustomizer) {
 
 		FtpInboundChannelAdapterSpec messageSourceBuilder = Ftp.inboundAdapter(ftpSessionFactory)
-				.preserveTimestamp(this.ftpSupplierProperties.isPreserveTimestamp())
-				.remoteDirectory(this.ftpSupplierProperties.getRemoteDir())
-				.remoteFileSeparator(this.ftpSupplierProperties.getRemoteFileSeparator())
-				.localDirectory(this.ftpSupplierProperties.getLocalDir())
-				.autoCreateLocalDirectory(this.ftpSupplierProperties.isAutoCreateLocalDir())
-				.temporaryFileSuffix(this.ftpSupplierProperties.getTmpFileSuffix())
-				.deleteRemoteFiles(this.ftpSupplierProperties.isDeleteRemoteFiles());
+			.preserveTimestamp(this.ftpSupplierProperties.isPreserveTimestamp())
+			.remoteDirectory(this.ftpSupplierProperties.getRemoteDir())
+			.remoteFileSeparator(this.ftpSupplierProperties.getRemoteFileSeparator())
+			.localDirectory(this.ftpSupplierProperties.getLocalDir())
+			.autoCreateLocalDirectory(this.ftpSupplierProperties.isAutoCreateLocalDir())
+			.temporaryFileSuffix(this.ftpSupplierProperties.getTmpFileSuffix())
+			.deleteRemoteFiles(this.ftpSupplierProperties.isDeleteRemoteFiles());
 
 		ChainFileListFilter<FTPFile> chainFileListFilter = new ChainFileListFilter<>();
 
@@ -125,20 +124,22 @@ public class FtpSupplierConfiguration {
 
 	@Bean
 	public Flux<Message<?>> ftpMessageFlux() {
-		return Mono.<Message<?>>create(monoSink ->
-				monoSink.onRequest(value ->
-						monoSink.success(this.ftpMessageSource.receive())))
-				.subscribeOn(Schedulers.boundedElastic())
-				.repeatWhenEmpty(it -> it.delayElements(this.ftpSupplierProperties.getDelayWhenEmpty()))
-				.repeat();
+		return Mono
+			.<Message<?>>create(
+					monoSink -> monoSink.onRequest(value -> monoSink.success(this.ftpMessageSource.receive())))
+			.subscribeOn(Schedulers.boundedElastic())
+			.repeatWhenEmpty(it -> it.delayElements(this.ftpSupplierProperties.getDelayWhenEmpty()))
+			.repeat();
 	}
 
 	@Bean
 	@ConditionalOnExpression("environment['file.consumer.mode'] != 'ref'")
 	public Publisher<Message<Object>> ftpReadingFlow(FtpInboundFileSynchronizingMessageSource ftpMessageSource) {
-		return FileUtils.enhanceFlowForReadingMode(IntegrationFlow
-				.from(IntegrationReactiveUtils.messageSourceToFlux(ftpMessageSource)), fileConsumerProperties)
-				.toReactivePublisher();
+		return FileUtils
+			.enhanceFlowForReadingMode(
+					IntegrationFlow.from(IntegrationReactiveUtils.messageSourceToFlux(ftpMessageSource)),
+					fileConsumerProperties)
+			.toReactivePublisher();
 	}
 
 	@Bean

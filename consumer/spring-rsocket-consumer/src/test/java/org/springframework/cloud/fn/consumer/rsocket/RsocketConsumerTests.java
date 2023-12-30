@@ -41,13 +41,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@SpringBootTest(properties = {"spring.rsocket.server.port=0"})
+@SpringBootTest(properties = { "spring.rsocket.server.port=0" })
 @DirtiesContext
 public class RsocketConsumerTests {
 
 	private static ApplicationContextRunner applicationContextRunner = new ApplicationContextRunner()
-			.withUserConfiguration(RsocketConsumerConfiguration.class, RSocketRequesterAutoConfiguration.class,
-					RSocketStrategiesAutoConfiguration.class);
+		.withUserConfiguration(RsocketConsumerConfiguration.class, RSocketRequesterAutoConfiguration.class,
+				RSocketStrategiesAutoConfiguration.class);
 
 	@Autowired
 	ApplicationContext applicationContext;
@@ -59,19 +59,18 @@ public class RsocketConsumerTests {
 		RSocketServer server = (RSocketServer) ReflectionTestUtils.getField(serverBootstrap, "server");
 		final int port = server.address().getPort();
 
-		applicationContextRunner.withPropertyValues(
-				"rsocket.consumer.port=" + port,
-				"rsocket.consumer.route=test-route")
-				.run(context -> {
-					Function<Flux<Message<?>>, Mono<Void>> rsocketConsumer = context.getBean("rsocketConsumer", Function.class);
-					rsocketConsumer.apply(Flux.just(new GenericMessage<>("Hello RSocket")))
-							.subscribe();
+		applicationContextRunner
+			.withPropertyValues("rsocket.consumer.port=" + port, "rsocket.consumer.route=test-route")
+			.run(context -> {
+				Function<Flux<Message<?>>, Mono<Void>> rsocketConsumer = context.getBean("rsocketConsumer",
+						Function.class);
+				rsocketConsumer.apply(Flux.just(new GenericMessage<>("Hello RSocket"))).subscribe();
 
-					StepVerifier.create(RSocketserverApplication.fireForgetPayloads)
-							.expectNext("Hello RSocket")
-							.thenCancel()
-							.verify();
-				});
+				StepVerifier.create(RSocketserverApplication.fireForgetPayloads)
+					.expectNext("Hello RSocket")
+					.thenCancel()
+					.verify();
+			});
 
 	}
 
@@ -86,7 +85,7 @@ public class RsocketConsumerTests {
 		void someMethod(String payload) {
 			fireForgetPayloads.onNext(payload);
 		}
+
 	}
+
 }
-
-

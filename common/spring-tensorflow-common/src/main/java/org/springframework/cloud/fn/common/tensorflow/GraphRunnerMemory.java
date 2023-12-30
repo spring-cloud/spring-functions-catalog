@@ -26,7 +26,6 @@ import org.tensorflow.Tensor;
 
 import org.springframework.cloud.fn.common.tensorflow.util.AutoCloseables;
 
-
 /**
  * Keeps all tensorMap input parameters.
  */
@@ -47,7 +46,7 @@ public class GraphRunnerMemory implements Function<Map<String, Tensor<?>>, Map<S
 	@Override
 	public void close() {
 		AutoCloseables.all(this.tensorMap.get());
-		//this.tensorMap.get().clear();
+		// this.tensorMap.get().clear();
 	}
-}
 
+}

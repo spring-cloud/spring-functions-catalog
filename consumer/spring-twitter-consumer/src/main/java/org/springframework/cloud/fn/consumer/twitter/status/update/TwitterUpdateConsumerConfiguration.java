@@ -35,7 +35,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 
 /**
- *
  * @author Christian Tzolov
  */
 @Configuration
@@ -85,8 +84,8 @@ public class TwitterUpdateConsumerConfiguration {
 			}
 
 			if (updateProperties.getDisplayCoordinates() != null) {
-				statusUpdate.setDisplayCoordinates(
-						updateProperties.getDisplayCoordinates().getValue(message, boolean.class));
+				statusUpdate
+					.setDisplayCoordinates(updateProperties.getDisplayCoordinates().getValue(message, boolean.class));
 			}
 
 			if (updateProperties.getMediaIds() != null) {
@@ -109,4 +108,5 @@ public class TwitterUpdateConsumerConfiguration {
 			Consumer<StatusUpdate> updateStatus) {
 		return message -> updateStatus.accept(statusUpdateQuery.apply(message));
 	}
+
 }

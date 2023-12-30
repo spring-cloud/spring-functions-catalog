@@ -44,7 +44,7 @@ import org.springframework.messaging.Message;
  * @author Soby Chacko
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties({MqttProperties.class, MqttSupplierProperties.class})
+@EnableConfigurationProperties({ MqttProperties.class, MqttSupplierProperties.class })
 @Import(MqttConfiguration.class)
 public class MqttSupplierConfiguration {
 
@@ -66,9 +66,8 @@ public class MqttSupplierConfiguration {
 	public MqttPahoMessageDrivenChannelAdapter mqttInbound(
 			@Nullable ComponentCustomizer<MqttPahoMessageDrivenChannelAdapter> mqttMessageProducerCustomizer) {
 
-		MqttPahoMessageDrivenChannelAdapter adapter =
-				new MqttPahoMessageDrivenChannelAdapter(this.properties.getClientId(), this.mqttClientFactory,
-						this.properties.getTopics());
+		MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(
+				this.properties.getClientId(), this.mqttClientFactory, this.properties.getTopics());
 		adapter.setQos(this.properties.getQos());
 		adapter.setConverter(pahoMessageConverter(this.beanFactory));
 		adapter.setAutoStartup(false);
@@ -82,8 +81,7 @@ public class MqttSupplierConfiguration {
 
 	@Bean
 	public Publisher<Message<byte[]>> mqttPublisher(MqttPahoMessageDrivenChannelAdapter mqttInbound) {
-		return IntegrationFlow.from(mqttInbound)
-				.toReactivePublisher(true);
+		return IntegrationFlow.from(mqttInbound).toReactivePublisher(true);
 	}
 
 	private DefaultPahoMessageConverter pahoMessageConverter(BeanFactory beanFactory) {

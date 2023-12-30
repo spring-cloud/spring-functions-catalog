@@ -36,6 +36,7 @@ import org.springframework.messaging.Message;
 
 /**
  * Configuration for SFTP Consumer.
+ *
  * @author Soby Chacko
  * @author Corneil du Plessis
  */
@@ -49,17 +50,17 @@ public class SftpConsumerConfiguration {
 			SessionFactory<SftpClient.DirEntry> ftpSessionFactory,
 			@Nullable ComponentCustomizer<SftpMessageHandlerSpec> sftpMessageHandlerSpecCustomizer) {
 
-		IntegrationFlowBuilder integrationFlowBuilder =
-				IntegrationFlow.from(MessageConsumer.class, (gateway) -> gateway.beanName("sftpConsumer"));
+		IntegrationFlowBuilder integrationFlowBuilder = IntegrationFlow.from(MessageConsumer.class,
+				(gateway) -> gateway.beanName("sftpConsumer"));
 
-		SftpMessageHandlerSpec handlerSpec =
-				Sftp.outboundAdapter(new SftpRemoteFileTemplate(ftpSessionFactory), properties.getMode())
-						.remoteDirectory(properties.getRemoteDir())
-						.temporaryRemoteDirectory(properties.getTemporaryRemoteDir())
-						.remoteFileSeparator(properties.getRemoteFileSeparator())
-						.autoCreateDirectory(properties.isAutoCreateDir())
-						.useTemporaryFileName(properties.isUseTemporaryFilename())
-						.temporaryFileSuffix(properties.getTmpFileSuffix());
+		SftpMessageHandlerSpec handlerSpec = Sftp
+			.outboundAdapter(new SftpRemoteFileTemplate(ftpSessionFactory), properties.getMode())
+			.remoteDirectory(properties.getRemoteDir())
+			.temporaryRemoteDirectory(properties.getTemporaryRemoteDir())
+			.remoteFileSeparator(properties.getRemoteFileSeparator())
+			.autoCreateDirectory(properties.isAutoCreateDir())
+			.useTemporaryFileName(properties.isUseTemporaryFilename())
+			.temporaryFileSuffix(properties.getTmpFileSuffix());
 		if (properties.getFilenameExpression() != null) {
 			handlerSpec.fileNameExpression(properties.getFilenameExpression());
 		}
@@ -68,9 +69,7 @@ public class SftpConsumerConfiguration {
 			sftpMessageHandlerSpecCustomizer.customize(handlerSpec);
 		}
 
-		return integrationFlowBuilder
-				.handle(handlerSpec)
-				.get();
+		return integrationFlowBuilder.handle(handlerSpec).get();
 	}
 
 	private interface MessageConsumer extends Consumer<Message<?>> {

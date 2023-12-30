@@ -23,7 +23,8 @@ import java.util.Map;
 import org.springframework.util.StringUtils;
 
 /**
- * Parses a comma delimited list of key value pairs in which the values can contain commas as well.
+ * Parses a comma delimited list of key value pairs in which the values can contain commas
+ * as well.
  *
  * @author Chris Schaeffer
  * @author David Turanski
@@ -63,4 +64,5 @@ abstract class KeyValueListParser {
 			properties.put(pair.substring(0, firstEquals).trim(), pair.substring(firstEquals + 1).trim());
 		}
 	}
+
 }

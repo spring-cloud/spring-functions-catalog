@@ -32,8 +32,9 @@ import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
 
 /**
- * An {@link EnvironmentPostProcessor} to add {@code spring.autoconfigure.exclude} property
- * since we can't use {@code application.properties} from the library perspective.
+ * An {@link EnvironmentPostProcessor} to add {@code spring.autoconfigure.exclude}
+ * property since we can't use {@code application.properties} from the library
+ * perspective.
  *
  * @author Artem Bilan
  * @author Corneil du Plessis
@@ -45,16 +46,14 @@ public class ExcludeStoresAutoConfigurationEnvironmentPostProcessor implements E
 		MutablePropertySources propertySources = environment.getPropertySources();
 		Properties properties = new Properties();
 
-		properties.setProperty("spring.autoconfigure.exclude",
-				DataSourceAutoConfiguration.class.getName() + ", " +
-						DataSourceTransactionManagerAutoConfiguration.class.getName() + ", " +
-						MongoAutoConfiguration.class.getName() + ", " +
-						MongoDataAutoConfiguration.class.getName() + ", " +
-						MongoRepositoriesAutoConfiguration.class.getName() + ", " +
-						RedisAutoConfiguration.class.getName() + ", " +
-						RedisRepositoriesAutoConfiguration.class.getName());
+		properties.setProperty("spring.autoconfigure.exclude", DataSourceAutoConfiguration.class.getName() + ", "
+				+ DataSourceTransactionManagerAutoConfiguration.class.getName() + ", "
+				+ MongoAutoConfiguration.class.getName() + ", " + MongoDataAutoConfiguration.class.getName() + ", "
+				+ MongoRepositoriesAutoConfiguration.class.getName() + ", " + RedisAutoConfiguration.class.getName()
+				+ ", " + RedisRepositoriesAutoConfiguration.class.getName());
 
-		propertySources.addLast(new PropertiesPropertySource("aggregator.exclude.stores.auto-configuration", properties));
+		propertySources
+			.addLast(new PropertiesPropertySource("aggregator.exclude.stores.auto-configuration", properties));
 	}
 
 }

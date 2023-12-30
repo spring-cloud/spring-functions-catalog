@@ -87,4 +87,5 @@ public class TcpConsumerProperties {
 	public void setClose(boolean close) {
 		this.close = close;
 	}
+
 }

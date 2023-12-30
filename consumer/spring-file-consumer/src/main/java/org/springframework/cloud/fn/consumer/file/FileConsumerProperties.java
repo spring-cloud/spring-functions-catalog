@@ -128,9 +128,7 @@ public class FileConsumerProperties {
 	}
 
 	public String getNameExpression() {
-		return (nameExpression != null)
-				? nameExpression + " + '" + getSuffix() + "'"
-				: "'" + name + getSuffix() + "'";
+		return (nameExpression != null) ? nameExpression + " + '" + getSuffix() + "'" : "'" + name + getSuffix() + "'";
 	}
 
 	public void setNameExpression(String nameExpression) {

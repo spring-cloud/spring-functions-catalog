@@ -22,6 +22,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
+
 /**
  * @author Artem Bilan
  * @author David Turanski
@@ -61,4 +62,5 @@ public class MongoDbConsumerProperties {
 	private boolean isValid() {
 		return StringUtils.hasText(this.collection) || this.collectionExpression != null;
 	}
+
 }

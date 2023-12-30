@@ -33,28 +33,41 @@ import org.springframework.validation.annotation.Validated;
 public class TwitterStreamSupplierProperties {
 
 	public enum StreamType {
-		/** Starts listening on random sample of all public statuses. The default access level provides a small
-		 * proportion of the Firehose. */
+
+		/**
+		 * Starts listening on random sample of all public statuses. The default access
+		 * level provides a small proportion of the Firehose.
+		 */
 		sample,
 
-		/** Start consuming public statuses that match one or more filter predicates. At least one predicate parameter,
-		 * follow, locations, or track must be specified. Multiple parameters may be specified which allows most
-		 * clients to use a single connection to the Streaming API. Placing long parameters in the URL may cause the
-		 * request to be rejected for excessive URL length.<br>
-		 * The default access level allows up to 200 track keywords, 400 follow userids and 10 1-degree location boxes.
-		 * Increased access levels allow 80,000 follow userids ('shadow' role), 400,000 follow userids ('birddog' role),
-		 * 10,000 track keywords ('restricted track' role),  200,000 track keywords ('partner track' role),
-		 * and 200 10-degree location boxes ('locRestricted' role). Increased track access levels also pass a higher
-		 * proportion of statuses before limiting the stream.*/
+		/**
+		 * Start consuming public statuses that match one or more filter predicates. At
+		 * least one predicate parameter, follow, locations, or track must be specified.
+		 * Multiple parameters may be specified which allows most clients to use a single
+		 * connection to the Streaming API. Placing long parameters in the URL may cause
+		 * the request to be rejected for excessive URL length.<br>
+		 * The default access level allows up to 200 track keywords, 400 follow userids
+		 * and 10 1-degree location boxes. Increased access levels allow 80,000 follow
+		 * userids ('shadow' role), 400,000 follow userids ('birddog' role), 10,000 track
+		 * keywords ('restricted track' role), 200,000 track keywords ('partner track'
+		 * role), and 200 10-degree location boxes ('locRestricted' role). Increased track
+		 * access levels also pass a higher proportion of statuses before limiting the
+		 * stream.
+		 */
 		filter,
 
-		/** tarts listening on all public statuses. Available only to approved parties and requires a signed agreement
-		 * to access. */
+		/**
+		 * tarts listening on all public statuses. Available only to approved parties and
+		 * requires a signed agreement to access.
+		 */
 		firehose,
 
-		/** Starts listening on all public statuses containing links.
-		 * Available only to approved parties and requires a signed agreement to access.*/
+		/**
+		 * Starts listening on all public statuses containing links. Available only to
+		 * approved parties and requires a signed agreement to access.
+		 */
 		link
+
 	}
 
 	private StreamType type = StreamType.sample;
@@ -76,12 +89,15 @@ public class TwitterStreamSupplierProperties {
 	public static class Filter {
 
 		public enum FilterLevel {
+
 			/** filter level. */
 			all, none, low, medium
+
 		}
 
 		/**
-		 * Indicates the number of previous statuses to stream before transitioning to the live stream.
+		 * Indicates the number of previous statuses to stream before transitioning to the
+		 * live stream.
 		 */
 		private int count = 0;
 
@@ -95,13 +111,12 @@ public class TwitterStreamSupplierProperties {
 		 */
 		private List<String> track;
 
-
 		/**
-		 * Locations to track. Internally represented as 2D array.
-		 * Bounding box is invalid: 52.38, 4.90, 51.51, -0.12.  The first pair must be the SW corner of the box
+		 * Locations to track. Internally represented as 2D array. Bounding box is
+		 * invalid: 52.38, 4.90, 51.51, -0.12. The first pair must be the SW corner of the
+		 * box
 		 */
 		private List<BoundingBox> locations = new ArrayList<>();
-
 
 		/**
 		 * Specifies the tweets language of the stream.
@@ -109,8 +124,8 @@ public class TwitterStreamSupplierProperties {
 		private List<String> language;
 
 		/**
-		 * The filter level limits what tweets appear in the stream to those with a minimum filterLevel attribute value.
-		 * One of either none, low, or medium.
+		 * The filter level limits what tweets appear in the stream to those with a
+		 * minimum filterLevel attribute value. One of either none, low, or medium.
 		 */
 		private FilterLevel filterLevel = FilterLevel.all;
 
@@ -183,10 +198,10 @@ public class TwitterStreamSupplierProperties {
 			if (!CollectionUtils.isEmpty(this.locations)) {
 				double[][] bboxLocations = new double[this.locations.size() * 2][2];
 				for (int i = 0; i < this.locations.size(); i = i + 2) {
-					//SW lat, lon
+					// SW lat, lon
 					bboxLocations[i][0] = this.locations.get(i).getSw().getLat();
 					bboxLocations[i][1] = this.locations.get(i).getSw().getLon();
-					//NE lat, lon
+					// NE lat, lon
 					bboxLocations[i + 1][0] = this.locations.get(i).getNe().getLat();
 					bboxLocations[i + 1][1] = this.locations.get(i).getNe().getLon();
 				}
@@ -232,6 +247,7 @@ public class TwitterStreamSupplierProperties {
 			public void setNe(Geocode ne) {
 				this.ne = ne;
 			}
+
 		}
 
 		public static class Geocode {
@@ -245,7 +261,6 @@ public class TwitterStreamSupplierProperties {
 			 * longitude.
 			 */
 			private double lon = -1;
-
 
 			public double getLat() {
 				return lat;
@@ -262,6 +277,9 @@ public class TwitterStreamSupplierProperties {
 			public void setLon(double lon) {
 				this.lon = lon;
 			}
+
 		}
+
 	}
+
 }

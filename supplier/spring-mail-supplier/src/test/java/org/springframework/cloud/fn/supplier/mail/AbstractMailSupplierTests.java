@@ -35,11 +35,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, properties = {
-		"mail.supplier.mark-as-read=true",
-		"mail.supplier.delete=false",
-		"mail.supplier.user-flag=testSIUserFlag",
-		"mail.supplier.java-mail-properties=mail.imap.socketFactory.fallback=true\\n mail.store.protocol=imap\\n mail.debug=true"})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, properties = { "mail.supplier.mark-as-read=true",
+		"mail.supplier.delete=false", "mail.supplier.user-flag=testSIUserFlag",
+		"mail.supplier.java-mail-properties=mail.imap.socketFactory.fallback=true\\n mail.store.protocol=imap\\n mail.debug=true" })
 @DirtiesContext
 public abstract class AbstractMailSupplierTests {
 
@@ -54,7 +52,8 @@ public abstract class AbstractMailSupplierTests {
 	protected StandardIntegrationFlow integrationFlow;
 
 	protected void sendMessage(String subject, String body) {
-		mailUser.deliver(GreenMailUtil.createTextEmail("bar@bax", "test@test", subject, body, mailServer.getSmtp().getServerSetup()));
+		mailUser.deliver(GreenMailUtil.createTextEmail("bar@bax", "test@test", subject, body,
+				mailServer.getSmtp().getServerSetup()));
 	}
 
 	@BeforeAll
@@ -66,7 +65,7 @@ public abstract class AbstractMailSupplierTests {
 		ServerSetup smtp = ServerSetupTest.SMTP.dynamicPort();
 		smtp.setServerStartupTimeout(10000);
 
-		mailServer = new GreenMail(new ServerSetup[] {imap, pop3, smtp});
+		mailServer = new GreenMail(new ServerSetup[] { imap, pop3, smtp });
 		mailUser = mailServer.setUser("user", "pw");
 		mailServer.start();
 	}

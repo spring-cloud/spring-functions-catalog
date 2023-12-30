@@ -57,8 +57,7 @@ public interface XmppTestContainerSupport {
 	/**
 	 * The container.
 	 */
-	GenericContainer<?> XMPP_CONTAINER = new GenericContainer<>("fishbowler/openfire:v4.7.0")
-		.withExposedPorts(5222)
+	GenericContainer<?> XMPP_CONTAINER = new GenericContainer<>("fishbowler/openfire:v4.7.0").withExposedPorts(5222)
 		.withClasspathResourceMapping("xmpp/conf", "/var/lib/openfire/conf", BindMode.READ_ONLY)
 		.withCommand("-demoboot")
 		.withStartupTimeout(Duration.ofSeconds(120))

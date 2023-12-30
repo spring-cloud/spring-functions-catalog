@@ -31,7 +31,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 
 /**
- *
  * @author Christian Tzolov
  */
 @Configuration
@@ -42,7 +41,8 @@ public class TwitterMessageConsumerConfiguration {
 	private static final Log logger = LogFactory.getLog(TwitterMessageConsumerConfiguration.class);
 
 	@Bean
-	public Consumer<Message<?>> sendDirectMessageConsumer(TwitterMessageConsumerProperties messageProperties, Twitter twitter) {
+	public Consumer<Message<?>> sendDirectMessageConsumer(TwitterMessageConsumerProperties messageProperties,
+			Twitter twitter) {
 		return message -> {
 			try {
 				String messageText = messageProperties.getText().getValue(message, String.class);
@@ -68,4 +68,5 @@ public class TwitterMessageConsumerConfiguration {
 			}
 		};
 	}
+
 }

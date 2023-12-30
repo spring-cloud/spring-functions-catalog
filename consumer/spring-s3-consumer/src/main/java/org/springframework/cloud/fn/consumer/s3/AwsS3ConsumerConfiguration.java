@@ -52,15 +52,13 @@ public class AwsS3ConsumerConfiguration {
 	public IntegrationFlow s3ConsumerFlow(@Nullable TransferListener transferListener,
 			MessageHandler amazonS3MessageHandler) {
 
-		return flow -> flow
-				.enrichHeaders(headers -> headers.header(AwsHeaders.TRANSFER_LISTENER, transferListener))
-				.handle(amazonS3MessageHandler);
+		return flow -> flow.enrichHeaders(headers -> headers.header(AwsHeaders.TRANSFER_LISTENER, transferListener))
+			.handle(amazonS3MessageHandler);
 	}
 
 	@Bean
 	public MessageHandler amazonS3MessageHandler(S3TransferManager s3TransferManager,
-			AwsS3ConsumerProperties s3ConsumerProperties,
-			BeanFactory beanFactory,
+			AwsS3ConsumerProperties s3ConsumerProperties, BeanFactory beanFactory,
 			@Nullable BiConsumer<PutObjectRequest.Builder, Message<?>> uploadMetadataProvider) {
 
 		Expression bucketExpression = s3ConsumerProperties.getBucketExpression();
@@ -85,19 +83,17 @@ public class AwsS3ConsumerConfiguration {
 		if (aclExpression != null) {
 			EvaluationContext evaluationContext = IntegrationContextUtils.getEvaluationContext(beanFactory);
 
-			metadataProviderToUse =
-					(builder, message) -> {
-						Object aclValue = aclExpression.getValue(evaluationContext, message);
-						Assert.notNull(aclValue,
-								() -> String.format("The expression '%s' for message '%s' returned null",
-										aclExpression, message));
+			metadataProviderToUse = (builder, message) -> {
+				Object aclValue = aclExpression.getValue(evaluationContext, message);
+				Assert.notNull(aclValue, () -> String.format("The expression '%s' for message '%s' returned null",
+						aclExpression, message));
 
-						builder.acl(aclValue.toString());
+				builder.acl(aclValue.toString());
 
-						if (uploadMetadataProvider != null) {
-							uploadMetadataProvider.accept(builder, message);
-						}
-					};
+				if (uploadMetadataProvider != null) {
+					uploadMetadataProvider.accept(builder, message);
+				}
+			};
 		}
 
 		if (metadataProviderToUse != null) {

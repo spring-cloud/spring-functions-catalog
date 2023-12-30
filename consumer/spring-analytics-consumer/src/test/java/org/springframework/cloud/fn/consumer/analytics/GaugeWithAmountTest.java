@@ -26,12 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Christian Tzolov
  */
-@TestPropertySource(properties = {
-		"analytics.meter-type=gauge",
-		"analytics.name=myGauge",
-		"analytics.tag.expression.foo='bar'",
-		"analytics.amount-expression=payload.length()"
-})
+@TestPropertySource(properties = { "analytics.meter-type=gauge", "analytics.name=myGauge",
+		"analytics.tag.expression.foo='bar'", "analytics.amount-expression=payload.length()" })
 class GaugeWithAmountTest extends AnalyticsConsumerParentTest {
 
 	@Test

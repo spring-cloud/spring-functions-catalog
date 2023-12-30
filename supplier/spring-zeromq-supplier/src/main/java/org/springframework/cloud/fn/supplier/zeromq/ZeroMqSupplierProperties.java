@@ -27,7 +27,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- *
  * @author Daniel Frey
  * @since 3.1.0
  */
@@ -58,7 +57,7 @@ public class ZeroMqSupplierProperties {
 	/**
 	 * The Topics to subscribe to.
 	 */
-	private String[] topics = {""};
+	private String[] topics = { "" };
 
 	/**
 	 * @param socketType the {@link SocketType} to establish.
@@ -78,7 +77,6 @@ public class ZeroMqSupplierProperties {
 	}
 
 	/**
-	 *
 	 * @param connectUrl The ZeroMQ server connect url
 	 *
 	 * @see org.springframework.integration.zeromq.inbound.ZeroMqMessageProducer#setConnectUrl(String)
@@ -119,7 +117,6 @@ public class ZeroMqSupplierProperties {
 	}
 
 	/**
-	 *
 	 * @param topics The ZeroMQ Topics to subscribe to
 	 *
 	 * @see org.springframework.integration.zeromq.inbound.ZeroMqMessageProducer#setTopics(String...)

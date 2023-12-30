@@ -47,8 +47,7 @@ public class CassandraClusterProperties {
 	/**
 	 * Base packages to scan for entities annotated with Table annotations.
 	 */
-	private String[] entityBasePackages = { };
-
+	private String[] entityBasePackages = {};
 
 	public void setCreateKeyspace(boolean createKeyspace) {
 		this.createKeyspace = createKeyspace;

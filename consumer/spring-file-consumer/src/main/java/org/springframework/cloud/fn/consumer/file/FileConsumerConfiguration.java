@@ -56,8 +56,7 @@ public class FileConsumerConfiguration {
 	public FileWritingMessageHandler fileWritingMessageHandler(FileNameGenerator fileNameGenerator,
 			@Nullable ComponentCustomizer<FileWritingMessageHandler> fileWritingMessageHandlerCustomizer) {
 
-		FileWritingMessageHandler handler =
-				this.properties.getDirectoryExpression() != null
+		FileWritingMessageHandler handler = this.properties.getDirectoryExpression() != null
 				? new FileWritingMessageHandler(
 						EXPRESSION_PARSER.parseExpression(this.properties.getDirectoryExpression()))
 				: new FileWritingMessageHandler(this.properties.getDirectory());

@@ -82,5 +82,7 @@ public class RedisConsumerTopicTests extends AbstractRedisConsumerTests {
 		public void handleMessage(String s) {
 			this.latch.countDown();
 		}
+
 	}
+
 }

@@ -39,7 +39,7 @@ public class RedisConsumerKeyTests extends AbstractRedisConsumerTests {
 
 	@Test
 	public void testWithKey() {
-		//Setup
+		// Setup
 		String key = "foo";
 		redisTemplate.delete(key);
 
@@ -49,18 +49,19 @@ public class RedisConsumerKeyTests extends AbstractRedisConsumerTests {
 		list.add("Moe");
 		list.add("Jack");
 
-		//Execute
+		// Execute
 		Message<List<String>> message = new GenericMessage<>(list);
 
 		redisConsumer.accept(message);
 
-		//Assert
+		// Assert
 		assertThat(redisList.size()).isEqualTo(3);
 		assertThat(redisList.get(0)).isEqualTo("Manny");
 		assertThat(redisList.get(1)).isEqualTo("Moe");
 		assertThat(redisList.get(2)).isEqualTo("Jack");
 
-		//Cleanup
+		// Cleanup
 		redisTemplate.delete(key);
 	}
+
 }

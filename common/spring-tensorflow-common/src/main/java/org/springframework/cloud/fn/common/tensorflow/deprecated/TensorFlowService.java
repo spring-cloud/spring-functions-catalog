@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-
 package org.springframework.cloud.fn.common.tensorflow.deprecated;
 
 import java.util.HashMap;
@@ -42,7 +41,9 @@ public class TensorFlowService implements Function<Map<String, Tensor<?>>, Map<S
 	private static final Log logger = LogFactory.getLog(TensorFlowService.class);
 
 	private final Session session;
+
 	private final List<String> fetchedNames;
+
 	private final boolean autoCloseFeedTensors;
 
 	public TensorFlowService(Resource modelLocation, List<String> fetchedNames) {
@@ -63,18 +64,19 @@ public class TensorFlowService implements Function<Map<String, Tensor<?>>, Map<S
 		this.autoCloseFeedTensors = autoCloseFeedTensors;
 		this.fetchedNames = fetchedNames;
 		Graph graph = new Graph();
-		byte[] model = cacheModel ? new CachedModelExtractor().getModel(modelLocation) : new ModelExtractor().getModel(modelLocation);
+		byte[] model = cacheModel ? new CachedModelExtractor().getModel(modelLocation)
+				: new ModelExtractor().getModel(modelLocation);
 		graph.importGraphDef(model);
 		this.session = new Session(graph);
 	}
 
 	/**
-	 * Evaluates a pre-trained tensorflow model (encoded as {@link Graph}). Use the feeds parameter to feed in the
-	 * model input data and fetch-names to specify the output tensors.
-	 *
+	 * Evaluates a pre-trained tensorflow model (encoded as {@link Graph}). Use the feeds
+	 * parameter to feed in the model input data and fetch-names to specify the output
+	 * tensors.
 	 * @param feeds Named map of input tensors.
-	 * @return Returns the computed output tensors. The names of the output tensors is defined by the fetchedNames
-	 * argument
+	 * @return Returns the computed output tensors. The names of the output tensors is
+	 * defined by the fetchedNames argument
 	 */
 	@Override
 	public Map<String, Tensor<?>> apply(Map<String, Tensor<?>> feeds) {
@@ -128,4 +130,5 @@ public class TensorFlowService implements Function<Map<String, Tensor<?>>, Map<S
 			this.session.close();
 		}
 	}
+
 }

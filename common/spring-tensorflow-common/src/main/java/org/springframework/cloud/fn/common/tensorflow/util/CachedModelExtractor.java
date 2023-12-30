@@ -30,7 +30,9 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
 /**
- * Extends the {@link ModelExtractor} to allow keeping a local copy (cache) of the loaded model (protobuf) files.
+ * Extends the {@link ModelExtractor} to allow keeping a local copy (cache) of the loaded
+ * model (protobuf) files.
+ *
  * @author Christian Tzolov
  */
 public class CachedModelExtractor extends ModelExtractor {
@@ -76,8 +78,8 @@ public class CachedModelExtractor extends ModelExtractor {
 
 			String fileName = modelResource.getFilename();
 			String fragment = modelResource.getURI().getFragment();
-			File cachedFile = StringUtils.isEmpty(fragment) ? new File(rootFolder, fileName) :
-					new File(rootFolder, fileName + "_" + fragment);
+			File cachedFile = StringUtils.isEmpty(fragment) ? new File(rootFolder, fileName)
+					: new File(rootFolder, fileName + "_" + fragment);
 			if (cachedFile.exists()) {
 				logger.info("Load model " + modelResource.toString() + " from cache: " + cacheRootDirectory);
 				return IOUtils.toByteArray(new FileInputStream(cachedFile));
@@ -104,4 +106,5 @@ public class CachedModelExtractor extends ModelExtractor {
 			rootFolder.mkdirs();
 		}
 	}
+
 }

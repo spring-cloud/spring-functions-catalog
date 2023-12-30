@@ -42,62 +42,51 @@ public final class ImageRecognitionExample {
 		// MmobileNetV2 models
 		// https://github.com/tensorflow/models/tree/master/research/slim/nets/mobilenet#pretrained-models
 		String mobilenet_v2_modelUri = "https://storage.googleapis.com/mobilenet_v2/checkpoints/mobilenet_v2_1.4_224.tgz#mobilenet_v2_1.4_224_frozen.pb";
-		//String mobilenet_v2_modelUri = "https://storage.googleapis.com/mobilenet_v2/checkpoints/mobilenet_v2_0.35_96.tgz#mobilenet_v2_0.35_96_frozen.pb";
-		try (ImageRecognition imageRecognition = ImageRecognition.mobileNetV2(
-				mobilenet_v2_modelUri,
-				224,
-				5,
-				true)) {
+		// String mobilenet_v2_modelUri =
+		// "https://storage.googleapis.com/mobilenet_v2/checkpoints/mobilenet_v2_0.35_96.tgz#mobilenet_v2_0.35_96_frozen.pb";
+		try (ImageRecognition imageRecognition = ImageRecognition.mobileNetV2(mobilenet_v2_modelUri, 224, 5, true)) {
 
-			List<RecognitionResponse> recognizedObjects =
-					ImageRecognition.toRecognitionResponse(imageRecognition.recognizeTopK(inputImage));
+			List<RecognitionResponse> recognizedObjects = ImageRecognition
+				.toRecognitionResponse(imageRecognition.recognizeTopK(inputImage));
 
 			// Draw the predicted labels on top of the input image.
 			byte[] augmentedImage = new ImageRecognitionAugmenter().apply(inputImage, recognizedObjects);
-			IOUtils.write(augmentedImage, new FileOutputStream("./image-recognition/target/image-augmented-mobilnetV2.jpg"));
-
+			IOUtils.write(augmentedImage,
+					new FileOutputStream("./image-recognition/target/image-augmented-mobilnetV2.jpg"));
 
 			String jsonRecognizedObjects = new JsonMapperFunction().apply(recognizedObjects);
 			System.out.println("mobilnetV2 result:" + jsonRecognizedObjects);
 		}
 
-
 		String mobilenet_v1_modelUri = "https://download.tensorflow.org/models/mobilenet_v1_2018_08_02/mobilenet_v1_1.0_224.tgz#mobilenet_v1_1.0_224_frozen.pb";
-		try (ImageRecognition recognitionService = ImageRecognition.mobileNetV1(
-				mobilenet_v1_modelUri,
-				224,
-				5,
-				true)) {
+		try (ImageRecognition recognitionService = ImageRecognition.mobileNetV1(mobilenet_v1_modelUri, 224, 5, true)) {
 
-			List<RecognitionResponse> recognizedObjects =
-					ImageRecognition.toRecognitionResponse(recognitionService.recognizeTopK(inputImage));
+			List<RecognitionResponse> recognizedObjects = ImageRecognition
+				.toRecognitionResponse(recognitionService.recognizeTopK(inputImage));
 
 			// Draw the predicted labels on top of the input image.
 			byte[] augmentedImage = new ImageRecognitionAugmenter().apply(inputImage, recognizedObjects);
-			IOUtils.write(augmentedImage, new FileOutputStream("./image-recognition/target/image-augmented-mobilnetV1.jpg"));
-
+			IOUtils.write(augmentedImage,
+					new FileOutputStream("./image-recognition/target/image-augmented-mobilnetV1.jpg"));
 
 			String jsonRecognizedObjects = new JsonMapperFunction().apply(recognizedObjects);
 			System.out.println("mobilnetV1 result:" + jsonRecognizedObjects);
 		}
 
 		String inception_modelUri = "https://storage.googleapis.com/scdf-tensorflow-models/image-recognition/tensorflow_inception_graph.pb";
-		try (ImageRecognition recognitionService = ImageRecognition.inception(
-				inception_modelUri,
-				224,
-				5,
-				true)) {
+		try (ImageRecognition recognitionService = ImageRecognition.inception(inception_modelUri, 224, 5, true)) {
 
-			List<RecognitionResponse> recognizedObjects =
-					ImageRecognition.toRecognitionResponse(recognitionService.recognizeTopK(inputImage));
+			List<RecognitionResponse> recognizedObjects = ImageRecognition
+				.toRecognitionResponse(recognitionService.recognizeTopK(inputImage));
 
 			// Draw the predicted labels on top of the input image.
 			byte[] augmentedImage = new ImageRecognitionAugmenter().apply(inputImage, recognizedObjects);
-			IOUtils.write(augmentedImage, new FileOutputStream("./image-recognition/target/image-augmented-inception.jpg"));
-
+			IOUtils.write(augmentedImage,
+					new FileOutputStream("./image-recognition/target/image-augmented-inception.jpg"));
 
 			String jsonRecognizedObjects = new JsonMapperFunction().apply(recognizedObjects);
 			System.out.println("inception result:" + jsonRecognizedObjects);
 		}
 	}
+
 }

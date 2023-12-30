@@ -46,19 +46,12 @@ public class FileModeRefTests extends AbstractFileSupplierTests {
 
 		final Flux<Message<?>> messageFlux = fileSupplier.get();
 
-		StepVerifier.create(messageFlux)
-				.assertNext((message) -> {
-							assertThat(message.getPayload())
-									.isEqualTo(firstFile.toAbsolutePath().toFile());
-							assertThat(message.getHeaders())
-									.containsEntry(FileHeaders.FILENAME, "first.file");
-							assertThat(message.getHeaders())
-									.containsEntry(FileHeaders.RELATIVE_PATH, "first.file");
-							assertThat(message.getHeaders())
-									.containsEntry(FileHeaders.ORIGINAL_FILE, firstFile.toFile());
-						}
-				)
-				.thenCancel()
-				.verify();
+		StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(message.getPayload()).isEqualTo(firstFile.toAbsolutePath().toFile());
+			assertThat(message.getHeaders()).containsEntry(FileHeaders.FILENAME, "first.file");
+			assertThat(message.getHeaders()).containsEntry(FileHeaders.RELATIVE_PATH, "first.file");
+			assertThat(message.getHeaders()).containsEntry(FileHeaders.ORIGINAL_FILE, firstFile.toFile());
+		}).thenCancel().verify();
 	}
+
 }

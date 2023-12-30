@@ -88,6 +88,7 @@ public class JdbcConsumerApplicationTests {
 
 	@SpringBootApplication
 	static class JdbcConsumerTestApplication {
+
 	}
 
 }

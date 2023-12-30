@@ -52,8 +52,8 @@ public class VaryingInsertTests extends JdbcConsumerApplicationTests {
 		jdbcConsumer.accept(message3);
 		final Message<Payload> message4 = MessageBuilder.withPayload(d).build();
 		jdbcConsumer.accept(message4);
-		List<Payload> result = jdbcOperations
-				.query("select a, b from messages", new BeanPropertyRowMapper<>(Payload.class));
+		List<Payload> result = jdbcOperations.query("select a, b from messages",
+				new BeanPropertyRowMapper<>(Payload.class));
 		Assertions.assertThat(result).extracting("a").containsExactly("hello", "world", "bonjour", null);
 		Assertions.assertThat(result).extracting("b").contains(42, 12, 22, null);
 	}

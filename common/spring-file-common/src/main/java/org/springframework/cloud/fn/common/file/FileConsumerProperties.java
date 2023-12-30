@@ -23,8 +23,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- *
- *  @author David Turanski
+ * @author David Turanski
  * @author Artem Bilan
  */
 @ConfigurationProperties("file.consumer")
@@ -32,22 +31,20 @@ import org.springframework.validation.annotation.Validated;
 public class FileConsumerProperties {
 
 	/**
-	 * The FileReadingMode to use for file reading sources.
-	 * Values are 'ref' - The File object,
-	 * 'lines' - a message per line, or
-	 * 'contents' - the contents as bytes.
+	 * The FileReadingMode to use for file reading sources. Values are 'ref' - The File
+	 * object, 'lines' - a message per line, or 'contents' - the contents as bytes.
 	 */
 	private FileReadingMode mode = FileReadingMode.contents;
 
 	/**
-	 * Set to true to emit start of file/end of file marker messages before/after the data.
-	 * Only valid with FileReadingMode 'lines'.
+	 * Set to true to emit start of file/end of file marker messages before/after the
+	 * data. Only valid with FileReadingMode 'lines'.
 	 */
 	private Boolean withMarkers = null;
 
 	/**
-	 * When 'fileMarkers == true', specify if they should be produced
-	 * as FileSplitter.FileMarker objects or JSON.
+	 * When 'fileMarkers == true', specify if they should be produced as
+	 * FileSplitter.FileMarker objects or JSON.
 	 */
 	private boolean markersJson = true;
 
@@ -80,4 +77,5 @@ public class FileConsumerProperties {
 	public boolean isWithMarkersValid() {
 		return this.withMarkers == null || FileReadingMode.lines == this.mode;
 	}
+
 }

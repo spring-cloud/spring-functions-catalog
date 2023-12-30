@@ -29,32 +29,25 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TestPropertySource(properties = {
-		"file.consumer.mode=lines",
-		"s3.supplier.filenamePattern=*/otherFile",
-		"file.consumer.with-markers=false"})
+@TestPropertySource(properties = { "file.consumer.mode=lines", "s3.supplier.filenamePattern=*/otherFile",
+		"file.consumer.with-markers=false" })
 public class AmazonS3LinesTransferredTests extends AbstractAwsS3SupplierMockTests {
 
 	@Test
 	public void test() {
 		final Flux<Message<?>> messageFlux = s3Supplier.get();
-		StepVerifier stepVerifier =
-				StepVerifier.create(messageFlux)
-						.assertNext((message) -> {
-									assertThat(message.getPayload()).isEqualTo("Other");
-									assertThat(message.getHeaders()).containsKey(FileHeaders.ORIGINAL_FILE);
-									assertThat(message.getHeaders()).containsValue(
-											new File(this.awsS3SupplierProperties.getLocalDir(), "subdir/otherFile"));
-								}
-						)
-						.assertNext((message) -> {
-							assertThat(message.getPayload().toString()).isEqualTo("Other2");
-						})
-						.thenCancel()
-						.verifyLater();
+		StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(message.getPayload()).isEqualTo("Other");
+			assertThat(message.getHeaders()).containsKey(FileHeaders.ORIGINAL_FILE);
+			assertThat(message.getHeaders())
+				.containsValue(new File(this.awsS3SupplierProperties.getLocalDir(), "subdir/otherFile"));
+		}).assertNext((message) -> {
+			assertThat(message.getPayload().toString()).isEqualTo("Other2");
+		}).thenCancel().verifyLater();
 		standardIntegrationFlow.start();
 		stepVerifier.verify(Duration.ofSeconds(10));
 
 		assertThat(this.awsS3SupplierProperties.getLocalDir().list()).hasSize(1);
 	}
+
 }

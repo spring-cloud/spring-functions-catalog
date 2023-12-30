@@ -41,9 +41,9 @@ public class TwitterSearchSupplierProperties {
 	private String query;
 
 	/**
-	 * Number of pages (e.g. requests) to search backwards (from most recent to the oldest tweets) before start
-	 * the search from the most recent tweets again.
-	 * The total amount of tweets searched backwards is (page * count)
+	 * Number of pages (e.g. requests) to search backwards (from most recent to the oldest
+	 * tweets) before start the search from the most recent tweets again. The total amount
+	 * of tweets searched backwards is (page * count)
 	 */
 	@Positive
 	private int page = 3;
@@ -56,36 +56,37 @@ public class TwitterSearchSupplierProperties {
 	private int count = 100;
 
 	/**
-	 * Restricts searched tweets to the given language, given by an http://en.wikipedia.org/wiki/ISO_639-1 .
+	 * Restricts searched tweets to the given language, given by an
+	 * http://en.wikipedia.org/wiki/ISO_639-1 .
 	 */
 	private String lang = null;
 
 	/**
-	 * If specified, returns tweets with since the given date. Date should be formatted as YYYY-MM-DD.
+	 * If specified, returns tweets with since the given date. Date should be formatted as
+	 * YYYY-MM-DD.
 	 */
 	@Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$")
 	private String since = null;
 
 	/**
-	 * If specified, returns tweets by users located within a given radius (in Km) of the given latitude/longitude,
-	 * where the user's location is taken from their Twitter profile.
-	 * Should be formatted as
+	 * If specified, returns tweets by users located within a given radius (in Km) of the
+	 * given latitude/longitude, where the user's location is taken from their Twitter
+	 * profile. Should be formatted as
 	 */
 	private Geocode geocode = new Geocode();
 
 	/**
-	 *  Specifies what type of search results you would prefer to receive.
-	 *  The current default is "mixed." Valid values include:
-	 *   mixed : Include both popular and real time results in the response.
-	 *   recent : return only the most recent results in the response
-	 *   popular : return only the most popular results in the response
+	 * Specifies what type of search results you would prefer to receive. The current
+	 * default is "mixed." Valid values include: mixed : Include both popular and real
+	 * time results in the response. recent : return only the most recent results in the
+	 * response popular : return only the most popular results in the response
 	 */
 	@NotNull
 	private Query.ResultType resultType = Query.ResultType.mixed;
 
 	/**
-	 * Restart search from the most recent tweets on empty response.
-	 * Applied only after the first restart (e.g. when since_id != UNBOUNDED)
+	 * Restart search from the most recent tweets on empty response. Applied only after
+	 * the first restart (e.g. when since_id != UNBOUNDED)
 	 */
 	private boolean restartFromMostRecentOnEmptyResponse = false;
 
@@ -193,5 +194,7 @@ public class TwitterSearchSupplierProperties {
 		public boolean isValid() {
 			return this.radius > 0;
 		}
+
 	}
+
 }

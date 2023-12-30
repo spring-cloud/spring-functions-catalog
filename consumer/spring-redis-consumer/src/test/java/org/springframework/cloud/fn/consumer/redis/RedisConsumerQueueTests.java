@@ -41,4 +41,5 @@ public class RedisConsumerQueueTests extends AbstractRedisConsumerTests {
 		Object result = redisTemplate.boundListOps("test-queue").rightPop(5000, TimeUnit.MILLISECONDS);
 		assertThat(result).isEqualTo("hello");
 	}
+
 }

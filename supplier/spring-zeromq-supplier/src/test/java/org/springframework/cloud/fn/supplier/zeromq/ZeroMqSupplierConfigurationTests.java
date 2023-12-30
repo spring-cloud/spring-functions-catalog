@@ -40,14 +40,14 @@ import org.springframework.test.annotation.DirtiesContext;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author Daniel Frey
- * since 3.1.0
+ * @author Daniel Frey since 3.1.0
  */
-@SpringBootTest(properties = {"zeromq.supplier.topics=test-topic"})
+@SpringBootTest(properties = { "zeromq.supplier.topics=test-topic" })
 @DirtiesContext
 public class ZeroMqSupplierConfigurationTests {
 
 	private static final ZContext CONTEXT = new ZContext();
+
 	private static ZMQ.Socket socket;
 
 	@Autowired
@@ -73,15 +73,12 @@ public class ZeroMqSupplierConfigurationTests {
 	@Test
 	void testSubscriptionConfiguration() throws InterruptedException {
 
-		StepVerifier stepVerifier =
-				StepVerifier.create(subject.get())
-						.assertNext((message) ->
-								assertThat(message.getPayload())
-										.asInstanceOf(InstanceOfAssertFactories.type(byte[].class))
-										.isEqualTo("test".getBytes(ZMQ.CHARSET))
-						)
-					.thenCancel()
-					.verifyLater();
+		StepVerifier stepVerifier = StepVerifier.create(subject.get())
+			.assertNext((message) -> assertThat(message.getPayload())
+				.asInstanceOf(InstanceOfAssertFactories.type(byte[].class))
+				.isEqualTo("test".getBytes(ZMQ.CHARSET)))
+			.thenCancel()
+			.verifyLater();
 
 		Thread.sleep(2000);
 
@@ -94,6 +91,8 @@ public class ZeroMqSupplierConfigurationTests {
 	}
 
 	@SpringBootApplication
-	public static class ZeroMqSourceTestApplication { }
+	public static class ZeroMqSourceTestApplication {
+
+	}
 
 }

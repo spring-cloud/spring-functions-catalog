@@ -28,12 +28,19 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 public class ObjectDetection {
 
 	private String name;
+
 	private float confidence;
+
 	private float x1;
+
 	private float y1;
+
 	private float x2;
+
 	private float y2;
+
 	private float[][] mask;
+
 	private int cid;
 
 	public String getName() {
@@ -102,15 +109,8 @@ public class ObjectDetection {
 
 	@Override
 	public String toString() {
-		return "ObjectDetection{" +
-				"name='" + name + '\'' +
-				", confidence=" + confidence +
-				", x1=" + x1 +
-				", y1=" + y1 +
-				", x2=" + x2 +
-				", y2=" + y2 +
-				", mask=" + Arrays.toString(mask) +
-				", cid=" + cid +
-				'}';
+		return "ObjectDetection{" + "name='" + name + '\'' + ", confidence=" + confidence + ", x1=" + x1 + ", y1=" + y1
+				+ ", x2=" + x2 + ", y2=" + y2 + ", mask=" + Arrays.toString(mask) + ", cid=" + cid + '}';
 	}
+
 }

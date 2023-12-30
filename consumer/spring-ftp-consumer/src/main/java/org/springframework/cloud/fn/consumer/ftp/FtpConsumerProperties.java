@@ -136,4 +136,5 @@ public class FtpConsumerProperties {
 	public void setRemoteFileSeparator(String remoteFileSeparator) {
 		this.remoteFileSeparator = remoteFileSeparator;
 	}
+
 }

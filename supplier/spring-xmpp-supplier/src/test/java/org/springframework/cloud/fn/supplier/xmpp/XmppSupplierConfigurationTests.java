@@ -54,14 +54,12 @@ import static org.springframework.cloud.fn.test.support.xmpp.XmppTestContainerSu
 /**
  * @author Daniel Frey
  */
-@SpringBootTest(
-		properties = {
-				"xmpp.factory.user=" + JANE_USER,														// Connect as user intended to listen for messages on behalf of
-				"xmpp.factory.password=" + USER_PW,
-				"xmpp.factory.service-name=" + SERVICE_NAME,
-				"xmpp.factory.security-mode=disabled"
-		}
-)
+@SpringBootTest(properties = { "xmpp.factory.user=" + JANE_USER, // Connect as user
+																	// intended to listen
+																	// for messages on
+																	// behalf of
+		"xmpp.factory.password=" + USER_PW, "xmpp.factory.service-name=" + SERVICE_NAME,
+		"xmpp.factory.security-mode=disabled" })
 public class XmppSupplierConfigurationTests implements XmppTestContainerSupport {
 
 	@DynamicPropertySource
@@ -84,8 +82,9 @@ public class XmppSupplierConfigurationTests implements XmppTestContainerSupport 
 		builder.setHost(XmppTestContainerSupport.getXmppHost());
 		builder.setPort(XmppTestContainerSupport.getXmppMappedPort());
 		builder.setResource(SERVICE_NAME);
-		builder.setUsernameAndPassword(JOHN_USER, USER_PW)											// Connect as user intended to send messages from
-				.setXmppDomain(SERVICE_NAME);
+		builder.setUsernameAndPassword(JOHN_USER, USER_PW) // Connect as user intended to
+															// send messages from
+			.setXmppDomain(SERVICE_NAME);
 		this.sourceConnection = new XMPPTCPConnection(builder.build());
 		this.sourceConnection.connect();
 		this.sourceConnection.login();
@@ -98,24 +97,21 @@ public class XmppSupplierConfigurationTests implements XmppTestContainerSupport 
 	}
 
 	@Test
-	void testSubscriptionConfiguration() throws XmppStringprepException, SmackException.NotConnectedException, InterruptedException {
+	void testSubscriptionConfiguration()
+			throws XmppStringprepException, SmackException.NotConnectedException, InterruptedException {
 
 		var payload = "test";
 
-		var stepVerifier =
-				StepVerifier.create(subject.get())
-						.assertNext((message) -> {
+		var stepVerifier = StepVerifier.create(subject.get()).assertNext((message) -> {
 
-							assertThat(message.getPayload())
-									.asInstanceOf(InstanceOfAssertFactories.type(String.class))
-									.isEqualTo(payload);
+			assertThat(message.getPayload()).asInstanceOf(InstanceOfAssertFactories.type(String.class))
+				.isEqualTo(payload);
 
-							assertThat(message.getHeaders().containsKey(XmppHeaders.TO)).isTrue();
-							assertThat(message.getHeaders().get(XmppHeaders.TO, String.class)).isEqualTo(JANE_USER + "@" + SERVICE_NAME);
+			assertThat(message.getHeaders().containsKey(XmppHeaders.TO)).isTrue();
+			assertThat(message.getHeaders().get(XmppHeaders.TO, String.class))
+				.isEqualTo(JANE_USER + "@" + SERVICE_NAME);
 
-						})
-						.thenCancel()
-						.verifyLater();
+		}).thenCancel().verifyLater();
 
 		var chatManager = ChatManager.getInstanceFor(this.sourceConnection);
 		var jid = JidCreate.entityBareFrom(JANE_USER + "@" + SERVICE_NAME);
@@ -129,6 +125,8 @@ public class XmppSupplierConfigurationTests implements XmppTestContainerSupport 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
 	@Import(XmppSupplierConfiguration.class)
-	static class XmppSupplierTestApplication { }
+	static class XmppSupplierTestApplication {
+
+	}
 
 }

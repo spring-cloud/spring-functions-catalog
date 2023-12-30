@@ -25,12 +25,12 @@ import org.springframework.util.Assert;
  * A value object representing a trace event: at a particular time with a simple (map)
  * information. Can be used for analyzing contextual information such as HTTP headers.
  *
- * <p> It is a copy of {@code InMemoryTraceRepository} from Spring Boot 1.5.x.
- * Since Spring Boot 2.0 traces are only available for HTTP.
+ * <p>
+ * It is a copy of {@code InMemoryTraceRepository} from Spring Boot 1.5.x. Since Spring
+ * Boot 2.0 traces are only available for HTTP.
  *
  * @author Dave Syer
  * @author Artem Bilan
- *
  * @since 2.0
  */
 public class Trace {
@@ -53,4 +53,5 @@ public class Trace {
 	public Map<String, Object> getInfo() {
 		return this.info;
 	}
+
 }

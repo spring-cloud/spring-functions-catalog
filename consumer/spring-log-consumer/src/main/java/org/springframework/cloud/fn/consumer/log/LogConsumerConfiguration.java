@@ -25,11 +25,11 @@ import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.Message;
 
 /**
- * The Configuration class for {@link Consumer} which logs incoming data.
- * For the logging logic a Spring Integration {@link org.springframework.integration.handler.LoggingHandler}
- * is used.
- * If incoming payload is a {@code byte[]} and incoming message {@code contentType} header is text-compatible
- * (e.g. {@code application/json}), it is converted into a {@link String}.
+ * The Configuration class for {@link Consumer} which logs incoming data. For the logging
+ * logic a Spring Integration
+ * {@link org.springframework.integration.handler.LoggingHandler} is used. If incoming
+ * payload is a {@code byte[]} and incoming message {@code contentType} header is
+ * text-compatible (e.g. {@code application/json}), it is converted into a {@link String}.
  * Otherwise the payload is passed to logger as is.
  *
  * @author Artem Bilan
@@ -41,8 +41,8 @@ public class LogConsumerConfiguration {
 	@Bean
 	IntegrationFlow logConsumerFlow(LogConsumerProperties logSinkProperties) {
 		return IntegrationFlow.from(MessageConsumer.class, (gateway) -> gateway.beanName("logConsumer"))
-				.log(logSinkProperties.getLevel(), logSinkProperties.getName(), logSinkProperties.getExpression())
-				.nullChannel();
+			.log(logSinkProperties.getLevel(), logSinkProperties.getName(), logSinkProperties.getExpression())
+			.nullChannel();
 	}
 
 	private interface MessageConsumer extends Consumer<Message<?>> {

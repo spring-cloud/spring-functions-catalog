@@ -35,8 +35,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DebeziumReactiveConsumerConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations.of(DebeziumEngineBuilderAutoConfiguration.class,
-					DebeziumReactiveConsumerConfiguration.class));
+		.withConfiguration(AutoConfigurations.of(DebeziumEngineBuilderAutoConfiguration.class,
+				DebeziumReactiveConsumerConfiguration.class));
 
 	// We have the debezium connectors on the classpath by default.
 

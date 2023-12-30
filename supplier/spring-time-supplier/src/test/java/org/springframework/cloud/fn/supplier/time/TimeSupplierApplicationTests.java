@@ -39,5 +39,7 @@ public abstract class TimeSupplierApplicationTests {
 
 	@SpringBootApplication
 	static class TimeSupplierTestApplication {
+
 	}
+
 }

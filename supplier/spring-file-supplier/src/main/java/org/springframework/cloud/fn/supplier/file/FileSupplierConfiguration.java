@@ -55,7 +55,7 @@ import org.springframework.util.StringUtils;
  * @author Soby Chacko
  */
 @Configuration
-@EnableConfigurationProperties({FileSupplierProperties.class, FileConsumerProperties.class})
+@EnableConfigurationProperties({ FileSupplierProperties.class, FileConsumerProperties.class })
 public class FileSupplierConfiguration {
 
 	private static final String METADATA_STORE_PREFIX = "local-file-system-metadata-";
@@ -70,7 +70,7 @@ public class FileSupplierConfiguration {
 	private FileReadingMessageSource fileMessageSource;
 
 	public FileSupplierConfiguration(FileSupplierProperties fileSupplierProperties,
-									FileConsumerProperties fileConsumerProperties) {
+			FileConsumerProperties fileConsumerProperties) {
 
 		this.fileSupplierProperties = fileSupplierProperties;
 		this.fileConsumerProperties = fileConsumerProperties;
@@ -87,7 +87,8 @@ public class FileSupplierConfiguration {
 		}
 
 		if (this.fileSupplierProperties.isPreventDuplicates()) {
-			chainFilter.addFilter(new FileSystemPersistentAcceptOnceFileListFilter(metadataStore, METADATA_STORE_PREFIX));
+			chainFilter
+				.addFilter(new FileSystemPersistentAcceptOnceFileListFilter(metadataStore, METADATA_STORE_PREFIX));
 		}
 
 		return chainFilter;
@@ -97,9 +98,8 @@ public class FileSupplierConfiguration {
 	public FileInboundChannelAdapterSpec fileMessageSource(FileListFilter<File> fileListFilter,
 			@Nullable ComponentCustomizer<FileInboundChannelAdapterSpec> fileInboundChannelAdapterSpecCustomizer) {
 
-		FileInboundChannelAdapterSpec adapterSpec =
-				Files.inboundAdapter(this.fileSupplierProperties.getDirectory())
-				.filter(fileListFilter);
+		FileInboundChannelAdapterSpec adapterSpec = Files.inboundAdapter(this.fileSupplierProperties.getDirectory())
+			.filter(fileListFilter);
 		if (fileInboundChannelAdapterSpecCustomizer != null) {
 			fileInboundChannelAdapterSpecCustomizer.customize(adapterSpec);
 		}
@@ -108,21 +108,20 @@ public class FileSupplierConfiguration {
 
 	@Bean
 	public Flux<Message<?>> fileMessageFlux() {
-		return Mono.<Message<?>>create(monoSink ->
-				monoSink.onRequest(value ->
-						monoSink.success(this.fileMessageSource.receive())))
-				.subscribeOn(Schedulers.boundedElastic())
-				.repeatWhenEmpty(it -> it.delayElements(this.fileSupplierProperties.getDelayWhenEmpty()))
-				.repeat()
-				.doOnRequest(r -> this.fileMessageSource.start());
+		return Mono
+			.<Message<?>>create(
+					monoSink -> monoSink.onRequest(value -> monoSink.success(this.fileMessageSource.receive())))
+			.subscribeOn(Schedulers.boundedElastic())
+			.repeatWhenEmpty(it -> it.delayElements(this.fileSupplierProperties.getDelayWhenEmpty()))
+			.repeat()
+			.doOnRequest(r -> this.fileMessageSource.start());
 	}
 
 	@Bean
 	@ConditionalOnExpression("environment['file.consumer.mode'] != 'ref'")
 	public Publisher<Message<Object>> fileReadingFlow() {
 		IntegrationFlowBuilder flowBuilder = IntegrationFlow.from(fileMessageFlux());
-		return FileUtils.enhanceFlowForReadingMode(flowBuilder, this.fileConsumerProperties)
-				.toReactivePublisher();
+		return FileUtils.enhanceFlowForReadingMode(flowBuilder, this.fileConsumerProperties).toReactivePublisher();
 	}
 
 	@Bean

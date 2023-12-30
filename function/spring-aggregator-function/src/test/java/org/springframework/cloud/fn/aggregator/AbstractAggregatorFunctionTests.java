@@ -48,9 +48,11 @@ public abstract class AbstractAggregatorFunctionTests {
 
 	@SpringBootApplication
 	public static class AggregatorFunctionTestApplication {
+
 		public static void main(String[] args) {
 			SpringApplication.run(AggregatorFunctionTestApplication.class, args);
 		}
+
 	}
 
 }

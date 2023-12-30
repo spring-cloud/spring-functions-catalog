@@ -33,4 +33,5 @@ public class AbstractJmsSupplierTests {
 	public static class JmsSupplierTestApplication {
 
 	}
+
 }

@@ -45,18 +45,17 @@ public class TaskLaunchRequestFunctionApplicationTests {
 	@BeforeEach
 	public void setUp() {
 		springApplicationBuilder = new SpringApplicationBuilder(TaskLaunchRequestFunctionTestApplication.class)
-				.web(WebApplicationType.NONE);
+			.web(WebApplicationType.NONE);
 	}
 
 	@Test
 	@DirtiesContext
 	public void simpleDataflowTaskLaunchRequest() throws IOException {
 
-		ApplicationContext context = springApplicationBuilder.properties(
-				"spring.jmx.enabled=false",
-				"spring.cloud.function.definition=taskLaunchRequestFunction",
-				"task.launch.request.task-name=foo")
-				.run();
+		ApplicationContext context = springApplicationBuilder
+			.properties("spring.jmx.enabled=false", "spring.cloud.function.definition=taskLaunchRequestFunction",
+					"task.launch.request.task-name=foo")
+			.run();
 
 		TaskLaunchRequest taskLaunchRequest = verifyAndreceiveTaskLaunchRequest(context);
 
@@ -69,16 +68,15 @@ public class TaskLaunchRequestFunctionApplicationTests {
 	@DirtiesContext
 	public void dataflowTaskLaunchRequestWithArgsAndDeploymentProperties() throws IOException {
 
-		ApplicationContext context = springApplicationBuilder.properties(
-				"spring.jmx.enabled=false", "spring.cloud.function.definition=taskLaunchRequestFunction",
-				"task.launch.request.task-name=foo", "task.launch.request.args=foo=bar,baz=boo",
-				"task.launch.request.deploymentProperties=count=3")
-				.run();
+		ApplicationContext context = springApplicationBuilder
+			.properties("spring.jmx.enabled=false", "spring.cloud.function.definition=taskLaunchRequestFunction",
+					"task.launch.request.task-name=foo", "task.launch.request.args=foo=bar,baz=boo",
+					"task.launch.request.deploymentProperties=count=3")
+			.run();
 		TaskLaunchRequest taskLaunchRequest = verifyAndreceiveTaskLaunchRequest(context);
 
 		assertThat(taskLaunchRequest.getTaskName()).isEqualTo("foo");
-		assertThat(taskLaunchRequest.getCommandlineArguments()).containsExactlyInAnyOrder("foo=bar",
-				"baz=boo");
+		assertThat(taskLaunchRequest.getCommandlineArguments()).containsExactlyInAnyOrder("foo=bar", "baz=boo");
 		assertThat(taskLaunchRequest.getDeploymentProperties()).containsOnly(entry("count", "3"));
 	}
 
@@ -86,10 +84,10 @@ public class TaskLaunchRequestFunctionApplicationTests {
 	@DirtiesContext
 	public void taskLaunchRequestWithCommandLineArgsMessageMapper() throws IOException {
 
-		ApplicationContext context = springApplicationBuilder.properties(
-				"spring.jmx.enabled=false", "spring.cloud.function.definition=taskLaunchRequestFunction",
-				"task.launch.request.task-name=foo", "enhanceTLRArgs=true")
-				.run();
+		ApplicationContext context = springApplicationBuilder
+			.properties("spring.jmx.enabled=false", "spring.cloud.function.definition=taskLaunchRequestFunction",
+					"task.launch.request.task-name=foo", "enhanceTLRArgs=true")
+			.run();
 
 		TaskLaunchRequest taskLaunchRequest = verifyAndreceiveTaskLaunchRequest(context);
 
@@ -102,12 +100,11 @@ public class TaskLaunchRequestFunctionApplicationTests {
 	@Test
 	@DirtiesContext
 	public void taskLaunchRequestWithArgExpressions() throws IOException {
-		ApplicationContext context = springApplicationBuilder.properties(
-				"spring.jmx.enabled=false",
-				"spring.cloud.function.definition=taskLaunchRequestFunction",
-				"task.launch.request.task-name=foo",
-				"task.launch.request.arg-expressions=foo=payload.toUpperCase(),bar=payload.substring(0,2)")
-				.run();
+		ApplicationContext context = springApplicationBuilder
+			.properties("spring.jmx.enabled=false", "spring.cloud.function.definition=taskLaunchRequestFunction",
+					"task.launch.request.task-name=foo",
+					"task.launch.request.arg-expressions=foo=payload.toUpperCase(),bar=payload.substring(0,2)")
+			.run();
 
 		Message<String> message = MessageBuilder.withPayload("hello").build();
 
@@ -123,11 +120,10 @@ public class TaskLaunchRequestFunctionApplicationTests {
 	@Test
 	@DirtiesContext
 	public void taskLaunchRequestWithIntPayload() throws IOException {
-		ApplicationContext context = springApplicationBuilder.properties(
-				"spring.jmx.enabled=false", "spring.cloud.function.definition=taskLaunchRequestFunction",
-				"task.launch.request.task-name=foo",
-				"task.launch.request.arg-expressions=i=payload")
-				.run();
+		ApplicationContext context = springApplicationBuilder
+			.properties("spring.jmx.enabled=false", "spring.cloud.function.definition=taskLaunchRequestFunction",
+					"task.launch.request.task-name=foo", "task.launch.request.arg-expressions=i=payload")
+			.run();
 
 		TaskLaunchRequestFunction taskLaunchRequestFunction = context.getBean(TaskLaunchRequestFunction.class);
 
@@ -144,10 +140,10 @@ public class TaskLaunchRequestFunctionApplicationTests {
 	@Test
 	@DirtiesContext
 	public void taskNameExpression() throws IOException {
-		ApplicationContext context = springApplicationBuilder.properties(
-				"spring.jmx.enabled=false", "spring.cloud.function.definition=taskLaunchRequestFunction",
-				"task.launch.request.task-name-expression=payload+'_task'")
-				.run();
+		ApplicationContext context = springApplicationBuilder
+			.properties("spring.jmx.enabled=false", "spring.cloud.function.definition=taskLaunchRequestFunction",
+					"task.launch.request.task-name-expression=payload+'_task'")
+			.run();
 
 		TaskLaunchRequestFunction taskLaunchRequestFunction = context.getBean(TaskLaunchRequestFunction.class);
 
@@ -163,10 +159,10 @@ public class TaskLaunchRequestFunctionApplicationTests {
 	@Test
 	@DirtiesContext
 	public void customTaskNameExtractor() throws IOException {
-		ApplicationContext context = springApplicationBuilder.properties(
-				"spring.jmx.enabled=false", "spring.cloud.function.definition=taskLaunchRequestFunction",
-				"customTaskNameExtractor=true")
-				.run();
+		ApplicationContext context = springApplicationBuilder
+			.properties("spring.jmx.enabled=false", "spring.cloud.function.definition=taskLaunchRequestFunction",
+					"customTaskNameExtractor=true")
+			.run();
 		TaskLaunchRequestFunction taskLaunchRequestFunction = context.getBean(TaskLaunchRequestFunction.class);
 
 		Message<String> message = MessageBuilder.withPayload("foo").build();
@@ -184,11 +180,10 @@ public class TaskLaunchRequestFunctionApplicationTests {
 		assertThat(request.getTaskName()).isEqualTo("defaultTask");
 	}
 
-	private TaskLaunchRequest verifyAndreceiveTaskLaunchRequest(ApplicationContext context)
-			throws IOException {
+	private TaskLaunchRequest verifyAndreceiveTaskLaunchRequest(ApplicationContext context) throws IOException {
 		TaskLaunchRequestFunction taskLaunchRequestFunction = context.getBean(TaskLaunchRequestFunction.class);
 		Message<TaskLaunchRequest> message = taskLaunchRequestFunction
-				.apply(MessageBuilder.withPayload(new byte[] {}).build());
+			.apply(MessageBuilder.withPayload(new byte[] {}).build());
 		assertThat(message).isNotNull();
 		return message.getPayload();
 	}
@@ -207,5 +202,7 @@ public class TaskLaunchRequestFunctionApplicationTests {
 		CommandLineArgumentsMessageMapper commandLineArgumentsProvider() {
 			return message -> Collections.singletonList("runtimeArg");
 		}
+
 	}
+
 }

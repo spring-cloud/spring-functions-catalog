@@ -25,14 +25,14 @@ import org.springframework.expression.Expression;
  * Properties for the Kafka Publisher (Consumer function).
  *
  * @author Artem Bilan
- *
  * @since 4.0
  */
 @ConfigurationProperties("kafka.publisher")
 public class KafkaPublisherProperties {
 
 	/**
-	 * Kafka topic - overridden by topicExpression, if supplied. Defaults to KafkaTemplate.getDefaultTopic()
+	 * Kafka topic - overridden by topicExpression, if supplied. Defaults to
+	 * KafkaTemplate.getDefaultTopic()
 	 */
 	private String topic;
 
@@ -77,7 +77,8 @@ public class KafkaPublisherProperties {
 	private boolean sync;
 
 	/**
-	 * How long Kafka producer handler should wait for send operation results. Defaults to 10 seconds.
+	 * How long Kafka producer handler should wait for send operation results. Defaults to
+	 * 10 seconds.
 	 */
 	private Duration sendTimeout = Duration.ofSeconds(10);
 

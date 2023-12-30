@@ -28,9 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Christian Tzolov
  */
-@TestPropertySource(properties = {
-		"analytics.name-expression=payload"
-})
+@TestPropertySource(properties = { "analytics.name-expression=payload" })
 public class ExpressionCounterNameTests extends AnalyticsConsumerParentTest {
 
 	@Test
@@ -38,4 +36,5 @@ public class ExpressionCounterNameTests extends AnalyticsConsumerParentTest {
 		IntStream.range(0, 13).forEach(i -> analyticsConsumer.accept(new GenericMessage<>("hello")));
 		assertThat(meterRegistry.find("hello").counter().count()).isEqualTo(13.0);
 	}
+
 }

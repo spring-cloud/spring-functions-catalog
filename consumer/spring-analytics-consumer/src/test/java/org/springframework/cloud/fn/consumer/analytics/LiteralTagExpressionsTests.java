@@ -29,11 +29,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Christian Tzolov
  */
-@TestPropertySource(properties = {
-		"analytics.name=counter666",
-		"analytics.tag.expression.foo='bar'",
-		"analytics.tag.expression.gork='bork'"
-})
+@TestPropertySource(properties = { "analytics.name=counter666", "analytics.tag.expression.foo='bar'",
+		"analytics.tag.expression.gork='bork'" })
 public class LiteralTagExpressionsTests extends AnalyticsConsumerParentTest {
 
 	@Test

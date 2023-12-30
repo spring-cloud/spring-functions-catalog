@@ -115,7 +115,8 @@ public class SearchPaginationTests {
 
 		pagination.update(tweets(7, 4, 1));
 
-		// Restart from Most Recent due to pageCounter == 0 while no reset have been performed so ar
+		// Restart from Most Recent due to pageCounter == 0 while no reset have been
+		// performed so ar
 		assertThat(pagination.getSinceId()).isEqualTo(10L);
 		assertThat(pagination.getMaxId()).isEqualTo(UNBOUNDED);
 		assertThat(pagination.getPageMaxId()).isEqualTo(UNBOUNDED);
@@ -345,5 +346,7 @@ public class SearchPaginationTests {
 		public int getAccessLevel() {
 			return 0;
 		}
+
 	}
+
 }

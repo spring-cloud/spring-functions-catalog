@@ -30,4 +30,5 @@ public class STXETXTests extends AbstractTcpSupplierTests {
 	public void test() throws Exception {
 		doTest("\u0002", "foo", "\u0003");
 	}
+
 }

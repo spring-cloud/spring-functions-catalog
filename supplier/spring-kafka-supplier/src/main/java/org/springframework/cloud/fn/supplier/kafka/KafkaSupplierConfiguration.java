@@ -47,11 +47,10 @@ import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**
- * An auto-configuration for Kafka Supplier.
- * Uses a {@link KafkaMessageDrivenChannelAdapterSpec} to consumer records from Kafka topic.
+ * An auto-configuration for Kafka Supplier. Uses a
+ * {@link KafkaMessageDrivenChannelAdapterSpec} to consumer records from Kafka topic.
  *
  * @author Artem Bilan
- *
  * @since 4.0
  */
 @AutoConfiguration(after = KafkaAutoConfiguration.class)
@@ -67,8 +66,7 @@ public class KafkaSupplierConfiguration {
 	public Publisher<Message<Object>> kafkaSupplierPublisher(
 			KafkaMessageDrivenChannelAdapterSpec<?, ?, ?> kafkaMessageDrivenChannelAdapterSpec) {
 
-		return IntegrationFlow.from(kafkaMessageDrivenChannelAdapterSpec)
-				.toReactivePublisher(true);
+		return IntegrationFlow.from(kafkaMessageDrivenChannelAdapterSpec).toReactivePublisher(true);
 	}
 
 	@Bean
@@ -90,22 +88,20 @@ public class KafkaSupplierConfiguration {
 			container = kafkaListenerContainerFactory.createContainer(kafkaSupplierProperties.getTopics());
 		}
 
-		KafkaMessageDrivenChannelAdapter.ListenerMode listenerMode =
-				Boolean.TRUE.equals(kafkaListenerContainerFactory.isBatchListener())
-						? KafkaMessageDrivenChannelAdapter.ListenerMode.batch
+		KafkaMessageDrivenChannelAdapter.ListenerMode listenerMode = Boolean.TRUE.equals(
+				kafkaListenerContainerFactory.isBatchListener()) ? KafkaMessageDrivenChannelAdapter.ListenerMode.batch
 						: KafkaMessageDrivenChannelAdapter.ListenerMode.record;
 
-		KafkaMessageDrivenChannelAdapterSpec<Object, Object, ?> kafkaMessageDrivenChannelAdapterSpec =
-				Kafka.messageDrivenChannelAdapter(container, listenerMode)
-						.ackDiscarded(kafkaSupplierProperties.isAckDiscarded())
-						.autoStartup(false);
+		KafkaMessageDrivenChannelAdapterSpec<Object, Object, ?> kafkaMessageDrivenChannelAdapterSpec = Kafka
+			.messageDrivenChannelAdapter(container, listenerMode)
+			.ackDiscarded(kafkaSupplierProperties.isAckDiscarded())
+			.autoStartup(false);
 
 		RecordMessageConverter recordMessageConverter = recordMessageConverterProvider.getIfUnique();
 
 		if (KafkaMessageDrivenChannelAdapter.ListenerMode.batch.equals(listenerMode)) {
-			BatchMessageConverter batchMessageConverter =
-					batchMessageConverterProvider.getIfUnique(
-							() -> new BatchMessagingMessageConverter(recordMessageConverter));
+			BatchMessageConverter batchMessageConverter = batchMessageConverterProvider
+				.getIfUnique(() -> new BatchMessagingMessageConverter(recordMessageConverter));
 
 			kafkaMessageDrivenChannelAdapterSpec.batchMessageConverter(batchMessageConverter);
 		}
@@ -130,10 +126,8 @@ public class KafkaSupplierConfiguration {
 
 		StandardEvaluationContext evaluationContext = IntegrationContextUtils.getEvaluationContext(beanFactory);
 
-		return consumerRecord ->
-				Boolean.TRUE.equals(
-						kafkaSupplierProperties.getRecordFilter()
-								.getValue(evaluationContext, consumerRecord, Boolean.class));
+		return consumerRecord -> Boolean.TRUE.equals(
+				kafkaSupplierProperties.getRecordFilter().getValue(evaluationContext, consumerRecord, Boolean.class));
 	}
 
 }

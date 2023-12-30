@@ -1,0 +1,19 @@
+
+apply plugin: 'io.spring.javaformat'
+apply plugin: 'checkstyle'
+
+checkstyle {
+	toolVersion = "10.3"
+	configDirectory = rootProject.file('etc/checkstyle')
+	ignoreFailures = true
+}
+
+dependencies {
+	// NOTE: We explicitly specify checkstyle dep before javaformat checkstyle due to antlr class mismatch
+	checkstyle("com.puppycrawl.tools:checkstyle:${checkstyle.toolVersion}")
+	checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:${javaFormatVersion}")
+}
+
+tasks.named("checkFormatMain") {
+	exclude "org/springframework/cloud/fn/object/detection/protos"
+}

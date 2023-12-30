@@ -33,7 +33,6 @@ import javax.imageio.ImageIO;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-
 /**
  * Ability to to augment the input image fromMemory the recognized labels.
  *
@@ -47,6 +46,7 @@ public class ImageRecognitionAugmenter implements BiFunction<byte[], List<Recogn
 	public static final String IMAGE_FORMAT = "jpg";
 
 	private final Color textColor = Color.BLACK;
+
 	private final Color bgColor = new Color(167, 252, 0);
 
 	public ImageRecognitionAugmenter() {
@@ -54,7 +54,6 @@ public class ImageRecognitionAugmenter implements BiFunction<byte[], List<Recogn
 
 	/**
 	 * Augment the input image by adding the recognized classes.
-	 *
 	 * @param imageBytes input image as byte array
 	 * @param result computed recognition labels
 	 * @return the image augmented fromMemory recognized labels.

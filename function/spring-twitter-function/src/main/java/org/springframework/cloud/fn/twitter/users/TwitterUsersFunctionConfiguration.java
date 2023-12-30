@@ -35,7 +35,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 
 /**
- *
  * @author Christian Tzolov
  */
 @Configuration
@@ -88,11 +87,12 @@ public class TwitterUsersFunctionConfiguration {
 
 	@Bean
 	/**
-	 * queryUsers - depends on the `twitter.users.type` property is either userSearch or userLookup.
-	 * managedJson - converts Users into JSON message payload.
+	 * queryUsers - depends on the `twitter.users.type` property is either userSearch or
+	 * userLookup. managedJson - converts Users into JSON message payload.
 	 */
 	public Function<Message<?>, Message<byte[]>> twitterUsersFunction(Function<Message<?>, List<User>> queryUsers,
 			Function<Object, Message<byte[]>> managedJson) {
 		return queryUsers.andThen(managedJson);
 	}
+
 }

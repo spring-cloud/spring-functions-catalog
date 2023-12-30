@@ -41,7 +41,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Artem Bilan
  */
 @TestPropertySource(properties = "aggregator.message-store-type=redis")
-public class RedisMessageStoreAggregatorTests extends AbstractAggregatorFunctionTests implements RedisTestContainerSupport {
+public class RedisMessageStoreAggregatorTests extends AbstractAggregatorFunctionTests
+		implements RedisTestContainerSupport {
 
 	@DynamicPropertySource
 	static void redisProperties(DynamicPropertyRegistry registry) {
@@ -52,8 +53,8 @@ public class RedisMessageStoreAggregatorTests extends AbstractAggregatorFunction
 	public void test() {
 		InputStream fakeNonSerializableKafkaConsumer = new ByteArrayInputStream(new byte[0]);
 
-		Flux<Message<?>> input =
-			Flux.just(MessageBuilder.withPayload("2")
+		Flux<Message<?>> input = Flux.just(
+				MessageBuilder.withPayload("2")
 					.setHeader(IntegrationMessageHeaderAccessor.CORRELATION_ID, "my_correlation")
 					.setHeader(IntegrationMessageHeaderAccessor.SEQUENCE_NUMBER, 2)
 					.setHeader(IntegrationMessageHeaderAccessor.SEQUENCE_SIZE, 2)
@@ -68,13 +69,11 @@ public class RedisMessageStoreAggregatorTests extends AbstractAggregatorFunction
 		Flux<Message<?>> output = this.aggregatorFunction.apply(input);
 
 		output.as(StepVerifier::create)
-			.assertNext((message) ->
-				assertThat(message)
-					.extracting(Message::getPayload)
-					.isInstanceOf(List.class)
-					.asList()
-					.hasSize(2)
-					.contains("1", "2"))
+			.assertNext((message) -> assertThat(message).extracting(Message::getPayload)
+				.isInstanceOf(List.class)
+				.asList()
+				.hasSize(2)
+				.contains("1", "2"))
 			.thenCancel()
 			.verify(Duration.ofSeconds(10));
 

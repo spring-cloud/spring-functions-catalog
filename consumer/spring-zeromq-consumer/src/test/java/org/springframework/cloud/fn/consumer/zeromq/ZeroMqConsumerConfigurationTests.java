@@ -41,7 +41,6 @@ import static org.awaitility.Awaitility.await;
 /**
  * @author Daniel Frey
  * @author Artem Bilan
- *
  * @since 3.1
  */
 @SpringBootTest(properties = "zeromq.consumer.topic='test-topic'")
@@ -74,15 +73,14 @@ public class ZeroMqConsumerConfigurationTests {
 	void testMessageHandlerConfiguration() {
 		Message<?> testMessage = MessageBuilder.withPayload("test").setHeader("topic", "test-topic").build();
 
-		await().atMost(Duration.ofSeconds(20)).pollDelay(Duration.ofMillis(100))
-				.untilAsserted(() -> {
-					socket.subscribe("test-topic");
-					subject.apply(Flux.just(testMessage)).subscribe();
-					String topic = socket.recvStr();
-					assertThat(topic).isEqualTo("test-topic");
-					assertThat(socket.recvStr()).isEmpty();
-					assertThat(socket.recvStr()).isEqualTo("test");
-				});
+		await().atMost(Duration.ofSeconds(20)).pollDelay(Duration.ofMillis(100)).untilAsserted(() -> {
+			socket.subscribe("test-topic");
+			subject.apply(Flux.just(testMessage)).subscribe();
+			String topic = socket.recvStr();
+			assertThat(topic).isEqualTo("test-topic");
+			assertThat(socket.recvStr()).isEmpty();
+			assertThat(socket.recvStr()).isEqualTo("test");
+		});
 
 	}
 

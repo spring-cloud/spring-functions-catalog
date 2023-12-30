@@ -34,16 +34,13 @@ public class Tcp5424Tests extends AbstractSyslogSupplierTests {
 	public void test() throws Exception {
 		final Flux<Message<?>> messageFlux = syslogSupplier.get();
 
-		final StepVerifier stepVerifier = StepVerifier.create(messageFlux)
-				.assertNext((message) -> {
-							assertThat(((Map) message.getPayload()).get("syslog_HOST")).isEqualTo("loggregator");
-						}
-				)
-				.thenCancel()
-				.verifyLater();
+		final StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(((Map) message.getPayload()).get("syslog_HOST")).isEqualTo("loggregator");
+		}).thenCancel().verifyLater();
 
 		sendTcp("253 " + RFC5424_PACKET);
 
 		stepVerifier.verify();
 	}
+
 }

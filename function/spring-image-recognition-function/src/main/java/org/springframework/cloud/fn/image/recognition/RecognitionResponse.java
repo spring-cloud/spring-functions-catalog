@@ -20,7 +20,9 @@ package org.springframework.cloud.fn.image.recognition;
  * @author Christian Tzolov
  */
 public class RecognitionResponse {
+
 	private String label;
+
 	private Double probability;
 
 	public RecognitionResponse() {
@@ -51,4 +53,5 @@ public class RecognitionResponse {
 	public String toString() {
 		return "{label='" + label + ", probability=" + probability + '}';
 	}
+
 }

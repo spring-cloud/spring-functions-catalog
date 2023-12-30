@@ -37,11 +37,10 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
 /**
- * A configuration for Apache Kafka Publisher (Consumer function).
- * Uses a {@link KafkaProducerMessageHandlerSpec} to publish a message to Kafka topic.
+ * A configuration for Apache Kafka Publisher (Consumer function). Uses a
+ * {@link KafkaProducerMessageHandlerSpec} to publish a message to Kafka topic.
  *
  * @author Artem Bilan
- *
  * @since 4.0
  */
 @AutoConfiguration(after = KafkaAutoConfiguration.class)
@@ -60,10 +59,8 @@ public class KafkaPublisherConfiguration {
 
 	@Bean
 	public KafkaProducerMessageHandlerSpec<?, ?, ?> kafkaProducerMessageHandlerSpec(KafkaTemplate<?, ?> kafkaTemplate,
-			KafkaPublisherProperties kafkaPublisherProperties,
-			PublishSubscribeChannel kafkaPublisherSuccessChannel,
-			PublishSubscribeChannel kafkaPublisherFailureChannel,
-			PublishSubscribeChannel kafkaPublisherFuturesChannel,
+			KafkaPublisherProperties kafkaPublisherProperties, PublishSubscribeChannel kafkaPublisherSuccessChannel,
+			PublishSubscribeChannel kafkaPublisherFailureChannel, PublishSubscribeChannel kafkaPublisherFuturesChannel,
 			@Nullable ComponentCustomizer<KafkaProducerMessageHandlerSpec<?, ?, ?>> kafkaProducerSpecComponentCustomizer) {
 
 		var kafkaProducerMessageHandlerSpec = Kafka.outboundChannelAdapter(kafkaTemplate);
@@ -73,15 +70,24 @@ public class KafkaPublisherConfiguration {
 		mapper.from(kafkaPublisherProperties.getTopic()).to(kafkaProducerMessageHandlerSpec::topic);
 		mapper.from(kafkaPublisherProperties.getTopicExpression()).to(kafkaProducerMessageHandlerSpec::topicExpression);
 		mapper.from(kafkaPublisherProperties.getKey()).to(kafkaProducerMessageHandlerSpec::messageKey);
-		mapper.from(kafkaPublisherProperties.getKeyExpression()).to(kafkaProducerMessageHandlerSpec::messageKeyExpression);
+		mapper.from(kafkaPublisherProperties.getKeyExpression())
+			.to(kafkaProducerMessageHandlerSpec::messageKeyExpression);
 		mapper.from(kafkaPublisherProperties.getPartition()).to(kafkaProducerMessageHandlerSpec::partitionId);
-		mapper.from(kafkaPublisherProperties.getPartitionExpression()).to(kafkaProducerMessageHandlerSpec::partitionIdExpression);
-		mapper.from(kafkaPublisherProperties.getTimestamp()).as(ValueExpression::new).to(kafkaProducerMessageHandlerSpec::timestampExpression);
-		mapper.from(kafkaPublisherProperties.getTimestampExpression()).to(kafkaProducerMessageHandlerSpec::timestampExpression);
-		mapper.from(kafkaPublisherProperties.getSendTimeout()).as(Duration::toMillis).to(kafkaProducerMessageHandlerSpec::sendTimeout);
-		mapper.from(kafkaPublisherProperties.isUseTemplateConverter()).to(kafkaProducerMessageHandlerSpec::useTemplateConverter);
+		mapper.from(kafkaPublisherProperties.getPartitionExpression())
+			.to(kafkaProducerMessageHandlerSpec::partitionIdExpression);
+		mapper.from(kafkaPublisherProperties.getTimestamp())
+			.as(ValueExpression::new)
+			.to(kafkaProducerMessageHandlerSpec::timestampExpression);
+		mapper.from(kafkaPublisherProperties.getTimestampExpression())
+			.to(kafkaProducerMessageHandlerSpec::timestampExpression);
+		mapper.from(kafkaPublisherProperties.getSendTimeout())
+			.as(Duration::toMillis)
+			.to(kafkaProducerMessageHandlerSpec::sendTimeout);
+		mapper.from(kafkaPublisherProperties.isUseTemplateConverter())
+			.to(kafkaProducerMessageHandlerSpec::useTemplateConverter);
 
-		kafkaProducerMessageHandlerSpec.headerMapper(new DefaultKafkaHeaderMapper(kafkaPublisherProperties.getMappedHeaders()));
+		kafkaProducerMessageHandlerSpec
+			.headerMapper(new DefaultKafkaHeaderMapper(kafkaPublisherProperties.getMappedHeaders()));
 
 		kafkaProducerMessageHandlerSpec.sendSuccessChannel(kafkaPublisherSuccessChannel);
 		kafkaProducerMessageHandlerSpec.sendFailureChannel(kafkaPublisherFailureChannel);

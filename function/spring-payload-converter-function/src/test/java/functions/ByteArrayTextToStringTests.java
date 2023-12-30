@@ -32,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ByteArrayTextToStringTests {
 
 	private static final String MESSAGE = "hello world";
+
 	private static Function<Message<?>, Message<?>> converter;
 
 	@BeforeAll

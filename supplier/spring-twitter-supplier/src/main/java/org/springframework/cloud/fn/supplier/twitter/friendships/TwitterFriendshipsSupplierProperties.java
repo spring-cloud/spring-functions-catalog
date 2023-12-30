@@ -24,7 +24,6 @@ import jakarta.validation.constraints.Positive;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-
 /**
  * @author Christian Tzolov
  */
@@ -33,8 +32,10 @@ import org.springframework.validation.annotation.Validated;
 public class TwitterFriendshipsSupplierProperties {
 
 	public enum FriendshipsRequestType {
+
 		/** Friendship query types. */
 		followers, friends
+
 	}
 
 	/**
@@ -71,7 +72,8 @@ public class TwitterFriendshipsSupplierProperties {
 	private boolean includeUserEntities = true;
 
 	/**
-	 * API request poll interval in milliseconds. Must be aligned with used APIs rate limits (~ 1 req/ 2 min).
+	 * API request poll interval in milliseconds. Must be aligned with used APIs rate
+	 * limits (~ 1 req/ 2 min).
 	 */
 	private int pollInterval = 121000;
 
@@ -138,14 +140,9 @@ public class TwitterFriendshipsSupplierProperties {
 
 	@Override
 	public String toString() {
-		return "TwitterFriendshipsSourceProperties{" +
-				"type=" + type +
-				", screenName='" + screenName + '\'' +
-				", userId=" + userId +
-				", count=" + count +
-				", skipStatus=" + skipStatus +
-				", includeUserEntities=" + includeUserEntities +
-				", pollInterval=" + pollInterval +
-				'}';
+		return "TwitterFriendshipsSourceProperties{" + "type=" + type + ", screenName='" + screenName + '\''
+				+ ", userId=" + userId + ", count=" + count + ", skipStatus=" + skipStatus + ", includeUserEntities="
+				+ includeUserEntities + ", pollInterval=" + pollInterval + '}';
 	}
+
 }

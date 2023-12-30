@@ -60,8 +60,7 @@ public class SplitterFunctionConfiguration {
 	@ConditionalOnProperty(prefix = "splitter", name = "expression")
 	public AbstractMessageSplitter expressionSplitter(SplitterFunctionProperties splitterFunctionProperties) {
 		return new ExpressionEvaluatingSplitter(
-				new SpelExpressionParser()
-						.parseExpression(splitterFunctionProperties.getExpression()));
+				new SpelExpressionParser().parseExpression(splitterFunctionProperties.getExpression()));
 	}
 
 	@Bean
@@ -96,10 +95,12 @@ public class SplitterFunctionConfiguration {
 
 		@ConditionalOnProperty(prefix = "splitter", name = "charset")
 		static class Charset {
+
 		}
 
 		@ConditionalOnProperty(prefix = "splitter", name = "fileMarkers")
 		static class FileMarkers {
+
 		}
 
 	}

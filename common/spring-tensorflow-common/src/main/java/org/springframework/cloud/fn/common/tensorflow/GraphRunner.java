@@ -24,13 +24,13 @@ import org.tensorflow.SavedModelBundle;
 import org.tensorflow.Session;
 import org.tensorflow.op.Ops;
 
-
 /**
  * @author Christian Tzolov
  */
 public class GraphRunner extends AbstractGraphRunner implements AutoCloseable {
 
 	private SavedModelBundle savedModelBundle;
+
 	private AutoCloseableSession autoCloseableSession;
 
 	public GraphRunner(List<String> feedNames, String fetchedName) {
@@ -48,7 +48,6 @@ public class GraphRunner extends AbstractGraphRunner implements AutoCloseable {
 	public GraphRunner(List<String> feedNames, List<String> fetchedNames) {
 		super(feedNames, fetchedNames);
 	}
-
 
 	@Override
 	public Session doGetSession() {
@@ -69,8 +68,8 @@ public class GraphRunner extends AbstractGraphRunner implements AutoCloseable {
 	}
 
 	public GraphRunner withGraphDefinition(GraphDefinition graphDefinition) {
-		Validate.isTrue(this.savedModelBundle == null, "Either SavedModel or GraphDefinition can be set! " +
-				"SavedModelBundle is found: " + this.savedModelBundle);
+		Validate.isTrue(this.savedModelBundle == null, "Either SavedModel or GraphDefinition can be set! "
+				+ "SavedModelBundle is found: " + this.savedModelBundle);
 
 		this.autoCloseableSession = new AutoCloseableSession() {
 			@Override
@@ -83,8 +82,8 @@ public class GraphRunner extends AbstractGraphRunner implements AutoCloseable {
 	}
 
 	public GraphRunner withSavedModel(String savedModelDir, String... tags) {
-		Validate.isTrue(this.autoCloseableSession == null, "Either SavedModel or GraphDefinition can be set! " +
-				"AutoCloseableSession is found: " + this.autoCloseableSession);
+		Validate.isTrue(this.autoCloseableSession == null, "Either SavedModel or GraphDefinition can be set! "
+				+ "AutoCloseableSession is found: " + this.autoCloseableSession);
 		this.savedModelBundle = SavedModelBundle.load(savedModelDir, tags);
 		return this;
 	}
@@ -104,4 +103,5 @@ public class GraphRunner extends AbstractGraphRunner implements AutoCloseable {
 			this.autoCloseableSession.close();
 		}
 	}
+
 }

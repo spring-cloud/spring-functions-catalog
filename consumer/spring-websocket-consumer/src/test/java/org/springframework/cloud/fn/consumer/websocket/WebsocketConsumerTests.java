@@ -44,12 +44,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Corneil du Plessis
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-		properties = {
-				"websocket.consumer.port=0",
-				"websocket.consumer.path=/some_websocket_path",
-				"websocket.consumer.logLevel=DEBUG",
-				"websocket.consumer.threads=2"
-		})
+		properties = { "websocket.consumer.port=0", "websocket.consumer.path=/some_websocket_path",
+				"websocket.consumer.logLevel=DEBUG", "websocket.consumer.threads=2" })
 @DirtiesContext
 public class WebsocketConsumerTests {
 
@@ -79,7 +75,8 @@ public class WebsocketConsumerTests {
 	@Test
 	@Timeout(TIMEOUT)
 	public void testMultipleMessageSingleSubscriber() throws Exception {
-		WebsocketConsumerClientHandler handler = new WebsocketConsumerClientHandler("handler_0", MESSAGE_COUNT, TIMEOUT);
+		WebsocketConsumerClientHandler handler = new WebsocketConsumerClientHandler("handler_0", MESSAGE_COUNT,
+				TIMEOUT);
 		doHandshake(handler);
 
 		List<String> messagesToSend = submitMultipleMessages(MESSAGE_COUNT);
@@ -115,7 +112,7 @@ public class WebsocketConsumerTests {
 		// create multiple handlers
 		List<WebsocketConsumerClientHandler> handlers = createHandlerList(CLIENT_COUNT, MESSAGE_COUNT);
 
-		// submit mulitple  message
+		// submit mulitple message
 		List<String> messagesReceived = submitMultipleMessages(MESSAGE_COUNT);
 
 		// wait on each handle
@@ -145,13 +142,13 @@ public class WebsocketConsumerTests {
 		return messagesToSend;
 	}
 
-	private List<WebsocketConsumerClientHandler> createHandlerList(int handlerCount, int messageCount) throws
-			InterruptedException,
-			ExecutionException {
+	private List<WebsocketConsumerClientHandler> createHandlerList(int handlerCount, int messageCount)
+			throws InterruptedException, ExecutionException {
 
 		List<WebsocketConsumerClientHandler> handlers = new ArrayList<>(handlerCount);
 		for (int i = 0; i < handlerCount; i++) {
-			WebsocketConsumerClientHandler handler = new WebsocketConsumerClientHandler("handler_" + i, messageCount, TIMEOUT);
+			WebsocketConsumerClientHandler handler = new WebsocketConsumerClientHandler("handler_" + i, messageCount,
+					TIMEOUT);
 			WebSocketSession session = doHandshake(handler);
 			assertThat(session.isOpen());
 			handlers.add(handler);
@@ -163,4 +160,5 @@ public class WebsocketConsumerTests {
 	public static class WebsocketConsumerTestApplication {
 
 	}
+
 }

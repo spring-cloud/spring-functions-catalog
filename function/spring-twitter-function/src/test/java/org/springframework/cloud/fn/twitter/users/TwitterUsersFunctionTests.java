@@ -55,14 +55,10 @@ import static org.mockserver.verify.VerificationTimes.once;
 /**
  * @author Christian Tzolov
  */
-@SpringBootTest(
-		webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = {
-				"twitter.connection.consumerKey=consumerKey666",
-				"twitter.connection.consumerSecret=consumerSecret666",
-				"twitter.connection.accessToken=accessToken666",
-				"twitter.connection.accessTokenSecret=accessTokenSecret666"
-		})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
+		properties = { "twitter.connection.consumerKey=consumerKey666",
+				"twitter.connection.consumerSecret=consumerSecret666", "twitter.connection.accessToken=accessToken666",
+				"twitter.connection.accessTokenSecret=accessTokenSecret666" })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class TwitterUsersFunctionTests {
 
@@ -73,8 +69,11 @@ public abstract class TwitterUsersFunctionTests {
 	private static ClientAndServer mockServer;
 
 	private static MockServerClient mockClient;
+
 	private static HttpRequest searchUsersRequest;
+
 	private static HttpRequest lookupUsersRequest;
+
 	private static HttpRequest lookupUsersRequest2;
 
 	@Autowired
@@ -84,16 +83,12 @@ public abstract class TwitterUsersFunctionTests {
 	Function<Message<?>, Message<byte[]>> twitterUsersFunction;
 
 	public static HttpRequest setExpectation(HttpRequest request, String responseUri) {
-		mockClient
-				.when(request, exactly(1))
-				.respond(response()
-						.withStatusCode(200)
-						.withHeaders(
-								new Header("Content-Type", "application/json; charset=utf-8"),
-								new Header("Cache-Control", "public, max-age=86400"))
-						.withBody(TwitterTestUtils.asString(responseUri))
-						.withDelay(TimeUnit.SECONDS, 1)
-				);
+		mockClient.when(request, exactly(1))
+			.respond(response().withStatusCode(200)
+				.withHeaders(new Header("Content-Type", "application/json; charset=utf-8"),
+						new Header("Cache-Control", "public, max-age=86400"))
+				.withBody(TwitterTestUtils.asString(responseUri))
+				.withDelay(TimeUnit.SECONDS, 1));
 		return request;
 	}
 
@@ -102,25 +97,20 @@ public abstract class TwitterUsersFunctionTests {
 		mockServer = ClientAndServer.startClientAndServer(MOCK_SERVER_PORT);
 		mockClient = new MockServerClient(MOCK_SERVER_IP, MOCK_SERVER_PORT);
 
-		searchUsersRequest = setExpectation(request()
-						.withMethod("GET")
-						.withPath("/users/search.json")
-						.withQueryStringParameter("q", "tzolov")
-						.withQueryStringParameter("page", "3"),
-				"classpath:/response/search_users.json");
+		searchUsersRequest = setExpectation(request().withMethod("GET")
+			.withPath("/users/search.json")
+			.withQueryStringParameter("q", "tzolov")
+			.withQueryStringParameter("page", "3"), "classpath:/response/search_users.json");
 
-		lookupUsersRequest = setExpectation(request()
-						.withMethod("GET")
-						.withPath("/users/lookup.json")
-						.withQueryStringParameter("user_id",
-								"710705860343963648,326896547,267603736,781497571629989888,838754923"),
+		lookupUsersRequest = setExpectation(request().withMethod("GET")
+			.withPath("/users/lookup.json")
+			.withQueryStringParameter("user_id", "710705860343963648,326896547,267603736,781497571629989888,838754923"),
 				"classpath:/response/lookup_users_id.json");
 
-		lookupUsersRequest2 = setExpectation(request()
-						.withMethod("GET")
-						.withPath("/users/lookup.json")
-						.withQueryStringParameter("screen_name",
-								"TzolovMarto,Rabotnik57,antzolov,peyo_tzolov,ivantzolov"),
+		lookupUsersRequest2 = setExpectation(
+				request().withMethod("GET")
+					.withPath("/users/lookup.json")
+					.withQueryStringParameter("screen_name", "TzolovMarto,Rabotnik57,antzolov,peyo_tzolov,ivantzolov"),
 				"classpath:/response/lookup_users_id.json");
 	}
 
@@ -129,10 +119,7 @@ public abstract class TwitterUsersFunctionTests {
 		mockServer.stop();
 	}
 
-	@TestPropertySource(properties = {
-			"twitter.users.type=search",
-			"twitter.users.search.query=payload"
-	})
+	@TestPropertySource(properties = { "twitter.users.type=search", "twitter.users.search.query=payload" })
 	public static class TwitterSearchUsersTests extends TwitterUsersFunctionTests {
 
 		@Test
@@ -143,12 +130,11 @@ public abstract class TwitterUsersFunctionTests {
 			List list = mapper.readValue(new String((byte[]) received.getPayload()), List.class);
 			assertThat(list).hasSize(20);
 		}
+
 	}
 
-	@TestPropertySource(properties = {
-			"twitter.users.type=lookup",
-			"twitter.users.lookup.userId='710705860343963648,326896547,267603736,781497571629989888,838754923'"
-	})
+	@TestPropertySource(properties = { "twitter.users.type=lookup",
+			"twitter.users.lookup.userId='710705860343963648,326896547,267603736,781497571629989888,838754923'" })
 	public static class TwitterLookupUserIdLiteralTests extends TwitterUsersFunctionTests {
 
 		@Test
@@ -161,12 +147,11 @@ public abstract class TwitterUsersFunctionTests {
 			List list = mapper.readValue(new String((byte[]) received.getPayload()), List.class);
 			assertThat(list).hasSize(5);
 		}
+
 	}
 
-	@TestPropertySource(properties = {
-			"twitter.users.type=lookup",
-			"twitter.users.lookup.screenName=#jsonPath(payload,'$[*].code')"
-	})
+	@TestPropertySource(properties = { "twitter.users.type=lookup",
+			"twitter.users.lookup.screenName=#jsonPath(payload,'$[*].code')" })
 	public static class TwitterLookupScreenNamePayloadTests extends TwitterUsersFunctionTests {
 
 		@Test
@@ -182,23 +167,26 @@ public abstract class TwitterUsersFunctionTests {
 			List list = mapper.readValue(new String((byte[]) received.getPayload()), List.class);
 			assertThat(list).hasSize(5);
 		}
+
 	}
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
 	@Import(TwitterUsersFunctionConfiguration.class)
 	static class TwitterUsersFunctionTestApplication {
+
 		@Bean
 		@Primary
 		public twitter4j.conf.Configuration twitterConfiguration2(TwitterConnectionProperties properties,
 				Function<TwitterConnectionProperties, ConfigurationBuilder> toConfigurationBuilder) {
 
-			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration =
-					toConfigurationBuilder.andThen(
-							new TwitterTestUtils().mockTwitterUrls(
-									String.format("http://%s:%s", MOCK_SERVER_IP, MOCK_SERVER_PORT)));
+			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration = toConfigurationBuilder
+				.andThen(new TwitterTestUtils()
+					.mockTwitterUrls(String.format("http://%s:%s", MOCK_SERVER_IP, MOCK_SERVER_PORT)));
 
 			return mockedConfiguration.apply(properties).build();
 		}
+
 	}
+
 }

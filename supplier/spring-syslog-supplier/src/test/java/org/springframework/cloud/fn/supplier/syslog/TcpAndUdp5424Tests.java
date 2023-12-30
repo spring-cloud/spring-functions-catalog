@@ -33,17 +33,11 @@ public class TcpAndUdp5424Tests extends AbstractSyslogSupplierTests {
 	@Test
 	public void test() throws Exception {
 		final Flux<Message<?>> messageFlux = syslogSupplier.get();
-		final StepVerifier stepVerifier = StepVerifier.create(messageFlux)
-				.assertNext((message) -> {
-					assertThat(((Map) message.getPayload()).get("syslog_HOST")).isEqualTo("loggregator");
-						}
-				)
-				.assertNext((message) -> {
-					assertThat(((Map) message.getPayload()).get("syslog_HOST")).isEqualTo("loggregator");
-						}
-				)
-				.thenCancel()
-				.verifyLater();
+		final StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(((Map) message.getPayload()).get("syslog_HOST")).isEqualTo("loggregator");
+		}).assertNext((message) -> {
+			assertThat(((Map) message.getPayload()).get("syslog_HOST")).isEqualTo("loggregator");
+		}).thenCancel().verifyLater();
 
 		sendTcp("253 " + RFC5424_PACKET);
 		sendUdp(RFC5424_PACKET);

@@ -59,8 +59,8 @@ public class JdbcSupplierConfiguration {
 	public MessageSource<Object> jdbcMessageSource(
 			@Nullable ComponentCustomizer<JdbcPollingChannelAdapter> jdbcPollingChannelAdapterCustomizer) {
 
-		JdbcPollingChannelAdapter jdbcPollingChannelAdapter =
-				new JdbcPollingChannelAdapter(this.dataSource, this.properties.getQuery());
+		JdbcPollingChannelAdapter jdbcPollingChannelAdapter = new JdbcPollingChannelAdapter(this.dataSource,
+				this.properties.getQuery());
 		jdbcPollingChannelAdapter.setMaxRows(this.properties.getMaxRows());
 		jdbcPollingChannelAdapter.setUpdateSql(this.properties.getUpdate());
 		if (jdbcPollingChannelAdapterCustomizer != null) {
@@ -77,7 +77,9 @@ public class JdbcSupplierConfiguration {
 		return () -> {
 			Message<?> received = jdbcMessageSource.receive();
 			if (received != null) {
-				return Flux.fromIterable(splitterFunction.apply(received)); // multiple Message<Map<String, Object>>
+				return Flux.fromIterable(splitterFunction.apply(received)); // multiple
+																			// Message<Map<String,
+																			// Object>>
 			}
 			else {
 				return Flux.empty();

@@ -44,8 +44,7 @@ public class TwitterUpdateSinkFunctionConfigurationTests {
 	public void testStatusUpdateConsumer() throws TwitterException {
 		Twitter twitter = mock(Twitter.class);
 
-		Consumer<StatusUpdate> statusUpdateConsumer =
-				new TwitterUpdateConsumerConfiguration().updateStatus(twitter);
+		Consumer<StatusUpdate> statusUpdateConsumer = new TwitterUpdateConsumerConfiguration().updateStatus(twitter);
 
 		StatusUpdate statusUpdateQuery = new StatusUpdate("Hello World");
 		statusUpdateConsumer.accept(statusUpdateQuery);
@@ -64,8 +63,8 @@ public class TwitterUpdateSinkFunctionConfigurationTests {
 		properties.getLocation().setLat(expression("'37.78217'"));
 		properties.getLocation().setLon(expression("'-122.40062'"));
 
-		Function<Message<?>, StatusUpdate> messageToStatusUpdateFunction =
-				new TwitterUpdateConsumerConfiguration().messageToStatusUpdateFunction(properties);
+		Function<Message<?>, StatusUpdate> messageToStatusUpdateFunction = new TwitterUpdateConsumerConfiguration()
+			.messageToStatusUpdateFunction(properties);
 
 		StatusUpdate result = messageToStatusUpdateFunction.apply(new GenericMessage<>("Hello World"));
 
@@ -83,4 +82,5 @@ public class TwitterUpdateSinkFunctionConfigurationTests {
 		ExpressionParser parser = new SpelExpressionParser();
 		return parser.parseExpression(expressionString);
 	}
+
 }

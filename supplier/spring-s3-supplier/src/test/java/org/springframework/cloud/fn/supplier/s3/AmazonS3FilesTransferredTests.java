@@ -28,26 +28,21 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TestPropertySource(properties = {"file.consumer.mode=ref",
-		"s3.supplier.filenameRegex=.*\\\\.test$"})
+@TestPropertySource(properties = { "file.consumer.mode=ref", "s3.supplier.filenameRegex=.*\\\\.test$" })
 public class AmazonS3FilesTransferredTests extends AbstractAwsS3SupplierMockTests {
 
 	@Test
 	public void test() {
 		final Flux<Message<?>> messageFlux = s3Supplier.get();
-		StepVerifier stepVerifier =
-				StepVerifier.create(messageFlux)
-						.assertNext((message) -> {
-									assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
-											.isEqualTo(new File(this.awsS3SupplierProperties.getLocalDir() + File.separator + "subdir" + File.separator + "1.test"));
-								}
-						)
-						.assertNext((message) -> {
-							assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
-									.isEqualTo(new File(this.awsS3SupplierProperties.getLocalDir() + File.separator + "subdir" + File.separator + "2.test"));
-						})
-						.thenCancel()
-						.verifyLater();
+		StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
+				.isEqualTo(new File(this.awsS3SupplierProperties.getLocalDir() + File.separator + "subdir"
+						+ File.separator + "1.test"));
+		}).assertNext((message) -> {
+			assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
+				.isEqualTo(new File(this.awsS3SupplierProperties.getLocalDir() + File.separator + "subdir"
+						+ File.separator + "2.test"));
+		}).thenCancel().verifyLater();
 		standardIntegrationFlow.start();
 		stepVerifier.verify(Duration.ofSeconds(10));
 	}

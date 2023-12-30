@@ -75,22 +75,17 @@ public class CassandraConsumerConfiguration {
 		IntegrationFlowBuilder integrationFlowBuilder = IntegrationFlow.from(CassandraConsumerFunction.class);
 		String ingestQuery = this.cassandraSinkProperties.getIngestQuery();
 		if (StringUtils.hasText(ingestQuery)) {
-			integrationFlowBuilder.transform(
-					new PayloadToMatrixTransformer(objectMapper, ingestQuery,
-							CassandraMessageHandler.Type.UPDATE == this.cassandraSinkProperties.getQueryType()
-									? new UpdateQueryColumnNameExtractor()
-									: new InsertQueryColumnNameExtractor()));
+			integrationFlowBuilder.transform(new PayloadToMatrixTransformer(objectMapper, ingestQuery,
+					CassandraMessageHandler.Type.UPDATE == this.cassandraSinkProperties.getQueryType()
+							? new UpdateQueryColumnNameExtractor() : new InsertQueryColumnNameExtractor()));
 		}
-		return integrationFlowBuilder
-				.handle(cassandraSinkMessageHandler)
-				.get();
+		return integrationFlowBuilder.handle(cassandraSinkMessageHandler).get();
 	}
 
 	@Bean
 	public MessageHandler cassandraSinkMessageHandler(ReactiveCassandraOperations cassandraOperations) {
-		CassandraMessageHandler.Type queryType =
-				Optional.ofNullable(this.cassandraSinkProperties.getQueryType())
-						.orElse(CassandraMessageHandler.Type.INSERT);
+		CassandraMessageHandler.Type queryType = Optional.ofNullable(this.cassandraSinkProperties.getQueryType())
+			.orElse(CassandraMessageHandler.Type.INSERT);
 
 		CassandraMessageHandler cassandraMessageHandler = new CassandraMessageHandler(cassandraOperations, queryType);
 		cassandraMessageHandler.setProducesReply(true);
@@ -98,24 +93,22 @@ public class CassandraConsumerConfiguration {
 		ConsistencyLevel consistencyLevel = this.cassandraSinkProperties.getConsistencyLevel();
 		if (consistencyLevel != null || ttl > 0) {
 
-			WriteOptions.WriteOptionsBuilder writeOptionsBuilder =
-					switch (queryType) {
-						case INSERT -> InsertOptions.builder();
-						case UPDATE -> UpdateOptions.builder();
-						default -> WriteOptions.builder();
-					};
+			WriteOptions.WriteOptionsBuilder writeOptionsBuilder = switch (queryType) {
+				case INSERT -> InsertOptions.builder();
+				case UPDATE -> UpdateOptions.builder();
+				default -> WriteOptions.builder();
+			};
 
-			JavaUtils.INSTANCE
-					.acceptIfNotNull(consistencyLevel, writeOptionsBuilder::consistencyLevel)
-					.acceptIfCondition(ttl > 0, ttl, writeOptionsBuilder::ttl);
+			JavaUtils.INSTANCE.acceptIfNotNull(consistencyLevel, writeOptionsBuilder::consistencyLevel)
+				.acceptIfCondition(ttl > 0, ttl, writeOptionsBuilder::ttl);
 
 			cassandraMessageHandler.setWriteOptions(writeOptionsBuilder.build());
 		}
 
 		JavaUtils.INSTANCE
-				.acceptIfHasText(this.cassandraSinkProperties.getIngestQuery(), cassandraMessageHandler::setIngestQuery)
-				.acceptIfNotNull(this.cassandraSinkProperties.getStatementExpression(),
-						cassandraMessageHandler::setStatementExpression);
+			.acceptIfHasText(this.cassandraSinkProperties.getIngestQuery(), cassandraMessageHandler::setIngestQuery)
+			.acceptIfNotNull(this.cassandraSinkProperties.getStatementExpression(),
+					cassandraMessageHandler::setStatementExpression);
 
 		return cassandraMessageHandler;
 	}
@@ -124,14 +117,12 @@ public class CassandraConsumerConfiguration {
 		if (uuid.length() == 36) {
 			String[] parts = uuid.split("-");
 			if (parts.length == 5) {
-				return (parts[0].length() == 8) && (parts[1].length() == 4) &&
-						(parts[2].length() == 4) && (parts[3].length() == 4) &&
-						(parts[4].length() == 12);
+				return (parts[0].length() == 8) && (parts[1].length() == 4) && (parts[2].length() == 4)
+						&& (parts[3].length() == 4) && (parts[4].length() == 12);
 			}
 		}
 		return false;
 	}
-
 
 	private static class PayloadToMatrixTransformer extends AbstractPayloadTransformer<Object, List<List<Object>>> {
 
@@ -145,7 +136,7 @@ public class CassandraConsumerConfiguration {
 			this.jsonObjectMapper = new Jackson2JsonObjectMapper(objectMapper);
 			this.columns.addAll(columnNameExtractor.extract(query));
 			this.jsonObjectMapper.getObjectMapper()
-					.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
+				.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 		}
 
 		@Override

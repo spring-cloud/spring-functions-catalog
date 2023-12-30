@@ -40,14 +40,15 @@ import org.springframework.messaging.Message;
  * @author Chris Bono
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties({TcpConsumerProperties.class, TcpConnectionFactoryProperties.class})
+@EnableConfigurationProperties({ TcpConsumerProperties.class, TcpConnectionFactoryProperties.class })
 public class TcpConsumerConfiguration {
 
 	private TcpConsumerProperties properties;
+
 	private TcpConnectionFactoryProperties tcpConnectionProperties;
 
 	public TcpConsumerConfiguration(TcpConsumerProperties properties,
-									TcpConnectionFactoryProperties tcpConnectionProperties) {
+			TcpConnectionFactoryProperties tcpConnectionProperties) {
 		this.properties = properties;
 		this.tcpConnectionProperties = tcpConnectionProperties;
 	}
@@ -58,7 +59,8 @@ public class TcpConsumerConfiguration {
 	}
 
 	@Bean
-	public TcpSendingMessageHandlerSmartLifeCycle handler(@Qualifier("tcpSinkConnectionFactory") AbstractConnectionFactory connectionFactory) {
+	public TcpSendingMessageHandlerSmartLifeCycle handler(
+			@Qualifier("tcpSinkConnectionFactory") AbstractConnectionFactory connectionFactory) {
 		TcpSendingMessageHandlerSmartLifeCycle tcpMessageHandler = new TcpSendingMessageHandlerSmartLifeCycle();
 		tcpMessageHandler.setConnectionFactory(connectionFactory);
 		return tcpMessageHandler;
@@ -105,5 +107,7 @@ public class TcpConsumerConfiguration {
 		public int getPhase() {
 			return Integer.MIN_VALUE;
 		}
+
 	}
+
 }

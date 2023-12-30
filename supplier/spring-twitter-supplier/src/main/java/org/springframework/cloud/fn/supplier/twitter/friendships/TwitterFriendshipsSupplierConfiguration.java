@@ -41,7 +41,6 @@ import org.springframework.integration.metadata.SimpleMetadataStore;
 import org.springframework.messaging.Message;
 
 /**
- *
  * @author Christian Tzolov
  */
 @Configuration
@@ -63,11 +62,10 @@ public class TwitterFriendshipsSupplierConfiguration {
 		return new Cursor();
 	}
 
-
 	@Bean
 	@ConditionalOnProperty(name = "twitter.friendships.source.type", havingValue = "followers")
-	public Supplier<List<User>> followersSupplier(TwitterFriendshipsSupplierProperties properties,
-			Twitter twitter, Cursor cursorState) {
+	public Supplier<List<User>> followersSupplier(TwitterFriendshipsSupplierProperties properties, Twitter twitter,
+			Cursor cursorState) {
 		return () -> {
 			try {
 				PagableResponseList<User> users;
@@ -85,7 +83,8 @@ public class TwitterFriendshipsSupplierConfiguration {
 					return users;
 				}
 
-				logger.error(String.format("NULL users response for properties: %s and cursor: %s!", properties, cursorState));
+				logger.error(String.format("NULL users response for properties: %s and cursor: %s!", properties,
+						cursorState));
 				cursorState.updateCursor(-1);
 			}
 			catch (TwitterException e) {
@@ -98,8 +97,8 @@ public class TwitterFriendshipsSupplierConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(name = "twitter.friendships.source.type", havingValue = "friends")
-	public Supplier<List<User>> friendsSupplier(TwitterFriendshipsSupplierProperties properties,
-			Twitter twitter, Cursor cursorState) {
+	public Supplier<List<User>> friendsSupplier(TwitterFriendshipsSupplierProperties properties, Twitter twitter,
+			Cursor cursorState) {
 		return () -> {
 			try {
 				PagableResponseList<User> users;
@@ -117,7 +116,8 @@ public class TwitterFriendshipsSupplierConfiguration {
 					return users;
 				}
 
-				logger.error(String.format("NULL users response for properties: %s and cursor: %s!", properties, cursorState));
+				logger.error(String.format("NULL users response for properties: %s and cursor: %s!", properties,
+						cursorState));
 				cursorState.updateCursor(-1);
 			}
 			catch (TwitterException e) {
@@ -147,4 +147,5 @@ public class TwitterFriendshipsSupplierConfiguration {
 			Supplier<List<User>> userRetriever, Function<Object, Message<byte[]>> managedJson) {
 		return () -> userDeduplication.andThen(managedJson).apply(userRetriever.get());
 	}
+
 }

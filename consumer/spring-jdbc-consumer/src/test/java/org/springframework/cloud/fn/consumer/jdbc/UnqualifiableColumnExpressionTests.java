@@ -37,10 +37,12 @@ public class UnqualifiableColumnExpressionTests extends JdbcConsumerApplicationT
 
 	@Test
 	public void doesNotFailParsingUnqualifiableExpression() {
-		// if the app initializes, the test condition passes, but go ahead and apply the column expression anyway
+		// if the app initializes, the test condition passes, but go ahead and apply the
+		// column expression anyway
 		jdbcConsumer.accept(MessageBuilder.withPayload(new Payload("desrever", 123)).build());
-		assertThat(jdbcOperations.queryForObject("select count(*) from messages where a = ? and b = ?",
-				Integer.class, "reversed", 123)).isEqualTo(1);
+		assertThat(jdbcOperations.queryForObject("select count(*) from messages where a = ? and b = ?", Integer.class,
+				"reversed", 123))
+			.isEqualTo(1);
 	}
 
 }

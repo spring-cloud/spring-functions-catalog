@@ -21,7 +21,6 @@ import jakarta.validation.constraints.Max;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-
 /**
  * @author Christian Tzolov
  */
@@ -42,4 +41,5 @@ public class TwitterMessageSupplierProperties {
 	public void setCount(int count) {
 		this.count = count;
 	}
+
 }

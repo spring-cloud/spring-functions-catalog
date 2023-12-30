@@ -52,15 +52,15 @@ public class FtpConsumerConfiguration {
 	public IntegrationFlow ftpInboundFlow(FtpConsumerProperties properties, SessionFactory<FTPFile> ftpSessionFactory,
 			@Nullable ComponentCustomizer<FtpMessageHandlerSpec> ftpMessageHandlerSpecCustomizer) {
 
-		IntegrationFlowBuilder integrationFlowBuilder =
-				IntegrationFlow.from(MessageConsumer.class, (gateway) -> gateway.beanName("ftpConsumer"));
+		IntegrationFlowBuilder integrationFlowBuilder = IntegrationFlow.from(MessageConsumer.class,
+				(gateway) -> gateway.beanName("ftpConsumer"));
 
-		FtpMessageHandlerSpec handlerSpec =
-				Ftp.outboundAdapter(new FtpRemoteFileTemplate(ftpSessionFactory), properties.getMode())
-						.remoteDirectory(properties.getRemoteDir())
-						.remoteFileSeparator(properties.getRemoteFileSeparator())
-						.autoCreateDirectory(properties.isAutoCreateDir())
-						.temporaryFileSuffix(properties.getTmpFileSuffix());
+		FtpMessageHandlerSpec handlerSpec = Ftp
+			.outboundAdapter(new FtpRemoteFileTemplate(ftpSessionFactory), properties.getMode())
+			.remoteDirectory(properties.getRemoteDir())
+			.remoteFileSeparator(properties.getRemoteFileSeparator())
+			.autoCreateDirectory(properties.isAutoCreateDir())
+			.temporaryFileSuffix(properties.getTmpFileSuffix());
 		if (properties.getFilenameExpression() != null) {
 			handlerSpec.fileNameExpression(
 					EXPRESSION_PARSER.parseExpression(properties.getFilenameExpression()).getExpressionString());
@@ -70,9 +70,7 @@ public class FtpConsumerConfiguration {
 			ftpMessageHandlerSpecCustomizer.customize(handlerSpec);
 		}
 
-		return integrationFlowBuilder
-				.handle(handlerSpec)
-				.get();
+		return integrationFlowBuilder.handle(handlerSpec).get();
 	}
 
 	private interface MessageConsumer extends Consumer<Message<?>> {

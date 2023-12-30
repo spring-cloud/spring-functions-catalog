@@ -55,14 +55,10 @@ import static org.mockserver.verify.VerificationTimes.once;
 /**
  * @author Christian Tzolov
  */
-@SpringBootTest(
-		webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = {
-				"twitter.connection.consumerKey=consumerKey666",
-				"twitter.connection.consumerSecret=consumerSecret666",
-				"twitter.connection.accessToken=accessToken666",
-				"twitter.connection.accessTokenSecret=accessTokenSecret666"
-		})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
+		properties = { "twitter.connection.consumerKey=consumerKey666",
+				"twitter.connection.consumerSecret=consumerSecret666", "twitter.connection.accessToken=accessToken666",
+				"twitter.connection.accessTokenSecret=accessTokenSecret666" })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class TwitterStreamSupplierTests {
 
@@ -73,8 +69,11 @@ public abstract class TwitterStreamSupplierTests {
 	private static ClientAndServer mockServer;
 
 	private static MockServerClient mockClient;
+
 	private static HttpRequest streamFilterRequest;
+
 	private static HttpRequest streamSampleRequest;
+
 	private static HttpRequest streamFirehoseRequest;
 
 	@Autowired
@@ -87,24 +86,20 @@ public abstract class TwitterStreamSupplierTests {
 
 		mockClient = new MockServerClient(MOCK_SERVER_IP, MOCK_SERVER_PORT);
 
-		streamFilterRequest = mockClientRecordRequest(request()
-				.withMethod("POST")
-				.withPath("/stream/statuses/filter.json")
-				.withBody(new StringBody("count=0&track=Java%2CPython&stall_warnings=true")));
+		streamFilterRequest = mockClientRecordRequest(request().withMethod("POST")
+			.withPath("/stream/statuses/filter.json")
+			.withBody(new StringBody("count=0&track=Java%2CPython&stall_warnings=true")));
 
-		streamSampleRequest = mockClientRecordRequest(request()
-				.withMethod("GET")
-				.withPath("/stream/statuses/sample.json"));
+		streamSampleRequest = mockClientRecordRequest(
+				request().withMethod("GET").withPath("/stream/statuses/sample.json"));
 
-		streamFirehoseRequest = mockClientRecordRequest(request()
-				.withMethod("POST")
-				.withPath("/stream/statuses/links.json")
-				.withBody(new StringBody("count=0&stall_warnings=true")));
+		streamFirehoseRequest = mockClientRecordRequest(request().withMethod("POST")
+			.withPath("/stream/statuses/links.json")
+			.withBody(new StringBody("count=0&stall_warnings=true")));
 
-		streamFirehoseRequest = mockClientRecordRequest(request()
-				.withMethod("POST")
-				.withPath("/stream/statuses/firehose.json")
-				.withBody(new StringBody("count=0&stall_warnings=true")));
+		streamFirehoseRequest = mockClientRecordRequest(request().withMethod("POST")
+			.withPath("/stream/statuses/firehose.json")
+			.withBody(new StringBody("count=0&stall_warnings=true")));
 	}
 
 	@AfterAll
@@ -113,21 +108,16 @@ public abstract class TwitterStreamSupplierTests {
 	}
 
 	private static HttpRequest mockClientRecordRequest(HttpRequest request) {
-		mockClient.when(request, /*unlimited())*/ exactly(1))
-				.respond(
-						response()
-								.withStatusCode(200)
-								.withHeaders(
-										new Header("Content-Type", "application/json; charset=utf-8"),
-										new Header("Cache-Control", "public, max-age=86400"))
-								.withBody(TwitterTestUtils.asString("classpath:/response/stream_test_1.json"))
-								.withDelay(TimeUnit.SECONDS, 10));
+		mockClient.when(request, /* unlimited()) */ exactly(1))
+			.respond(response().withStatusCode(200)
+				.withHeaders(new Header("Content-Type", "application/json; charset=utf-8"),
+						new Header("Cache-Control", "public, max-age=86400"))
+				.withBody(TwitterTestUtils.asString("classpath:/response/stream_test_1.json"))
+				.withDelay(TimeUnit.SECONDS, 10));
 		return request;
 	}
 
-	@TestPropertySource(properties = {
-			"twitter.stream.type=sample"
-	})
+	@TestPropertySource(properties = { "twitter.stream.type=sample" })
 	public static class TwitterStreamSampleTests extends TwitterStreamSupplierTests {
 
 		@Test
@@ -135,21 +125,19 @@ public abstract class TwitterStreamSupplierTests {
 			final Flux<Message<?>> messageFlux = twitterStreamSupplier.get();
 
 			final StepVerifier stepVerifier = StepVerifier.create(messageFlux)
-					.assertNext((message) -> assertThat(new String((byte[]) message.getPayload()))
-							.contains("\"id\":1075751718749659136"))
-					.thenCancel()
-					.verifyLater();
+				.assertNext((message) -> assertThat(new String((byte[]) message.getPayload()))
+					.contains("\"id\":1075751718749659136"))
+				.thenCancel()
+				.verifyLater();
 
 			stepVerifier.verify();
 
 			mockClient.verify(streamSampleRequest, once());
 		}
+
 	}
 
-	@TestPropertySource(properties = {
-			"twitter.stream.type=filter",
-			"twitter.stream.filter.track=Java,Python"
-	})
+	@TestPropertySource(properties = { "twitter.stream.type=filter", "twitter.stream.filter.track=Java,Python" })
 	public static class TwitterStreamFilterTests extends TwitterStreamSupplierTests {
 
 		@Test
@@ -157,20 +145,19 @@ public abstract class TwitterStreamSupplierTests {
 			final Flux<Message<?>> messageFlux = twitterStreamSupplier.get();
 
 			final StepVerifier stepVerifier = StepVerifier.create(messageFlux)
-					.assertNext((message) -> assertThat(new String((byte[]) message.getPayload()))
-							.contains("\"id\":1075751718749659136"))
-					.thenCancel()
-					.verifyLater();
+				.assertNext((message) -> assertThat(new String((byte[]) message.getPayload()))
+					.contains("\"id\":1075751718749659136"))
+				.thenCancel()
+				.verifyLater();
 
 			stepVerifier.verify();
 
 			mockClient.verify(streamFilterRequest, once());
 		}
+
 	}
 
-	@TestPropertySource(properties = {
-			"twitter.stream.type=firehose"
-	})
+	@TestPropertySource(properties = { "twitter.stream.type=firehose" })
 	public static class TwitterStreamFirehoseTests extends TwitterStreamSupplierTests {
 
 		@Test
@@ -178,15 +165,16 @@ public abstract class TwitterStreamSupplierTests {
 			final Flux<Message<?>> messageFlux = twitterStreamSupplier.get();
 
 			final StepVerifier stepVerifier = StepVerifier.create(messageFlux)
-					.assertNext((message) -> assertThat(new String((byte[]) message.getPayload()))
-							.contains("\"id\":1075751718749659136"))
-					.thenCancel()
-					.verifyLater();
+				.assertNext((message) -> assertThat(new String((byte[]) message.getPayload()))
+					.contains("\"id\":1075751718749659136"))
+				.thenCancel()
+				.verifyLater();
 
 			stepVerifier.verify();
 
 			mockClient.verify(streamFirehoseRequest, once());
 		}
+
 	}
 
 	@SpringBootConfiguration
@@ -199,12 +187,13 @@ public abstract class TwitterStreamSupplierTests {
 		public twitter4j.conf.Configuration twitterConfiguration2(TwitterConnectionProperties properties,
 				Function<TwitterConnectionProperties, ConfigurationBuilder> toConfigurationBuilder) {
 
-			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration =
-					toConfigurationBuilder.andThen(
-							new TwitterTestUtils().mockTwitterUrls(
-									String.format("http://%s:%s", MOCK_SERVER_IP, MOCK_SERVER_PORT)));
+			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration = toConfigurationBuilder
+				.andThen(new TwitterTestUtils()
+					.mockTwitterUrls(String.format("http://%s:%s", MOCK_SERVER_IP, MOCK_SERVER_PORT)));
 
 			return mockedConfiguration.apply(properties).build();
 		}
+
 	}
+
 }

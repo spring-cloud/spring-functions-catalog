@@ -33,12 +33,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 /**
- *
  * @author Gary Russell
  * @author Soby Chacko
  */
-@SpringBootTest(properties = {
-		"header.enricher.headers=foo='bar' \\n baz='fiz' \\n buz=payload \\n jaz=@value",
+@SpringBootTest(properties = { "header.enricher.headers=foo='bar' \\n baz='fiz' \\n buz=payload \\n jaz=@value",
 		"header.enricher.overwrite = true" })
 @DirtiesContext
 public class HeaderEnricherFunctionApplicationTests {
@@ -48,8 +46,7 @@ public class HeaderEnricherFunctionApplicationTests {
 
 	@Test
 	public void testDefault() {
-		final Message<?> message = MessageBuilder.withPayload("hello")
-				.setHeader("baz", "qux").build();
+		final Message<?> message = MessageBuilder.withPayload("hello").setHeader("baz", "qux").build();
 		final Message<?> enriched = headerEnricherFunction.apply(message);
 
 		assertThat(enriched, HeaderMatcher.hasHeader("foo", equalTo("bar")));

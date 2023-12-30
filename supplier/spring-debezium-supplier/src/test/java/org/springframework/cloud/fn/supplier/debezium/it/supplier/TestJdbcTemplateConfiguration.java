@@ -28,11 +28,11 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- *
  * @author Christian Tzolov
  */
 @Configuration
 public class TestJdbcTemplateConfiguration {
+
 	@Bean
 	public JdbcTemplate myJdbcTemplate(DataSource dataSource) {
 		return new JdbcTemplate(dataSource);
@@ -47,9 +47,7 @@ public class TestJdbcTemplateConfiguration {
 
 	@Bean
 	public HikariDataSource dataSource(DataSourceProperties dataSourceProperties) {
-		return dataSourceProperties.initializeDataSourceBuilder()
-				.type(HikariDataSource.class)
-				.build();
+		return dataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
 	}
 
 }

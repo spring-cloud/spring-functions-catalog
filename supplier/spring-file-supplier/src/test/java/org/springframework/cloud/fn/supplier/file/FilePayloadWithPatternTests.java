@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Artem Bilan
  * @author Soby Chacko
  */
-@TestPropertySource(properties = {"file.consumer.mode=ref", "file.supplier.filenamePattern = *.txt"})
+@TestPropertySource(properties = { "file.consumer.mode=ref", "file.supplier.filenamePattern = *.txt" })
 public class FilePayloadWithPatternTests extends AbstractFileSupplierTests {
 
 	@Test
@@ -51,18 +51,11 @@ public class FilePayloadWithPatternTests extends AbstractFileSupplierTests {
 
 		final Flux<Message<?>> messageFlux = fileSupplier.get();
 
-		StepVerifier.create(messageFlux)
-				.assertNext((message) -> {
-							assertThat(message.getPayload())
-									.isEqualTo(txtFile1.toAbsolutePath().toFile());
-						}
-				)
-				.assertNext((message) -> {
-					assertThat(message.getPayload())
-							.isEqualTo(txtFile2.toAbsolutePath().toFile());
-				})
-				.expectNoEvent(Duration.ofSeconds(1))
-				.thenCancel()
-				.verify();
+		StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(message.getPayload()).isEqualTo(txtFile1.toAbsolutePath().toFile());
+		}).assertNext((message) -> {
+			assertThat(message.getPayload()).isEqualTo(txtFile2.toAbsolutePath().toFile());
+		}).expectNoEvent(Duration.ofSeconds(1)).thenCancel().verify();
 	}
+
 }

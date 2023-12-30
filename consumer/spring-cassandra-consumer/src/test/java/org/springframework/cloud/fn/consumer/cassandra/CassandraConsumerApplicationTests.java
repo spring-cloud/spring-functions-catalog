@@ -42,8 +42,7 @@ import org.springframework.test.context.DynamicPropertySource;
  * @author Artem Bilan
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = {
-				"spring.cassandra.keyspace-name=" + CassandraConsumerApplicationTests.CASSANDRA_KEYSPACE,
+		properties = { "spring.cassandra.keyspace-name=" + CassandraConsumerApplicationTests.CASSANDRA_KEYSPACE,
 				"cassandra.cluster.createKeyspace=true" })
 @DirtiesContext
 abstract class CassandraConsumerApplicationTests implements CassandraContainerTest {
@@ -56,12 +55,11 @@ abstract class CassandraConsumerApplicationTests implements CassandraContainerTe
 	@Autowired
 	protected Function<Object, Mono<? extends WriteResult>> cassandraConsumer;
 
-
 	@DynamicPropertySource
 	static void registerConfigurationProperties(DynamicPropertyRegistry registry) {
 		registry.add("spring.cassandra.localDatacenter", () -> CASSANDRA_CONTAINER.getLocalDatacenter());
-		registry.add("spring.cassandra.contactPoints", () ->
-			Optional.of(CASSANDRA_CONTAINER.getContactPoint())
+		registry.add("spring.cassandra.contactPoints",
+				() -> Optional.of(CASSANDRA_CONTAINER.getContactPoint())
 					.map(contactPoint -> contactPoint.getAddress().getHostAddress() + ':' + contactPoint.getPort())
 					.get());
 	}
@@ -75,14 +73,8 @@ abstract class CassandraConsumerApplicationTests implements CassandraContainerTe
 
 		List<Book> books = new ArrayList<>();
 		for (int i = 0; i < numBooks; i++) {
-			books.add(
-					new Book(
-							UUID.randomUUID(),
-							"Spring Cloud Data Flow Guide",
-							"SCDF Guru",
-							i * 10 + 5,
-							LocalDate.now(),
-							true));
+			books.add(new Book(UUID.randomUUID(), "Spring Cloud Data Flow Guide", "SCDF Guru", i * 10 + 5,
+					LocalDate.now(), true));
 		}
 
 		return books;

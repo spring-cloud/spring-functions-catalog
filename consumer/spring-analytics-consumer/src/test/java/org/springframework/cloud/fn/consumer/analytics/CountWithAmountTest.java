@@ -26,11 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Christian Tzolov
  */
-@TestPropertySource(properties = {
-		"analytics.name=counter666",
-		"analytics.tag.expression.foo='bar'",
-		"analytics.amount-expression=payload.length()"
-})
+@TestPropertySource(properties = { "analytics.name=counter666", "analytics.tag.expression.foo='bar'",
+		"analytics.amount-expression=payload.length()" })
 class CountWithAmountTest extends AnalyticsConsumerParentTest {
 
 	@Test
@@ -40,4 +37,5 @@ class CountWithAmountTest extends AnalyticsConsumerParentTest {
 		analyticsConsumer.accept(new GenericMessage<>(message));
 		assertThat(meterRegistry.find("counter666").counter().count()).isEqualTo(messageSize);
 	}
+
 }

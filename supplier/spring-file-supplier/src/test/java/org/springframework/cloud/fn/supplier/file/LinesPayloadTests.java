@@ -47,10 +47,11 @@ public class LinesPayloadTests extends AbstractFileSupplierTests {
 		final Flux<Message<?>> messageFlux = fileSupplier.get();
 
 		StepVerifier.create(messageFlux)
-				.assertNext((message) -> assertThat(message.getPayload()).isEqualTo("first line"))
-				.assertNext((message) -> assertThat(message.getPayload()).isEqualTo("second line"))
-				.thenCancel()
-				.verify();
+			.assertNext((message) -> assertThat(message.getPayload()).isEqualTo("first line"))
+			.assertNext((message) -> assertThat(message.getPayload()).isEqualTo("second line"))
+			.thenCancel()
+			.verify();
 
 	}
+
 }

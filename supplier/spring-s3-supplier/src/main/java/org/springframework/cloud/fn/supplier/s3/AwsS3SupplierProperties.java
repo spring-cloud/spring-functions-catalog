@@ -172,4 +172,5 @@ public class AwsS3SupplierProperties {
 	public void setListOnly(boolean listOnly) {
 		this.listOnly = listOnly;
 	}
+
 }

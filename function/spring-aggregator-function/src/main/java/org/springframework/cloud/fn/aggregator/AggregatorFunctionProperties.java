@@ -55,7 +55,8 @@ public class AggregatorFunctionProperties {
 	private String messageStoreType = MessageStoreType.SIMPLE;
 
 	/**
-	 * Persistence message store entity: table prefix in RDBMS, collection name in MongoDb, etc.
+	 * Persistence message store entity: table prefix in RDBMS, collection name in
+	 * MongoDb, etc.
 	 */
 	private String messageStoreEntity;
 

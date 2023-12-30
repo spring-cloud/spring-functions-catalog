@@ -44,7 +44,8 @@ public class MqttSupplierProperties {
 	private String[] topics = new String[] { "stream.mqtt" };
 
 	/**
-	 * the qos; a single value for all topics or a comma-delimited list to match the topics.
+	 * the qos; a single value for all topics or a comma-delimited list to match the
+	 * topics.
 	 */
 	private int[] qos = new int[] { 0 };
 

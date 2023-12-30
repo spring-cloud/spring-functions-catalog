@@ -32,15 +32,15 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
 
 /**
- * 4 of the pre-trained model in the model zoo (https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md)
+ * 4 of the pre-trained model in the model zoo
+ * (https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md)
  * can also compute the masks of the detected objects, providing instance segmentation.
  * <p>
  * Here are the models that can be used for instance segmentation.
  * <p>
- * mask_rcnn_inception_resnet_v2_atrous_coco	771	36	Masks
- * mask_rcnn_inception_v2_coco					79	25	Masks
- * mask_rcnn_resnet101_atrous_coco				470	33	Masks
- * mask_rcnn_resnet50_atrous_coco				343	29	Masks
+ * mask_rcnn_inception_resnet_v2_atrous_coco 771 36 Masks mask_rcnn_inception_v2_coco 79
+ * 25 Masks mask_rcnn_resnet101_atrous_coco 470 33 Masks mask_rcnn_resnet50_atrous_coco
+ * 343 29 Masks
  *
  * @author Christian Tzolov
  */
@@ -50,44 +50,53 @@ public class ExampleInstanceSegmentation {
 
 		ResourceLoader resourceLoader = new DefaultResourceLoader();
 
-		// You can download pre-trained models directly from the zoo: https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
-		// Just use the notation <zoo model tar.gz url>#<name of the frozen model file name>
-		// For performance reasons you may consider downloading the model locally and use the file:/<path to my model> URI instead!
+		// You can download pre-trained models directly from the zoo:
+		// https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md
+		// Just use the notation <zoo model tar.gz url>#<name of the frozen model file
+		// name>
+		// For performance reasons you may consider downloading the model locally and use
+		// the file:/<path to my model> URI instead!
 		String model = "https://download.tensorflow.org/models/object_detection/mask_rcnn_inception_resnet_v2_atrous_coco_2018_01_28.tar.gz#frozen_inference_graph.pb";
 
 		// All labels for the pre-trained models are available at:
 		// https://github.com/tensorflow/models/tree/master/research/object_detection/data
 		// Use the labels applicable for the model.
-		// Also, for performance reasons you may consider to download the labels and load them from file: instead.
+		// Also, for performance reasons you may consider to download the labels and load
+		// them from file: instead.
 		String labels = "https://raw.githubusercontent.com/tensorflow/models/master/research/object_detection/data/mscoco_label_map.pbtxt";
 
-		// You can cache the TF model on the local file system to improve the bootstrap performance on consecutive runs!
+		// You can cache the TF model on the local file system to improve the bootstrap
+		// performance on consecutive runs!
 		boolean CACHE_TF_MODEL = true;
 
-		// For the pre-trained models fromMemory mask you can set the INSTANCE_SEGMENTATION to enable object instance segmentation as well
+		// For the pre-trained models fromMemory mask you can set the
+		// INSTANCE_SEGMENTATION to enable object instance segmentation as well
 		boolean INSTANCE_SEGMENTATION = true;
 
 		// Only object fromMemory confidence above the threshold are returned
 		float CONFIDENCE_THRESHOLD = 0.4f;
 
-		ObjectDetectionService detectionService =
-			new ObjectDetectionService(model, labels, CONFIDENCE_THRESHOLD, INSTANCE_SEGMENTATION, CACHE_TF_MODEL);
+		ObjectDetectionService detectionService = new ObjectDetectionService(model, labels, CONFIDENCE_THRESHOLD,
+				INSTANCE_SEGMENTATION, CACHE_TF_MODEL);
 
 		// You can use file:, http: or classpath: to provide the path to the input image.
 		byte[] image = GraphicsUtils.loadAsByteArray("classpath:/images/object-detection.jpg");
 
-		// Returns a list ObjectDetection domain classes to allow programmatic accesses to the detected objects's metadata
+		// Returns a list ObjectDetection domain classes to allow programmatic accesses to
+		// the detected objects's metadata
 		List<ObjectDetection> detectedObjects = detectionService.detect(image);
 
 		// Get JSON representation of the detected objects
 		String jsonObjectDetections = new JsonMapperFunction().apply(detectedObjects);
 		System.out.println(jsonObjectDetections);
 
-		// Draw the detected object metadata on top of the original image and store the result
+		// Draw the detected object metadata on top of the original image and store the
+		// result
 		byte[] annotatedImage = new ObjectDetectionImageAugmenter(INSTANCE_SEGMENTATION).apply(image, detectedObjects);
 		File projectDir = new File("functions/function/object-detection-function");
 		File output = new File(projectDir, "target/object-detection-segmentation-augmented.jpg");
 		IOUtils.write(annotatedImage, new FileOutputStream(output));
 		System.out.println("Created:" + output.getPath());
 	}
+
 }

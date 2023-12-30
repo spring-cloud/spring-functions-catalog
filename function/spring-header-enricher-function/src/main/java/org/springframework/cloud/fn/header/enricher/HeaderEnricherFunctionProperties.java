@@ -35,8 +35,8 @@ import org.springframework.validation.annotation.Validated;
 public class HeaderEnricherFunctionProperties {
 
 	/**
-	 * \n separated properties representing headers in which values are SpEL expressions, e.g
-	 * foo='bar' \n baz=payload.baz.
+	 * \n separated properties representing headers in which values are SpEL expressions,
+	 * e.g foo='bar' \n baz=payload.baz.
 	 */
 	private Properties headers;
 

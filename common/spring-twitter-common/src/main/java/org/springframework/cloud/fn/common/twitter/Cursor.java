@@ -20,6 +20,7 @@ package org.springframework.cloud.fn.common.twitter;
  * @author Christian Tzolov
  */
 public class Cursor {
+
 	private long cursor = -1;
 
 	public long getCursor() {
@@ -34,4 +35,5 @@ public class Cursor {
 	public String toString() {
 		return "Cursor{cursor=" + cursor + '}';
 	}
+
 }

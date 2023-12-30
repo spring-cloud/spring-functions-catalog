@@ -21,7 +21,6 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.validation.annotation.Validated;
 
-
 /**
  * @author Christian Tzolov
  */
@@ -47,7 +46,8 @@ public class TwitterMessageConsumerProperties {
 	private Expression userId;
 
 	/**
-	 * A media id to associate with the message. A Direct Message may only reference a single media id.
+	 * A media id to associate with the message. A Direct Message may only reference a
+	 * single media id.
 	 */
 	private Expression mediaId;
 
@@ -82,4 +82,5 @@ public class TwitterMessageConsumerProperties {
 	public void setMediaId(Expression mediaId) {
 		this.mediaId = mediaId;
 	}
+
 }

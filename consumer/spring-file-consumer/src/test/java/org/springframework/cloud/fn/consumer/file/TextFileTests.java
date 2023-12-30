@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Artem Bilan
  * @author Soby Chacko
  */
-@TestPropertySource(properties = {"file.consumer.name = test", "file.consumer.suffix=txt"})
+@TestPropertySource(properties = { "file.consumer.name = test", "file.consumer.suffix=txt" })
 public class TextFileTests extends AbstractFileConsumerTests {
 
 	@Test
@@ -41,7 +41,7 @@ public class TextFileTests extends AbstractFileConsumerTests {
 		File file = new File(tempDir.toFile(), "test.txt");
 		assertThat(file.exists()).isTrue();
 		assertThat("hello file-consumer" + System.lineSeparator())
-				.isEqualTo(FileCopyUtils.copyToString(new FileReader(file)));
+			.isEqualTo(FileCopyUtils.copyToString(new FileReader(file)));
 	}
 
 }

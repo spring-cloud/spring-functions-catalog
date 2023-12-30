@@ -24,7 +24,6 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.validation.annotation.Validated;
 
-
 /**
  * @author Christian Tzolov
  */
@@ -35,8 +34,10 @@ public class TwitterGeoFunctionProperties {
 	private static final Expression DEFAULT_EXPRESSION = new SpelExpressionParser().parseExpression("payload");
 
 	public enum GeoType {
+
 		/** Geo retrieval type. */
 		reverse, search
+
 	}
 
 	/**
@@ -56,22 +57,24 @@ public class TwitterGeoFunctionProperties {
 	private Location location = new Location();
 
 	/**
-	 * Hints for the number of results to return. This does not guarantee that the number of results
-	 * returned will equal max_results, but instead informs how many 'nearby' results to return.
+	 * Hints for the number of results to return. This does not guarantee that the number
+	 * of results returned will equal max_results, but instead informs how many 'nearby'
+	 * results to return.
 	 */
 	private int maxResults = -1;
 
 	/**
-	 * Sets a hint on the 'region' in which to search. If a number, then this is a radius in meters, but it
-	 * can also take a string that is suffixed with ft to specify feet. If this is not passed in, then it is
-	 * assumed to be 0m. If coming from a device, in practice, this value is whatever accuracy the device
-	 * has measuring its location (whether it be coming from a GPS, WiFi triangulation, etc.).
+	 * Sets a hint on the 'region' in which to search. If a number, then this is a radius
+	 * in meters, but it can also take a string that is suffixed with ft to specify feet.
+	 * If this is not passed in, then it is assumed to be 0m. If coming from a device, in
+	 * practice, this value is whatever accuracy the device has measuring its location
+	 * (whether it be coming from a GPS, WiFi triangulation, etc.).
 	 */
 	private String accuracy = null;
 
 	/**
-	 * Minimal granularity of data to return. If this is not passed in, then neighborhood is assumed.
-	 * City can also be passed.
+	 * Minimal granularity of data to return. If this is not passed in, then neighborhood
+	 * is assumed. City can also be passed.
 	 */
 	private String granularity = null;
 
@@ -125,7 +128,8 @@ public class TwitterGeoFunctionProperties {
 
 	@AssertTrue(message = "Either the IP or the Location must be set")
 	public boolean isAtLeastOne() {
-		return this.getSearch().getIp() == null ^ (this.getLocation().getLat() == null && this.getLocation().getLon() == null);
+		return this.getSearch().getIp() == null
+				^ (this.getLocation().getLat() == null && this.getLocation().getLon() == null);
 	}
 
 	@AssertTrue(message = "The IP parameter is applicable only for 'Search' GeoType")
@@ -137,9 +141,10 @@ public class TwitterGeoFunctionProperties {
 	}
 
 	public static class Search {
+
 		/**
-		 * An IP address. Used when attempting to fix geolocation based off of the user's IP address.
-		 * Applicable only for 'search' geo type.
+		 * An IP address. Used when attempting to fix geolocation based off of the user's
+		 * IP address. Applicable only for 'search' geo type.
 		 */
 		private Expression ip = null;
 
@@ -163,6 +168,7 @@ public class TwitterGeoFunctionProperties {
 		public void setQuery(Expression query) {
 			this.query = query;
 		}
+
 	}
 
 	public static class Location {
@@ -176,7 +182,6 @@ public class TwitterGeoFunctionProperties {
 		 * User's lon.
 		 */
 		private Expression lon;
-
 
 		public Expression getLat() {
 			return lat;
@@ -193,5 +198,7 @@ public class TwitterGeoFunctionProperties {
 		public void setLon(Expression lon) {
 			this.lon = lon;
 		}
+
 	}
+
 }

@@ -56,41 +56,30 @@ import static org.mockito.Mockito.mock;
 /**
  * @author Artem Bilan
  * @author Corneil du Plessis
- *
  * @since 2.0.2
  */
 public class MetadataStoreAutoConfigurationTests {
 
-	private final static List<Class<? extends ConcurrentMetadataStore>> METADATA_STORE_CLASSES =
-			List.of(
-					RedisMetadataStore.class,
-					MongoDbMetadataStore.class,
-					JdbcMetadataStore.class,
-					ZookeeperMetadataStore.class,
-					HazelcastMetadataStore.class,
-					DynamoDbMetadataStore.class,
-					SimpleMetadataStore.class
-			);
+	private final static List<Class<? extends ConcurrentMetadataStore>> METADATA_STORE_CLASSES = List.of(
+			RedisMetadataStore.class, MongoDbMetadataStore.class, JdbcMetadataStore.class, ZookeeperMetadataStore.class,
+			HazelcastMetadataStore.class, DynamoDbMetadataStore.class, SimpleMetadataStore.class);
 
 	@ParameterizedTest
 	@MethodSource
 	public void testMetadataStore(Class<? extends ConcurrentMetadataStore> classToInclude) {
-		ApplicationContextRunner contextRunner =
-				new ApplicationContextRunner()
-						.withUserConfiguration(TestConfiguration.class)
-						.withPropertyValues("metadata.store.type=" +
-								classToInclude.getSimpleName()
-										.replaceFirst("MetadataStore", "")
-										.toLowerCase()
-										.replaceFirst("simple", "memory"))
-						.withClassLoader(filteredClassLoaderBut(classToInclude));
-		contextRunner
-				.run(context -> {
-					assertThat(context.getBeansOfType(MetadataStore.class)).hasSize(1);
+		ApplicationContextRunner contextRunner = new ApplicationContextRunner()
+			.withUserConfiguration(TestConfiguration.class)
+			.withPropertyValues("metadata.store.type=" + classToInclude.getSimpleName()
+				.replaceFirst("MetadataStore", "")
+				.toLowerCase()
+				.replaceFirst("simple", "memory"))
+			.withClassLoader(filteredClassLoaderBut(classToInclude));
+		contextRunner.run(context -> {
+			assertThat(context.getBeansOfType(MetadataStore.class)).hasSize(1);
 
-					assertThat(context.getBeanNamesForType(classToInclude))
-							.containsOnlyOnce(Introspector.decapitalize(classToInclude.getSimpleName()));
-				});
+			assertThat(context.getBeanNamesForType(classToInclude))
+				.containsOnlyOnce(Introspector.decapitalize(classToInclude.getSimpleName()));
+		});
 	}
 
 	static List<Class<? extends ConcurrentMetadataStore>> testMetadataStore() {
@@ -98,10 +87,9 @@ public class MetadataStoreAutoConfigurationTests {
 	}
 
 	private static FilteredClassLoader filteredClassLoaderBut(Class<? extends ConcurrentMetadataStore> classToInclude) {
-		return new FilteredClassLoader(
-				METADATA_STORE_CLASSES.stream()
-						.filter(Predicate.isEqual(classToInclude).negate())
-						.toArray(Class<?>[]::new));
+		return new FilteredClassLoader(METADATA_STORE_CLASSES.stream()
+			.filter(Predicate.isEqual(classToInclude).negate())
+			.toArray(Class<?>[]::new));
 	}
 
 	@Configuration
@@ -126,9 +114,8 @@ public class MetadataStoreAutoConfigurationTests {
 			@Bean
 			public static DynamoDbAsyncClient dynamoDB() {
 				DynamoDbAsyncClient dynamoDb = mock(DynamoDbAsyncClient.class);
-				willReturn(CompletableFuture.completedFuture(DescribeTableResponse.builder().build()))
-						.given(dynamoDb)
-						.describeTable(ArgumentMatchers.<Consumer<DescribeTableRequest.Builder>>any());
+				willReturn(CompletableFuture.completedFuture(DescribeTableResponse.builder().build())).given(dynamoDb)
+					.describeTable(ArgumentMatchers.<Consumer<DescribeTableRequest.Builder>>any());
 
 				return dynamoDb;
 			}

@@ -43,4 +43,5 @@ public class JsonMapperFunction implements Function<Object, String> {
 		return "ERROR";
 
 	}
+
 }

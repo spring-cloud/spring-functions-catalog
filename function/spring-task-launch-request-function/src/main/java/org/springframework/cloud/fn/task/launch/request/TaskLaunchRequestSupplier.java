@@ -64,4 +64,5 @@ class TaskLaunchRequestSupplier implements Supplier<TaskLaunchRequest> {
 
 		return taskLaunchRequest;
 	}
+
 }

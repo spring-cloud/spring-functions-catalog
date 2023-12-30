@@ -58,7 +58,6 @@ import org.springframework.messaging.Message;
 @EnableConfigurationProperties(MailSupplierProperties.class)
 public class MailSupplierConfiguration {
 
-
 	final private MailSupplierProperties properties;
 
 	public MailSupplierConfiguration(MailSupplierProperties properties) {
@@ -69,13 +68,12 @@ public class MailSupplierConfiguration {
 	public Publisher<Message<Object>> mailInboundFlow(MessageProducerSupport messageProducer) {
 
 		return IntegrationFlow.from(messageProducer)
-				.transform(Mail.toStringTransformer(this.properties.getCharset()))
-				.enrichHeaders(h -> h
-						.defaultOverwrite(true)
-						.header(MailHeaders.TO, arrayToListProcessor(MailHeaders.TO))
-						.header(MailHeaders.CC, arrayToListProcessor(MailHeaders.CC))
-						.header(MailHeaders.BCC, arrayToListProcessor(MailHeaders.BCC)))
-				.toReactivePublisher(true);
+			.transform(Mail.toStringTransformer(this.properties.getCharset()))
+			.enrichHeaders(h -> h.defaultOverwrite(true)
+				.header(MailHeaders.TO, arrayToListProcessor(MailHeaders.TO))
+				.header(MailHeaders.CC, arrayToListProcessor(MailHeaders.CC))
+				.header(MailHeaders.BCC, arrayToListProcessor(MailHeaders.BCC)))
+			.toReactivePublisher(true);
 	}
 
 	@Bean
@@ -101,11 +99,11 @@ public class MailSupplierConfiguration {
 
 		URLName urlName = this.properties.getUrl();
 		ImapIdleChannelAdapterSpec imapIdleChannelAdapterSpec = Mail.imapIdleAdapter(urlName.toString())
-				.shouldDeleteMessages(this.properties.isDelete())
-				.userFlag(this.properties.getUserFlag())
-				.javaMailProperties(getJavaMailProperties(urlName))
-				.selectorExpression(this.properties.getExpression())
-				.shouldMarkMessagesAsRead(this.properties.isMarkAsRead());
+			.shouldDeleteMessages(this.properties.isDelete())
+			.userFlag(this.properties.getUserFlag())
+			.javaMailProperties(getJavaMailProperties(urlName))
+			.selectorExpression(this.properties.getExpression())
+			.shouldMarkMessagesAsRead(this.properties.isMarkAsRead());
 
 		if (imapIdleChannelAdapterSpecCustomizer != null) {
 			imapIdleChannelAdapterSpecCustomizer.customize(imapIdleChannelAdapterSpec);
@@ -116,8 +114,7 @@ public class MailSupplierConfiguration {
 	@Bean
 	@ConditionalOnProperty(value = "mail.supplier.idle-imap", matchIfMissing = true, havingValue = "false")
 	MessageSourceSpec<?, ?> mailMessageSource(
-			@Nullable ComponentCustomizer<MailInboundChannelAdapterSpec<?, ?>>
-					mailInboundChannelAdapterSpecCustomizer) {
+			@Nullable ComponentCustomizer<MailInboundChannelAdapterSpec<?, ?>> mailInboundChannelAdapterSpecCustomizer) {
 
 		MailInboundChannelAdapterSpec<?, ?> adapterSpec;
 		URLName urlName = this.properties.getUrl();
@@ -131,13 +128,12 @@ public class MailSupplierConfiguration {
 				adapterSpec = getPop3ChannelAdapterSpec(urlName);
 				break;
 			default:
-				throw new IllegalArgumentException(
-						"Unsupported mail protocol: " + urlName.getProtocol());
+				throw new IllegalArgumentException("Unsupported mail protocol: " + urlName.getProtocol());
 		}
 		adapterSpec.javaMailProperties(getJavaMailProperties(urlName))
-				.userFlag(this.properties.getUserFlag())
-				.selectorExpression(this.properties.getExpression())
-				.shouldDeleteMessages(this.properties.isDelete());
+			.userFlag(this.properties.getUserFlag())
+			.selectorExpression(this.properties.getExpression())
+			.shouldDeleteMessages(this.properties.isDelete());
 
 		if (mailInboundChannelAdapterSpecCustomizer != null) {
 			mailInboundChannelAdapterSpecCustomizer.customize(adapterSpec);
@@ -169,8 +165,7 @@ public class MailSupplierConfiguration {
 	 */
 	@SuppressWarnings("rawtypes")
 	private MailInboundChannelAdapterSpec getImapChannelAdapterSpec(URLName urlName) {
-		return Mail.imapInboundAdapter(urlName.toString())
-				.shouldMarkMessagesAsRead(this.properties.isMarkAsRead());
+		return Mail.imapInboundAdapter(urlName.toString()).shouldMarkMessagesAsRead(this.properties.isMarkAsRead());
 	}
 
 	private Properties getJavaMailProperties(URLName urlName) {

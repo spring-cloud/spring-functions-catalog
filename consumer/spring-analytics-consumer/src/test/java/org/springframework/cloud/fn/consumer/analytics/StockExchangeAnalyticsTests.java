@@ -33,12 +33,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Christian Tzolov
  */
 
-@TestPropertySource(properties = {
-		"analytics.meter-type=counter",
-		"analytics.name=stocks",
+@TestPropertySource(properties = { "analytics.meter-type=counter", "analytics.name=stocks",
 		"analytics.tag.expression.symbol=#jsonPath(payload,'$.data.symbol')",
-		"analytics.tag.expression.exchange=#jsonPath(payload,'$.data.exchange')"
-})
+		"analytics.tag.expression.exchange=#jsonPath(payload,'$.data.exchange')" })
 public class StockExchangeAnalyticsTests extends AnalyticsConsumerParentTest {
 
 	@Test
@@ -60,15 +57,18 @@ public class StockExchangeAnalyticsTests extends AnalyticsConsumerParentTest {
 
 		assertThat(counters).hasSize(2);
 
-		//Iterator<Counter> itr = counters.iterator();
+		// Iterator<Counter> itr = counters.iterator();
 		//
-		//Counter applCounter = itr.next();
-		//assertThat(applCounter.count()).isEqualTo(3);
-		//assertThat(applCounter.getId().getTags()).contains(Tag.of("symbol", "AAPL"), Tag.of("exchange", "XNAS"));
+		// Counter applCounter = itr.next();
+		// assertThat(applCounter.count()).isEqualTo(3);
+		// assertThat(applCounter.getId().getTags()).contains(Tag.of("symbol", "AAPL"),
+		// Tag.of("exchange", "XNAS"));
 		//
-		//Counter vmwCounter = itr.next();
-		//assertThat(vmwCounter.count()).isEqualTo(2);
-		//assertThat(vmwCounter.getId().getTags()).contains(Tag.of("symbol", "VMW"), Tag.of("exchange", "NYSE"));
+		// Counter vmwCounter = itr.next();
+		// assertThat(vmwCounter.count()).isEqualTo(2);
+		// assertThat(vmwCounter.getId().getTags()).contains(Tag.of("symbol", "VMW"),
+		// Tag.of("exchange", "NYSE"));
 
 	}
+
 }

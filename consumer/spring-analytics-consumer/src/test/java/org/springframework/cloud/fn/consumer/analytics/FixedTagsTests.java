@@ -30,22 +30,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Christian Tzolov
  */
-@TestPropertySource(properties = {
-		"analytics.name=counter666",
-		"analytics.tag.fixed.foo=bar",
-		"analytics.tag.fixed.gork=bork"
-})
+@TestPropertySource(
+		properties = { "analytics.name=counter666", "analytics.tag.fixed.foo=bar", "analytics.tag.fixed.gork=bork" })
 public class FixedTagsTests extends AnalyticsConsumerParentTest {
 
 	@Test
 	void testAnalyticsSink() {
 		IntStream.range(0, 13).forEach(i -> analyticsConsumer.accept(new GenericMessage<>("hello")));
 		Meter counterMeter = meterRegistry.find("counter666").meter();
-		assertThat(StreamSupport.stream(counterMeter.measure().spliterator(), false)
-				.mapToDouble(m -> m.getValue()).sum()).isEqualTo(13.0);
+		assertThat(
+				StreamSupport.stream(counterMeter.measure().spliterator(), false).mapToDouble(m -> m.getValue()).sum())
+			.isEqualTo(13.0);
 
 		assertThat(counterMeter.getId().getTags().size()).isEqualTo(2);
 		assertThat(counterMeter.getId().getTag("foo")).isEqualTo("bar");
 		assertThat(counterMeter.getId().getTag("gork")).isEqualTo("bork");
 	}
+
 }

@@ -38,13 +38,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Artem Bilan
  */
-@TestPropertySource(properties = {
-		"aggregator.correlation=T(Thread).currentThread().id",
+@TestPropertySource(properties = { "aggregator.correlation=T(Thread).currentThread().id",
 		"aggregator.release=!messages.?[payload == 'bar'].empty",
-		"aggregator.aggregation=#this.?[payload == 'foo'].![payload]",
-		"aggregator.messageStoreType=mongodb",
-		"aggregator.message-store-entity=aggregatorTest"
-})
+		"aggregator.aggregation=#this.?[payload == 'foo'].![payload]", "aggregator.messageStoreType=mongodb",
+		"aggregator.message-store-entity=aggregatorTest" })
 @AutoConfigureDataMongo
 public class CustomPropsAndMongoMessageStoreAggregatorTests extends AbstractAggregatorFunctionTests
 		implements MongoDbTestContainerSupport {
@@ -57,22 +54,19 @@ public class CustomPropsAndMongoMessageStoreAggregatorTests extends AbstractAggr
 
 	@Test
 	public void test() {
-		Flux<Message<?>> input =
-				Flux.just("foo", "bar")
-						.map(GenericMessage::new);
+		Flux<Message<?>> input = Flux.just("foo", "bar").map(GenericMessage::new);
 
 		Flux<Message<?>> output = this.aggregatorFunction.apply(input);
 
 		output.as(StepVerifier::create)
-				.assertNext((message) ->
-						assertThat(message)
-								.extracting(Message::getPayload)
-								.isInstanceOf(List.class)
-								.asList()
-								.hasSize(1)
-								.element(0).isEqualTo("foo"))
-				.thenCancel()
-				.verify(Duration.ofSeconds(10));
+			.assertNext((message) -> assertThat(message).extracting(Message::getPayload)
+				.isInstanceOf(List.class)
+				.asList()
+				.hasSize(1)
+				.element(0)
+				.isEqualTo("foo"))
+			.thenCancel()
+			.verify(Duration.ofSeconds(10));
 
 		assertThat(this.messageGroupStore).isInstanceOf(ConfigurableMongoDbMessageStore.class);
 		assertThat(TestUtils.getPropertyValue(this.messageGroupStore, "collectionName")).isEqualTo("aggregatorTest");

@@ -52,22 +52,18 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Artem Bilan
  *
  */
-@SpringBootTest(properties =
-		{ "mqtt.supplier.topics=test,fake",
-				"mqtt.supplier.qos=0,0",
-				"mqtt.ssl-properties.com.ibm.ssl.protocol=TLS",
-				"mqtt.ssl-properties.com.ibm.ssl.keyStoreType=TEST"})
+@SpringBootTest(properties = { "mqtt.supplier.topics=test,fake", "mqtt.supplier.qos=0,0",
+		"mqtt.ssl-properties.com.ibm.ssl.protocol=TLS", "mqtt.ssl-properties.com.ibm.ssl.keyStoreType=TEST" })
 @DirtiesContext
 public class MqttSupplierTests {
 
 	static {
-		GenericContainer<?> mosquitto =
-				new GenericContainer<>("eclipse-mosquitto:2.0.13")
-					.withCommand("mosquitto -c /mosquitto-no-auth.conf")
-					.withReuse(true)
-					.withExposedPorts(1883)
-					.withStartupTimeout(Duration.ofSeconds(120))
-					.withStartupAttempts(3);
+		GenericContainer<?> mosquitto = new GenericContainer<>("eclipse-mosquitto:2.0.13")
+			.withCommand("mosquitto -c /mosquitto-no-auth.conf")
+			.withReuse(true)
+			.withExposedPorts(1883)
+			.withStartupTimeout(Duration.ofSeconds(120))
+			.withStartupAttempts(3);
 		mosquitto.start();
 		final Integer mappedPort = mosquitto.getMappedPort(1883);
 		System.setProperty("mqtt.url", "tcp://localhost:" + mappedPort);
@@ -89,20 +85,15 @@ public class MqttSupplierTests {
 		MqttConnectOptions connectionInfo = this.mqttOutbound.getConnectionInfo();
 		Properties sslProperties = connectionInfo.getSSLProperties();
 		assertThat(sslProperties)
-				.containsEntry(SSLSocketFactoryFactory.SSLPROTOCOL, SSLSocketFactoryFactory.DEFAULT_PROTOCOL)
-				.containsEntry(SSLSocketFactoryFactory.KEYSTORETYPE, "TEST");
+			.containsEntry(SSLSocketFactoryFactory.SSLPROTOCOL, SSLSocketFactoryFactory.DEFAULT_PROTOCOL)
+			.containsEntry(SSLSocketFactoryFactory.KEYSTORETYPE, "TEST");
 		this.mqttOutbound.handleMessage(MessageBuilder.withPayload("hello").build());
 
 		final Flux<Message<?>> messageFlux = mqttSupplier.get();
 
-		StepVerifier.create(messageFlux)
-				.assertNext((message) -> {
-							assertThat(message.getPayload())
-									.isEqualTo("hello");
-						}
-				)
-				.thenCancel()
-				.verify();
+		StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(message.getPayload()).isEqualTo("hello");
+		}).thenCancel().verify();
 	}
 
 	@SpringBootApplication

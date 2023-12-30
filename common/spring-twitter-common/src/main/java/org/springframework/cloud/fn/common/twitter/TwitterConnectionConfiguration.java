@@ -40,7 +40,6 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.MimeTypeUtils;
 
 /**
- *
  * @author Christian Tzolov
  */
 @Configuration
@@ -67,13 +66,12 @@ public class TwitterConnectionConfiguration {
 
 	@Bean
 	public Function<TwitterConnectionProperties, ConfigurationBuilder> toConfigurationBuilder() {
-		return properties -> new ConfigurationBuilder()
-				.setJSONStoreEnabled(properties.isRawJson())
-				.setDebugEnabled(properties.isDebugEnabled())
-				.setOAuthConsumerKey(properties.getConsumerKey())
-				.setOAuthConsumerSecret(properties.getConsumerSecret())
-				.setOAuthAccessToken(properties.getAccessToken())
-				.setOAuthAccessTokenSecret(properties.getAccessTokenSecret());
+		return properties -> new ConfigurationBuilder().setJSONStoreEnabled(properties.isRawJson())
+			.setDebugEnabled(properties.isDebugEnabled())
+			.setOAuthConsumerKey(properties.getConsumerKey())
+			.setOAuthConsumerSecret(properties.getConsumerSecret())
+			.setOAuthAccessToken(properties.getAccessToken())
+			.setOAuthAccessTokenSecret(properties.getAccessTokenSecret());
 	}
 
 	@Bean
@@ -82,10 +80,9 @@ public class TwitterConnectionConfiguration {
 			try {
 				String json = mapper.writeValueAsString(objects);
 
-				return MessageBuilder
-						.withPayload(json.getBytes())
-						.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE)
-						.build();
+				return MessageBuilder.withPayload(json.getBytes())
+					.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE)
+					.build();
 			}
 			catch (JsonProcessingException e) {
 				logger.error("Status to JSON conversion error!", e);
@@ -95,12 +92,12 @@ public class TwitterConnectionConfiguration {
 	}
 
 	/**
-	 *  Retrieves the raw JSON form of the provided object.
+	 * Retrieves the raw JSON form of the provided object.
 	 *
-	 *  Note that raw JSON forms can be retrieved only from the same thread invoked the last method
-	 *  call and will become inaccessible once another method call.
-	 *
-	 * @return Function that can retrieve the raw JSON object from the objects returned by the Twitter4J's APIs.
+	 * Note that raw JSON forms can be retrieved only from the same thread invoked the
+	 * last method call and will become inaccessible once another method call.
+	 * @return Function that can retrieve the raw JSON object from the objects returned by
+	 * the Twitter4J's APIs.
 	 */
 	@Bean
 	public Function<Object, Object> rawJsonExtractor() {
@@ -124,4 +121,5 @@ public class TwitterConnectionConfiguration {
 			Function<Object, Object> rawJsonExtractor, Function<Object, Message<byte[]>> json) {
 		return list -> (properties.isRawJson()) ? rawJsonExtractor.andThen(json).apply(list) : json.apply(list);
 	}
+
 }

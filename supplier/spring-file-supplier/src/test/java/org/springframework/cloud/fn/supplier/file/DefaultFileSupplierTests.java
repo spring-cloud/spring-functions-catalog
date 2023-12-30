@@ -63,34 +63,20 @@ public class DefaultFileSupplierTests extends AbstractFileSupplierTests {
 
 		final Flux<Message<?>> messageFlux = fileSupplier.get();
 
-		//create file after subscription
+		// create file after subscription
 		Path tempFile = tempDir.resolve("test.file");
 
-		StepVerifier stepVerifier =
-				StepVerifier.create(messageFlux)
-						.assertNext((message) -> {
-									assertThat(message.getPayload())
-											.isEqualTo("first.file".getBytes());
-									assertThat(message.getHeaders())
-											.containsEntry(FileHeaders.FILENAME, "first.file");
-									assertThat(message.getHeaders())
-											.containsEntry(FileHeaders.RELATIVE_PATH, "first.file");
-									assertThat(message.getHeaders())
-											.containsEntry(FileHeaders.ORIGINAL_FILE, firstFile.toFile());
-								}
-						)
-						.assertNext((message) -> {
-							assertThat(message.getPayload())
-									.isEqualTo("testing".getBytes());
-							assertThat(message.getHeaders())
-									.containsEntry(FileHeaders.FILENAME, "test.file");
-							assertThat(message.getHeaders())
-									.containsEntry(FileHeaders.RELATIVE_PATH, "test.file");
-							assertThat(message.getHeaders())
-									.containsEntry(FileHeaders.ORIGINAL_FILE, tempFile.toFile());
-						})
-						.thenCancel()
-						.verifyLater();
+		StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(message.getPayload()).isEqualTo("first.file".getBytes());
+			assertThat(message.getHeaders()).containsEntry(FileHeaders.FILENAME, "first.file");
+			assertThat(message.getHeaders()).containsEntry(FileHeaders.RELATIVE_PATH, "first.file");
+			assertThat(message.getHeaders()).containsEntry(FileHeaders.ORIGINAL_FILE, firstFile.toFile());
+		}).assertNext((message) -> {
+			assertThat(message.getPayload()).isEqualTo("testing".getBytes());
+			assertThat(message.getHeaders()).containsEntry(FileHeaders.FILENAME, "test.file");
+			assertThat(message.getHeaders()).containsEntry(FileHeaders.RELATIVE_PATH, "test.file");
+			assertThat(message.getHeaders()).containsEntry(FileHeaders.ORIGINAL_FILE, tempFile.toFile());
+		}).thenCancel().verifyLater();
 		Files.write(tempFile, "testing".getBytes());
 		stepVerifier.verify();
 
@@ -98,21 +84,24 @@ public class DefaultFileSupplierTests extends AbstractFileSupplierTests {
 
 		assertThat(this.metadataStore).isInstanceOf(JdbcMetadataStore.class);
 
-		List<String> metadataStoreContent =
-				jdbcTemplate.queryForList("SELECT metadata_key FROM int_metadata_store", String.class);
+		List<String> metadataStoreContent = jdbcTemplate.queryForList("SELECT metadata_key FROM int_metadata_store",
+				String.class);
 
 		assertThat(metadataStoreContent).hasSize(2);
 		assertThat(metadataStoreContent.get(0)).startsWith("local-file-system-metadata-");
 		assertThat(metadataStoreContent.get(0)).endsWith("first.file");
 		assertThat(metadataStoreContent.get(1)).endsWith("test.file");
 
-		/* See AbstractFileSupplierTests.FileSupplierTestApplication.fileInboundChannelAdapterSpecCustomizer() -
-		 through the ComponentCustomizer and @CustomizationAware on the FileSupplierConfiguration.fileMessageSource()
-		 the provided customization is populated down to the bean under testing.
-		*/
+		/*
+		 * See AbstractFileSupplierTests.FileSupplierTestApplication.
+		 * fileInboundChannelAdapterSpecCustomizer() - through the ComponentCustomizer
+		 * and @CustomizationAware on the FileSupplierConfiguration.fileMessageSource()
+		 * the provided customization is populated down to the bean under testing.
+		 */
 		assertThat(TestUtils.getPropertyValue(this.fileMessageSource, "watchEvents",
 				FileReadingMessageSource.WatchEventType[].class))
-				.isEqualTo(new FileReadingMessageSource.WatchEventType[]{ FileReadingMessageSource.WatchEventType.DELETE });
+			.isEqualTo(
+					new FileReadingMessageSource.WatchEventType[] { FileReadingMessageSource.WatchEventType.DELETE });
 	}
 
 }

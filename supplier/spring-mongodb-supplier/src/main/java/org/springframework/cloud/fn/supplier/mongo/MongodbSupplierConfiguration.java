@@ -38,9 +38,9 @@ import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**
- * A configuration for MongoDB Source applications. Produces
- * {@link MongoDbMessageSource} which polls collection with the query after startup
- * according to the polling properties.
+ * A configuration for MongoDB Source applications. Produces {@link MongoDbMessageSource}
+ * which polls collection with the query after startup according to the polling
+ * properties.
  *
  * @author Adam Zwickey
  * @author Artem Bilan
@@ -69,7 +69,9 @@ public class MongodbSupplierConfiguration {
 		return () -> {
 			Message<?> received = mongoDbSource.receive();
 			if (received != null) {
-				return Flux.fromIterable(splitterFunction.apply(received)); // multiple Message<Map<String, Object>>
+				return Flux.fromIterable(splitterFunction.apply(received)); // multiple
+																			// Message<Map<String,
+																			// Object>>
 			}
 			else {
 				return Flux.empty();
@@ -88,8 +90,7 @@ public class MongodbSupplierConfiguration {
 			@Nullable ComponentCustomizer<MongoDbMessageSource> mongoDbMessageSourceCustomizer) {
 
 		Expression queryExpression = (this.properties.getQueryExpression() != null
-				? this.properties.getQueryExpression()
-				: new LiteralExpression(this.properties.getQuery()));
+				? this.properties.getQueryExpression() : new LiteralExpression(this.properties.getQuery()));
 		MongoDbMessageSource mongoDbMessageSource = new MongoDbMessageSource(this.mongoTemplate, queryExpression);
 		mongoDbMessageSource.setCollectionNameExpression(new LiteralExpression(this.properties.getCollection()));
 		mongoDbMessageSource.setEntityClass(String.class);

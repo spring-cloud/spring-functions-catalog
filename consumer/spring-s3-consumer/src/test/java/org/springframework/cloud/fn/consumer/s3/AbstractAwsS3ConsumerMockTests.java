@@ -47,12 +47,11 @@ import static org.mockito.BDDMockito.willReturn;
 
 @DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = {
-				"spring.cloud.aws.credentials.accessKey=" + AbstractAwsS3ConsumerMockTests.AWS_ACCESS_KEY,
+		properties = { "spring.cloud.aws.credentials.accessKey=" + AbstractAwsS3ConsumerMockTests.AWS_ACCESS_KEY,
 				"spring.cloud.aws.credentials.secretKey=" + AbstractAwsS3ConsumerMockTests.AWS_SECRET_KEY,
 				"spring.cloud.aws.region.static=" + AbstractAwsS3ConsumerMockTests.AWS_REGION,
 				"spring.cloud.aws.s3.endpoint=s3://foo",
-				"s3.consumer.bucket=" + AbstractAwsS3ConsumerMockTests.S3_BUCKET})
+				"s3.consumer.bucket=" + AbstractAwsS3ConsumerMockTests.S3_BUCKET })
 public abstract class AbstractAwsS3ConsumerMockTests {
 
 	protected static final String AWS_ACCESS_KEY = "test.accessKey";
@@ -80,9 +79,8 @@ public abstract class AbstractAwsS3ConsumerMockTests {
 
 	@BeforeEach
 	public void setupTest() {
-		willReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()))
-				.given(amazonS3)
-				.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class));
+		willReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build())).given(amazonS3)
+			.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class));
 
 		new DirectFieldAccessor(this.s3TransferManager).setPropertyValue("s3AsyncClient", amazonS3);
 	}
@@ -99,7 +97,6 @@ public abstract class AbstractAwsS3ConsumerMockTests {
 		public TransferListener transferListener() {
 			return new TransferListener() {
 
-
 				@Override
 				public void transferComplete(Context.TransferComplete context) {
 					transferCompletedLatch().countDown();
@@ -113,8 +110,8 @@ public abstract class AbstractAwsS3ConsumerMockTests {
 			return (builder, message) -> {
 				if (message.getPayload() instanceof InputStream) {
 					builder.contentLength(1L)
-							.contentType(MediaType.APPLICATION_JSON_VALUE)
-							.contentDisposition("test.json");
+						.contentType(MediaType.APPLICATION_JSON_VALUE)
+						.contentDisposition("test.json");
 				}
 			};
 		}

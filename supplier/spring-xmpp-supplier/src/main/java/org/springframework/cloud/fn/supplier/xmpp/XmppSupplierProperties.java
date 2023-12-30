@@ -24,7 +24,6 @@ import org.springframework.expression.Expression;
 import org.springframework.validation.annotation.Validated;
 
 /**
- *
  * @author Daniel Frey
  * @since 4.0.0
  */
@@ -47,6 +46,7 @@ public class XmppSupplierProperties {
 	public void setPayloadExpression(Expression payloadExpression) {
 		this.payloadExpression = payloadExpression;
 	}
+
 	public Expression getPayloadExpression() {
 		return payloadExpression;
 	}

@@ -33,7 +33,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilderFactory;
 
-
 /**
  * Configuration for a {@link Function} that makes HTTP requests to a resource and for
  * each request, returns a {@link ResponseEntity}.
@@ -47,7 +46,8 @@ import org.springframework.web.util.UriBuilderFactory;
 public class HttpRequestFunctionConfiguration {
 
 	@Bean
-	public HttpRequestFunction httpRequestFunction(WebClient.Builder webClientBuilder, HttpRequestFunctionProperties properties) {
+	public HttpRequestFunction httpRequestFunction(WebClient.Builder webClientBuilder,
+			HttpRequestFunctionProperties properties) {
 		return new HttpRequestFunction(webClientBuilder.build(), properties);
 	}
 
@@ -76,8 +76,7 @@ public class HttpRequestFunctionConfiguration {
 
 		@Override
 		public Object apply(Message<?> message) {
-			return this.webClient
-				.method(resolveHttpMethod(message))
+			return this.webClient.method(resolveHttpMethod(message))
 				.uri(uriBuilderFactory.uriString(resolveUrl(message)).build())
 				.bodyValue(resolveBody(message))
 				.headers(httpHeaders -> httpHeaders.addAll(resolveHeaders(message)))
@@ -98,7 +97,7 @@ public class HttpRequestFunctionConfiguration {
 
 		private Object resolveBody(Message<?> message) {
 			return properties.getBodyExpression() != null ? properties.getBodyExpression().getValue(message)
-				: message.getPayload();
+					: message.getPayload();
 		}
 
 		private HttpHeaders resolveHeaders(Message<?> message) {
@@ -107,8 +106,7 @@ public class HttpRequestFunctionConfiguration {
 				Map<?, ?> headersMap = properties.getHeadersExpression().getValue(message, Map.class);
 				for (Map.Entry<?, ?> header : headersMap.entrySet()) {
 					if (header.getKey() != null && header.getValue() != null) {
-						headers.add(header.getKey().toString(),
-							header.getValue().toString());
+						headers.add(header.getKey().toString(), header.getValue().toString());
 					}
 				}
 			}
@@ -123,5 +121,7 @@ public class HttpRequestFunctionConfiguration {
 		public HttpMethod convert(String source) {
 			return HttpMethod.valueOf(source);
 		}
+
 	}
+
 }

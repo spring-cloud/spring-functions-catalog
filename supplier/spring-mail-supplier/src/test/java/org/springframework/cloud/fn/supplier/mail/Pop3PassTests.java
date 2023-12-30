@@ -28,20 +28,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = "mail.supplier.url=pop3://user:pw@localhost:${test.mail.server.pop3.port}/INBOX")
 public class Pop3PassTests extends AbstractMailSupplierTests {
 
-
 	@Test
 	public void testSimpleTest() {
 		// given
 		sendMessage("test", "foo");
 		final Flux<Message<?>> messageFlux = mailSupplier.get();
 
-		StepVerifier.create(messageFlux)
-			.assertNext((message) -> {
-					assertThat(((String) message.getPayload())).contains("foo");
-				}
-			)
-			.thenCancel()
-			.verify();
+		StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(((String) message.getPayload())).contains("foo");
+		}).thenCancel().verify();
 
 	}
+
 }

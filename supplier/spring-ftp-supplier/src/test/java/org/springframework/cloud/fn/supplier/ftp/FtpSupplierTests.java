@@ -39,12 +39,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = {
-				"ftp.factory.username = foo",
-				"ftp.factory.password = foo",
-				"file.consumer.mode = ref",
-				"ftp.factory.cacheSessions = true"
-		})
+		properties = { "ftp.factory.username = foo", "ftp.factory.password = foo", "file.consumer.mode = ref",
+				"ftp.factory.cacheSessions = true" })
 @DirtiesContext
 public class FtpSupplierTests extends FtpTestSupport {
 
@@ -64,27 +60,23 @@ public class FtpSupplierTests extends FtpTestSupport {
 	public void testSourceFileAsRef() {
 		final Flux<Message<?>> messageFlux = ftpSupplier.get();
 		assertThat(this.sessionFactory).isInstanceOf(CachingSessionFactory.class);
-		StepVerifier stepVerifier =
-				StepVerifier.create(messageFlux)
-						.assertNext((message) -> {
-							assertThat(new File(message.getPayload().toString().replaceAll("\"", ""))).isEqualTo(
-									new File(this.config.getLocalDir(), "ftpSource1.txt"));
-								}
-						)
-						.assertNext((message) -> {
-							assertThat(new File(message.getPayload().toString().replaceAll("\"", ""))).isEqualTo(
-									new File(this.config.getLocalDir(), "ftpSource2.txt"));
-						})
-						.thenCancel()
-						.verifyLater();
+		StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
+				.isEqualTo(new File(this.config.getLocalDir(), "ftpSource1.txt"));
+		}).assertNext((message) -> {
+			assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
+				.isEqualTo(new File(this.config.getLocalDir(), "ftpSource2.txt"));
+		}).thenCancel().verifyLater();
 		stepVerifier.verify();
 	}
 
 	@SpringBootApplication
 	static class FtpSupplierTestApplication {
 
-		// These properties can be moved into the SpringBootApplication annotation, but providing here
-		// as a way to demonstrate how we can provide ConfigurationProperties as a bean in the application itself
+		// These properties can be moved into the SpringBootApplication annotation, but
+		// providing here
+		// as a way to demonstrate how we can provide ConfigurationProperties as a bean in
+		// the application itself
 		// This way, it is less error-prone from typos.
 		@Bean
 		@Primary
@@ -94,5 +86,7 @@ public class FtpSupplierTests extends FtpTestSupport {
 			ftpSupplierProperties.setFilenamePattern("*");
 			return ftpSupplierProperties;
 		}
+
 	}
+
 }

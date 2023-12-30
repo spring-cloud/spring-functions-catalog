@@ -63,36 +63,31 @@ import org.springframework.util.StringUtils;
 public class CassandraAppClusterConfiguration {
 
 	@Bean
-	public CqlSessionBuilderCustomizer clusterBuilderCustomizer(
-			CassandraClusterProperties cassandraClusterProperties) {
+	public CqlSessionBuilderCustomizer clusterBuilderCustomizer(CassandraClusterProperties cassandraClusterProperties) {
 
 		PropertyMapper map = PropertyMapper.get();
-		return builder ->
-				map.from(cassandraClusterProperties::isSkipSslValidation)
-						.whenTrue()
-						.toCall(() -> {
-							try {
-								builder.withSslContext(TrustAllSSLContextFactory.getSslContext());
-							}
-							catch (NoSuchAlgorithmException | KeyManagementException ex) {
-								throw new BeanInitializationException(
-										"Unable to configure a Cassandra cluster using SSL.", ex);
-							}
+		return builder -> map.from(cassandraClusterProperties::isSkipSslValidation).whenTrue().toCall(() -> {
+			try {
+				builder.withSslContext(TrustAllSSLContextFactory.getSslContext());
+			}
+			catch (NoSuchAlgorithmException | KeyManagementException ex) {
+				throw new BeanInitializationException("Unable to configure a Cassandra cluster using SSL.", ex);
+			}
 
-						});
+		});
 	}
 
 	@Bean
 	@ConditionalOnProperty("cassandra.cluster.create-keyspace")
 	public Object keyspaceCreator(CassandraProperties cassandraProperties, CqlSessionBuilder cqlSessionBuilder) {
-		CreateKeyspaceSpecification createKeyspaceSpecification =
-				CreateKeyspaceSpecification
-						.createKeyspace(cassandraProperties.getKeyspaceName())
-						.withSimpleReplication()
-						.ifNotExists();
+		CreateKeyspaceSpecification createKeyspaceSpecification = CreateKeyspaceSpecification
+			.createKeyspace(cassandraProperties.getKeyspaceName())
+			.withSimpleReplication()
+			.ifNotExists();
 
 		String createKeySpaceQuery = new CreateKeyspaceCqlGenerator(createKeyspaceSpecification).toCql();
-		try (var systemSession = cqlSessionBuilder.withKeyspace(CqlSessionFactoryBean.CASSANDRA_SYSTEM_SESSION).build()) {
+		try (var systemSession = cqlSessionBuilder.withKeyspace(CqlSessionFactoryBean.CASSANDRA_SYSTEM_SESSION)
+			.build()) {
 			systemSession.execute(createKeySpaceQuery);
 		}
 
@@ -106,25 +101,22 @@ public class CassandraAppClusterConfiguration {
 		return cqlSessionBuilder.build();
 	}
 
-
 	@Bean
 	@ConditionalOnProperty("cassandra.cluster.init-script")
 	public Object keyspaceInitializer(CassandraClusterProperties cassandraClusterProperties,
 			ReactiveCassandraTemplate reactiveCassandraTemplate) throws IOException {
 
-		String scripts =
-				new Scanner(cassandraClusterProperties.getInitScript().getInputStream(),
-						StandardCharsets.UTF_8)
-						.useDelimiter("\\A")
-						.next();
+		String scripts = new Scanner(cassandraClusterProperties.getInitScript().getInputStream(),
+				StandardCharsets.UTF_8)
+			.useDelimiter("\\A")
+			.next();
 
-		ReactiveCqlOperations reactiveCqlOperations =
-				reactiveCassandraTemplate.getReactiveCqlOperations();
+		ReactiveCqlOperations reactiveCqlOperations = reactiveCassandraTemplate.getReactiveCqlOperations();
 
 		Flux.fromArray(StringUtils.delimitedListToStringArray(scripts, ";", "\r\n\f"))
-				.filter(StringUtils::hasText) // an empty String after the last ';'
-				.concatMap(script -> reactiveCqlOperations.execute(script + ";"))
-				.blockLast();
+			.filter(StringUtils::hasText) // an empty String after the last ';'
+			.concatMap(script -> reactiveCqlOperations.execute(script + ";"))
+			.blockLast();
 
 		return null;
 
@@ -144,9 +136,9 @@ public class CassandraAppClusterConfiguration {
 				BeanDefinitionRegistry registry) {
 
 			Binder.get(this.environment)
-					.bind("cassandra.cluster.entity-base-packages", String[].class)
-					.map(Arrays::asList)
-					.ifBound(packagesToScan -> EntityScanPackages.register(registry, packagesToScan));
+				.bind("cassandra.cluster.entity-base-packages", String[].class)
+				.map(Arrays::asList)
+				.ifBound(packagesToScan -> EntityScanPackages.register(registry, packagesToScan));
 		}
 
 	}

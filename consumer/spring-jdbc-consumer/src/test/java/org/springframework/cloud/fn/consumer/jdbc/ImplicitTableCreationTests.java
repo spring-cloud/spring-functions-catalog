@@ -34,10 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Soby Chacko
  * @author Szabolcs Stremler
  */
-@TestPropertySource(properties = {
-		"jdbc.consumer.tableName=no_script",
-		"jdbc.consumer.initialize=true",
-		"jdbc.consumer.columns=a,b"})
+@TestPropertySource(properties = { "jdbc.consumer.tableName=no_script", "jdbc.consumer.initialize=true",
+		"jdbc.consumer.columns=a,b" })
 public class ImplicitTableCreationTests extends JdbcConsumerApplicationTests {
 
 	@Test
@@ -45,8 +43,8 @@ public class ImplicitTableCreationTests extends JdbcConsumerApplicationTests {
 		Payload sent = new Payload("hello", 42);
 		final Message<Payload> message = MessageBuilder.withPayload(sent).build();
 		jdbcConsumer.accept(message);
-		Payload result = jdbcOperations
-				.query("select a, b from no_script", new BeanPropertyRowMapper<>(Payload.class)).get(0);
+		Payload result = jdbcOperations.query("select a, b from no_script", new BeanPropertyRowMapper<>(Payload.class))
+			.get(0);
 		assertThat(result).usingRecursiveComparison().isEqualTo(sent);
 	}
 

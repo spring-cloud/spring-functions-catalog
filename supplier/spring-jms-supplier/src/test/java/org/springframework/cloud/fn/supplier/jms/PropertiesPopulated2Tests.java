@@ -26,13 +26,11 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TestPropertySource(properties = {
-		"jms.supplier.sessionTransacted = true", "jms.supplier.clientId = client", "jms.supplier.destination = topic",
-		"jms.supplier.subscriptionName = subName", "jms.supplier.subscriptionDurable = true",
-		"jms.supplier.subscriptionShared = false", "spring.jms.listener.acknowledgeMode = AUTO",
-		"spring.jms.listener.concurrency = 3",
-		"spring.jms.listener.maxConcurrency = 4"
-})
+@TestPropertySource(properties = { "jms.supplier.sessionTransacted = true", "jms.supplier.clientId = client",
+		"jms.supplier.destination = topic", "jms.supplier.subscriptionName = subName",
+		"jms.supplier.subscriptionDurable = true", "jms.supplier.subscriptionShared = false",
+		"spring.jms.listener.acknowledgeMode = AUTO", "spring.jms.listener.concurrency = 3",
+		"spring.jms.listener.maxConcurrency = 4" })
 public class PropertiesPopulated2Tests extends AbstractJmsSupplierTests {
 
 	@Test
@@ -53,4 +51,5 @@ public class PropertiesPopulated2Tests extends AbstractJmsSupplierTests {
 		assertThat(TestUtils.getPropertyValue(container, "maxConcurrentConsumers")).isEqualTo(4);
 		assertThat(TestUtils.getPropertyValue(container, "pubSubDomain", Boolean.class)).isTrue();
 	}
+
 }

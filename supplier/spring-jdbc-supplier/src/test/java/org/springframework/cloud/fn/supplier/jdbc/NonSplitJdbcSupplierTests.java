@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Artem Bilan
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = {"jdbc.supplier.query=select id, name from test order by id", "jdbc.supplier.split=false"})
+		properties = { "jdbc.supplier.query=select id, name from test order by id", "jdbc.supplier.split=false" })
 @DirtiesContext
 public class NonSplitJdbcSupplierTests {
 
@@ -61,5 +61,7 @@ public class NonSplitJdbcSupplierTests {
 
 	@SpringBootApplication
 	static class JdbcSupplierTestApplication {
+
 	}
+
 }

@@ -46,57 +46,47 @@ public class DefaultJdbcSupplierTests {
 	JdbcTemplate jdbcTemplate;
 
 	@Test
-	@SuppressWarnings({ "unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	void testExtraction() {
 		final Flux<Message<?>> messageFlux = jdbcSupplier.get();
-		StepVerifier stepVerifier =
-				StepVerifier.create(messageFlux)
-						.assertNext((message) ->
-								assertThat(message)
-										.satisfies((msg) -> assertThat(msg)
-												.extracting(Message::getPayload)
-												.matches(o -> {
-													Map map = (Map) o;
-													return map.get("ID").equals(1L) && map.get("NAME").equals("Bob");
-												})
-										))
-						.assertNext((message) ->
-								assertThat(message)
-										.satisfies((msg) -> assertThat(msg)
-												.extracting(Message::getPayload)
-												.matches(o -> {
-													Map map = (Map) o;
-													return map.get("ID").equals(2L) && map.get("NAME").equals("Jane");
-												})
-										))
-						.assertNext((message) ->
-								assertThat(message)
-										.satisfies((msg) -> assertThat(msg)
-												.extracting(Message::getPayload)
-												.matches(o -> {
-													Map map = (Map) o;
-													return map.get("ID").equals(3L) && map.get("NAME").equals("John");
-												})
-										))
-						.thenCancel()
-						.verifyLater();
+		StepVerifier stepVerifier = StepVerifier.create(messageFlux)
+			.assertNext((message) -> assertThat(message)
+				.satisfies((msg) -> assertThat(msg).extracting(Message::getPayload).matches(o -> {
+					Map map = (Map) o;
+					return map.get("ID").equals(1L) && map.get("NAME").equals("Bob");
+				})))
+			.assertNext((message) -> assertThat(message)
+				.satisfies((msg) -> assertThat(msg).extracting(Message::getPayload).matches(o -> {
+					Map map = (Map) o;
+					return map.get("ID").equals(2L) && map.get("NAME").equals("Jane");
+				})))
+			.assertNext((message) -> assertThat(message)
+				.satisfies((msg) -> assertThat(msg).extracting(Message::getPayload).matches(o -> {
+					Map map = (Map) o;
+					return map.get("ID").equals(3L) && map.get("NAME").equals("John");
+				})))
+			.thenCancel()
+			.verifyLater();
 		stepVerifier.verify();
 	}
 
 	/*
-	The test to verify that DB is not initialized with Spring Integration DDL
-	(spring.integration.jdbc.initialize-schema=NEVER) what happens by default via IntegrationAutoConfiguration.IntegrationJdbcConfiguration.
-	This is not a functionality of this JDBC Supplier.
+	 * The test to verify that DB is not initialized with Spring Integration DDL
+	 * (spring.integration.jdbc.initialize-schema=NEVER) what happens by default via
+	 * IntegrationAutoConfiguration.IntegrationJdbcConfiguration. This is not a
+	 * functionality of this JDBC Supplier.
 	 */
 	@Test
 	void verifyNoIntMessageGroupTable() {
 		assertThatExceptionOfType(BadSqlGrammarException.class)
-				.isThrownBy(() -> this.jdbcTemplate.queryForList("SELECT * FROM INT_MESSAGE_GROUP"))
-				.havingCause()
-				.withMessageContaining("Table \"INT_MESSAGE_GROUP\" not found;");
+			.isThrownBy(() -> this.jdbcTemplate.queryForList("SELECT * FROM INT_MESSAGE_GROUP"))
+			.havingCause()
+			.withMessageContaining("Table \"INT_MESSAGE_GROUP\" not found;");
 	}
 
 	@SpringBootApplication
 	static class JdbcSupplierTestApplication {
+
 	}
+
 }

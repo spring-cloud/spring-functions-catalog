@@ -36,8 +36,7 @@ public class FtpConsumerPropertiesTests {
 	@Test
 	public void remoteDirCanBeCustomized() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.consumer.remoteDir:/remote")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.consumer.remoteDir:/remote").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpConsumerProperties properties = context.getBean(FtpConsumerProperties.class);
@@ -48,8 +47,7 @@ public class FtpConsumerPropertiesTests {
 	@Test
 	public void autoCreateDirCanBeDisabled() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.consumer.autoCreateDir:false")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.consumer.autoCreateDir:false").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpConsumerProperties properties = context.getBean(FtpConsumerProperties.class);
@@ -60,8 +58,7 @@ public class FtpConsumerPropertiesTests {
 	@Test
 	public void tmpFileSuffixCanBeCustomized() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.consumer.tmpFileSuffix:.foo")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.consumer.tmpFileSuffix:.foo").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpConsumerProperties properties = context.getBean(FtpConsumerProperties.class);
@@ -72,8 +69,7 @@ public class FtpConsumerPropertiesTests {
 	@Test
 	public void tmpFileRemoteDirCanBeCustomized() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.consumer.temporaryRemoteDir:/foo")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.consumer.temporaryRemoteDir:/foo").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpConsumerProperties properties = context.getBean(FtpConsumerProperties.class);
@@ -84,8 +80,7 @@ public class FtpConsumerPropertiesTests {
 	@Test
 	public void remoteFileSeparatorCanBeCustomized() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.consumer.remoteFileSeparator:\\")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.consumer.remoteFileSeparator:\\").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpConsumerProperties properties = context.getBean(FtpConsumerProperties.class);
@@ -96,8 +91,7 @@ public class FtpConsumerPropertiesTests {
 	@Test
 	public void useTemporaryFileNameCanBeCustomized() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.consumer.useTemporaryFilename:false")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.consumer.useTemporaryFilename:false").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpConsumerProperties properties = context.getBean(FtpConsumerProperties.class);
@@ -108,8 +102,7 @@ public class FtpConsumerPropertiesTests {
 	@Test
 	public void fileExistsModeCanBeCustomized() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.consumer.mode:FAIL")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.consumer.mode:FAIL").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpConsumerProperties properties = context.getBean(FtpConsumerProperties.class);
@@ -122,4 +115,5 @@ public class FtpConsumerPropertiesTests {
 	static class Conf {
 
 	}
+
 }

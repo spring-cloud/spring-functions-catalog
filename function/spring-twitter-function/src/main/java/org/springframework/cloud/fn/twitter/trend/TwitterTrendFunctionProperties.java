@@ -33,10 +33,12 @@ public class TwitterTrendFunctionProperties {
 	private static final Expression DEFAULT_EXPRESSION = new SpelExpressionParser().parseExpression("payload");
 
 	enum TrendQueryType {
+
 		/** Retrieve trending places. */
 		trend,
 		/** Retrieve the Locations of trending places. */
 		trendLocation
+
 	}
 
 	private TrendQueryType trendQueryType = TrendQueryType.trend;
@@ -74,17 +76,18 @@ public class TwitterTrendFunctionProperties {
 	}
 
 	public static class Closest {
+
 		/**
-		 * If provided with a long parameter the available trend locations will be sorted by distance, nearest
-		 * to furthest, to the co-ordinate pair.
-		 * The valid ranges for longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.
+		 * If provided with a long parameter the available trend locations will be sorted
+		 * by distance, nearest to furthest, to the co-ordinate pair. The valid ranges for
+		 * longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.
 		 */
 		private Expression lat;
 
 		/**
-		 * If provided with a lat parameter the available trend locations will be sorted by distance, nearest to
-		 * furthest, to the co-ordinate pair. The valid ranges for longitude is -180.0 to +180.0 (West is negative,
-		 * East is positive) inclusive.
+		 * If provided with a lat parameter the available trend locations will be sorted
+		 * by distance, nearest to furthest, to the co-ordinate pair. The valid ranges for
+		 * longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.
 		 */
 		private Expression lon;
 
@@ -103,5 +106,7 @@ public class TwitterTrendFunctionProperties {
 		public void setLon(Expression lon) {
 			this.lon = lon;
 		}
+
 	}
+
 }

@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.fn.common.twitter.util;
 
-
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.function.Function;
@@ -52,8 +51,10 @@ public class TwitterTestUtils {
 
 	/**
 	 * Load Spring Resource as String.
-	 * @param resourcePath Resource path (accepts file:// , classpath:// and http:// uri schemas)
-	 * @return Returns text (UTF8) representation of the resource pointed by the resourcePath
+	 * @param resourcePath Resource path (accepts file:// , classpath:// and http:// uri
+	 * schemas)
+	 * @return Returns text (UTF8) representation of the resource pointed by the
+	 * resourcePath
 	 */
 	public static String asString(String resourcePath) {
 		try {

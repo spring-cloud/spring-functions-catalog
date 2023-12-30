@@ -41,7 +41,6 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.MimeTypeUtils;
 
 /**
- *
  * @author Christian Tzolov
  */
 
@@ -57,8 +56,8 @@ public class TwitterStreamSupplierConfiguration {
 	}
 
 	@Bean
-	public StatusListener twitterStatusListener(FluxMessageChannel twitterStatusInputChannel, TwitterStream twitterStream,
-			ObjectMapper objectMapper) {
+	public StatusListener twitterStatusListener(FluxMessageChannel twitterStatusInputChannel,
+			TwitterStream twitterStream, ObjectMapper objectMapper) {
 
 		StatusListener statusListener = new StatusListener() {
 
@@ -90,8 +89,8 @@ public class TwitterStreamSupplierConfiguration {
 				try {
 					String json = objectMapper.writeValueAsString(status);
 					Message<byte[]> message = MessageBuilder.withPayload(json.getBytes())
-							.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE)
-							.build();
+						.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE)
+						.build();
 					twitterStatusInputChannel.send(message);
 				}
 				catch (JsonProcessingException e) {
@@ -115,40 +114,38 @@ public class TwitterStreamSupplierConfiguration {
 	public Supplier<Flux<Message<?>>> twitterStreamSupplier(TwitterStream twitterStream,
 			FluxMessageChannel twitterStatusInputChannel, TwitterStreamSupplierProperties streamProperties) {
 
-		return () -> Flux.from(twitterStatusInputChannel)
-				.doOnSubscribe(subscription -> {
-					try {
-						switch (streamProperties.getType()) {
+		return () -> Flux.from(twitterStatusInputChannel).doOnSubscribe(subscription -> {
+			try {
+				switch (streamProperties.getType()) {
 
-						case filter:
-							twitterStream.filter(streamProperties.getFilter().toFilterQuery());
-							return;
+					case filter:
+						twitterStream.filter(streamProperties.getFilter().toFilterQuery());
+						return;
 
-						case sample:
-							twitterStream.sample();
-							return;
+					case sample:
+						twitterStream.sample();
+						return;
 
-						case firehose:
-							twitterStream.firehose(streamProperties.getFilter().getCount());
-							return;
+					case firehose:
+						twitterStream.firehose(streamProperties.getFilter().getCount());
+						return;
 
-						case link:
-							twitterStream.links(streamProperties.getFilter().getCount());
-							return;
-						default:
-							throw new IllegalArgumentException("Unknown stream type:" + streamProperties.getType());
-						}
-					}
-					catch (Exception e) {
-						this.logger.error("Filter is not property set");
-					}
-				})
-				.doAfterTerminate(() -> {
-					this.logger.info("Proactive cancel for twitter stream");
-					twitterStream.shutdown();
-				})
-				.doOnError(throwable -> {
-					this.logger.error(throwable.getMessage(), throwable);
-				});
+					case link:
+						twitterStream.links(streamProperties.getFilter().getCount());
+						return;
+					default:
+						throw new IllegalArgumentException("Unknown stream type:" + streamProperties.getType());
+				}
+			}
+			catch (Exception e) {
+				this.logger.error("Filter is not property set");
+			}
+		}).doAfterTerminate(() -> {
+			this.logger.info("Proactive cancel for twitter stream");
+			twitterStream.shutdown();
+		}).doOnError(throwable -> {
+			this.logger.error(throwable.getMessage(), throwable);
+		});
 	}
+
 }

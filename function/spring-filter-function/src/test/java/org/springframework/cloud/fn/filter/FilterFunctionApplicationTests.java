@@ -21,10 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
 import org.junit.jupiter.api.Test;
-
-
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -50,10 +47,9 @@ public class FilterFunctionApplicationTests {
 
 	@Test
 	public void testFilter() {
-		Stream<Message<?>> messages = List.of("hello", "hello world")
-			.stream()
-			.map(GenericMessage::new);
-		List<Message<?>> result = messages.filter(message -> this.filter.apply(message) != null).collect(Collectors.toList());
+		Stream<Message<?>> messages = List.of("hello", "hello world").stream().map(GenericMessage::new);
+		List<Message<?>> result = messages.filter(message -> this.filter.apply(message) != null)
+			.collect(Collectors.toList());
 		assertThat(result.size()).isEqualTo(1);
 		assertThat(result.get(0).getPayload()).isNotNull();
 		assertThat(result.get(0).getPayload()).isEqualTo("hello world");

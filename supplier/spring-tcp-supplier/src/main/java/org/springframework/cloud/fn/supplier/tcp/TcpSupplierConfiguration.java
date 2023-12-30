@@ -82,18 +82,14 @@ public class TcpSupplierConfiguration {
 
 	@Bean
 	public Publisher<Message<Object>> tcpSupplierFlow(TcpReceivingChannelAdapter adapter) {
-		return IntegrationFlow.from(adapter)
-				.headerFilter(IpHeaders.LOCAL_ADDRESS)
-				.toReactivePublisher();
+		return IntegrationFlow.from(adapter).headerFilter(IpHeaders.LOCAL_ADDRESS).toReactivePublisher();
 	}
 
 	@Bean
-	public Supplier<Flux<Message<Object>>> tcpSupplier(
-			Publisher<Message<Object>> tcpSupplierFlow,
+	public Supplier<Flux<Message<Object>>> tcpSupplier(Publisher<Message<Object>> tcpSupplierFlow,
 			TcpReceivingChannelAdapter tcpReceivingChannelAdapter) {
 
-		return () -> Flux.from(tcpSupplierFlow)
-				.doOnSubscribe(subscription -> tcpReceivingChannelAdapter.start());
+		return () -> Flux.from(tcpSupplierFlow).doOnSubscribe(subscription -> tcpReceivingChannelAdapter.start());
 	}
 
 }

@@ -57,8 +57,8 @@ class LogConsumerApplicationTests {
 	@Test
 	public void testJsonContentType() {
 		Message<String> message = MessageBuilder.withPayload("{\"foo\":\"bar\"}")
-				.setHeader("contentType", new MimeType("json"))
-				.build();
+			.setHeader("contentType", new MimeType("json"))
+			.build();
 		testMessage(message, "{\"foo\":\"bar\"}");
 	}
 
@@ -77,17 +77,20 @@ class LogConsumerApplicationTests {
 		this.logConsumer.accept(message);
 		verify(logger, times(2)).warn(captor.capture());
 
-//		Message<?> captorMessage = (Message<?>) captor.getAllValues().get(2);
-//		assertThat(captorMessage.getPayload()).isEqualTo(expectedPayload);
-//
-//		MessageHeaders messageHeaders = captorMessage.getHeaders();
-//		assertThat(messageHeaders).hasSize(4);
-//
-//		assertThat(messageHeaders)
-//				.containsEntry(MessageHeaders.CONTENT_TYPE, message.getHeaders().get(MessageHeaders.CONTENT_TYPE));
+		// Message<?> captorMessage = (Message<?>) captor.getAllValues().get(2);
+		// assertThat(captorMessage.getPayload()).isEqualTo(expectedPayload);
+		//
+		// MessageHeaders messageHeaders = captorMessage.getHeaders();
+		// assertThat(messageHeaders).hasSize(4);
+		//
+		// assertThat(messageHeaders)
+		// .containsEntry(MessageHeaders.CONTENT_TYPE,
+		// message.getHeaders().get(MessageHeaders.CONTENT_TYPE));
 	}
 
 	@SpringBootApplication
 	static class LogConsumerTestApplication {
+
 	}
+
 }

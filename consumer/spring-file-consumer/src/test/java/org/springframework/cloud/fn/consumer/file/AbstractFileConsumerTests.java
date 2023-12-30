@@ -54,5 +54,7 @@ public class AbstractFileConsumerTests {
 
 	@SpringBootApplication
 	static class FileConsumerTestApplication {
+
 	}
+
 }

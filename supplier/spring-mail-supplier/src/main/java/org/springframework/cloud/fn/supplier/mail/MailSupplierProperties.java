@@ -182,4 +182,5 @@ public class MailSupplierProperties {
 	public void setUserFlag(String userFlag) {
 		this.userFlag = userFlag;
 	}
+
 }

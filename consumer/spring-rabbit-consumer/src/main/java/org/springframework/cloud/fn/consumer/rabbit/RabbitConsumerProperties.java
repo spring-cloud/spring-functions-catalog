@@ -52,8 +52,8 @@ public class RabbitConsumerProperties {
 	private Expression routingKeyExpression;
 
 	/**
-	 * Default delivery mode when 'amqp_deliveryMode' header is not present,
-	 * true for PERSISTENT.
+	 * Default delivery mode when 'amqp_deliveryMode' header is not present, true for
+	 * PERSISTENT.
 	 */
 	private boolean persistentDeliveryMode;
 
@@ -63,8 +63,9 @@ public class RabbitConsumerProperties {
 	private String[] mappedRequestHeaders = { "*" };
 
 	/**
-	 * The bean name for a custom message converter; if omitted, a SimpleMessageConverter is used.
-	 * If 'jsonConverter', a Jackson2JsonMessageConverter bean will be created for you.
+	 * The bean name for a custom message converter; if omitted, a SimpleMessageConverter
+	 * is used. If 'jsonConverter', a Jackson2JsonMessageConverter bean will be created
+	 * for you.
 	 */
 	private String converterBeanName;
 
@@ -155,4 +156,5 @@ public class RabbitConsumerProperties {
 	public void setHeadersMappedLast(boolean headersMappedLast) {
 		this.headersMappedLast = headersMappedLast;
 	}
+
 }

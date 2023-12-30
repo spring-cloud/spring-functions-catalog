@@ -42,8 +42,8 @@ public class SimpleMappingTests extends JdbcConsumerApplicationTests {
 		Payload sent = new Payload("hello", 42);
 		final Message<Payload> message = MessageBuilder.withPayload(sent).build();
 		jdbcConsumer.accept(message);
-		Payload result = jdbcOperations
-				.query("select a, b from messages", new BeanPropertyRowMapper<>(Payload.class)).get(0);
+		Payload result = jdbcOperations.query("select a, b from messages", new BeanPropertyRowMapper<>(Payload.class))
+			.get(0);
 		assertThat(result).usingRecursiveComparison().isEqualTo(sent);
 	}
 

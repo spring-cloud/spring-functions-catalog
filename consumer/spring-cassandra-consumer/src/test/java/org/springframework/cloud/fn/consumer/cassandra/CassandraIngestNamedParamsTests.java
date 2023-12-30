@@ -35,11 +35,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Artem Bilan
  */
-@TestPropertySource(properties = {
-		"cassandra.cluster.init-script=init-db.cql",
-		"cassandra.ingest-query=" +
-				"insert into book (isbn, title, author, pages, saleDate, inStock) " +
-				"values (:myIsbn, :myTitle, :myAuthor, ?, ?, ?)" })
+@TestPropertySource(properties = { "cassandra.cluster.init-script=init-db.cql",
+		"cassandra.ingest-query=" + "insert into book (isbn, title, author, pages, saleDate, inStock) "
+				+ "values (:myIsbn, :myTitle, :myAuthor, ?, ?, ?)" })
 class CassandraIngestNamedParamsTests extends CassandraConsumerApplicationTests {
 
 	@Test
@@ -53,16 +51,12 @@ class CassandraIngestNamedParamsTests extends CassandraConsumerApplicationTests 
 		booksJsonWithNamedParams = StringUtils.replace(booksJsonWithNamedParams, "title", "myTitle");
 		booksJsonWithNamedParams = StringUtils.replace(booksJsonWithNamedParams, "author", "myAuthor");
 
-		Mono<? extends WriteResult> result =
-				this.cassandraConsumer.apply(booksJsonWithNamedParams);
+		Mono<? extends WriteResult> result = this.cassandraConsumer.apply(booksJsonWithNamedParams);
 
 		StepVerifier.create(result)
-				.expectNextCount(1)
-				.then(() ->
-						assertThat(this.cassandraTemplate.query(Book.class)
-								.count())
-								.isEqualTo(5))
-				.verifyComplete();
+			.expectNextCount(1)
+			.then(() -> assertThat(this.cassandraTemplate.query(Book.class).count()).isEqualTo(5))
+			.verifyComplete();
 	}
 
 }

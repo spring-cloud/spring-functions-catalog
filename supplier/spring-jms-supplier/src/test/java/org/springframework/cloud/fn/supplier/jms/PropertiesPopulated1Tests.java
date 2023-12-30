@@ -26,17 +26,11 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TestPropertySource(properties = {
-		"jms.supplier.sessionTransacted = false",
-		"jms.supplier.destination = topic",
-		"jms.supplier.messageSelector = JMSCorrelationId=foo",
-		"jms.supplier.subscriptionDurable = false",
-		"jms.supplier.subscriptionShared = false",
-		"spring.jms.listener.acknowledgeMode = DUPS_OK",
-		"spring.jms.listener.concurrency = 3",
-		"spring.jms.listener.maxConcurrency = 4",
-		"spring.jms.pubSubDomain = true"
-})
+@TestPropertySource(properties = { "jms.supplier.sessionTransacted = false", "jms.supplier.destination = topic",
+		"jms.supplier.messageSelector = JMSCorrelationId=foo", "jms.supplier.subscriptionDurable = false",
+		"jms.supplier.subscriptionShared = false", "spring.jms.listener.acknowledgeMode = DUPS_OK",
+		"spring.jms.listener.concurrency = 3", "spring.jms.listener.maxConcurrency = 4",
+		"spring.jms.pubSubDomain = true" })
 public class PropertiesPopulated1Tests extends AbstractJmsSupplierTests {
 
 	@Test
@@ -44,7 +38,8 @@ public class PropertiesPopulated1Tests extends AbstractJmsSupplierTests {
 		AbstractMessageListenerContainer container = TestUtils.getPropertyValue(this.endpoint, "listenerContainer",
 				AbstractMessageListenerContainer.class);
 		assertThat(container).isInstanceOf(SimpleMessageListenerContainer.class);
-		assertThat(TestUtils.getPropertyValue(container, "sessionAcknowledgeMode")).isEqualTo(Session.DUPS_OK_ACKNOWLEDGE);
+		assertThat(TestUtils.getPropertyValue(container, "sessionAcknowledgeMode"))
+			.isEqualTo(Session.DUPS_OK_ACKNOWLEDGE);
 		assertThat(TestUtils.getPropertyValue(container, "sessionTransacted", Boolean.class)).isFalse();
 		assertThat(TestUtils.getPropertyValue(container, "clientId")).isNull();
 		assertThat(TestUtils.getPropertyValue(container, "destination")).isEqualTo("topic");
@@ -54,4 +49,5 @@ public class PropertiesPopulated1Tests extends AbstractJmsSupplierTests {
 		assertThat(TestUtils.getPropertyValue(container, "concurrentConsumers")).isEqualTo(3);
 		assertThat(TestUtils.getPropertyValue(container, "pubSubDomain", Boolean.class)).isTrue();
 	}
+
 }

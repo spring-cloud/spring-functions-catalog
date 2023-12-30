@@ -23,6 +23,7 @@ package org.springframework.cloud.fn.common.file;
  * @author David Turanski
  */
 public enum FileReadingMode {
+
 	/**
 	 * ref mode.
 	 */
@@ -35,4 +36,5 @@ public enum FileReadingMode {
 	 * contents mode.
 	 */
 	contents;
+
 }

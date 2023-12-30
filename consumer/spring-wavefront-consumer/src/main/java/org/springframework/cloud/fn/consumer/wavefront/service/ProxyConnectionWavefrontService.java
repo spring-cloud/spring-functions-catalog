@@ -30,6 +30,7 @@ public class ProxyConnectionWavefrontService implements WavefrontService {
 	private static final Log logger = LogFactory.getLog(ProxyConnectionWavefrontService.class);
 
 	private final RestTemplate restTemplate;
+
 	private final String wavefrontProxyUrl;
 
 	public ProxyConnectionWavefrontService(final RestTemplateBuilder restTemplateBuilder,
@@ -45,4 +46,5 @@ public class ProxyConnectionWavefrontService implements WavefrontService {
 		}
 		restTemplate.postForEntity(wavefrontProxyUrl, metricInWavefrontFormat, Void.class);
 	}
+
 }

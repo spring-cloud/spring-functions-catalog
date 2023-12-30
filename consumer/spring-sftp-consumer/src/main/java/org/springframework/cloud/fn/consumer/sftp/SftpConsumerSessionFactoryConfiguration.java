@@ -39,8 +39,7 @@ public class SftpConsumerSessionFactoryConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public SessionFactory<SftpClient.DirEntry> sftpSessionFactory(
-			SftpConsumerProperties properties,
+	public SessionFactory<SftpClient.DirEntry> sftpSessionFactory(SftpConsumerProperties properties,
 			ApplicationContext applicationContext) {
 
 		DefaultSftpSessionFactory sftpSessionFactory = new DefaultSftpSessionFactory();
@@ -54,7 +53,7 @@ public class SftpConsumerSessionFactoryConfiguration {
 		sftpSessionFactory.setAllowUnknownKeys(factory.isAllowUnknownKeys());
 		if (factory.getKnownHostsExpression() != null) {
 			String knownHostsLocation = factory.getKnownHostsExpression()
-					.getValue(IntegrationContextUtils.getEvaluationContext(applicationContext), String.class);
+				.getValue(IntegrationContextUtils.getEvaluationContext(applicationContext), String.class);
 			Resource knownHostsResource = applicationContext.getResource(knownHostsLocation);
 			sftpSessionFactory.setKnownHostsResource(knownHostsResource);
 		}
@@ -65,4 +64,5 @@ public class SftpConsumerSessionFactoryConfiguration {
 			return sftpSessionFactory;
 		}
 	}
+
 }

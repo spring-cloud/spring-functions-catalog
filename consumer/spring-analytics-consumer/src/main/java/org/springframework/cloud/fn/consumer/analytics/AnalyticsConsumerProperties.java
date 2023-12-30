@@ -34,13 +34,20 @@ import org.springframework.validation.annotation.Validated;
 public class AnalyticsConsumerProperties {
 
 	enum MeterType {
-		/** Uses the Micrometer Counter meter type. It accumulates intermediate counts toward the point where
-		 * the data is sent to the metrics backend.*/
+
+		/**
+		 * Uses the Micrometer Counter meter type. It accumulates intermediate counts
+		 * toward the point where the data is sent to the metrics backend.
+		 */
 		counter,
-		/** Uses the Micrometer Gauge meter type. Gauges sample the input time series. Any intermediate values set on
-		 * a gauge are lost by the time the gauge value is reported to a metrics backend.
-		 * TIP: Never gauge something you can count with a Counter!*/
+		/**
+		 * Uses the Micrometer Gauge meter type. Gauges sample the input time series. Any
+		 * intermediate values set on a gauge are lost by the time the gauge value is
+		 * reported to a metrics backend. TIP: Never gauge something you can count with a
+		 * Counter!
+		 */
 		gauge
+
 	}
 
 	/**
@@ -49,27 +56,27 @@ public class AnalyticsConsumerProperties {
 	private MeterType meterType = MeterType.counter;
 
 	/**
-	 * The name of the output metrics.
-	 * The 'name' and 'nameExpression' are mutually exclusive. Only one of them can be set.
+	 * The name of the output metrics. The 'name' and 'nameExpression' are mutually
+	 * exclusive. Only one of them can be set.
 	 */
 	private String name;
 
 	/**
-	 * A SpEL expression to compute the output metrics name from the input message.
-	 * The 'name' and 'nameExpression' are mutually exclusive. Only one of them can be set.
+	 * A SpEL expression to compute the output metrics name from the input message. The
+	 * 'name' and 'nameExpression' are mutually exclusive. Only one of them can be set.
 	 */
 	private Expression nameExpression;
 
 	/**
-	 * If neither `name` nor `nameExpression` is set the name of the output metrics defaults to the
-	 * Spring application name.
+	 * If neither `name` nor `nameExpression` is set the name of the output metrics
+	 * defaults to the Spring application name.
 	 */
 	@Value("${spring.application.name:analytics}")
 	private String defaultName;
 
 	/**
-	 * A SpEL expression to compute the output metrics value (e.g. amount).
-	 * It defaults to 1.0
+	 * A SpEL expression to compute the output metrics value (e.g. amount). It defaults to
+	 * 1.0
 	 */
 	private Expression amountExpression;
 
@@ -132,20 +139,18 @@ public class AnalyticsConsumerProperties {
 
 	@Override
 	public String toString() {
-		return "AnalyticsFunctionProperties{" +
-				"defaultName='" + defaultName + '\'' +
-				", name=" + name +
-				", tag=" + tag +
-				'}';
+		return "AnalyticsFunctionProperties{" + "defaultName='" + defaultName + '\'' + ", name=" + name + ", tag=" + tag
+				+ '}';
 	}
 
 	public static class MetricsTag {
 
 		/**
-		 * DEPRECATED: Please use the analytics.tag.expression with literal SpEL expression.
+		 * DEPRECATED: Please use the analytics.tag.expression with literal SpEL
+		 * expression.
 		 *
-		 * Custom, fixed Tags. Those tags have constant values, created once and then sent along with every
-		 * published metrics. The convention to define a fixed Tags is:
+		 * Custom, fixed Tags. Those tags have constant values, created once and then sent
+		 * along with every published metrics. The convention to define a fixed Tags is:
 		 * <code>
 		 *   analytics.tag.fixed.[tag-name]=[tag-value]
 		 * </code>
@@ -154,10 +159,10 @@ public class AnalyticsConsumerProperties {
 		private Map<String, String> fixed;
 
 		/**
-		 * Computes tags from SpEL expression.
-		 * Single SpEL expression can produce an array of values, which in turn means distinct name/value tags.
-		 * Every name/value tag will produce a separate meter increment.
-		 * Tag expression format is: analytics.tag.expression.[tag-name]=[SpEL expression]
+		 * Computes tags from SpEL expression. Single SpEL expression can produce an array
+		 * of values, which in turn means distinct name/value tags. Every name/value tag
+		 * will produce a separate meter increment. Tag expression format is:
+		 * analytics.tag.expression.[tag-name]=[SpEL expression]
 		 */
 		private Map<String, Expression> expression;
 
@@ -179,10 +184,9 @@ public class AnalyticsConsumerProperties {
 
 		@Override
 		public String toString() {
-			return "MetricsTag{" +
-					"fixed=" + fixed +
-					", expression=" + expression +
-					'}';
+			return "MetricsTag{" + "fixed=" + fixed + ", expression=" + expression + '}';
 		}
+
 	}
+
 }

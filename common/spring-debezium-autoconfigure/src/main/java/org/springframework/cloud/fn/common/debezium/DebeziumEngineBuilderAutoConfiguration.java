@@ -46,16 +46,20 @@ import org.springframework.core.annotation.Order;
 /**
  * {@link EnableAutoConfiguration Auto-configuration} for {@link DebeziumEngine.Builder}.
  * <p>
- * The builder provides a standalone engine configuration that talks with the source data system.
+ * The builder provides a standalone engine configuration that talks with the source data
+ * system.
  * <p>
- * The application that runs the debezium engine assumes all responsibility for fault tolerance, scalability, and
- * durability. Additionally, applications must specify how the engine can store its relational database schema history
- * and offsets. By default, this information will be stored in memory and will thus be lost upon application restart.
+ * The application that runs the debezium engine assumes all responsibility for fault
+ * tolerance, scalability, and durability. Additionally, applications must specify how the
+ * engine can store its relational database schema history and offsets. By default, this
+ * information will be stored in memory and will thus be lost upon application restart.
  * <p>
- * The {@link DebeziumEngine.Builder} auto-configuration is activated only if a Debezium Connector is available on the
- * classpath and the <code>debezium.properties.connector.class</code> property is set.
+ * The {@link DebeziumEngine.Builder} auto-configuration is activated only if a Debezium
+ * Connector is available on the classpath and the
+ * <code>debezium.properties.connector.class</code> property is set.
  * <p>
- * Properties prefixed with <code>debezium.properties</code> are passed through as native Debezium properties.
+ * Properties prefixed with <code>debezium.properties</code> are passed through as native
+ * Debezium properties.
  *
  * @author Christian Tzolov
  * @author Corneil du Plessis
@@ -69,29 +73,31 @@ public class DebeziumEngineBuilderAutoConfiguration {
 	private static final Log logger = LogFactory.getLog(DebeziumEngineBuilderAutoConfiguration.class);
 
 	/**
-	 * The fully-qualified class name of the commit policy type. The default is a periodic commit policy based upon time
-	 * intervals.
-	 * @param properties The 'debezium.properties.offset.flush.interval.ms' configuration is compulsory for the Periodic
-	 * policy type. The ALWAYS and DEFAULT doesn't require additional configuration.
+	 * The fully-qualified class name of the commit policy type. The default is a periodic
+	 * commit policy based upon time intervals.
+	 * @param properties The 'debezium.properties.offset.flush.interval.ms' configuration
+	 * is compulsory for the Periodic policy type. The ALWAYS and DEFAULT doesn't require
+	 * additional configuration.
 	 */
 	@Bean
 	@ConditionalOnMissingBean
 	public OffsetCommitPolicy offsetCommitPolicy(DebeziumProperties properties) {
 
 		switch (properties.getOffsetCommitPolicy()) {
-		case PERIODIC:
-			return OffsetCommitPolicy.periodic(properties.getDebeziumNativeConfiguration());
-		case ALWAYS:
-			return OffsetCommitPolicy.always();
-		case DEFAULT:
-		default:
-			return NULL_OFFSET_COMMIT_POLICY;
+			case PERIODIC:
+				return OffsetCommitPolicy.periodic(properties.getDebeziumNativeConfiguration());
+			case ALWAYS:
+				return OffsetCommitPolicy.always();
+			case DEFAULT:
+			default:
+				return NULL_OFFSET_COMMIT_POLICY;
 		}
 	}
 
 	/**
-	 * Use the specified clock when needing to determine the current time. Defaults to {@link Clock#systemDefaultZone()
-	 * system clock}, but you can override the Bean in your configuration with you {@link Clock implementation}. Returns
+	 * Use the specified clock when needing to determine the current time. Defaults to
+	 * {@link Clock#systemDefaultZone() system clock}, but you can override the Bean in
+	 * your configuration with you {@link Clock implementation}. Returns
 	 * @return Clock for the system default zone.
 	 */
 	@Bean
@@ -101,9 +107,10 @@ public class DebeziumEngineBuilderAutoConfiguration {
 	}
 
 	/**
-	 * When the engine's {@link DebeziumEngine#run()} method completes, call the supplied function with the results.
-	 * @return Default completion callback that logs the completion status. The bean can be overridden in custom
-	 * implementation.
+	 * When the engine's {@link DebeziumEngine#run()} method completes, call the supplied
+	 * function with the results.
+	 * @return Default completion callback that logs the completion status. The bean can
+	 * be overridden in custom implementation.
 	 */
 	@Bean
 	@ConditionalOnMissingBean
@@ -112,8 +119,9 @@ public class DebeziumEngineBuilderAutoConfiguration {
 	}
 
 	/**
-	 * During the engine run, provides feedback about the different stages according to the completion state of each
-	 * component running within the engine (connectors, tasks etc). The bean can be overridden in custom implementation.
+	 * During the engine run, provides feedback about the different stages according to
+	 * the completion state of each component running within the engine (connectors, tasks
+	 * etc). The bean can be overridden in custom implementation.
 	 */
 	@Bean
 	@ConditionalOnMissingBean
@@ -135,29 +143,29 @@ public class DebeziumEngineBuilderAutoConfiguration {
 				serializationFormatClass(properties.getHeaderFormat()),
 				"Cannot find header format for " + properties.getProperties());
 
-		return DebeziumEngine
-				.create(KeyValueHeaderChangeEventFormat.of(payloadFormat, payloadFormat, headerFormat))
-				.using(properties.getDebeziumNativeConfiguration())
-				.using(debeziumClock)
-				.using(completionCallback)
-				.using(connectorCallback)
-				.using((offsetCommitPolicy != NULL_OFFSET_COMMIT_POLICY) ? offsetCommitPolicy : null);
+		return DebeziumEngine.create(KeyValueHeaderChangeEventFormat.of(payloadFormat, payloadFormat, headerFormat))
+			.using(properties.getDebeziumNativeConfiguration())
+			.using(debeziumClock)
+			.using(completionCallback)
+			.using(connectorCallback)
+			.using((offsetCommitPolicy != NULL_OFFSET_COMMIT_POLICY) ? offsetCommitPolicy : null);
 	}
 
 	/**
-	 * Converts the {@link DebeziumFormat} enum into Debezium {@link SerializationFormat} class.
+	 * Converts the {@link DebeziumFormat} enum into Debezium {@link SerializationFormat}
+	 * class.
 	 * @param debeziumFormat debezium format property.
 	 */
 	private Class<? extends SerializationFormat<byte[]>> serializationFormatClass(DebeziumFormat debeziumFormat) {
 		switch (debeziumFormat) {
-		case JSON:
-			return io.debezium.engine.format.JsonByteArray.class;
-		case AVRO:
-			return io.debezium.engine.format.Avro.class;
-		case PROTOBUF:
-			return io.debezium.engine.format.Protobuf.class;
-		default:
-			throw new IllegalArgumentException("Unknown debezium format: " + debeziumFormat);
+			case JSON:
+				return io.debezium.engine.format.JsonByteArray.class;
+			case AVRO:
+				return io.debezium.engine.format.Avro.class;
+			case PROTOBUF:
+				return io.debezium.engine.format.Protobuf.class;
+			default:
+				throw new IllegalArgumentException("Unknown debezium format: " + debeziumFormat);
 		}
 	}
 
@@ -173,7 +181,8 @@ public class DebeziumEngineBuilderAutoConfiguration {
 	};
 
 	/**
-	 * Callback function which informs users about the various stages a connector goes through during startup.
+	 * Callback function which informs users about the various stages a connector goes
+	 * through during startup.
 	 */
 	private static final ConnectorCallback DEFAULT_CONNECTOR_CALLBACK = new ConnectorCallback() {
 
@@ -218,7 +227,8 @@ public class DebeziumEngineBuilderAutoConfiguration {
 	};
 
 	/**
-	 * Determine if Debezium connector is available. This either kicks in if any debezium connector is available.
+	 * Determine if Debezium connector is available. This either kicks in if any debezium
+	 * connector is available.
 	 */
 	@Order(Ordered.LOWEST_PRECEDENCE)
 	static class OnDebeziumConnectorCondition extends AnyNestedCondition {

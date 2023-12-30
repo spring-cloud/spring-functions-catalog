@@ -42,22 +42,21 @@ public class AmazonS3UploadFileTests extends AbstractAwsS3ConsumerMockTests {
 
 	@Test
 	public void test() throws Exception {
-		S3AsyncClient amazonS3Client =
-				TestUtils.getPropertyValue(this.s3TransferManager, "s3AsyncClient", S3AsyncClient.class);
+		S3AsyncClient amazonS3Client = TestUtils.getPropertyValue(this.s3TransferManager, "s3AsyncClient",
+				S3AsyncClient.class);
 
 		File file = new File(temporaryRemoteFolder.toFile(), "foo.mp3");
 		file.createNewFile();
-		Message<?> message = MessageBuilder.withPayload(file)
-				.build();
+		Message<?> message = MessageBuilder.withPayload(file).build();
 
 		this.s3Consumer.accept(message);
 
-		ArgumentCaptor<PutObjectRequest> putObjectRequestArgumentCaptor =
-				ArgumentCaptor.forClass(PutObjectRequest.class);
-		ArgumentCaptor<AsyncRequestBody> asyncRequestBodyArgumentCaptor =
-				ArgumentCaptor.forClass(AsyncRequestBody.class);
-		verify(amazonS3Client, atLeastOnce())
-				.putObject(putObjectRequestArgumentCaptor.capture(), asyncRequestBodyArgumentCaptor.capture());
+		ArgumentCaptor<PutObjectRequest> putObjectRequestArgumentCaptor = ArgumentCaptor
+			.forClass(PutObjectRequest.class);
+		ArgumentCaptor<AsyncRequestBody> asyncRequestBodyArgumentCaptor = ArgumentCaptor
+			.forClass(AsyncRequestBody.class);
+		verify(amazonS3Client, atLeastOnce()).putObject(putObjectRequestArgumentCaptor.capture(),
+				asyncRequestBodyArgumentCaptor.capture());
 
 		PutObjectRequest putObjectRequest = putObjectRequestArgumentCaptor.getValue();
 		assertThat(putObjectRequest.bucket()).isEqualTo(S3_BUCKET);
@@ -69,9 +68,9 @@ public class AmazonS3UploadFileTests extends AbstractAwsS3ConsumerMockTests {
 
 		AsyncRequestBody asyncRequestBody = asyncRequestBodyArgumentCaptor.getValue();
 		StepVerifier.create(asyncRequestBody)
-				.assertNext(buffer -> assertThat(TestUtils.getPropertyValue(buffer, "hb", byte[].class)).isEmpty())
-				.expectComplete()
-				.verify();
+			.assertNext(buffer -> assertThat(TestUtils.getPropertyValue(buffer, "hb", byte[].class)).isEmpty())
+			.expectComplete()
+			.verify();
 
 		assertThat(this.transferCompletedLatch.await(10, TimeUnit.SECONDS)).isTrue();
 	}

@@ -36,22 +36,20 @@ import org.springframework.util.StreamUtils;
 /**
  * Create a text file mapping label id to human readable string.
  *
- * Produces a text file where every line represents single category. The line number represents the category id, while
- * the line text is human-readable names for the categories fromMemory this imagenet id.
+ * Produces a text file where every line represents single category. The line number
+ * represents the category id, while the line text is human-readable names for the
+ * categories fromMemory this imagenet id.
  *
- * Based on https://github.com/tensorflow/models/blob/master/research/slim/datasets/imagenet.py#L66
+ * Based on
+ * https://github.com/tensorflow/models/blob/master/research/slim/datasets/imagenet.py#L66
  *
- *   We retrieve a synset file, which contains a list of valid synset labels used
- *   by ILSVRC competition. There is one synset one per line, eg.
- *           #   n01440764
- *           #   n01443537
- *   We also retrieve a synset_to_human_file, which contains a mapping from synsets
- *   to human-readable names for every synset in Imagenet. These are stored in a
- *   tsv format, as follows:
- *           #   n02119247    black fox
- *           #   n02119359    silver fox
- *   We assign each synset (in alphabetical order) an integer, starting from 1
- *   (since 0 is reserved for the background class)
+ * We retrieve a synset file, which contains a list of valid synset labels used by ILSVRC
+ * competition. There is one synset one per line, eg. # n01440764 # n01443537 We also
+ * retrieve a synset_to_human_file, which contains a mapping from synsets to
+ * human-readable names for every synset in Imagenet. These are stored in a tsv format, as
+ * follows: # n02119247 black fox # n02119359 silver fox We assign each synset (in
+ * alphabetical order) an integer, starting from 1 (since 0 is reserved for the background
+ * class)
  *
  * @author Christian Tzolov
  */
@@ -62,8 +60,10 @@ public final class ImageNetReadableNamesWriter {
 
 	/** BASE_URL. */
 	public final static String BASE_URL = "https://raw.githubusercontent.com/tensorflow/models/master/research/inception/inception/data/";
+
 	/** SYNSET_URI. */
 	public final static String SYNSET_URI = BASE_URL + "imagenet_lsvrc_2015_synsets.txt";
+
 	/** SYNSET_TO_HUMAN_URI. */
 	public final static String SYNSET_TO_HUMAN_URI = BASE_URL + "imagenet_metadata.txt";
 
@@ -71,19 +71,24 @@ public final class ImageNetReadableNamesWriter {
 		Charset utf8 = Charset.forName("UTF-8");
 
 		try (InputStream synsetIs = toResource(SYNSET_URI).getInputStream();
-			InputStream synsetToHumanIs = toResource(SYNSET_TO_HUMAN_URI).getInputStream()) {
+				InputStream synsetToHumanIs = toResource(SYNSET_TO_HUMAN_URI).getInputStream()) {
 
-			List<String> synsetList = Arrays.asList(StreamUtils.copyToString(synsetIs, utf8)
-					.split("\n")).stream().map(l -> l.trim()).collect(Collectors.toList());
+			List<String> synsetList = Arrays.asList(StreamUtils.copyToString(synsetIs, utf8).split("\n"))
+				.stream()
+				.map(l -> l.trim())
+				.collect(Collectors.toList());
 			Assert.notNull(synsetList, "Failed to initialize the labels list");
-			Assert.isTrue(synsetList.size() == 1000, "Labels list is expected to be of " +
-					"size 1000 but was:" + synsetList.size());
+			Assert.isTrue(synsetList.size() == 1000,
+					"Labels list is expected to be of " + "size 1000 but was:" + synsetList.size());
 
-			Map<String, String> synsetToHuman = Arrays.asList(StreamUtils.copyToString(synsetToHumanIs, utf8)
-					.split("\n")).stream().map(s2h -> s2h.split("\t")).collect(Collectors.toMap(s -> s[0], s -> s[1]));
+			Map<String, String> synsetToHuman = Arrays
+				.asList(StreamUtils.copyToString(synsetToHumanIs, utf8).split("\n"))
+				.stream()
+				.map(s2h -> s2h.split("\t"))
+				.collect(Collectors.toMap(s -> s[0], s -> s[1]));
 			Assert.notNull(synsetToHuman, "Failed to initialize the synsetToHuman");
-			Assert.isTrue(synsetToHuman.size() == 21842, "synsetToHuman is expected to be of " +
-					"size 21842 but was:" + synsetToHuman.size());
+			Assert.isTrue(synsetToHuman.size() == 21842,
+					"synsetToHuman is expected to be of " + "size 21842 but was:" + synsetToHuman.size());
 
 			List<String> l = synsetList.stream().map(id -> synsetToHuman.get(id)).collect(Collectors.toList());
 
@@ -102,4 +107,5 @@ public final class ImageNetReadableNamesWriter {
 	public static Resource toResource(String uri) {
 		return new DefaultResourceLoader().getResource(uri);
 	}
+
 }

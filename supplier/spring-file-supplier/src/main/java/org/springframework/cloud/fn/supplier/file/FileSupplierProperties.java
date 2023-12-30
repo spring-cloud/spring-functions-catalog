@@ -34,8 +34,7 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class FileSupplierProperties {
 
-	private static final String DEFAULT_DIR = System.getProperty("java.io.tmpdir") +
-			File.separator + "file-supplier";
+	private static final String DEFAULT_DIR = System.getProperty("java.io.tmpdir") + File.separator + "file-supplier";
 
 	/**
 	 * The directory to poll for new files.
@@ -94,7 +93,7 @@ public class FileSupplierProperties {
 		this.filenameRegex = filenameRegex;
 	}
 
-	//@AssertTrue(message = "filenamePattern and filenameRegex are mutually exclusive")
+	// @AssertTrue(message = "filenamePattern and filenameRegex are mutually exclusive")
 
 	public boolean isExclusivePatterns() {
 		return !(this.filenamePattern != null && this.filenameRegex != null);
@@ -107,6 +106,5 @@ public class FileSupplierProperties {
 	public void setDelayWhenEmpty(Duration delayWhenEmpty) {
 		this.delayWhenEmpty = delayWhenEmpty;
 	}
-
 
 }

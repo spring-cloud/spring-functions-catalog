@@ -44,8 +44,8 @@ public class SpELTests extends JdbcConsumerApplicationTests {
 		final Message<Payload> message = MessageBuilder.withPayload(sent).build();
 		jdbcConsumer.accept(message);
 		Payload expected = new Payload("hell", 666);
-		Payload result = jdbcOperations
-				.query("select a, b from messages", new BeanPropertyRowMapper<>(Payload.class)).get(0);
+		Payload result = jdbcOperations.query("select a, b from messages", new BeanPropertyRowMapper<>(Payload.class))
+			.get(0);
 		assertThat(result).usingRecursiveComparison().isEqualTo(expected);
 	}
 

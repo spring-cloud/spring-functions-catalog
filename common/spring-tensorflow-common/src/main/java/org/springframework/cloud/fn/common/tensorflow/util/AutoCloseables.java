@@ -25,8 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utilities for AutoCloseable classes.
- * Based on the Apache Drill AutoCloseables implementation.
+ * Utilities for AutoCloseable classes. Based on the Apache Drill AutoCloseables
+ * implementation.
  */
 public final class AutoCloseables {
 
@@ -45,7 +45,8 @@ public final class AutoCloseables {
 	}
 
 	/**
-	 * Closes all autoCloseables if not null and suppresses exceptions by adding them to t.
+	 * Closes all autoCloseables if not null and suppresses exceptions by adding them to
+	 * t.
 	 * @param t the throwable to add suppressed exception to
 	 * @param autoCloseables the closeables to close
 	 */
@@ -54,7 +55,8 @@ public final class AutoCloseables {
 	}
 
 	/**
-	 * Closes all autoCloseables if not null and suppresses exceptions by adding them to t.
+	 * Closes all autoCloseables if not null and suppresses exceptions by adding them to
+	 * t.
 	 * @param t the throwable to add suppressed exception to
 	 * @param autoCloseables the closeables to close
 	 */
@@ -68,7 +70,8 @@ public final class AutoCloseables {
 	}
 
 	/**
-	 * Closes all autoCloseables if not null and suppresses subsequent exceptions if more than one.
+	 * Closes all autoCloseables if not null and suppresses subsequent exceptions if more
+	 * than one.
 	 * @param autoCloseables the closeables to close
 	 */
 	public static void close(AutoCloseable... autoCloseables) throws Exception {
@@ -76,7 +79,8 @@ public final class AutoCloseables {
 	}
 
 	/**
-	 * Closes all autoCloseables if not null and suppresses subsequent exceptions if more than one.
+	 * Closes all autoCloseables if not null and suppresses subsequent exceptions if more
+	 * than one.
 	 * @param autoCloseables the closeables to close
 	 */
 	public static void close(Iterable<? extends AutoCloseable> autoCloseables) throws Exception {
@@ -102,7 +106,8 @@ public final class AutoCloseables {
 	}
 
 	/**
-	 * Closes all autoCloseables entry values if not null and suppresses subsequent exceptions if more than one.
+	 * Closes all autoCloseables entry values if not null and suppresses subsequent
+	 * exceptions if more than one.
 	 * @param closableMaps the closeables to close
 	 */
 	public static void close(Map<?, ? extends AutoCloseable>... closableMaps) throws Exception {
@@ -139,15 +144,14 @@ public final class AutoCloseables {
 	 * @param closeables - array containing auto closeables
 	 */
 	public static void closeSilently(AutoCloseable... closeables) {
-		Arrays.stream(closeables).filter(Objects::nonNull)
-				.forEach(target -> {
-					try {
-						target.close();
-					}
-					catch (Exception e) {
-						LOGGER.warn(String.format("Exception was thrown while closing auto closeable: %s", target), e);
-					}
-				});
+		Arrays.stream(closeables).filter(Objects::nonNull).forEach(target -> {
+			try {
+				target.close();
+			}
+			catch (Exception e) {
+				LOGGER.warn(String.format("Exception was thrown while closing auto closeable: %s", target), e);
+			}
+		});
 	}
 
 }

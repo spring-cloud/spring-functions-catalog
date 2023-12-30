@@ -57,4 +57,5 @@ public class WebsocketConsumerClientHandler extends AbstractWebSocketHandler {
 	public List<String> getReceivedMessages() {
 		return receivedMessages;
 	}
+
 }

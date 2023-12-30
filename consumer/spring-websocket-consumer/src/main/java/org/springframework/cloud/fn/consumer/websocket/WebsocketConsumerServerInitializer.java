@@ -37,8 +37,10 @@ import org.springframework.cloud.fn.consumer.websocket.trace.InMemoryTraceReposi
  * Does some basic initialization and setup.
  *
  * <ul>
- * <li>Configure the {@link SslContext} based on {@link WebsocketConsumerProperties#ssl}</li>
- * <li>add the {@link WebsocketConsumerServerHandler} to the underlying {@link ChannelPipeline}</li>
+ * <li>Configure the {@link SslContext} based on
+ * {@link WebsocketConsumerProperties#ssl}</li>
+ * <li>add the {@link WebsocketConsumerServerHandler} to the underlying
+ * {@link ChannelPipeline}</li>
  * </ul>
  *
  * @author Oliver Moser
@@ -87,4 +89,5 @@ public class WebsocketConsumerServerInitializer extends ChannelInitializer<Socke
 			return null;
 		}
 	}
+
 }

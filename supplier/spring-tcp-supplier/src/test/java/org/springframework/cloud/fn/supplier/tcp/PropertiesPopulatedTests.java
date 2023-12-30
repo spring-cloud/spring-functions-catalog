@@ -27,8 +27,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Gary Russell
  */
-@TestPropertySource(properties = {"tcp.nio = true", "tcp.reverseLookup = true",
-		"tcp.useDirectBuffers = true", "tcp.socketTimeout = 123", "tcp.supplier.bufferSize = 5"})
+@TestPropertySource(properties = { "tcp.nio = true", "tcp.reverseLookup = true", "tcp.useDirectBuffers = true",
+		"tcp.socketTimeout = 123", "tcp.supplier.bufferSize = 5" })
 public class PropertiesPopulatedTests extends AbstractTcpSupplierTests {
 
 	@Test

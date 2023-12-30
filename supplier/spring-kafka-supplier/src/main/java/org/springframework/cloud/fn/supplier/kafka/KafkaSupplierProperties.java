@@ -25,7 +25,6 @@ import org.springframework.expression.Expression;
  * Auto-configuration properties for the Kafka Supplier.
  *
  * @author Artem Bilan
- *
  * @since 4.0
  */
 @ConfigurationProperties("kafka.supplier")
@@ -47,7 +46,8 @@ public class KafkaSupplierProperties {
 	private boolean ackDiscarded;
 
 	/**
-	 * SpEL expression for 'RecordFilterStrategy' with a 'ConsumerRecord' as a root object.
+	 * SpEL expression for 'RecordFilterStrategy' with a 'ConsumerRecord' as a root
+	 * object.
 	 */
 	Expression recordFilter;
 

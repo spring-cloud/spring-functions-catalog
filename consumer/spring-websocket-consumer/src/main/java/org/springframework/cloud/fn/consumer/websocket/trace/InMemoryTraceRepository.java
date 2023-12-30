@@ -25,13 +25,12 @@ import java.util.Map;
 /**
  * A repository for {@link Trace}s.
  *
- * It is a copy of {@code InMemoryTraceRepository} from Spring Boot 1.5.x.
- * Since Spring Boot 2.0 traces are only available for HTTP.
+ * It is a copy of {@code InMemoryTraceRepository} from Spring Boot 1.5.x. Since Spring
+ * Boot 2.0 traces are only available for HTTP.
  *
  * @author Dave Syer
  * @author Olivier Bourgain
  * @author Artem Bilan
- *
  * @since 2.0
  */
 public class InMemoryTraceRepository {
@@ -82,4 +81,5 @@ public class InMemoryTraceRepository {
 			}
 		}
 	}
+
 }

@@ -32,7 +32,7 @@ import org.springframework.test.context.TestPropertySource;
  * @author Soby Chacko
  * @author Szabolcs Stremler
  */
-@TestPropertySource(properties = {"jdbc.consumer.batchSize=1000", "jdbc.consumer.idleTimeout=100"})
+@TestPropertySource(properties = { "jdbc.consumer.batchSize=1000", "jdbc.consumer.idleTimeout=100" })
 public class BatchInsertTimeoutTests extends JdbcConsumerApplicationTests {
 
 	@Test
@@ -43,8 +43,9 @@ public class BatchInsertTimeoutTests extends JdbcConsumerApplicationTests {
 			final Message<Payload> message = MessageBuilder.withPayload(sent).build();
 			jdbcConsumer.accept(message);
 		}
-		Awaitility.await().until(() -> jdbcOperations
-				.queryForObject("select count(*) from messages", Integer.class), value -> value == numberOfInserts);
+		Awaitility.await()
+			.until(() -> jdbcOperations.queryForObject("select count(*) from messages", Integer.class),
+					value -> value == numberOfInserts);
 	}
 
 }

@@ -32,19 +32,16 @@ import org.springframework.integration.redis.metadata.RedisMetadataStore;
  */
 @ConfigurationProperties("metadata.store")
 public class MetadataStoreProperties {
+
 	enum StoreType {
-		mongodb,
-		redis,
-		dynamodb,
-		jdbc,
-		zookeeper,
-		hazelcast,
-		memory
+
+		mongodb, redis, dynamodb, jdbc, zookeeper, hazelcast, memory
+
 	}
 
 	/**
-	 * Indicates the type of metadata store to configure (default is 'memory').
-	 * You must include the corresponding Spring Integration dependency to use a persistent store.
+	 * Indicates the type of metadata store to configure (default is 'memory'). You must
+	 * include the corresponding Spring Integration dependency to use a persistent store.
 	 */
 	private StoreType type = StoreType.memory;
 

@@ -42,14 +42,15 @@ import org.springframework.integration.json.JsonPropertyAccessor;
 public class SpelExpressionConverterConfiguration {
 
 	/**
-	 * Specific Application Context name to be used as Bean qualifier when the {@link EvaluationContext} is injected.
+	 * Specific Application Context name to be used as Bean qualifier when the
+	 * {@link EvaluationContext} is injected.
 	 */
 	public static final String INTEGRATION_EVALUATION_CONTEXT = "integrationEvaluationContext";
 
 	@Bean
 	public static SpelPropertyAccessorRegistrar spelPropertyAccessorRegistrar() {
 		return (new SpelPropertyAccessorRegistrar())
-				.add(Introspector.decapitalize(JsonPropertyAccessor.class.getSimpleName()), new JsonPropertyAccessor());
+			.add(Introspector.decapitalize(JsonPropertyAccessor.class.getSimpleName()), new JsonPropertyAccessor());
 	}
 
 	@Bean
@@ -60,6 +61,7 @@ public class SpelExpressionConverterConfiguration {
 	}
 
 	public static class SpelConverter implements Converter<String, Expression> {
+
 		private SpelExpressionParser parser = new SpelExpressionParser();
 
 		@Autowired
@@ -84,5 +86,7 @@ public class SpelExpressionConverterConfiguration {
 						String.format("Could not convert '%s' into a SpEL expression", source), var3);
 			}
 		}
+
 	}
+
 }

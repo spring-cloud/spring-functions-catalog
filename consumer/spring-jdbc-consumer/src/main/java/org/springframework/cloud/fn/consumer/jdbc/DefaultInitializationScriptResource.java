@@ -25,8 +25,8 @@ import org.apache.commons.logging.LogFactory;
 import org.springframework.core.io.ByteArrayResource;
 
 /**
- * An in-memory script crafted for dropping-creating the table we're working with.
- * All columns are created as VARCHAR(2000).
+ * An in-memory script crafted for dropping-creating the table we're working with. All
+ * columns are created as VARCHAR(2000).
  *
  * @author Eric Bottard
  * @author Thomas Risberg

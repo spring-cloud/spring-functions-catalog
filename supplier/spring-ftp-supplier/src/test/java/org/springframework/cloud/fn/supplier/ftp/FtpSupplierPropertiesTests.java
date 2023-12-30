@@ -37,8 +37,7 @@ public class FtpSupplierPropertiesTests {
 	@Test
 	public void localDirCanBeCustomized() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.supplier.localDir:local")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.supplier.localDir:local").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpSupplierProperties properties = context.getBean(FtpSupplierProperties.class);
@@ -49,8 +48,7 @@ public class FtpSupplierPropertiesTests {
 	@Test
 	public void remoteDirCanBeCustomized() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.supplier.remoteDir:/remote")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.supplier.remoteDir:/remote").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpSupplierProperties properties = context.getBean(FtpSupplierProperties.class);
@@ -61,8 +59,7 @@ public class FtpSupplierPropertiesTests {
 	@Test
 	public void deleteRemoteFilesCanBeEnabled() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.supplier.deleteRemoteFiles:true")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.supplier.deleteRemoteFiles:true").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpSupplierProperties properties = context.getBean(FtpSupplierProperties.class);
@@ -73,8 +70,7 @@ public class FtpSupplierPropertiesTests {
 	@Test
 	public void autoCreateLocalDirCanBeDisabled() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.supplier.autoCreateLocalDir:false")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.supplier.autoCreateLocalDir:false").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpSupplierProperties properties = context.getBean(FtpSupplierProperties.class);
@@ -85,8 +81,7 @@ public class FtpSupplierPropertiesTests {
 	@Test
 	public void tmpFileSuffixCanBeCustomized() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.supplier.tmpFileSuffix:.foo")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.supplier.tmpFileSuffix:.foo").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpSupplierProperties properties = context.getBean(FtpSupplierProperties.class);
@@ -97,8 +92,7 @@ public class FtpSupplierPropertiesTests {
 	@Test
 	public void filenamePatternCanBeCustomized() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.supplier.filenamePattern:*.foo")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.supplier.filenamePattern:*.foo").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpSupplierProperties properties = context.getBean(FtpSupplierProperties.class);
@@ -109,8 +103,7 @@ public class FtpSupplierPropertiesTests {
 	@Test
 	public void remoteFileSeparatorCanBeCustomized() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.supplier.remoteFileSeparator:\\")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.supplier.remoteFileSeparator:\\").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpSupplierProperties properties = context.getBean(FtpSupplierProperties.class);
@@ -118,12 +111,10 @@ public class FtpSupplierPropertiesTests {
 		context.close();
 	}
 
-
 	@Test
 	public void preserveTimestampDirCanBeDisabled() {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
-		TestPropertyValues.of("ftp.supplier.preserveTimestamp:false")
-				.applyTo(context);
+		TestPropertyValues.of("ftp.supplier.preserveTimestamp:false").applyTo(context);
 		context.register(Conf.class);
 		context.refresh();
 		FtpSupplierProperties properties = context.getBean(FtpSupplierProperties.class);
@@ -136,4 +127,5 @@ public class FtpSupplierPropertiesTests {
 	static class Conf {
 
 	}
+
 }

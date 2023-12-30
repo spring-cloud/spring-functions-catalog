@@ -78,7 +78,8 @@ public class WebsocketConsumerConfiguration {
 			String messagePayload = message.getPayload().toString();
 			for (Channel channel : WebsocketConsumerServer.channels) {
 				if (logger.isTraceEnabled()) {
-					logger.trace(String.format("Writing message %s to channel %s", messagePayload, channel.localAddress()));
+					logger.trace(
+							String.format("Writing message %s to channel %s", messagePayload, channel.localAddress()));
 				}
 
 				channel.write(new TextWebSocketFrame(messagePayload));
@@ -102,13 +103,15 @@ public class WebsocketConsumerConfiguration {
 
 	@Configuration
 	static class WebsocketConsumerServerConfiguration {
+
 		@Bean
 		public InMemoryTraceRepository websocketTraceRepository() {
 			return new InMemoryTraceRepository();
 		}
 
 		@Bean
-		public WebsocketConsumerServer server(WebsocketConsumerProperties properties, WebsocketConsumerServerInitializer initializer) {
+		public WebsocketConsumerServer server(WebsocketConsumerProperties properties,
+				WebsocketConsumerServerInitializer initializer) {
 			return new WebsocketConsumerServer(properties, initializer);
 		}
 
@@ -116,6 +119,7 @@ public class WebsocketConsumerConfiguration {
 		public WebsocketConsumerServerInitializer initializer(InMemoryTraceRepository websocketTraceRepository) {
 			return new WebsocketConsumerServerInitializer(websocketTraceRepository);
 		}
+
 	}
 
 }

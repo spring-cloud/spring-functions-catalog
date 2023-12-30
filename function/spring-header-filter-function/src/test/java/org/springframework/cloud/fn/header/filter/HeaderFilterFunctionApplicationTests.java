@@ -29,13 +29,10 @@ import org.springframework.messaging.support.MessageBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = {
-	HeaderFilterFunctionApplicationTests.HeaderFilterFunctionTestApplication.class,
-	HeaderFilterFunctionConfiguration.class
-},
-	properties = {"header.filter.remove=foo,bar,pf-*"}
-)
+@SpringBootTest(classes = { HeaderFilterFunctionApplicationTests.HeaderFilterFunctionTestApplication.class,
+		HeaderFilterFunctionConfiguration.class }, properties = { "header.filter.remove=foo,bar,pf-*" })
 public class HeaderFilterFunctionApplicationTests {
+
 	@Autowired
 	protected Function<Message<?>, Message<?>> headerFilter;
 
@@ -93,9 +90,11 @@ public class HeaderFilterFunctionApplicationTests {
 
 	@SpringBootApplication
 	static class HeaderFilterFunctionTestApplication {
+
 		public static void main(String[] main) {
 
 		}
+
 	}
 
 }

@@ -57,7 +57,8 @@ public class SyslogSupplierProperties {
 	private int socketTimeout;
 
 	/**
-	 * '5424' or '3164' - the syslog format according to the RFC; 3164 is aka 'BSD' format.
+	 * '5424' or '3164' - the syslog format according to the RFC; 3164 is aka 'BSD'
+	 * format.
 	 */
 	private String rfc = "3164";
 
@@ -124,6 +125,7 @@ public class SyslogSupplierProperties {
 	}
 
 	public enum Protocol {
+
 		/**
 		 * TCP protocol.
 		 */
@@ -138,5 +140,7 @@ public class SyslogSupplierProperties {
 		 * Represents both TCP and UDP.
 		 */
 		both;
+
 	}
+
 }

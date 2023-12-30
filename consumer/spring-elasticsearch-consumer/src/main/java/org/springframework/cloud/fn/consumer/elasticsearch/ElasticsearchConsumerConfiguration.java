@@ -78,19 +78,24 @@ public class ElasticsearchConsumerConfiguration {
 	private static final Log logger = LogFactory.getLog(ElasticsearchConsumerConfiguration.class);
 
 	@Bean
-	FactoryBean<MessageHandler> aggregator(MessageGroupStore messageGroupStore, ElasticsearchConsumerProperties consumerProperties) {
+	FactoryBean<MessageHandler> aggregator(MessageGroupStore messageGroupStore,
+			ElasticsearchConsumerProperties consumerProperties) {
 		AggregatorFactoryBean aggregatorFactoryBean = new AggregatorFactoryBean();
 		aggregatorFactoryBean.setCorrelationStrategy(message -> "");
 		aggregatorFactoryBean.setReleaseStrategy(new MessageCountReleaseStrategy(consumerProperties.getBatchSize()));
 		if (consumerProperties.getGroupTimeout() >= 0) {
-			aggregatorFactoryBean.setGroupTimeoutExpression(new ValueExpression<>(consumerProperties.getGroupTimeout()));
+			aggregatorFactoryBean
+				.setGroupTimeoutExpression(new ValueExpression<>(consumerProperties.getGroupTimeout()));
 		}
 		aggregatorFactoryBean.setMessageStore(messageGroupStore);
 
-		// Currently, there is no way to customize the splitting behavior of an aggregator receiving
+		// Currently, there is no way to customize the splitting behavior of an aggregator
+		// receiving
 		// a Collection<Message<?>> from the configured MessageGroupProcessor.
-		// Thus, fooling the aggregator with a wrapper of Message<?> is just a straightforward way to preserve the
-		// individual message headers and release an entire batch to downstream indexing handler.
+		// Thus, fooling the aggregator with a wrapper of Message<?> is just a
+		// straightforward way to preserve the
+		// individual message headers and release an entire batch to downstream indexing
+		// handler.
 		aggregatorFactoryBean.setProcessorBean(new AbstractAggregatingMessageGroupProcessor() {
 			@Override
 			protected Object aggregatePayloads(MessageGroup group, Map<String, Object> defaultHeaders) {
@@ -118,14 +123,11 @@ public class ElasticsearchConsumerConfiguration {
 	}
 
 	@Bean
-	IntegrationFlow elasticsearchConsumerFlow(
-		@Qualifier("aggregator") MessageHandler aggregator,
-		ElasticsearchConsumerProperties properties,
-		@Qualifier("indexingHandler") MessageHandler indexingHandler
-	) {
+	IntegrationFlow elasticsearchConsumerFlow(@Qualifier("aggregator") MessageHandler aggregator,
+			ElasticsearchConsumerProperties properties, @Qualifier("indexingHandler") MessageHandler indexingHandler) {
 
-		final IntegrationFlowBuilder builder =
-			IntegrationFlow.from(MessageConsumer.class, gateway -> gateway.beanName("elasticsearchConsumer"));
+		final IntegrationFlowBuilder builder = IntegrationFlow.from(MessageConsumer.class,
+				gateway -> gateway.beanName("elasticsearchConsumer"));
 		if (properties.getBatchSize() > 1) {
 			builder.handle(aggregator);
 		}
@@ -133,10 +135,8 @@ public class ElasticsearchConsumerConfiguration {
 	}
 
 	@Bean
-	public MessageHandler indexingHandler(
-		ElasticsearchClient elasticsearchClient,
-		ElasticsearchConsumerProperties consumerProperties
-	) {
+	public MessageHandler indexingHandler(ElasticsearchClient elasticsearchClient,
+			ElasticsearchConsumerProperties consumerProperties) {
 		return message -> {
 			if (message.getPayload() instanceof Iterable) {
 				BulkRequest.Builder builder = new BulkRequest.Builder();
@@ -144,9 +144,10 @@ public class ElasticsearchConsumerConfiguration {
 					.filter(MessageWrapper.class::isInstance)
 					.map(itemPayload -> ((MessageWrapper) itemPayload).getMessage())
 					.map(m -> buildIndexRequest(m, consumerProperties))
-					.forEach(indexRequest ->
-						builder.operations(builder1 -> builder1.index(idx -> idx.index(indexRequest.index()).id(indexRequest.id()).document(indexRequest.document())))
-					);
+					.forEach(indexRequest -> builder
+						.operations(builder1 -> builder1.index(idx -> idx.index(indexRequest.index())
+							.id(indexRequest.id())
+							.document(indexRequest.document()))));
 
 				index(elasticsearchClient, builder.build(), consumerProperties.isAsync());
 			}
@@ -194,11 +195,13 @@ public class ElasticsearchConsumerConfiguration {
 
 	private void index(ElasticsearchClient elasticsearchClient, BulkRequest request, boolean isAsync) {
 		if (isAsync) {
-			ElasticsearchAsyncClient elasticsearchAsyncClient = new ElasticsearchAsyncClient(elasticsearchClient._transport());
+			ElasticsearchAsyncClient elasticsearchAsyncClient = new ElasticsearchAsyncClient(
+					elasticsearchClient._transport());
 			CompletableFuture<BulkResponse> responseCompletableFuture = elasticsearchAsyncClient.bulk(request);
 			responseCompletableFuture.whenComplete((bulkResponse, x) -> {
 				if (x != null) {
-					throw new IllegalStateException("Error occurred while performing bulk index operation: " + x.getMessage(), x);
+					throw new IllegalStateException(
+							"Error occurred while performing bulk index operation: " + x.getMessage(), x);
 				}
 				else {
 					handleBulkResponse(bulkResponse);
@@ -212,14 +215,16 @@ public class ElasticsearchConsumerConfiguration {
 				handleBulkResponse(bulkResponse);
 			}
 			catch (IOException e) {
-				throw new IllegalStateException("Error occurred while performing bulk index operation: " + e.getMessage(), e);
+				throw new IllegalStateException(
+						"Error occurred while performing bulk index operation: " + e.getMessage(), e);
 			}
 		}
 	}
 
 	private void index(ElasticsearchClient elasticsearchClient, IndexRequest request, boolean isAsync) {
 		if (isAsync) {
-			ElasticsearchAsyncClient elasticsearchAsyncClient = new ElasticsearchAsyncClient(elasticsearchClient._transport());
+			ElasticsearchAsyncClient elasticsearchAsyncClient = new ElasticsearchAsyncClient(
+					elasticsearchClient._transport());
 			CompletableFuture<IndexResponse> responseCompletableFuture = elasticsearchAsyncClient.index(request);
 			responseCompletableFuture.whenComplete((indexResponse, x) -> {
 				if (x != null) {
@@ -248,9 +253,8 @@ public class ElasticsearchConsumerConfiguration {
 					if (logger.isDebugEnabled()) {
 						logger.debug("itemResponse.error=" + itemResponse.error());
 					}
-					logger.error(String.format("Index operation [id=%s, index=%s] failed: %s",
-						itemResponse.id(), itemResponse.index(), itemResponse.error().toString())
-					);
+					logger.error(String.format("Index operation [id=%s, index=%s] failed: %s", itemResponse.id(),
+							itemResponse.index(), itemResponse.error().toString()));
 				}
 				else {
 					var r = itemResponse.get();
@@ -258,12 +262,14 @@ public class ElasticsearchConsumerConfiguration {
 						if (logger.isDebugEnabled()) {
 							logger.debug("itemResponse:" + r);
 						}
-						logger.debug(String.format("Index operation [id=%s, index=%s] succeeded: document [id=%s, version=%s] was written on shard %s.",
-							itemResponse.id(), itemResponse.index(), r.source().get("id"), r.source().get("version"), r.source().get("shardId"))
-						);
+						logger.debug(String.format(
+								"Index operation [id=%s, index=%s] succeeded: document [id=%s, version=%s] was written on shard %s.",
+								itemResponse.id(), itemResponse.index(), r.source().get("id"),
+								r.source().get("version"), r.source().get("shardId")));
 					}
 					else {
-						logger.debug(String.format("Index operation [id=%s, index=%s] succeeded", itemResponse.id(), itemResponse.index()));
+						logger.debug(String.format("Index operation [id=%s, index=%s] succeeded", itemResponse.id(),
+								itemResponse.index()));
 					}
 				}
 			}
@@ -272,20 +278,22 @@ public class ElasticsearchConsumerConfiguration {
 		if (response.errors()) {
 			String error = response.items()
 				.stream()
-				.map(bulkResponseItem ->  bulkResponseItem.error() != null ? bulkResponseItem.error().toString() : "")
-				.reduce((errorCause, errorCause2) -> errorCause != null ? errorCause + " : " + errorCause2 : errorCause2)
+				.map(bulkResponseItem -> bulkResponseItem.error() != null ? bulkResponseItem.error().toString() : "")
+				.reduce((errorCause, errorCause2) -> errorCause != null ? errorCause + " : " + errorCause2
+						: errorCause2)
 				.orElseGet(response::toString);
 			throw new IllegalStateException("Bulk indexing operation completed with failures: " + error);
 		}
 	}
 
 	private void handleResponse(IndexResponse response) {
-		logger.debug(String.format("Index operation [index=%s] succeeded: document [id=%s, version=%d] was written on shard %s.",
-			response.index(), response.id(), response.version(), response.shards().toString())
-		);
+		logger.debug(String.format(
+				"Index operation [index=%s] succeeded: document [id=%s, version=%d] was written on shard %s.",
+				response.index(), response.id(), response.version(), response.shards().toString()));
 	}
 
 	static class MessageWrapper {
+
 		private final Message<?> message;
 
 		MessageWrapper(Message<?> message) {
@@ -295,6 +303,7 @@ public class ElasticsearchConsumerConfiguration {
 		public Message<?> getMessage() {
 			return message;
 		}
+
 	}
 
 	private interface MessageConsumer extends Consumer<Message<?>> {

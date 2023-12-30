@@ -50,23 +50,21 @@ public class WebsocketSupplierConfiguration {
 
 	@Bean
 	public Supplier<Flux<Message<?>>> websocketSupplier(Publisher<Message<?>> websocketPublisher,
-														WebSocketInboundChannelAdapter webSocketInboundChannelAdapter) {
+			WebSocketInboundChannelAdapter webSocketInboundChannelAdapter) {
 		return () -> Flux.from(websocketPublisher)
-				.doOnSubscribe(subscription -> webSocketInboundChannelAdapter.start())
-				.doOnTerminate(webSocketInboundChannelAdapter::stop);
+			.doOnSubscribe(subscription -> webSocketInboundChannelAdapter.start())
+			.doOnTerminate(webSocketInboundChannelAdapter::stop);
 	}
 
 	@Bean
 	public Publisher<Message<byte[]>> websocketPublisher(IntegrationWebSocketContainer serverWebSocketContainer) {
-		return IntegrationFlow.from(
-				webSocketInboundChannelAdapter(serverWebSocketContainer))
-				.toReactivePublisher();
+		return IntegrationFlow.from(webSocketInboundChannelAdapter(serverWebSocketContainer)).toReactivePublisher();
 	}
 
 	private WebSocketInboundChannelAdapter webSocketInboundChannelAdapter(
 			IntegrationWebSocketContainer serverWebSocketContainer) {
-		WebSocketInboundChannelAdapter webSocketInboundChannelAdapter =
-				new WebSocketInboundChannelAdapter(serverWebSocketContainer);
+		WebSocketInboundChannelAdapter webSocketInboundChannelAdapter = new WebSocketInboundChannelAdapter(
+				serverWebSocketContainer);
 		webSocketInboundChannelAdapter.setAutoStartup(false);
 		return webSocketInboundChannelAdapter;
 	}
@@ -82,9 +80,8 @@ public class WebsocketSupplierConfiguration {
 	@Bean
 	public IntegrationWebSocketContainer serverWebSocketContainer(
 			ObjectProvider<ServerWebSocketContainer.SockJsServiceOptions> sockJsServiceOptions) {
-		return new ServerWebSocketContainer(properties.getPath())
-				.setAllowedOrigins(properties.getAllowedOrigins())
-				.withSockJs(sockJsServiceOptions.getIfAvailable());
+		return new ServerWebSocketContainer(properties.getPath()).setAllowedOrigins(properties.getAllowedOrigins())
+			.withSockJs(sockJsServiceOptions.getIfAvailable());
 	}
 
 }
