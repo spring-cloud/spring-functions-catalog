@@ -1,5 +1,9 @@
 buildscript {
 	ext.isCI = System.getenv('GITHUB_ACTION')
+
+	dependencies {
+		classpath("io.spring.javaformat:spring-javaformat-gradle-plugin:${javaFormatVersion}")
+	}
 }
 
 plugins {
@@ -58,12 +62,14 @@ allprojects {
 
 }
 
+
+
 configure(javaProjects) { subproject ->
 	apply plugin: 'java-library'
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
-
 	apply from: "${rootDir}/publish-maven.gradle"
+	apply from: "${rootDir}/gradle/checkstyle-conventions.gradle"
 
 	sourceSets {
 		test {

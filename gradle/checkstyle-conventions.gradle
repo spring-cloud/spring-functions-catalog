@@ -1,0 +1,26 @@
+
+apply plugin: 'io.spring.javaformat'
+apply plugin: 'checkstyle'
+
+checkstyle {
+	toolVersion = "10.3"
+	configDirectory = rootProject.file('etc/checkstyle')
+	ignoreFailures = true
+}
+
+dependencies {
+	checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:${javaFormatVersion}") {
+		exclude group: 'com.puppycrawl.tools', module: 'checkstyle'
+	}
+	checkstyle("com.puppycrawl.tools:checkstyle:10.3")
+}
+
+tasks.named("checkFormatMain") {
+	exclude "org/springframework/cloud/fn/object/detection/protos"
+}
+
+[ "checkstyleMain", "checkstyleTest", "checkFormatMain", "checkFormatTest" ].each {
+	tasks.named(it) {
+		mustRunAfter "test"
+	}
+}
