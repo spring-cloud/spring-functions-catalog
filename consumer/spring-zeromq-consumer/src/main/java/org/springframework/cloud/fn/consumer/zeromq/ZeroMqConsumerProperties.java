@@ -25,7 +25,6 @@ import org.springframework.expression.Expression;
 import org.springframework.validation.annotation.Validated;
 
 /**
- *
  * @author Daniel Frey
  * @since 3.1.0
  */

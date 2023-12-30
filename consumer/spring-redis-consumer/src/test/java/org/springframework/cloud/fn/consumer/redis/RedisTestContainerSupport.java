@@ -29,8 +29,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  */
 @Testcontainers(disabledWithoutDocker = true)
 public interface RedisTestContainerSupport {
-	GenericContainer<?> REDIS_CONTAINER = new GenericContainer<>("redis:7")
-		.withExposedPorts(6379)
+
+	GenericContainer<?> REDIS_CONTAINER = new GenericContainer<>("redis:7").withExposedPorts(6379)
 		.withStartupTimeout(Duration.ofSeconds(120))
 		.withStartupAttempts(3);
 
@@ -42,4 +42,5 @@ public interface RedisTestContainerSupport {
 	static String getUri() {
 		return "redis://localhost:" + REDIS_CONTAINER.getFirstMappedPort();
 	}
+
 }

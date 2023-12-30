@@ -40,11 +40,9 @@ import org.springframework.test.context.DynamicPropertySource;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
-@SpringBootTest(properties = {
-		"mongodb.supplier.collection=testing",
-		"mongodb.supplier.query={ name: { $exists: true }}",
-		"mongodb.supplier.update-expression='{ $unset: { name: 0 } }'"
-})
+@SpringBootTest(
+		properties = { "mongodb.supplier.collection=testing", "mongodb.supplier.query={ name: { $exists: true }}",
+				"mongodb.supplier.update-expression='{ $unset: { name: 0 } }'" })
 class MongodbSupplierApplicationTests implements MongoDbTestContainerSupport {
 
 	@DynamicPropertySource
@@ -66,12 +64,8 @@ class MongodbSupplierApplicationTests implements MongoDbTestContainerSupport {
 		MongoDatabase database = this.mongo.getDatabase("test");
 		database.createCollection("testing");
 		MongoCollection<Document> collection = database.getCollection("testing");
-		collection.insertOne(
-			new Document("greeting", "hello")
-				.append("name", "foo"));
-		collection.insertOne(
-			new Document("greeting", "hola")
-				.append("name", "bar"));
+		collection.insertOne(new Document("greeting", "hello").append("name", "foo"));
+		collection.insertOne(new Document("greeting", "hola").append("name", "bar"));
 	}
 
 	@Test
@@ -80,17 +74,13 @@ class MongodbSupplierApplicationTests implements MongoDbTestContainerSupport {
 		Flux<Message<?>> messageFlux = this.mongodbSupplier.get();
 		// when
 		StepVerifier.create(messageFlux)
-		// then
-				.assertNext((message) ->
-						assertThat(toMap(message)).contains(
-								entry("greeting", "hello"),
-								entry("name", "foo")))
-				.assertNext((message) ->
-						assertThat(toMap(message)).contains(
-								entry("greeting", "hola"),
-								entry("name", "bar")))
-				.thenCancel()
-				.verify();
+			// then
+			.assertNext(
+					(message) -> assertThat(toMap(message)).contains(entry("greeting", "hello"), entry("name", "foo")))
+			.assertNext(
+					(message) -> assertThat(toMap(message)).contains(entry("greeting", "hola"), entry("name", "bar")))
+			.thenCancel()
+			.verify();
 
 		assertThat(this.mongodbSupplier.get().collectList().block()).isEmpty();
 	}
@@ -109,5 +99,7 @@ class MongodbSupplierApplicationTests implements MongoDbTestContainerSupport {
 
 	@SpringBootApplication
 	static class MongoDbSupplierTestApplication {
+
 	}
+
 }

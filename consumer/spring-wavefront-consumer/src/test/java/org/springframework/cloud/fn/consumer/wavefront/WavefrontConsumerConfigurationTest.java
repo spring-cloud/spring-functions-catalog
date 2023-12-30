@@ -35,15 +35,11 @@ import org.springframework.messaging.support.GenericMessage;
 /**
  * @author Timo Salm
  */
-@SpringBootTest(properties = {
-		"wavefront.metric-name=vehicle-location",
-		"wavefront.source=vehicle-api",
+@SpringBootTest(properties = { "wavefront.metric-name=vehicle-location", "wavefront.source=vehicle-api",
 		"wavefront.metric-expression=#jsonPath(payload,'$.mileage')",
 		"wavefront.timestamp-expression=#jsonPath(payload,'$.receivedAt')",
 		"wavefront.tag-expression.vin=#jsonPath(payload,'$.vin')",
-		"wavefront.tag-expression.latitude=#jsonPath(payload,'$.location.latitude')",
-		"wavefront.proxy-uri=testUrl"
-})
+		"wavefront.tag-expression.latitude=#jsonPath(payload,'$.location.latitude')", "wavefront.proxy-uri=testUrl" })
 public class WavefrontConsumerConfigurationTest {
 
 	@Autowired
@@ -60,17 +56,19 @@ public class WavefrontConsumerConfigurationTest {
 	@Test
 	void testWavefrontConsumer() {
 		final long timestamp = new Date().getTime();
-		final String dataJsonString = "{ \"mileage\": 1.5, \"receivedAt\": " + timestamp + ", \"vin\": \"test-vin\", " +
-				"\"location\": {\"latitude\": 4.53, \"longitude\": 2.89 }}";
+		final String dataJsonString = "{ \"mileage\": 1.5, \"receivedAt\": " + timestamp + ", \"vin\": \"test-vin\", "
+				+ "\"location\": {\"latitude\": 4.53, \"longitude\": 2.89 }}";
 
 		wavefrontConsumer.accept(new GenericMessage(dataJsonString.getBytes()));
 
-		final String formattedString = "\"vehicle-location\" 1.5 " + timestamp + " source=vehicle-api " +
-				"latitude=\"4.53\" vin=\"test-vin\"";
+		final String formattedString = "\"vehicle-location\" 1.5 " + timestamp + " source=vehicle-api "
+				+ "latitude=\"4.53\" vin=\"test-vin\"";
 		Mockito.verify(wavefrontServiceMock, Mockito.times(1)).send(formattedString);
 	}
 
 	@SpringBootApplication
 	static class WavefrontConsumerTestApplication {
+
 	}
+
 }

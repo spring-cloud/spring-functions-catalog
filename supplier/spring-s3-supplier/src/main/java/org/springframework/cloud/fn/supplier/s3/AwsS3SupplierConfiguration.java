@@ -59,7 +59,7 @@ import org.springframework.util.StringUtils;
  * @author David Turanski
  */
 @Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties({AwsS3SupplierProperties.class, FileConsumerProperties.class})
+@EnableConfigurationProperties({ AwsS3SupplierProperties.class, FileConsumerProperties.class })
 public class AwsS3SupplierConfiguration {
 
 	protected static final String METADATA_STORE_PREFIX = "s3-metadata-";
@@ -73,8 +73,7 @@ public class AwsS3SupplierConfiguration {
 	protected final ConcurrentMetadataStore metadataStore;
 
 	public AwsS3SupplierConfiguration(AwsS3SupplierProperties awsS3SupplierProperties,
-			FileConsumerProperties fileConsumerProperties,
-			S3SessionFactory s3SessionFactory,
+			FileConsumerProperties fileConsumerProperties, S3SessionFactory s3SessionFactory,
 			ConcurrentMetadataStore metadataStore) {
 
 		this.awsS3SupplierProperties = awsS3SupplierProperties;
@@ -96,12 +95,12 @@ public class AwsS3SupplierConfiguration {
 		public ChainFileListFilter<S3Object> filter(ConcurrentMetadataStore metadataStore) {
 			ChainFileListFilter<S3Object> chainFilter = new ChainFileListFilter<>();
 			if (StringUtils.hasText(this.awsS3SupplierProperties.getFilenamePattern())) {
-				chainFilter.addFilter(
-						new S3SimplePatternFileListFilter(this.awsS3SupplierProperties.getFilenamePattern()));
+				chainFilter
+					.addFilter(new S3SimplePatternFileListFilter(this.awsS3SupplierProperties.getFilenamePattern()));
 			}
 			else if (this.awsS3SupplierProperties.getFilenameRegex() != null) {
 				chainFilter
-						.addFilter(new S3RegexPatternFileListFilter(this.awsS3SupplierProperties.getFilenameRegex()));
+					.addFilter(new S3RegexPatternFileListFilter(this.awsS3SupplierProperties.getFilenameRegex()));
 			}
 
 			chainFilter.addFilter(new S3PersistentAcceptOnceFileListFilter(metadataStore, METADATA_STORE_PREFIX));
@@ -109,8 +108,7 @@ public class AwsS3SupplierConfiguration {
 		}
 
 		SynchronizingConfiguration(AwsS3SupplierProperties awsS3SupplierProperties,
-				FileConsumerProperties fileConsumerProperties,
-				S3SessionFactory s3SessionFactory,
+				FileConsumerProperties fileConsumerProperties, S3SessionFactory s3SessionFactory,
 				ConcurrentMetadataStore concurrentMetadataStore) {
 
 			super(awsS3SupplierProperties, fileConsumerProperties, s3SessionFactory, concurrentMetadataStore);
@@ -118,12 +116,12 @@ public class AwsS3SupplierConfiguration {
 
 		@Bean
 		public Publisher<Message<Object>> s3SupplierFlow(S3InboundFileSynchronizingMessageSource s3MessageSource) {
-			return FileUtils.enhanceFlowForReadingMode(
-							IntegrationFlow.from(
-									IntegrationReactiveUtils.messageSourceToFlux(s3MessageSource)
-											.doOnSubscribe((s) -> s3MessageSource.start())),
-							fileConsumerProperties)
-					.toReactivePublisher(true);
+			return FileUtils
+				.enhanceFlowForReadingMode(
+						IntegrationFlow.from(IntegrationReactiveUtils.messageSourceToFlux(s3MessageSource)
+							.doOnSubscribe((s) -> s3MessageSource.start())),
+						fileConsumerProperties)
+				.toReactivePublisher(true);
 		}
 
 		@Bean
@@ -165,8 +163,7 @@ public class AwsS3SupplierConfiguration {
 	static class ListOnlyConfiguration extends AwsS3SupplierConfiguration {
 
 		ListOnlyConfiguration(AwsS3SupplierProperties awsS3SupplierProperties,
-				FileConsumerProperties fileConsumerProperties,
-				S3SessionFactory s3SessionFactory,
+				FileConsumerProperties fileConsumerProperties, S3SessionFactory s3SessionFactory,
 				ConcurrentMetadataStore metadataStore) {
 
 			super(awsS3SupplierProperties, fileConsumerProperties, s3SessionFactory, metadataStore);
@@ -191,7 +188,8 @@ public class AwsS3SupplierConfiguration {
 			}
 			else if (this.awsS3SupplierProperties.getFilenameRegex() != null) {
 				predicate = (S3Object summary) -> this.awsS3SupplierProperties.getFilenameRegex()
-						.matcher(summary.key()).matches();
+					.matcher(summary.key())
+					.matches();
 			}
 			predicate = predicate.and((S3Object summary) -> {
 				final String key = METADATA_STORE_PREFIX + awsS3SupplierProperties.getRemoteDir() + "-" + summary.key();
@@ -208,32 +206,27 @@ public class AwsS3SupplierConfiguration {
 		}
 
 		@Bean
-		ReactiveMessageSourceProducer s3ListingMessageProducer(
-			S3Client amazonS3,
-			ObjectMapper objectMapper,
-			AwsS3SupplierProperties awsS3SupplierProperties,
-			Predicate<S3Object> filter
-		) {
-			return new ReactiveMessageSourceProducer(
-					(MessageSource<List<String>>) () -> {
-						List<String> summaryList =
-								amazonS3.listObjects(ListObjectsRequest.builder()
-												.bucket(awsS3SupplierProperties.getRemoteDir())
-												.build())
-										.contents()
-										.stream()
-										.filter(filter)
-										.map(s3Object -> {
-											try {
-												return objectMapper.writeValueAsString(s3Object.toBuilder());
-											}
-											catch (JsonProcessingException ex) {
-												throw new RuntimeException(ex);
-											}
-										})
-										.collect(Collectors.toList());
-						return summaryList.isEmpty() ? null : new GenericMessage<>(summaryList);
-					});
+		ReactiveMessageSourceProducer s3ListingMessageProducer(S3Client amazonS3, ObjectMapper objectMapper,
+				AwsS3SupplierProperties awsS3SupplierProperties, Predicate<S3Object> filter) {
+			return new ReactiveMessageSourceProducer((MessageSource<List<String>>) () -> {
+				List<String> summaryList = amazonS3
+					.listObjects(ListObjectsRequest.builder().bucket(awsS3SupplierProperties.getRemoteDir()).build())
+					.contents()
+					.stream()
+					.filter(filter)
+					.map(s3Object -> {
+						try {
+							return objectMapper.writeValueAsString(s3Object.toBuilder());
+						}
+						catch (JsonProcessingException ex) {
+							throw new RuntimeException(ex);
+						}
+					})
+					.collect(Collectors.toList());
+				return summaryList.isEmpty() ? null : new GenericMessage<>(summaryList);
+			});
 		}
+
 	}
+
 }

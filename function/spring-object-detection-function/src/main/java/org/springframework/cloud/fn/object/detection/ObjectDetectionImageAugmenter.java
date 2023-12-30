@@ -33,8 +33,8 @@ import org.springframework.cloud.fn.object.detection.domain.ObjectDetection;
 import org.springframework.util.CollectionUtils;
 
 /**
- * Augment the input image fromMemory detected object bounding boxes and categories.
- * For mask models and withMask set to true it draws the instance segmentation image as well.
+ * Augment the input image fromMemory detected object bounding boxes and categories. For
+ * mask models and withMask set to true it draws the instance segmentation image as well.
  *
  * @author Christian Tzolov
  */
@@ -48,6 +48,7 @@ public class ObjectDetectionImageAugmenter implements BiFunction<byte[], List<Ob
 	private String imageFormat = DEFAULT_IMAGE_FORMAT;
 
 	private final boolean withMask;
+
 	private boolean agnosticColors = false;
 
 	public ObjectDetectionImageAugmenter() {
@@ -99,8 +100,7 @@ public class ObjectDetectionImageAugmenter implements BiFunction<byte[], List<Ob
 						float[][] mask = od.getMask();
 						if (mask != null) {
 							Color maskColor = this.agnosticColors ? null : GraphicsUtils.getClassColor(cid);
-							BufferedImage maskImage = GraphicsUtils.createMaskImage(
-									mask, x2 - x1, y2 - y1, maskColor);
+							BufferedImage maskImage = GraphicsUtils.createMaskImage(mask, x2 - x1, y2 - y1, maskColor);
 							GraphicsUtils.overlayImages(bufferedImage, maskImage, x1, y1);
 						}
 					}
@@ -116,4 +116,5 @@ public class ObjectDetectionImageAugmenter implements BiFunction<byte[], List<Ob
 		// Null mend that QR image is found and not output message will be send.
 		return imageBytes;
 	}
+
 }

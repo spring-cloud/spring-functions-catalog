@@ -39,10 +39,10 @@ public class HeaderInsertTests extends JdbcConsumerApplicationTests {
 	@Test
 	public void testHeaderInsertion() {
 		Payload sent = new Payload("hello", 42);
-		final Message<Payload> message = MessageBuilder.withPayload(sent)
-				.setHeader("foo", "bar").build();
+		final Message<Payload> message = MessageBuilder.withPayload(sent).setHeader("foo", "bar").build();
 		jdbcConsumer.accept(message);
-		assertThat(jdbcOperations.queryForObject("select count(*) from messages where a = ?",
-				Integer.class, "bar")).isEqualTo(1);
+		assertThat(jdbcOperations.queryForObject("select count(*) from messages where a = ?", Integer.class, "bar"))
+			.isEqualTo(1);
 	}
+
 }

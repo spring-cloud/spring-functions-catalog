@@ -33,15 +33,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = {
-				"sftp.consumer.remoteDir = sftpTarget",
-				"sftp.consumer.factory.username = foo",
-				"sftp.consumer.factory.password = foo",
-				"sftp.consumer.mode = FAIL",
+		properties = { "sftp.consumer.remoteDir = sftpTarget", "sftp.consumer.factory.username = foo",
+				"sftp.consumer.factory.password = foo", "sftp.consumer.mode = FAIL",
 				"sftp.consumer.factory.port = ${sftp.factory.port}",
 				"sftp.consumer.filenameExpression = payload.name.toUpperCase()",
-				"sftp.consumer.factory.allowUnknownKeys = true"
-		})
+				"sftp.consumer.factory.allowUnknownKeys = true" })
 public class SftpConsumerTests extends SftpTestSupport {
 
 	@Autowired
@@ -74,6 +70,7 @@ public class SftpConsumerTests extends SftpTestSupport {
 
 	@SpringBootApplication
 	static class SftpConsumerTestApplication {
-	}
-}
 
+	}
+
+}

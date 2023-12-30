@@ -30,13 +30,10 @@ import org.springframework.messaging.support.MessageBuilder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(classes = {
-	HeaderFilterFunctionApplicationDeleteAllTests.HeaderFilterFunctionTestApplication.class,
-	HeaderFilterFunctionConfiguration.class
-},
-	properties = {"header.filter.delete-all=true"}
-)
+@SpringBootTest(classes = { HeaderFilterFunctionApplicationDeleteAllTests.HeaderFilterFunctionTestApplication.class,
+		HeaderFilterFunctionConfiguration.class }, properties = { "header.filter.delete-all=true" })
 public class HeaderFilterFunctionApplicationDeleteAllTests {
+
 	@Autowired
 	protected Function<Message<?>, Message<?>> headerFilter;
 
@@ -54,9 +51,11 @@ public class HeaderFilterFunctionApplicationDeleteAllTests {
 
 	@SpringBootApplication
 	static class HeaderFilterFunctionTestApplication {
+
 		public static void main(String[] args) throws Exception {
 			SpringApplication.main(args);
 		}
+
 	}
 
 }

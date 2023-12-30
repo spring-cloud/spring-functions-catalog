@@ -48,7 +48,8 @@ public class SpelFunctionApplicationTests {
 	@Test
 	public void testJson() {
 		Message<?> message = MessageBuilder.withPayload("{\"foo\":\"bar\"}")
-				.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON).build();
+			.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON)
+			.build();
 		final Message<?> transformed = this.transformer.apply(message);
 		assertThat(transformed.getPayload()).isEqualTo("{\"FOO\":\"BAR\"}");
 	}
@@ -57,4 +58,5 @@ public class SpelFunctionApplicationTests {
 	static class SpelFunctionTestApplication {
 
 	}
+
 }

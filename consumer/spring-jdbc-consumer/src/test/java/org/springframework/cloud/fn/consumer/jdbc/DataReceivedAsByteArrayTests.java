@@ -41,8 +41,8 @@ public class DataReceivedAsByteArrayTests extends JdbcConsumerApplicationTests {
 		String hello = "{\"a\": \"hello\"}";
 		final Message<byte[]> message = MessageBuilder.withPayload(hello.getBytes()).build();
 		jdbcConsumer.accept(message);
-		final Integer count =
-				jdbcOperations.queryForObject("select count(*) from messages where a = ?", Integer.class, "hello");
+		final Integer count = jdbcOperations.queryForObject("select count(*) from messages where a = ?", Integer.class,
+				"hello");
 		assertThat(count).isEqualTo(1);
 	}
 

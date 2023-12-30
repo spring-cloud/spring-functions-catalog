@@ -33,26 +33,28 @@ public final class Functions {
 	}
 
 	/**
-	 * On every function call enrich the input tensorMap with an addition (tensorName, tensor) pair.
-	 *
+	 * On every function call enrich the input tensorMap with an addition (tensorName,
+	 * tensor) pair.
 	 * @param tensorName tensor key to use in the map
 	 * @param tensor new Tensor to add to the map
-	 * @return Returns a copy of the input tensorMap enriched with the provided (tensorName, tensor).
+	 * @return Returns a copy of the input tensorMap enriched with the provided
+	 * (tensorName, tensor).
 	 */
-	public static Function<Map<String, Tensor<?>>, Map<String, Tensor<?>>> enrichWith(
-			String tensorName, Tensor<?> tensor) {
+	public static Function<Map<String, Tensor<?>>, Map<String, Tensor<?>>> enrichWith(String tensorName,
+			Tensor<?> tensor) {
 		return tensorMap -> enrich(tensorMap, tensorName, tensor);
 	}
 
 	/**
-	 * On function call retrieves a named tensor from the provided {@link GraphRunnerMemory} and uses it to enrich
-	 * the input tensorMap.
+	 * On function call retrieves a named tensor from the provided
+	 * {@link GraphRunnerMemory} and uses it to enrich the input tensorMap.
 	 * @param memory GraphRunnerMemory to retrieve the tensor from
 	 * @param tensorName name of the tensor in GraphRunnerMemory to retrieve.
-	 * @return Returns copy of the input tensorMap enriched with the tensor from the memory.
+	 * @return Returns copy of the input tensorMap enriched with the tensor from the
+	 * memory.
 	 */
-	public static Function<Map<String, Tensor<?>>, Map<String, Tensor<?>>> enrichFromMemory(
-			GraphRunnerMemory memory, String tensorName) {
+	public static Function<Map<String, Tensor<?>>, Map<String, Tensor<?>>> enrichFromMemory(GraphRunnerMemory memory,
+			String tensorName) {
 		return tensorMap -> enrich(tensorMap, tensorName, memory.getTensorMap().get(tensorName));
 	}
 
@@ -64,10 +66,10 @@ public final class Functions {
 
 	/**
 	 * Renames the tensor names in the incoming tensorMap with the providing mappings.
-	 *
-	 * @param mapping  Pairs of From and To names. E.g. fromName1, toName1, fromName2, toName2, ... fromNameN, toNameN
-	 *                 Must be an even number.
-	 * @return Map that renames the input tensorMap entries according to the mapping provided
+	 * @param mapping Pairs of From and To names. E.g. fromName1, toName1, fromName2,
+	 * toName2, ... fromNameN, toNameN Must be an even number.
+	 * @return Map that renames the input tensorMap entries according to the mapping
+	 * provided
 	 */
 	public static Function<Map<String, Tensor<?>>, Map<String, Tensor<?>>> rename(String... mapping) {
 
@@ -76,11 +78,10 @@ public final class Functions {
 			mappingMap.put(mapping[i], mapping[i + 1]);
 		}
 
-		return tensorMap -> tensorMap.entrySet().stream()
-				.filter(e -> mappingMap.containsKey(e.getKey()))
-				.collect(Collectors.toMap(
-						kv -> mappingMap.get(kv.getKey()),
-						kv -> kv.getValue()
-				));
+		return tensorMap -> tensorMap.entrySet()
+			.stream()
+			.filter(e -> mappingMap.containsKey(e.getKey()))
+			.collect(Collectors.toMap(kv -> mappingMap.get(kv.getKey()), kv -> kv.getValue()));
 	}
+
 }

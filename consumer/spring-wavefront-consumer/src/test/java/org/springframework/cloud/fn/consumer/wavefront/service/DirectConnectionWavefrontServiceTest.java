@@ -33,7 +33,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 /**
  * @author Timo Salm
  */
@@ -54,11 +53,11 @@ public class DirectConnectionWavefrontServiceTest {
 		service.send(metricInWavefrontFormat);
 
 		final ArgumentCaptor<HttpEntity> argument = ArgumentCaptor.forClass(HttpEntity.class);
-		verify(restTemplateMock, Mockito.times(1))
-				.exchange(eq(wavefrontServerUri + "/report"), eq(HttpMethod.POST), argument.capture(),
-						eq(Void.class));
+		verify(restTemplateMock, Mockito.times(1)).exchange(eq(wavefrontServerUri + "/report"), eq(HttpMethod.POST),
+				argument.capture(), eq(Void.class));
 		assertThat(Objects.requireNonNull(argument.getValue().getHeaders().get("Authorization")).get(0))
-				.isEqualTo("Bearer " + wavefrontApiToken);
+			.isEqualTo("Bearer " + wavefrontApiToken);
 		assertThat(Objects.requireNonNull(argument.getValue().getBody())).isEqualTo(metricInWavefrontFormat);
 	}
+
 }

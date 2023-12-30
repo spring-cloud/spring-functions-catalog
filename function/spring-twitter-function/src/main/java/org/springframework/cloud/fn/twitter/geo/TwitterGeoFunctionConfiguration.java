@@ -36,7 +36,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 
 /**
- *
  * @author Christian Tzolov
  */
 @Configuration
@@ -103,11 +102,10 @@ public class TwitterGeoFunctionConfiguration {
 	}
 
 	@Bean
-	public Function<Message<?>, Message<byte[]>> twitterGeoFunction(
-			Function<Message<?>, GeoQuery> toGeoQuery,
-			Function<GeoQuery, List<Place>> places,
-			Function<Object, Message<byte[]>> managedJson) {
+	public Function<Message<?>, Message<byte[]>> twitterGeoFunction(Function<Message<?>, GeoQuery> toGeoQuery,
+			Function<GeoQuery, List<Place>> places, Function<Object, Message<byte[]>> managedJson) {
 
 		return toGeoQuery.andThen(places).andThen(managedJson)::apply;
 	}
+
 }

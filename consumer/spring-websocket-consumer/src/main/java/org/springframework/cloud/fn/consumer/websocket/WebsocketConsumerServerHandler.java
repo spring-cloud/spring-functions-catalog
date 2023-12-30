@@ -49,7 +49,8 @@ import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
 /**
- * Handles handshakes and messages. Based on the Netty <a href="https://bit.ly/1jVBj5T">websocket examples</a>.
+ * Handles handshakes and messages. Based on the Netty
+ * <a href="https://bit.ly/1jVBj5T">websocket examples</a>.
  *
  * @author Netty Project
  * @author Oliver Moser
@@ -69,8 +70,7 @@ public class WebsocketConsumerServerHandler extends SimpleChannelInboundHandler<
 	private WebSocketServerHandshaker handshaker;
 
 	public WebsocketConsumerServerHandler(InMemoryTraceRepository websocketTraceRepository,
-										WebsocketConsumerProperties properties,
-										boolean traceEnabled) {
+			WebsocketConsumerProperties properties, boolean traceEnabled) {
 
 		this.websocketTraceRepository = websocketTraceRepository;
 		this.properties = properties;
@@ -113,8 +113,8 @@ public class WebsocketConsumerServerHandler extends SimpleChannelInboundHandler<
 		}
 
 		// Handshake
-		WebSocketServerHandshakerFactory wsFactory
-				= new WebSocketServerHandshakerFactory(getWebSocketLocation(req), null, true);
+		WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory(getWebSocketLocation(req),
+				null, true);
 
 		this.handshaker = wsFactory.newHandshaker(req);
 		if (this.handshaker == null) {
@@ -139,8 +139,8 @@ public class WebsocketConsumerServerHandler extends SimpleChannelInboundHandler<
 			return;
 		}
 		if (!(frame instanceof TextWebSocketFrame)) {
-			throw new UnsupportedOperationException(String.format("%s frame types not supported", frame.getClass()
-					.getName()));
+			throw new UnsupportedOperationException(
+					String.format("%s frame types not supported", frame.getClass().getName()));
 		}
 
 		// todo [om] think about BinaryWebsocketFrame
@@ -209,4 +209,5 @@ public class WebsocketConsumerServerHandler extends SimpleChannelInboundHandler<
 			return "ws://" + location;
 		}
 	}
+
 }

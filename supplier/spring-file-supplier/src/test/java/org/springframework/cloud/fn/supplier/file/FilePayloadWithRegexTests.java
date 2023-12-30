@@ -36,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Artem Bilan
  * @author Soby Chacko
  */
-@TestPropertySource(properties = {"file.consumer.mode=ref", "file.supplier.filenameRegex = t.*.txt"})
+@TestPropertySource(properties = { "file.consumer.mode=ref", "file.supplier.filenameRegex = t.*.txt" })
 public class FilePayloadWithRegexTests extends AbstractFileSupplierTests {
 
 	@Test
@@ -51,18 +51,11 @@ public class FilePayloadWithRegexTests extends AbstractFileSupplierTests {
 
 		final Flux<Message<?>> messageFlux = fileSupplier.get();
 
-		StepVerifier stepVerifier =
-				StepVerifier.create(messageFlux)
-						.assertNext((message) -> {
-									assertThat(message.getPayload())
-											.isEqualTo(txtFile1.toAbsolutePath().toFile());
-								}
-						)
-						.expectNoEvent(Duration.ofSeconds(1))
-						.expectNoEvent(Duration.ofSeconds(1))
-						.thenCancel()
-						.verifyLater();
+		StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(message.getPayload()).isEqualTo(txtFile1.toAbsolutePath().toFile());
+		}).expectNoEvent(Duration.ofSeconds(1)).expectNoEvent(Duration.ofSeconds(1)).thenCancel().verifyLater();
 
 		stepVerifier.verify();
 	}
+
 }

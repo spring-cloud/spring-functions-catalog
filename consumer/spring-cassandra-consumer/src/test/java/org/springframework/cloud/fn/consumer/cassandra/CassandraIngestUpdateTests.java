@@ -34,11 +34,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Artem Bilan
  */
-@TestPropertySource(properties = {
-		"cassandra.cluster.init-script=init-db.cql",
-		"cassandra.ingest-query=" +
-				"update book set inStock = :inStock, author = :author, pages = :pages, " +
-				"saleDate = :saleDate, title = :title where isbn = :isbn",
+@TestPropertySource(properties = { "cassandra.cluster.init-script=init-db.cql",
+		"cassandra.ingest-query=" + "update book set inStock = :inStock, author = :author, pages = :pages, "
+				+ "saleDate = :saleDate, title = :title where isbn = :isbn",
 		"cassandra.queryType=UPDATE" })
 class CassandraIngestUpdateTests extends CassandraConsumerApplicationTests {
 
@@ -48,16 +46,12 @@ class CassandraIngestUpdateTests extends CassandraConsumerApplicationTests {
 
 		Jackson2JsonObjectMapper mapper = new Jackson2JsonObjectMapper(objectMapper);
 
-		Mono<? extends WriteResult> result =
-				this.cassandraConsumer.apply(mapper.toJson(books));
+		Mono<? extends WriteResult> result = this.cassandraConsumer.apply(mapper.toJson(books));
 
 		StepVerifier.create(result)
-				.expectNextCount(1)
-				.then(() ->
-						assertThat(this.cassandraTemplate.query(Book.class)
-								.count())
-								.isEqualTo(5))
-				.verifyComplete();
+			.expectNextCount(1)
+			.then(() -> assertThat(this.cassandraTemplate.query(Book.class).count()).isEqualTo(5))
+			.verifyComplete();
 	}
 
 }

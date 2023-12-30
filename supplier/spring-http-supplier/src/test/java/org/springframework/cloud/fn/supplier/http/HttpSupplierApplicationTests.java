@@ -55,15 +55,10 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Artem Bilan
  */
-@SpringBootTest(
-		webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-		properties = {
-				"server.ssl.key-store=classpath:test.jks",
-				"server.ssl.key-password=password",
-				"server.ssl.trust-store=classpath:test.jks",
-				"server.ssl.client-auth=want",
-				"spring.codec.max-in-memory-size=10MB"
-		})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+		properties = { "server.ssl.key-store=classpath:test.jks", "server.ssl.key-password=password",
+				"server.ssl.trust-store=classpath:test.jks", "server.ssl.client-auth=want",
+				"spring.codec.max-in-memory-size=10MB" })
 @DirtiesContext
 public class HttpSupplierApplicationTests {
 
@@ -78,95 +73,69 @@ public class HttpSupplierApplicationTests {
 
 	@Test
 	public void testHttpSupplier() throws SSLException {
-		ServerCodecConfigurer codecConfigurer =
-				TestUtils.getPropertyValue(this.webFluxInboundEndpoint, "codecConfigurer", ServerCodecConfigurer.class);
+		ServerCodecConfigurer codecConfigurer = TestUtils.getPropertyValue(this.webFluxInboundEndpoint,
+				"codecConfigurer", ServerCodecConfigurer.class);
 
 		final ServerCodecConfigurer.ServerDefaultCodecs serverDefaultCodecs = codecConfigurer.defaultCodecs();
 		assertThat(TestUtils.getPropertyValue(serverDefaultCodecs, "maxInMemorySize", Integer.class))
-				.isEqualTo(1024 * 1024 * 10);
+			.isEqualTo(1024 * 1024 * 10);
 
-		AbstractJackson2Decoder jackson2JsonDecoder =
-				TestUtils.getPropertyValue(serverDefaultCodecs, "jackson2JsonDecoder", AbstractJackson2Decoder.class);
+		AbstractJackson2Decoder jackson2JsonDecoder = TestUtils.getPropertyValue(serverDefaultCodecs,
+				"jackson2JsonDecoder", AbstractJackson2Decoder.class);
 
-		assertThat(jackson2JsonDecoder).isNotNull()
-				.extracting("maxInMemorySize")
-				.isEqualTo(1024 * 1024 * 10);
+		assertThat(jackson2JsonDecoder).isNotNull().extracting("maxInMemorySize").isEqualTo(1024 * 1024 * 10);
 
 		Flux<Message<byte[]>> messageFlux = this.httpSupplier.get();
 
-		StepVerifier stepVerifier =
-				StepVerifier.create(messageFlux)
-						.assertNext((message) ->
-								assertThat(message)
-										.satisfies((msg) -> assertThat(msg)
-												.extracting(Message::getPayload)
-												.isEqualTo("test1".getBytes()))
-										.satisfies((msg) -> assertThat(msg.getHeaders())
-												.containsEntry(MessageHeaders.CONTENT_TYPE,
-														new MediaType("text", "plain", StandardCharsets.UTF_8))
-												.extractingByKey(HttpHeaders.REQUEST_URL).asString()
-												.startsWith("https://"))
-						)
-						.assertNext((message) ->
-								assertThat(message)
-										.extracting(Message::getPayload)
-										.isEqualTo("{\"name\":\"test2\"}".getBytes()))
-						.assertNext((message) ->
-								assertThat(message)
-										.extracting(Message::getPayload)
-										.isEqualTo("{\"name\":\"test3\"}".getBytes()))
-						.assertNext((message) ->
-								assertThat(message)
-										.satisfies((msg) -> assertThat(msg)
-												.extracting(Message::getPayload)
-												.asInstanceOf(InstanceOfAssertFactories.MAP)
-												.isEmpty())
-										.satisfies((msg) -> assertThat(msg.getHeaders())
-												.doesNotContainKey(MessageHeaders.CONTENT_TYPE)))
-						.thenCancel()
-						.verifyLater();
+		StepVerifier stepVerifier = StepVerifier.create(messageFlux)
+			.assertNext((message) -> assertThat(message)
+				.satisfies((msg) -> assertThat(msg).extracting(Message::getPayload).isEqualTo("test1".getBytes()))
+				.satisfies((msg) -> assertThat(msg.getHeaders())
+					.containsEntry(MessageHeaders.CONTENT_TYPE, new MediaType("text", "plain", StandardCharsets.UTF_8))
+					.extractingByKey(HttpHeaders.REQUEST_URL)
+					.asString()
+					.startsWith("https://")))
+			.assertNext((message) -> assertThat(message).extracting(Message::getPayload)
+				.isEqualTo("{\"name\":\"test2\"}".getBytes()))
+			.assertNext((message) -> assertThat(message).extracting(Message::getPayload)
+				.isEqualTo("{\"name\":\"test3\"}".getBytes()))
+			.assertNext((message) -> assertThat(message)
+				.satisfies((msg) -> assertThat(msg).extracting(Message::getPayload)
+					.asInstanceOf(InstanceOfAssertFactories.MAP)
+					.isEmpty())
+				.satisfies((msg) -> assertThat(msg.getHeaders()).doesNotContainKey(MessageHeaders.CONTENT_TYPE)))
+			.thenCancel()
+			.verifyLater();
 
-		SslContext sslContext =
-				SslContextBuilder.forClient()
-						.sslProvider(SslProvider.JDK)
-						.trustManager(InsecureTrustManagerFactory.INSTANCE)
-						.build();
+		SslContext sslContext = SslContextBuilder.forClient()
+			.sslProvider(SslProvider.JDK)
+			.trustManager(InsecureTrustManagerFactory.INSTANCE)
+			.build();
 
-		HttpClient httpClient =
-				HttpClient.create()
-						.secure(sslSpec -> sslSpec.sslContext(sslContext));
+		HttpClient httpClient = HttpClient.create().secure(sslSpec -> sslSpec.sslContext(sslContext));
 
-		WebClient webClient =
-				WebClient.builder()
-						.clientConnector(new ReactorClientHttpConnector(httpClient))
-						.baseUrl("https://localhost:" + port)
-						.build();
+		WebClient webClient = WebClient.builder()
+			.clientConnector(new ReactorClientHttpConnector(httpClient))
+			.baseUrl("https://localhost:" + port)
+			.build();
+
+		webClient.post().uri("/").bodyValue("test1").retrieve().toBodilessEntity().block(Duration.ofSeconds(10));
 
 		webClient.post()
-				.uri("/")
-				.bodyValue("test1")
-				.retrieve()
-				.toBodilessEntity()
-				.block(Duration.ofSeconds(10));
+			.uri("/")
+			.bodyValue(new TestPojo("test2"))
+			.retrieve()
+			.toBodilessEntity()
+			.block(Duration.ofSeconds(10));
 
 		webClient.post()
-				.uri("/")
-				.bodyValue(new TestPojo("test2"))
-				.retrieve()
-				.toBodilessEntity()
-				.block(Duration.ofSeconds(10));
+			.uri("/")
+			.bodyValue(new TestPojo("test3"))
+			.retrieve()
+			.toBodilessEntity()
+			.block(Duration.ofSeconds(10));
 
-		webClient.post()
-				.uri("/")
-				.bodyValue(new TestPojo("test3"))
-				.retrieve()
-				.toBodilessEntity()
-				.block(Duration.ofSeconds(10));
-
-		webClient.post().uri("/")
-				.retrieve()
-				.toBodilessEntity()
-				.block(Duration.ofSeconds(10));
+		webClient.post().uri("/").retrieve().toBodilessEntity().block(Duration.ofSeconds(10));
 
 		stepVerifier.verify();
 	}

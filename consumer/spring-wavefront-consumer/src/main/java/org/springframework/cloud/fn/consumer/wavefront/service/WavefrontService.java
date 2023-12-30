@@ -20,5 +20,7 @@ package org.springframework.cloud.fn.consumer.wavefront.service;
  * @author Timo Salm
  */
 public interface WavefrontService {
+
 	void send(String metricInWavefrontFormat);
+
 }

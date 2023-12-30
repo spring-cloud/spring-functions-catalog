@@ -38,12 +38,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Artem Bilan
  * @author Soby Chacko
  * <p>
- * We don't need a separate SpringBootApplication for this test as there is already one available in this package.
- * {@link AbstractFileConsumerTests}.
+ * We don't need a separate SpringBootApplication for this test as there is already one
+ * available in this package. {@link AbstractFileConsumerTests}.
  */
-@SpringBootTest(properties = {"file.consumer.nameExpression = payload.substring(0, 4)",
-		"file.consumer.directoryExpression = '${java.io.tmpdir}'+'/'+headers.dir",
-		"file.consumer.suffix=out"})
+@SpringBootTest(properties = { "file.consumer.nameExpression = payload.substring(0, 4)",
+		"file.consumer.directoryExpression = '${java.io.tmpdir}'+'/'+headers.dir", "file.consumer.suffix=out" })
 @DirtiesContext
 public class ExpressionTests {
 
@@ -60,6 +59,7 @@ public class ExpressionTests {
 		file.deleteOnExit();
 		assertThat(file.exists()).isTrue();
 		assertThat("this is something" + System.lineSeparator())
-				.isEqualTo(FileCopyUtils.copyToString(new FileReader(file)));
+			.isEqualTo(FileCopyUtils.copyToString(new FileReader(file)));
 	}
+
 }

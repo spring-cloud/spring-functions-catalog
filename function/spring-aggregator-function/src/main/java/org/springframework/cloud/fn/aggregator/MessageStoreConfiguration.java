@@ -40,11 +40,10 @@ import org.springframework.integration.store.MessageGroupStore;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.util.StringUtils;
 
-
 /**
- * A helper class containing configuration classes for particular technologies
- * to expose an appropriate {@link org.springframework.integration.store.MessageStore} bean
- * via matched configuration properties.
+ * A helper class containing configuration classes for particular technologies to expose
+ * an appropriate {@link org.springframework.integration.store.MessageStore} bean via
+ * matched configuration properties.
  *
  * @author Artem Bilan
  * @author Corneil du Plessis
@@ -52,11 +51,9 @@ import org.springframework.util.StringUtils;
 class MessageStoreConfiguration {
 
 	@ConditionalOnClass(ConfigurableMongoDbMessageStore.class)
-	@ConditionalOnProperty(prefix = AggregatorFunctionProperties.PREFIX,
-			name = "message-store-type",
+	@ConditionalOnProperty(prefix = AggregatorFunctionProperties.PREFIX, name = "message-store-type",
 			havingValue = AggregatorFunctionProperties.MessageStoreType.MONGODB)
-	@Import({ MongoAutoConfiguration.class,
-			MongoDataAutoConfiguration.class })
+	@Import({ MongoAutoConfiguration.class, MongoDataAutoConfiguration.class })
 	static class Mongo {
 
 		@Bean
@@ -72,15 +69,14 @@ class MessageStoreConfiguration {
 		@Bean
 		@Primary
 		public MongoCustomConversions mongoDbCustomConversions() {
-			return new MongoCustomConversions(Arrays.asList(
-					new MessageToBinaryConverter(), new BinaryToMessageConverter()));
+			return new MongoCustomConversions(
+					Arrays.asList(new MessageToBinaryConverter(), new BinaryToMessageConverter()));
 		}
 
 	}
 
 	@ConditionalOnClass(RedisMessageStore.class)
-	@ConditionalOnProperty(prefix = AggregatorFunctionProperties.PREFIX,
-			name = "message-store-type",
+	@ConditionalOnProperty(prefix = AggregatorFunctionProperties.PREFIX, name = "message-store-type",
 			havingValue = AggregatorFunctionProperties.MessageStoreType.REDIS)
 	@Import(RedisAutoConfiguration.class)
 	static class Redis {
@@ -93,12 +89,9 @@ class MessageStoreConfiguration {
 	}
 
 	@ConditionalOnClass(JdbcMessageStore.class)
-	@ConditionalOnProperty(prefix = AggregatorFunctionProperties.PREFIX,
-			name = "message-store-type",
+	@ConditionalOnProperty(prefix = AggregatorFunctionProperties.PREFIX, name = "message-store-type",
 			havingValue = AggregatorFunctionProperties.MessageStoreType.JDBC)
-	@Import({
-			DataSourceAutoConfiguration.class,
-			DataSourceTransactionManagerAutoConfiguration.class })
+	@Import({ DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class })
 	static class Jdbc {
 
 		@Bean

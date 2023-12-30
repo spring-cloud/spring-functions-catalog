@@ -35,4 +35,5 @@ public class NotNioTests extends AbstractTcpSupplierTests {
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(120000);
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "deserializer.maxMessageSize")).isEqualTo(2048);
 	}
+
 }

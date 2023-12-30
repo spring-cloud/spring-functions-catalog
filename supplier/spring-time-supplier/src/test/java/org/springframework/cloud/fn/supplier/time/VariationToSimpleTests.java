@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
  * @author Soby Chacko
  * @author Artem Bilan
  */
-@SpringBootTest({"time.dateFormat=MMddyyyy HH:mm:ss"})
+@SpringBootTest({ "time.dateFormat=MMddyyyy HH:mm:ss" })
 public class VariationToSimpleTests extends TimeSupplierApplicationTests {
 
 	@Test
@@ -48,7 +48,8 @@ public class VariationToSimpleTests extends TimeSupplierApplicationTests {
 	public void testInvalidDateFormat() {
 		TimeSupplierProperties timeSupplierProperties = new TimeSupplierProperties();
 		timeSupplierProperties.setDateFormat("AA/dd/yyyy HH:mm:ss");
-		assertThatIllegalArgumentException().isThrownBy(() -> new SimpleDateFormat(timeSupplierProperties.getDateFormat()));
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> new SimpleDateFormat(timeSupplierProperties.getDateFormat()));
 	}
 
 }

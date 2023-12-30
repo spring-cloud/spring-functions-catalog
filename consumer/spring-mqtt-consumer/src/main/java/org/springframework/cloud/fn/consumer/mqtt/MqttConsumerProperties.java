@@ -114,4 +114,5 @@ public class MqttConsumerProperties {
 	public void setAsync(boolean async) {
 		this.async = async;
 	}
+
 }

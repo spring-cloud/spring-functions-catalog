@@ -44,7 +44,7 @@ public class RabbitSupplierProperties {
 	/**
 	 * Headers that will be mapped.
 	 */
-	private String[] mappedRequestHeaders = {"STANDARD_REQUEST_HEADERS"};
+	private String[] mappedRequestHeaders = { "STANDARD_REQUEST_HEADERS" };
 
 	/**
 	 * Initial retry interval when retry is enabled.
@@ -158,4 +158,5 @@ public class RabbitSupplierProperties {
 	public void setOwnConnection(boolean ownConnection) {
 		this.ownConnection = ownConnection;
 	}
+
 }

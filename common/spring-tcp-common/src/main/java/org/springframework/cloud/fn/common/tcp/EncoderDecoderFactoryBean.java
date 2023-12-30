@@ -29,8 +29,7 @@ import org.springframework.integration.ip.tcp.serializer.ByteArrayStxEtxSerializ
 import org.springframework.util.Assert;
 
 /**
- * Factory bean for an encoder/decoder based on
- * {@link Encoding}.
+ * Factory bean for an encoder/decoder based on {@link Encoding}.
  *
  * @author Gary Russell
  * @author Christian Tzolov

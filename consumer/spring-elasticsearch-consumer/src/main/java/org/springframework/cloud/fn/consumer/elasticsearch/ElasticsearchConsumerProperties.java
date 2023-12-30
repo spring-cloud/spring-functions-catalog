@@ -27,44 +27,45 @@ import org.springframework.expression.Expression;
 public class ElasticsearchConsumerProperties {
 
 	/**
-	 * The id of the document to index.
-	 * If set, the INDEX_ID header value overrides this property on a per message basis.
+	 * The id of the document to index. If set, the INDEX_ID header value overrides this
+	 * property on a per message basis.
 	 */
 	Expression id;
 
 	/**
-	 * Name of the index.
-	 * If set, the INDEX_NAME header value overrides this property on a per message basis.
+	 * Name of the index. If set, the INDEX_NAME header value overrides this property on a
+	 * per message basis.
 	 */
 	String index;
 
 	/**
-	 * Indicates the shard to route to.
-	 * If not provided, Elasticsearch will default to a hash of the document id.
+	 * Indicates the shard to route to. If not provided, Elasticsearch will default to a
+	 * hash of the document id.
 	 */
 	String routing;
 
 	/**
-	 * Timeout for the shard to be available.
-	 * If not set, it defaults to 1 minute set by the Elasticsearch client.
+	 * Timeout for the shard to be available. If not set, it defaults to 1 minute set by
+	 * the Elasticsearch client.
 	 */
 	long timeoutSeconds;
 
 	/**
-	 * Indicates whether the indexing operation is async or not.
-	 * By default indexing is done synchronously.
+	 * Indicates whether the indexing operation is async or not. By default indexing is
+	 * done synchronously.
 	 */
 	boolean async;
 
 	/**
-	 * Number of items to index for each request. It defaults to 1.
-	 * For values greater than 1 bulk indexing API will be used.
+	 * Number of items to index for each request. It defaults to 1. For values greater
+	 * than 1 bulk indexing API will be used.
 	 */
 	int batchSize = 1;
 
 	/**
-	 * Timeout in milliseconds after which message group is flushed when bulk indexing is active.
-	 * It defaults to -1, meaning no automatic flush of idle message groups occurs.
+	 * Timeout in milliseconds after which message group is flushed when bulk indexing is
+	 * active. It defaults to -1, meaning no automatic flush of idle message groups
+	 * occurs.
 	 */
 	long groupTimeout = -1L;
 
@@ -123,4 +124,5 @@ public class ElasticsearchConsumerProperties {
 	public void setGroupTimeout(long groupTimeout) {
 		this.groupTimeout = groupTimeout;
 	}
+
 }

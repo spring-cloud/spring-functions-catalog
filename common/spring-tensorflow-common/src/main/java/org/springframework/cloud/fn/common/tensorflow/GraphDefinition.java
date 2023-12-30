@@ -23,5 +23,7 @@ import org.tensorflow.op.Ops;
  */
 @FunctionalInterface
 public interface GraphDefinition {
+
 	void defineGraph(Ops tf);
+
 }

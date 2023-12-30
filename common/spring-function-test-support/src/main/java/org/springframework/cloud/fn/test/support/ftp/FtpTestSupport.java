@@ -79,13 +79,11 @@ public class FtpTestSupport extends RemoteFileTestSupport {
 
 		private TestUserManager(String homeDirectory) {
 			this.testUser = new BaseUser();
-			this.testUser.setAuthorities(Arrays.asList(new ConcurrentLoginPermission(1024, 1024),
-					new WritePermission(),
+			this.testUser.setAuthorities(Arrays.asList(new ConcurrentLoginPermission(1024, 1024), new WritePermission(),
 					new TransferRatePermission(1024, 1024)));
 			this.testUser.setHomeDirectory(homeDirectory);
 			this.testUser.setName("TEST_USER");
 		}
-
 
 		@Override
 		public User getUserByName(String s) throws FtpException {
@@ -126,4 +124,5 @@ public class FtpTestSupport extends RemoteFileTestSupport {
 		}
 
 	}
+
 }

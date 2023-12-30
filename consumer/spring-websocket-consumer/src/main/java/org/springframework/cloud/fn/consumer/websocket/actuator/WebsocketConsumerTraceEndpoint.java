@@ -29,8 +29,8 @@ import org.springframework.cloud.fn.consumer.websocket.trace.InMemoryTraceReposi
 import org.springframework.cloud.fn.consumer.websocket.trace.Trace;
 
 /**
- * Simple Spring Boot Actuator {@link Endpoint} implementation that
- * provides access to Websocket messages last sent/received.
+ * Simple Spring Boot Actuator {@link Endpoint} implementation that provides access to
+ * Websocket messages last sent/received.
  *
  * @author Oliver Moser
  * @author Artem Bilan

@@ -80,13 +80,14 @@ public abstract class RemoteFileTestSupport {
 	 *  localTarget/
 	 * </pre>
 	 *
-	 * The intent is tests retrieve from remoteSource and verify arrival in localTarget or send from localSource and verify
-	 * arrival in remoteTarget.
+	 * The intent is tests retrieve from remoteSource and verify arrival in localTarget or
+	 * send from localSource and verify arrival in remoteTarget.
 	 * <p>
-	 * Subclasses can change 'remote' in these names by overriding {@link #prefix()} or override this method completely to
-	 * create a different structure.
+	 * Subclasses can change 'remote' in these names by overriding {@link #prefix()} or
+	 * override this method completely to create a different structure.
 	 * <p>
-	 * While a single server exists for all tests, the directory structure is rebuilt for each test.
+	 * While a single server exists for all tests, the directory structure is rebuilt for
+	 * each test.
 	 * @throws IOException IO Exception.
 	 */
 	@BeforeEach
@@ -151,4 +152,5 @@ public abstract class RemoteFileTestSupport {
 	protected String prefix() {
 		return "remote";
 	}
+
 }

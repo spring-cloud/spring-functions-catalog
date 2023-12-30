@@ -24,8 +24,9 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TestPropertySource(properties = { "syslog.supplier.port = 0", "syslog.supplier.nio = true", "syslog.supplier.reverseLookup = true",
-		"syslog.supplier.socketTimeout = 123", "syslog.supplier.bufferSize = 5" })
+@TestPropertySource(
+		properties = { "syslog.supplier.port = 0", "syslog.supplier.nio = true", "syslog.supplier.reverseLookup = true",
+				"syslog.supplier.socketTimeout = 123", "syslog.supplier.bufferSize = 5" })
 public class PropertiesPopulatedTests extends AbstractSyslogSupplierTests {
 
 	@Test
@@ -35,4 +36,5 @@ public class PropertiesPopulatedTests extends AbstractSyslogSupplierTests {
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(123);
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "deserializer.maxMessageSize")).isEqualTo(5);
 	}
+
 }

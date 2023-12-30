@@ -57,7 +57,7 @@ class TaskLaunchRequestMessageProcessor implements MessagePostProcessor {
 		taskLaunchRequest.addCommmandLineArguments(commandLineArgumentsMessageMapper.processMessage(message));
 
 		MessageBuilder<TaskLaunchRequest> builder = MessageBuilder.withPayload(taskLaunchRequest)
-				.copyHeaders(message.getHeaders());
+			.copyHeaders(message.getHeaders());
 		return adjustHeaders(builder).build();
 	}
 
@@ -65,4 +65,5 @@ class TaskLaunchRequestMessageProcessor implements MessagePostProcessor {
 		builder.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
 		return builder;
 	}
+
 }

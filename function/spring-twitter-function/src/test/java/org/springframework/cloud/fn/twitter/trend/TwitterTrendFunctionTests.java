@@ -52,14 +52,10 @@ import static org.mockserver.verify.VerificationTimes.once;
 /**
  * @author Christian Tzolov
  */
-@SpringBootTest(
-		webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = {
-				"twitter.connection.consumerKey=consumerKey666",
-				"twitter.connection.consumerSecret=consumerSecret666",
-				"twitter.connection.accessToken=accessToken666",
-				"twitter.connection.accessTokenSecret=accessTokenSecret666"
-		})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
+		properties = { "twitter.connection.consumerKey=consumerKey666",
+				"twitter.connection.consumerSecret=consumerSecret666", "twitter.connection.accessToken=accessToken666",
+				"twitter.connection.accessTokenSecret=accessTokenSecret666" })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class TwitterTrendFunctionTests {
 
@@ -70,6 +66,7 @@ public abstract class TwitterTrendFunctionTests {
 	private static ClientAndServer mockServer;
 
 	private static MockServerClient mockClient;
+
 	private static HttpRequest trendsRequest;
 
 	@Autowired
@@ -80,10 +77,8 @@ public abstract class TwitterTrendFunctionTests {
 		mockServer = ClientAndServer.startClientAndServer(MOCK_SERVER_PORT);
 		mockClient = new MockServerClient(MOCK_SERVER_IP, MOCK_SERVER_PORT);
 
-		trendsRequest = setExpectation(request()
-				.withMethod("GET")
-				.withPath("/trends/place.json")
-				.withQueryStringParameter("id", "2972"));
+		trendsRequest = setExpectation(
+				request().withMethod("GET").withPath("/trends/place.json").withQueryStringParameter("id", "2972"));
 	}
 
 	@AfterAll
@@ -92,23 +87,16 @@ public abstract class TwitterTrendFunctionTests {
 	}
 
 	public static HttpRequest setExpectation(HttpRequest request) {
-		mockClient
-				.when(request, exactly(1))
-				.respond(response()
-						.withStatusCode(200)
-						.withHeaders(
-								new Header("Content-Type", "application/json; charset=utf-8"),
-								new Header("Cache-Control", "public, max-age=86400"))
-						.withBody(TwitterTestUtils.asString("classpath:/response/trends.json"))
-						.withDelay(TimeUnit.SECONDS, 1)
-				);
+		mockClient.when(request, exactly(1))
+			.respond(response().withStatusCode(200)
+				.withHeaders(new Header("Content-Type", "application/json; charset=utf-8"),
+						new Header("Cache-Control", "public, max-age=86400"))
+				.withBody(TwitterTestUtils.asString("classpath:/response/trends.json"))
+				.withDelay(TimeUnit.SECONDS, 1));
 		return request;
 	}
 
-	@TestPropertySource(properties = {
-			"twitter.trend.locationId='2972'",
-			"twitter.connection.rawJson=true"
-	})
+	@TestPropertySource(properties = { "twitter.trend.locationId='2972'", "twitter.connection.rawJson=true" })
 	public static class TwitterTrendPayloadTests extends TwitterTrendFunctionTests {
 
 		@Test
@@ -117,24 +105,26 @@ public abstract class TwitterTrendFunctionTests {
 			mockClient.verify(trendsRequest, once());
 			assertThat(received).isNotNull();
 		}
+
 	}
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
 	@Import(TwitterTrendFunctionConfiguration.class)
 	public static class TwitterTrendFunctionTestApplication {
+
 		@Bean
 		@Primary
 		public twitter4j.conf.Configuration twitterConfiguration2(TwitterConnectionProperties properties,
 				Function<TwitterConnectionProperties, ConfigurationBuilder> toConfigurationBuilder) {
 
-			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration =
-					toConfigurationBuilder.andThen(
-							new TwitterTestUtils().mockTwitterUrls(
-									String.format("http://%s:%s", MOCK_SERVER_IP, MOCK_SERVER_PORT)));
+			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration = toConfigurationBuilder
+				.andThen(new TwitterTestUtils()
+					.mockTwitterUrls(String.format("http://%s:%s", MOCK_SERVER_IP, MOCK_SERVER_PORT)));
 
 			return mockedConfiguration.apply(properties).build();
 		}
+
 	}
 
 }

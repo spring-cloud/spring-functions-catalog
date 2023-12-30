@@ -47,7 +47,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Artem Bilan
  * @author David Turanski
  * @author Corneil du Plessis
- *
  * @since 2.0.2
  */
 @AutoConfiguration
@@ -170,6 +169,7 @@ public class MetadataStoreAutoConfiguration {
 
 	@ConditionalOnProperty(prefix = "metadata.store", name = "type", havingValue = "jdbc")
 	static class Jdbc {
+
 		@Bean
 		@ConditionalOnMissingBean
 		public ConcurrentMetadataStore jdbcMetadataStore(JdbcTemplate jdbcTemplate,

@@ -20,4 +20,5 @@ import org.springframework.integration.handler.MessageProcessor;
 
 @FunctionalInterface
 public interface TaskNameMessageMapper extends MessageProcessor<String> {
+
 }

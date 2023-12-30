@@ -36,4 +36,5 @@ public class DebeziumSupplierProperties {
 	public void setCopyHeaders(boolean copyHeaders) {
 		this.copyHeaders = copyHeaders;
 	}
+
 }

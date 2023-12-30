@@ -37,33 +37,29 @@ public class SplitterFunctionProperties {
 	private String expression;
 
 	/**
-	 * When expression is null, delimiters to use when tokenizing
-	 * {@link String} payloads.
+	 * When expression is null, delimiters to use when tokenizing {@link String} payloads.
 	 */
 	private String delimiters;
 
 	/**
-	 * Set to true or false to use a {@code FileSplitter} (to split
-	 * text-based files by line) that includes
-	 * (or not) beginning/end of file markers.
+	 * Set to true or false to use a {@code FileSplitter} (to split text-based files by
+	 * line) that includes (or not) beginning/end of file markers.
 	 */
 	private Boolean fileMarkers;
 
 	/**
-	 * When 'fileMarkers == true', specify if they should be produced
-	 * as FileSplitter.FileMarker objects or JSON.
+	 * When 'fileMarkers == true', specify if they should be produced as
+	 * FileSplitter.FileMarker objects or JSON.
 	 */
 	private boolean markersJson = true;
 
 	/**
-	 * The charset to use when converting bytes in text-based files
-	 * to String.
+	 * The charset to use when converting bytes in text-based files to String.
 	 */
 	private String charset;
 
 	/**
-	 * Add correlation/sequence information in headers to facilitate later
-	 * aggregation.
+	 * Add correlation/sequence information in headers to facilitate later aggregation.
 	 */
 	private boolean applySequence = true;
 
@@ -122,7 +118,8 @@ public class SplitterFunctionProperties {
 
 	@AssertTrue(message = "File properties are not allowed when an 'expression' or 'delimiters' property is provided")
 	public boolean isFilePropsAllowed() {
-		return !(this.expression != null || this.delimiters != null) || this.fileMarkers == null && this.charset == null;
+		return !(this.expression != null || this.delimiters != null)
+				|| this.fileMarkers == null && this.charset == null;
 	}
 
 }

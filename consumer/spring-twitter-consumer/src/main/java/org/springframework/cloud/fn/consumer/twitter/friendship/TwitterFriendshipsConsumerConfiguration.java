@@ -29,7 +29,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 
 /**
- *
  * @author Christian Tzolov
  */
 @Configuration
@@ -43,45 +42,50 @@ public class TwitterFriendshipsConsumerConfiguration {
 
 		return message -> {
 			try {
-				TwitterFriendshipsConsumerProperties.OperationType type =
-						properties.getType().getValue(message, TwitterFriendshipsConsumerProperties.OperationType.class);
-				//TwitterFriendshipsSinkProperties.OperationType type = TwitterFriendshipsSinkProperties.OperationType.create;
+				TwitterFriendshipsConsumerProperties.OperationType type = properties.getType()
+					.getValue(message, TwitterFriendshipsConsumerProperties.OperationType.class);
+				// TwitterFriendshipsSinkProperties.OperationType type =
+				// TwitterFriendshipsSinkProperties.OperationType.create;
 				if (properties.getUserId() != null) {
 					Long userId = properties.getUserId().getValue(message, long.class);
 					switch (type) {
-					case create:
-						boolean follow = properties.getCreate().getFollow().getValue(message, boolean.class);
-						twitter.createFriendship(userId, follow);
-						return;
+						case create:
+							boolean follow = properties.getCreate().getFollow().getValue(message, boolean.class);
+							twitter.createFriendship(userId, follow);
+							return;
 
-					case update:
-						boolean enableDeviceNotification = properties.getUpdate().getDevice().getValue(message, boolean.class);
-						boolean retweets = properties.getUpdate().getRetweets().getValue(message, boolean.class);
-						twitter.updateFriendship(userId, enableDeviceNotification, retweets);
-						return;
+						case update:
+							boolean enableDeviceNotification = properties.getUpdate()
+								.getDevice()
+								.getValue(message, boolean.class);
+							boolean retweets = properties.getUpdate().getRetweets().getValue(message, boolean.class);
+							twitter.updateFriendship(userId, enableDeviceNotification, retweets);
+							return;
 
-					case destroy:
-						twitter.destroyFriendship(userId);
-						return;
+						case destroy:
+							twitter.destroyFriendship(userId);
+							return;
 					}
 				}
 				else if (properties.getScreenName() != null) {
 					String screenName = properties.getScreenName().getValue(message, String.class);
 					switch (type) {
-					case create:
-						boolean follow = properties.getCreate().getFollow().getValue(message, boolean.class);
-						twitter.createFriendship(screenName, follow);
-						return;
+						case create:
+							boolean follow = properties.getCreate().getFollow().getValue(message, boolean.class);
+							twitter.createFriendship(screenName, follow);
+							return;
 
-					case update:
-						boolean enableDeviceNotification = properties.getUpdate().getDevice().getValue(message, boolean.class);
-						boolean retweets = properties.getUpdate().getRetweets().getValue(message, boolean.class);
-						twitter.updateFriendship(screenName, enableDeviceNotification, retweets);
-						return;
+						case update:
+							boolean enableDeviceNotification = properties.getUpdate()
+								.getDevice()
+								.getValue(message, boolean.class);
+							boolean retweets = properties.getUpdate().getRetweets().getValue(message, boolean.class);
+							twitter.updateFriendship(screenName, enableDeviceNotification, retweets);
+							return;
 
-					case destroy:
-						twitter.destroyFriendship(screenName);
-						return;
+						case destroy:
+							twitter.destroyFriendship(screenName);
+							return;
 					}
 				}
 				else {
@@ -93,4 +97,5 @@ public class TwitterFriendshipsConsumerConfiguration {
 			}
 		};
 	}
+
 }

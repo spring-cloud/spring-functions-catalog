@@ -30,12 +30,7 @@ import org.springframework.data.cassandra.core.mapping.Table;
  * @author Artem Bilan
  */
 @Table("book")
-public record Book(
-		@PrimaryKey UUID isbn,
-		String title,
-		@Indexed String author,
-		Integer pages,
-		LocalDate saleDate,
+public record Book(@PrimaryKey UUID isbn, String title, @Indexed String author, Integer pages, LocalDate saleDate,
 		Boolean isInStock) {
 
 }

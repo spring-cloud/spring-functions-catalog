@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 import org.springframework.integration.ip.tcp.serializer.ByteArrayCrLfSerializer;
 
-
 /**
  * @author Gary Russell
  */
@@ -30,4 +29,5 @@ public class CRLFTests extends AbstractTcpConsumerTests {
 	public void test() throws Exception {
 		doTest(new ByteArrayCrLfSerializer());
 	}
+
 }

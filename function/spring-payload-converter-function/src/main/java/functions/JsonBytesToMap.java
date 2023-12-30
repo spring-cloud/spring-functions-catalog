@@ -29,12 +29,11 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.MimeTypeUtils;
 
 /**
- * The {@link Function} to deserialize {@code byte[]} payload into a Map
- * if {@link MessageHeaders#CONTENT_TYPE} header is JSON.
- * Otherwise, the message is returned as is.
+ * The {@link Function} to deserialize {@code byte[]} payload into a Map if
+ * {@link MessageHeaders#CONTENT_TYPE} header is JSON. Otherwise, the message is returned
+ * as is.
  *
  * @author Artem Bilan
- *
  * @since 4.0
  */
 public class JsonBytesToMap implements Function<Message<?>, Message<?>> {
@@ -51,15 +50,13 @@ public class JsonBytesToMap implements Function<Message<?>, Message<?>> {
 	public Message<?> apply(Message<?> message) {
 		if (message.getPayload() instanceof byte[] payload) {
 			MessageHeaders headers = message.getHeaders();
-			String contentType =
-					headers.containsKey(MessageHeaders.CONTENT_TYPE)
-							? headers.get(MessageHeaders.CONTENT_TYPE).toString()
-							: MimeTypeUtils.APPLICATION_JSON_VALUE;
+			String contentType = headers.containsKey(MessageHeaders.CONTENT_TYPE)
+					? headers.get(MessageHeaders.CONTENT_TYPE).toString() : MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 			if (contentType.contains("json")) {
 				message = MessageBuilder.withPayload(payloadToMapIfCan(payload))
-						.copyHeaders(message.getHeaders())
-						.build();
+					.copyHeaders(message.getHeaders())
+					.build();
 			}
 		}
 

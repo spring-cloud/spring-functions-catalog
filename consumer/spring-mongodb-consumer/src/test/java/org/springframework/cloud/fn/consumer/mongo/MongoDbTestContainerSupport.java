@@ -30,9 +30,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers(disabledWithoutDocker = true)
 public interface MongoDbTestContainerSupport {
 
-	MongoDBContainer MONGO_CONTAINER = new MongoDBContainer("mongo:6.0.6")
-		.withStartupTimeout(Duration.ofSeconds(120))
+	MongoDBContainer MONGO_CONTAINER = new MongoDBContainer("mongo:6.0.6").withStartupTimeout(Duration.ofSeconds(120))
 		.withStartupAttempts(3);
+
 	@BeforeAll
 	static void startContainer() {
 		MONGO_CONTAINER.start();

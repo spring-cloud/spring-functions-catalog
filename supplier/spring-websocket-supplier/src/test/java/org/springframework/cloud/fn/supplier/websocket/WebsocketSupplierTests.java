@@ -69,22 +69,17 @@ public class WebsocketSupplierTests {
 	public void testBasicFlow() throws IOException {
 		final Flux<Message<?>> messageFlux = websocketSupplier.get();
 		final StepVerifier stepVerifier = StepVerifier.create(messageFlux)
-				.assertNext((message) ->
-						assertThat(message.getPayload())
-								.isEqualTo(messageString)
-				)
-				.thenCancel()
-				.verifyLater();
+			.assertNext((message) -> assertThat(message.getPayload()).isEqualTo(messageString))
+			.thenCancel()
+			.verifyLater();
 		StandardWebSocketClient webSocketClient = new StandardWebSocketClient();
-		ClientWebSocketContainer clientWebSocketContainer =
-				new ClientWebSocketContainer(webSocketClient, "ws://localhost:{port}/{path}",
-						this.port,
-						this.properties.getPath());
+		ClientWebSocketContainer clientWebSocketContainer = new ClientWebSocketContainer(webSocketClient,
+				"ws://localhost:{port}/{path}", this.port, this.properties.getPath());
 
 		HttpHeaders httpHeaders = new HttpHeaders();
 		String token = Base64Utils.encodeToString(
 				(this.securityProperties.getUser().getName() + ":" + this.securityProperties.getUser().getPassword())
-						.getBytes(StandardCharsets.UTF_8));
+					.getBytes(StandardCharsets.UTF_8));
 		httpHeaders.set(HttpHeaders.AUTHORIZATION, "Basic " + token);
 		clientWebSocketContainer.setHeaders(httpHeaders);
 		clientWebSocketContainer.start();

@@ -68,19 +68,17 @@ import org.springframework.util.Assert;
 @EnableConfigurationProperties(RabbitSupplierProperties.class)
 public class RabbitSupplierConfiguration implements DisposableBean {
 
-	private static final MessagePropertiesConverter inboundMessagePropertiesConverter =
-			new DefaultMessagePropertiesConverter() {
+	private static final MessagePropertiesConverter inboundMessagePropertiesConverter = new DefaultMessagePropertiesConverter() {
 
-				@Override
-				public MessageProperties toMessageProperties(AMQP.BasicProperties source,
-						Envelope envelope, String charset) {
+		@Override
+		public MessageProperties toMessageProperties(AMQP.BasicProperties source, Envelope envelope, String charset) {
 
-					MessageProperties properties = super.toMessageProperties(source, envelope, charset);
-					properties.setDeliveryMode(null);
-					return properties;
-				}
+			MessageProperties properties = super.toMessageProperties(source, envelope, charset);
+			properties.setDeliveryMode(null);
+			return properties;
+		}
 
-			};
+	};
 
 	@Autowired
 	private RabbitProperties rabbitProperties;
@@ -107,8 +105,7 @@ public class RabbitSupplierConfiguration implements DisposableBean {
 
 	@Bean
 	public SimpleMessageListenerContainer container(RetryOperationsInterceptor rabbitSourceRetryInterceptor) {
-		ConnectionFactory connectionFactory = this.properties.isOwnConnection()
-				? buildLocalConnectionFactory()
+		ConnectionFactory connectionFactory = this.properties.isOwnConnection() ? buildLocalConnectionFactory()
 				: this.rabbitConnectionFactory;
 		SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(connectionFactory);
 		container.setAutoStartup(false);
@@ -151,16 +148,14 @@ public class RabbitSupplierConfiguration implements DisposableBean {
 	public Publisher<Message<byte[]>> rabbitPublisher(SimpleMessageListenerContainer container,
 			@Nullable ComponentCustomizer<AmqpInboundChannelAdapterSMLCSpec> amqpMessageProducerCustomizer) {
 
-		AmqpInboundChannelAdapterSMLCSpec messageProducerSpec =
-				Amqp.inboundAdapter(container)
-						.mappedRequestHeaders(properties.getMappedRequestHeaders());
+		AmqpInboundChannelAdapterSMLCSpec messageProducerSpec = Amqp.inboundAdapter(container)
+			.mappedRequestHeaders(properties.getMappedRequestHeaders());
 
 		if (amqpMessageProducerCustomizer != null) {
 			amqpMessageProducerCustomizer.customize(messageProducerSpec);
 		}
 
-		return IntegrationFlow.from(messageProducerSpec)
-				.toReactivePublisher(true);
+		return IntegrationFlow.from(messageProducerSpec).toReactivePublisher(true);
 	}
 
 	@Bean
@@ -171,11 +166,11 @@ public class RabbitSupplierConfiguration implements DisposableBean {
 	@Bean
 	public RetryOperationsInterceptor rabbitSourceRetryInterceptor() {
 		return RetryInterceptorBuilder.stateless()
-				.maxAttempts(this.properties.getMaxAttempts())
-				.backOffOptions(this.properties.getInitialRetryInterval(), this.properties.getRetryMultiplier(),
-						this.properties.getMaxRetryInterval())
-				.recoverer(new RejectAndDontRequeueRecoverer())
-				.build();
+			.maxAttempts(this.properties.getMaxAttempts())
+			.backOffOptions(this.properties.getInitialRetryInterval(), this.properties.getRetryMultiplier(),
+					this.properties.getMaxRetryInterval())
+			.recoverer(new RejectAndDontRequeueRecoverer())
+			.build();
 	}
 
 	@Override
@@ -187,9 +182,8 @@ public class RabbitSupplierConfiguration implements DisposableBean {
 
 	private ConnectionFactory buildLocalConnectionFactory() {
 		try {
-			this.ownConnectionFactory = rabbitConnectionFactory(
-					this.rabbitProperties, this.resourceLoader, this.credentialsProvider, this.credentialsRefreshService,
-					this.connectionFactoryCustomizers);
+			this.ownConnectionFactory = rabbitConnectionFactory(this.rabbitProperties, this.resourceLoader,
+					this.credentialsProvider, this.credentialsRefreshService, this.connectionFactoryCustomizers);
 
 		}
 		catch (Exception exception) {
@@ -199,31 +193,33 @@ public class RabbitSupplierConfiguration implements DisposableBean {
 		return this.ownConnectionFactory;
 	}
 
-	/* NOTE: This is based on RabbitAutoConfiguration.RabbitConnectionFactoryCreator
-	 * 		https://github.com/spring-projects/spring-boot/blob/c820ad01a108d419d8548265b8a34ed7c5591f7c/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/amqp/RabbitAutoConfiguration.java#L95
-	 * [UPGRADE_CONSIDERATION] this should stay somewhat in sync w/ the functionality provided by its original source.
+	/*
+	 * NOTE: This is based on RabbitAutoConfiguration.RabbitConnectionFactoryCreator
+	 * https://github.com/spring-projects/spring-boot/blob/
+	 * c820ad01a108d419d8548265b8a34ed7c5591f7c/spring-boot-project/spring-boot-
+	 * autoconfigure/src/main/java/org/springframework/boot/autoconfigure/amqp/
+	 * RabbitAutoConfiguration.java#L95 [UPGRADE_CONSIDERATION] this should stay somewhat
+	 * in sync w/ the functionality provided by its original source.
 	 */
 	private static CachingConnectionFactory rabbitConnectionFactory(RabbitProperties properties,
-			ResourceLoader resourceLoader,
-			ObjectProvider<CredentialsProvider> credentialsProvider,
+			ResourceLoader resourceLoader, ObjectProvider<CredentialsProvider> credentialsProvider,
 			ObjectProvider<CredentialsRefreshService> credentialsRefreshService,
 			ObjectProvider<ConnectionFactoryCustomizer> connectionFactoryCustomizers) throws Exception {
 
 		RabbitConnectionFactoryBean connectionFactoryBean = new RabbitConnectionFactoryBean();
-		RabbitConnectionFactoryBeanConfigurer connectionFactoryBeanConfigurer =
-				new RabbitConnectionFactoryBeanConfigurer(resourceLoader, properties);
+		RabbitConnectionFactoryBeanConfigurer connectionFactoryBeanConfigurer = new RabbitConnectionFactoryBeanConfigurer(
+				resourceLoader, properties);
 		connectionFactoryBeanConfigurer.setCredentialsProvider(credentialsProvider.getIfUnique());
 		connectionFactoryBeanConfigurer.setCredentialsRefreshService(credentialsRefreshService.getIfUnique());
 		connectionFactoryBeanConfigurer.configure(connectionFactoryBean);
 		connectionFactoryBean.afterPropertiesSet();
 
 		com.rabbitmq.client.ConnectionFactory connectionFactory = connectionFactoryBean.getObject();
-		connectionFactoryCustomizers.orderedStream()
-				.forEach((customizer) -> customizer.customize(connectionFactory));
+		connectionFactoryCustomizers.orderedStream().forEach((customizer) -> customizer.customize(connectionFactory));
 
 		CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(connectionFactory);
-		CachingConnectionFactoryConfigurer cachingConnectionFactoryConfigurer =
-				new CachingConnectionFactoryConfigurer(properties);
+		CachingConnectionFactoryConfigurer cachingConnectionFactoryConfigurer = new CachingConnectionFactoryConfigurer(
+				properties);
 		cachingConnectionFactoryConfigurer.setConnectionNameStrategy(cf -> "rabbit.supplier.own.connection");
 		cachingConnectionFactoryConfigurer.configure(cachingConnectionFactory);
 		cachingConnectionFactory.afterPropertiesSet();

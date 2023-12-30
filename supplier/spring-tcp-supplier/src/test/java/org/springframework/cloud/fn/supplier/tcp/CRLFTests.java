@@ -27,4 +27,5 @@ public class CRLFTests extends AbstractTcpSupplierTests {
 	public void test() throws Exception {
 		doTest("", "foo", "\r\n");
 	}
+
 }

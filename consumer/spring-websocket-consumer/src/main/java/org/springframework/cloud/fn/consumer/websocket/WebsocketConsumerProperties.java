@@ -58,7 +58,8 @@ public class WebsocketConsumerProperties {
 	int port = DEFAULT_PORT;
 
 	/**
-	 * the number of threads for the Netty {@link io.netty.channel.EventLoopGroup}. Default is <tt>1</tt>
+	 * the number of threads for the Netty {@link io.netty.channel.EventLoopGroup}.
+	 * Default is <tt>1</tt>
 	 */
 	int threads = DEFAULT_THREADS;
 
@@ -68,7 +69,8 @@ public class WebsocketConsumerProperties {
 	String logLevel = DEFAULT_LOGLEVEL;
 
 	/**
-	 * the path on which a WebsocketSink consumer needs to connect. Default is <tt>/websocket</tt>
+	 * the path on which a WebsocketSink consumer needs to connect. Default is
+	 * <tt>/websocket</tt>
 	 */
 	String path = DEFAULT_PATH;
 
@@ -111,4 +113,5 @@ public class WebsocketConsumerProperties {
 	public void setPath(String path) {
 		this.path = path;
 	}
+
 }

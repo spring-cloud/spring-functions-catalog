@@ -141,8 +141,9 @@ public class SftpConsumerPropertiesTests {
 		context.refresh();
 		SessionFactory<?> sessionFactory = context.getBean(SessionFactory.class);
 		assertThat(TestUtils.getPropertyValue(sessionFactory, "sessionFactory.knownHosts")
-				.toString().replaceAll(java.util.regex.Matcher.quoteReplacement(File.separator), "/")
-				.endsWith("/.ssh/known_hosts]")).isTrue();
+			.toString()
+			.replaceAll(java.util.regex.Matcher.quoteReplacement(File.separator), "/")
+			.endsWith("/.ssh/known_hosts]")).isTrue();
 		context.close();
 	}
 
@@ -170,7 +171,8 @@ public class SftpConsumerPropertiesTests {
 		}
 
 		/**
-		 * TODO: This needs to be refactored into a generic place for any functions to use.
+		 * TODO: This needs to be refactored into a generic place for any functions to
+		 * use.
 		 *
 		 * A simple converter from String to Expression.
 		 *
@@ -190,14 +192,13 @@ public class SftpConsumerPropertiesTests {
 				try {
 					Expression expression = this.parser.parseExpression(source);
 					if (expression instanceof SpelExpression) {
-						((SpelExpression) expression)
-								.setEvaluationContext(this.evaluationContext);
+						((SpelExpression) expression).setEvaluationContext(this.evaluationContext);
 					}
 					return expression;
 				}
 				catch (ParseException e) {
-					throw new IllegalArgumentException(String.format(
-							"Could not convert '%s' into a SpEL expression", source), e);
+					throw new IllegalArgumentException(
+							String.format("Could not convert '%s' into a SpEL expression", source), e);
 				}
 			}
 

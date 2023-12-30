@@ -20,18 +20,20 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
  * Properties for configuration of header-filter-function.
+ *
  * @author Corneil du Plessis
  */
 @ConfigurationProperties("header.filter")
 public class HeaderFilterFunctionProperties {
+
 	/**
 	 * Indicates the need to remove all headers.
 	 */
 	private boolean deleteAll = false;
 
 	/**
-	 * Remove all headers named. A comma, space separated list of header names.
-	 * The names may contain patterns.
+	 * Remove all headers named. A comma, space separated list of header names. The names
+	 * may contain patterns.
 	 */
 	private String remove;
 
@@ -50,4 +52,5 @@ public class HeaderFilterFunctionProperties {
 	public void setRemove(String remove) {
 		this.remove = remove;
 	}
+
 }

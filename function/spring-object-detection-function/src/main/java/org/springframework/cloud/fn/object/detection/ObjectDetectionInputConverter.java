@@ -35,8 +35,8 @@ import org.tensorflow.types.UInt8;
 import org.springframework.cloud.fn.common.tensorflow.deprecated.GraphicsUtils;
 
 /**
- * Converts byte array image into a input Tensor for the Object Detection API. The computed image tensors uses the
- * 'image_tensor' model placeholder.
+ * Converts byte array image into a input Tensor for the Object Detection API. The
+ * computed image tensors uses the 'image_tensor' model placeholder.
  *
  * @author Christian Tzolov
  */
@@ -95,4 +95,5 @@ public class ObjectDetectionInputConverter implements Function<byte[][], Map<Str
 			data[i + 2] = tmp;
 		}
 	}
+
 }

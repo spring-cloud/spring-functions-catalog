@@ -38,18 +38,16 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 @SpringBootTest(properties = "syslog.supplier.port = 0")
 @DirtiesContext
 public class AbstractSyslogSupplierTests {
 
 	protected static final String RFC3164_PACKET = "<157>JUL 26 22:08:35 WEBERN TESTING[70729]: TEST SYSLOG MESSAGE";
 
-	protected static final String RFC5424_PACKET =
-			"<14>1 2014-06-20T09:14:07+00:00 loggregator d0602076-b14a-4c55-852a-981e7afeed38 DEA - "
-					+ "[exampleSDID@32473 iut=\\\"3\\\" eventSource=\\\"Application\\\" eventID=\\\"1011\\\"]"
-					+ "[exampleSDID@32473 iut=\\\"3\\\" eventSource=\\\"Application\\\" eventID=\\\"1011\\\"] "
-					+ "Removing instance";
+	protected static final String RFC5424_PACKET = "<14>1 2014-06-20T09:14:07+00:00 loggregator d0602076-b14a-4c55-852a-981e7afeed38 DEA - "
+			+ "[exampleSDID@32473 iut=\\\"3\\\" eventSource=\\\"Application\\\" eventID=\\\"1011\\\"]"
+			+ "[exampleSDID@32473 iut=\\\"3\\\" eventSource=\\\"Application\\\" eventID=\\\"1011\\\"] "
+			+ "Removing instance";
 
 	@Autowired
 	Supplier<Flux<Message<?>>> syslogSupplier;

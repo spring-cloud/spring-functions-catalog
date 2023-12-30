@@ -42,22 +42,19 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(properties = {
-		"mqtt.consumer.topic=test",
-		"mqtt.ssl-properties.com.ibm.ssl.protocol=TLS",
+@SpringBootTest(properties = { "mqtt.consumer.topic=test", "mqtt.ssl-properties.com.ibm.ssl.protocol=TLS",
 		"mqtt.ssl-properties.com.ibm.ssl.keyStoreType=TEST" })
 @DirtiesContext
 @Tag("integration")
 public class MqttConsumerTests {
 
 	static {
-		GenericContainer<?> mosquitto =
-				new GenericContainer<>("eclipse-mosquitto:2.0.13")
-					.withCommand("mosquitto -c /mosquitto-no-auth.conf")
-					.withReuse(true)
-					.withExposedPorts(1883)
-					.withStartupTimeout(Duration.ofSeconds(120))
-					.withStartupAttempts(3);
+		GenericContainer<?> mosquitto = new GenericContainer<>("eclipse-mosquitto:2.0.13")
+			.withCommand("mosquitto -c /mosquitto-no-auth.conf")
+			.withReuse(true)
+			.withExposedPorts(1883)
+			.withStartupTimeout(Duration.ofSeconds(120))
+			.withStartupAttempts(3);
 		mosquitto.start();
 		final Integer mappedPort = mosquitto.getMappedPort(1883);
 		System.setProperty("mqtt.url", "tcp://localhost:" + mappedPort);
@@ -82,8 +79,8 @@ public class MqttConsumerTests {
 		MqttConnectOptions connectionInfo = this.mqttPahoMessageDrivenChannelAdapter.getConnectionInfo();
 		Properties sslProperties = connectionInfo.getSSLProperties();
 		assertThat(sslProperties)
-				.containsEntry(SSLSocketFactoryFactory.SSLPROTOCOL, SSLSocketFactoryFactory.DEFAULT_PROTOCOL)
-				.containsEntry(SSLSocketFactoryFactory.KEYSTORETYPE, "TEST");
+			.containsEntry(SSLSocketFactoryFactory.SSLPROTOCOL, SSLSocketFactoryFactory.DEFAULT_PROTOCOL)
+			.containsEntry(SSLSocketFactoryFactory.KEYSTORETYPE, "TEST");
 
 		this.mqttConsumer.accept(MessageBuilder.withPayload("hello").build());
 		Message<?> in = this.queue.receive(10000);

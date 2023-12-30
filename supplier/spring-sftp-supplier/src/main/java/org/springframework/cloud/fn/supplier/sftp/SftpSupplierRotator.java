@@ -55,9 +55,11 @@ public class SftpSupplierRotator extends RotatingServerAdvice {
 	public Message<?> afterReceive(Message<?> result, MessageSource<?> source) {
 		if (result != null) {
 			result = MessageBuilder.fromMessage(result)
-					.setHeader(SFTP_SELECTED_SERVER_PROPERTY_KEY, this.getCurrentKey()).build();
+				.setHeader(SFTP_SELECTED_SERVER_PROPERTY_KEY, this.getCurrentKey())
+				.build();
 		}
 		this.rotationPolicy.afterReceive(result != null, source);
 		return result;
 	}
+
 }

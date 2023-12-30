@@ -48,6 +48,7 @@ public class FtpSessionFactoryProperties {
 	 */
 
 	private String username;
+
 	/**
 	 * The password to use to connect to the server.
 	 */

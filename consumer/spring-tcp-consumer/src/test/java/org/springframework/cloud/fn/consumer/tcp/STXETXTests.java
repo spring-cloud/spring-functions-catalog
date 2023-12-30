@@ -31,4 +31,5 @@ public class STXETXTests extends AbstractTcpConsumerTests {
 	public void test() throws Exception {
 		doTest(new ByteArrayStxEtxSerializer());
 	}
+
 }

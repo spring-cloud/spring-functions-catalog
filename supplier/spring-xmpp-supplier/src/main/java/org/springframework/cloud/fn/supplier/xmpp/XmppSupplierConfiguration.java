@@ -44,7 +44,8 @@ public class XmppSupplierConfiguration {
 	private FluxMessageChannel output = new FluxMessageChannel();
 
 	@Bean
-	public ChatMessageListeningEndpoint chatMessageListeningEndpoint(XMPPConnection xmppConnection, XmppSupplierProperties properties) {
+	public ChatMessageListeningEndpoint chatMessageListeningEndpoint(XMPPConnection xmppConnection,
+			XmppSupplierProperties properties) {
 
 		var chatMessageListeningEndpoint = new ChatMessageListeningEndpoint(xmppConnection);
 

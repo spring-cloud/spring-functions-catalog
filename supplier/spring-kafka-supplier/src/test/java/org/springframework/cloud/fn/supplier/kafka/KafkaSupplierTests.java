@@ -36,75 +36,61 @@ import org.springframework.messaging.Message;
 
 /**
  * @author Artem Bilan
- *
  * @since 4.0
  */
 @EmbeddedKafka(partitions = 1, controlledShutdown = true)
 public class KafkaSupplierTests {
 
 	final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations.of(
-					IntegrationAutoConfiguration.class,
-					KafkaAutoConfiguration.class,
-					KafkaSupplierConfiguration.class,
-					SpelExpressionConverterConfiguration.class));
+		.withConfiguration(AutoConfigurations.of(IntegrationAutoConfiguration.class, KafkaAutoConfiguration.class,
+				KafkaSupplierConfiguration.class, SpelExpressionConverterConfiguration.class));
 
 	@Test
 	void recordModeAndTopicPattern() {
-		this.contextRunner.withPropertyValues(
-						"spring.kafka.template.defaultTopic=defaultTopic",
-						"spring.kafka.consumer.group-id=test-group1",
-						"spring.kafka.consumer.auto-offset-reset=earliest",
-						"kafka.supplier.topicPattern=default.+")
-				.run((context) -> {
-					String testPayload1 = "test data #1";
-					String testPayload2 = "test data #2";
+		this.contextRunner
+			.withPropertyValues("spring.kafka.template.defaultTopic=defaultTopic",
+					"spring.kafka.consumer.group-id=test-group1", "spring.kafka.consumer.auto-offset-reset=earliest",
+					"kafka.supplier.topicPattern=default.+")
+			.run((context) -> {
+				String testPayload1 = "test data #1";
+				String testPayload2 = "test data #2";
 
-					KafkaTemplate<Object, Object> kafkaTemplate = getKafkaTemplate(context);
-					kafkaTemplate.sendDefault(testPayload1);
-					kafkaTemplate.sendDefault(testPayload2);
-					kafkaTemplate.flush();
+				KafkaTemplate<Object, Object> kafkaTemplate = getKafkaTemplate(context);
+				kafkaTemplate.sendDefault(testPayload1);
+				kafkaTemplate.sendDefault(testPayload2);
+				kafkaTemplate.flush();
 
-					Supplier<Flux<Message<?>>> kafkaSupplier = getKafkaSupplier(context);
-					StepVerifier.create(
-									kafkaSupplier.get()
-											.map(Message::getPayload)
-											.cast(String.class))
-							.expectNext(testPayload1, testPayload2)
-							.thenCancel()
-							.verify(Duration.ofSeconds(30));
-				});
+				Supplier<Flux<Message<?>>> kafkaSupplier = getKafkaSupplier(context);
+				StepVerifier.create(kafkaSupplier.get().map(Message::getPayload).cast(String.class))
+					.expectNext(testPayload1, testPayload2)
+					.thenCancel()
+					.verify(Duration.ofSeconds(30));
+			});
 	}
 
 	@Test
 	void batchMode() {
-		this.contextRunner.withPropertyValues(
-						"spring.kafka.consumer.group-id=test-group2",
-						"spring.kafka.consumer.auto-offset-reset=earliest",
-						"spring.kafka.listener.type=BATCH",
-						"kafka.supplier.topics=testTopic1,testTopic2",
-						"kafka.supplier.recordFilter=value() == 'test data #2'")
-				.run((context) -> {
-					String testPayload1 = "test data #1";
-					String testPayload2 = "test data #2";
+		this.contextRunner.withPropertyValues("spring.kafka.consumer.group-id=test-group2",
+				"spring.kafka.consumer.auto-offset-reset=earliest", "spring.kafka.listener.type=BATCH",
+				"kafka.supplier.topics=testTopic1,testTopic2", "kafka.supplier.recordFilter=value() == 'test data #2'")
+			.run((context) -> {
+				String testPayload1 = "test data #1";
+				String testPayload2 = "test data #2";
 
-					Supplier<Flux<Message<?>>> kafkaSupplier = getKafkaSupplier(context);
-					StepVerifier stepVerifier = StepVerifier.create(
-									kafkaSupplier.get()
-											.map(Message::getPayload)
-											.cast(List.class))
-							.expectNext(List.of(testPayload1))
-							.thenCancel()
-							.verifyLater();
+				Supplier<Flux<Message<?>>> kafkaSupplier = getKafkaSupplier(context);
+				StepVerifier stepVerifier = StepVerifier
+					.create(kafkaSupplier.get().map(Message::getPayload).cast(List.class))
+					.expectNext(List.of(testPayload1))
+					.thenCancel()
+					.verifyLater();
 
+				KafkaTemplate<Object, Object> kafkaTemplate = getKafkaTemplate(context);
+				kafkaTemplate.send("testTopic1", testPayload1);
+				kafkaTemplate.send("testTopic2", testPayload2);
+				kafkaTemplate.flush();
 
-					KafkaTemplate<Object, Object> kafkaTemplate = getKafkaTemplate(context);
-					kafkaTemplate.send("testTopic1", testPayload1);
-					kafkaTemplate.send("testTopic2", testPayload2);
-					kafkaTemplate.flush();
-
-					stepVerifier.verify(Duration.ofSeconds(30));
-				});
+				stepVerifier.verify(Duration.ofSeconds(30));
+			});
 	}
 
 	@SuppressWarnings("unchecked")

@@ -34,8 +34,8 @@ public class TcpConnectionFactoryProperties {
 	private int port = 1234;
 
 	/**
-	 * Perform a reverse DNS lookup on the remote IP Address; if false,
-	 * just the IP address is included in the message headers.
+	 * Perform a reverse DNS lookup on the remote IP Address; if false, just the IP
+	 * address is included in the message headers.
 	 */
 	private boolean reverseLookup = false;
 
@@ -93,4 +93,5 @@ public class TcpConnectionFactoryProperties {
 	public void setReverseLookup(boolean reverseLookup) {
 		this.reverseLookup = reverseLookup;
 	}
+
 }

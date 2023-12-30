@@ -41,8 +41,7 @@ public class RemoteFileDeletingAdvice implements MessageSourceMutator {
 	 * @param template the template.
 	 * @param remoteFileSeparator the separator.
 	 */
-	public RemoteFileDeletingAdvice(RemoteFileTemplate<?> template,
-			String remoteFileSeparator) {
+	public RemoteFileDeletingAdvice(RemoteFileTemplate<?> template, String remoteFileSeparator) {
 		this.template = template;
 		this.remoteFileSeparator = remoteFileSeparator;
 	}
@@ -57,4 +56,5 @@ public class RemoteFileDeletingAdvice implements MessageSourceMutator {
 		}
 		return result;
 	}
+
 }

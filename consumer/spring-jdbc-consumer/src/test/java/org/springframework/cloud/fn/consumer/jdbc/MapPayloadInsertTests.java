@@ -58,12 +58,15 @@ public class MapPayloadInsertTests extends JdbcConsumerApplicationTests {
 		jdbcConsumer.accept(message2);
 		final Message<Map<String, Object>> message3 = MessageBuilder.withPayload(mapC).build();
 		jdbcConsumer.accept(message3);
-		assertThat(namedParameterJdbcOperations.queryForObject(
-				"select count(*) from messages where a = :a and b = :b", mapA, Integer.class)).isEqualTo(1);
-		assertThat(namedParameterJdbcOperations.queryForObject(
-				"select count(*) from messages where a = :a and b IS NULL", mapB, Integer.class)).isEqualTo(1);
-		assertThat(namedParameterJdbcOperations.queryForObject(
-				"select count(*) from messages where a = :a and b IS NULL", mapC, Integer.class)).isEqualTo(1);
+		assertThat(namedParameterJdbcOperations.queryForObject("select count(*) from messages where a = :a and b = :b",
+				mapA, Integer.class))
+			.isEqualTo(1);
+		assertThat(namedParameterJdbcOperations
+			.queryForObject("select count(*) from messages where a = :a and b IS NULL", mapB, Integer.class))
+			.isEqualTo(1);
+		assertThat(namedParameterJdbcOperations
+			.queryForObject("select count(*) from messages where a = :a and b IS NULL", mapC, Integer.class))
+			.isEqualTo(1);
 	}
 
 }

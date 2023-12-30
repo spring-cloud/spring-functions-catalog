@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Gary Russell
  */
-@TestPropertySource(properties = {"tcp.consumer.host = foo"})
+@TestPropertySource(properties = { "tcp.consumer.host = foo" })
 public class NotNioTests extends AbstractTcpConsumerTests {
 
 	@Test
@@ -37,4 +37,5 @@ public class NotNioTests extends AbstractTcpConsumerTests {
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "lookupHost", Boolean.class)).isFalse();
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(120000);
 	}
+
 }

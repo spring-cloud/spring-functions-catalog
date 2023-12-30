@@ -21,6 +21,7 @@ package org.springframework.cloud.fn.common.tcp;
  * @author Christian Tzolov
  */
 public enum Encoding {
+
 	/**
 	 * CRLF encoding.
 	 */
@@ -53,4 +54,5 @@ public enum Encoding {
 	 * L4 encoding.
 	 */
 	L4;
+
 }

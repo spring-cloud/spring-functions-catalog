@@ -23,23 +23,28 @@ import twitter4j.Status;
 import org.springframework.util.Assert;
 
 /**
- * Searched tweets are ordered from top to bottom by their IDs. The higher the ID, more recent the tweet is.
+ * Searched tweets are ordered from top to bottom by their IDs. The higher the ID, more
+ * recent the tweet is.
  *
- * The search goes backwards - from most recent to the oldest tweets and it uses the sinceId and the maxId to retrieve
- * only tweets with IDs in the [sinceId, maxId) range. The -1 stands for unbounded sinceId or maxId.
+ * The search goes backwards - from most recent to the oldest tweets and it uses the
+ * sinceId and the maxId to retrieve only tweets with IDs in the [sinceId, maxId) range.
+ * The -1 stands for unbounded sinceId or maxId.
  *
- * The first `pageCount` number requests are performed backwards, leaving the bottom boundary (sinceId) unbounded and
- * adjusting the upper boundary (maxId) to the lowest tweet ID received. This ensures that no already processed
- * tweets are returned.
+ * The first `pageCount` number requests are performed backwards, leaving the bottom
+ * boundary (sinceId) unbounded and adjusting the upper boundary (maxId) to the lowest
+ * tweet ID received. This ensures that no already processed tweets are returned.
  *
- * The pageCounter is used the to count the number of pages retrieved in the pageCount range. Is starts from pageCount
- * and goes backward until 0. On 0 the pageCounter is reset back to pageCount.
+ * The pageCounter is used the to count the number of pages retrieved in the pageCount
+ * range. Is starts from pageCount and goes backward until 0. On 0 the pageCounter is
+ * reset back to pageCount.
  *
- * After performing pageCount number requests (e.g. pageCounter = 0), we start new iteration of searches from the top,
- * most recent tweets but now the bottom boundary (sinceId) is adjusted to the max ID received so far. That means that
- * only the newly added tweets will be processed
+ * After performing pageCount number requests (e.g. pageCounter = 0), we start new
+ * iteration of searches from the top, most recent tweets but now the bottom boundary
+ * (sinceId) is adjusted to the max ID received so far. That means that only the newly
+ * added tweets will be processed
  *
- * Search pagination with max_id and since_id: https://developer.twitter.com/en/docs/tweets/timelines/guides/working-with-timelines.html
+ * Search pagination with max_id and since_id:
+ * https://developer.twitter.com/en/docs/tweets/timelines/guides/working-with-timelines.html
  *
  * @author Christian Tzolov
  */
@@ -53,8 +58,8 @@ public class SearchPagination {
 	/**
 	 * Number of pages to search in history before start form the top again.
 	 *
-	 * Note that the search goes backwards - from most recent to the oldest tweets.
-	 * (eg. maxId == To max ID , sinceId == From min ID)
+	 * Note that the search goes backwards - from most recent to the oldest tweets. (eg.
+	 * maxId == To max ID , sinceId == From min ID)
 	 */
 	private final int pageCount;
 
@@ -113,18 +118,15 @@ public class SearchPagination {
 
 	public void update(List<Status> tweets) {
 
-		tweets.stream().mapToLong(t -> t.getId()).min()
-				.ifPresent(tweetsMinId -> {
-					this.maxId = tweetsMinId - 1;
-				});
+		tweets.stream().mapToLong(t -> t.getId()).min().ifPresent(tweetsMinId -> {
+			this.maxId = tweetsMinId - 1;
+		});
 
-		tweets.stream().mapToLong(t -> t.getId()).max()
-				.ifPresent(tweetsMaxId -> {
-					Assert.isTrue(this.sinceId <= tweetsMaxId,
-							String.format("MAX_ID (%s) must be bigger then current SINCE_ID(%s)",
-									tweetsMaxId, this.sinceId));
-					this.pageMaxId = Math.max(this.pageMaxId, tweetsMaxId);
-				});
+		tweets.stream().mapToLong(t -> t.getId()).max().ifPresent(tweetsMaxId -> {
+			Assert.isTrue(this.sinceId <= tweetsMaxId,
+					String.format("MAX_ID (%s) must be bigger then current SINCE_ID(%s)", tweetsMaxId, this.sinceId));
+			this.pageMaxId = Math.max(this.pageMaxId, tweetsMaxId);
+		});
 
 		this.countDown(tweets.size());
 	}
@@ -160,7 +162,8 @@ public class SearchPagination {
 	}
 
 	public String status() {
-		return String.format("MaxId: %s, SinceId: %s, Page Counter# %s, pageMaxId: %s",
-				this.maxId, this.sinceId, this.pageCounter, this.pageMaxId);
+		return String.format("MaxId: %s, SinceId: %s, Page Counter# %s, pageMaxId: %s", this.maxId, this.sinceId,
+				this.pageCounter, this.pageMaxId);
 	}
+
 }

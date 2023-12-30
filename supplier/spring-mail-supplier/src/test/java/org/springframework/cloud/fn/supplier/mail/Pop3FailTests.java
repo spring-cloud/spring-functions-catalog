@@ -28,7 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = "mail.supplier.url=pop3://user:pw@localhost:${test.mail.server.pop3.port}/INBOX")
 public class Pop3FailTests extends AbstractMailSupplierTests {
 
-
 	@Test
 	public void testSimpleTest() {
 		// given
@@ -36,13 +35,9 @@ public class Pop3FailTests extends AbstractMailSupplierTests {
 		// when
 		final Flux<Message<?>> messageFlux = mailSupplier.get();
 		// then
-		StepVerifier.create(messageFlux)
-			.assertNext((message) -> {
-					assertThat(((String) message.getPayload())).isNotEqualTo("Test Mail");
-				}
-			)
-			.thenCancel()
-			.verify();
+		StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(((String) message.getPayload())).isNotEqualTo("Test Mail");
+		}).thenCancel().verify();
 	}
 
 }

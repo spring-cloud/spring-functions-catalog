@@ -55,14 +55,8 @@ import static org.springframework.cloud.fn.test.support.xmpp.XmppTestContainerSu
  * @author Daniel Frey
  * @author Chris Bono
  */
-@SpringBootTest(
-		properties = {
-				"xmpp.factory.user=" + JOHN_USER,
-				"xmpp.factory.password=" + USER_PW,
-				"xmpp.factory.service-name=" + SERVICE_NAME,
-				"xmpp.factory.security-mode=disabled"
-		}
-)
+@SpringBootTest(properties = { "xmpp.factory.user=" + JOHN_USER, "xmpp.factory.password=" + USER_PW,
+		"xmpp.factory.service-name=" + SERVICE_NAME, "xmpp.factory.security-mode=disabled" })
 @DirtiesContext
 public class XmppConsumerConfigurationTests implements XmppTestContainerSupport {
 
@@ -76,7 +70,7 @@ public class XmppConsumerConfigurationTests implements XmppTestContainerSupport 
 	private Consumer<Message<?>> xmppConsumer;
 
 	// A client connection is needed to receive the message from the xmpp server
-	//   to verify it was received successfully
+	// to verify it was received successfully
 	private XMPPTCPConnection clientConnection;
 
 	@BeforeEach
@@ -87,8 +81,7 @@ public class XmppConsumerConfigurationTests implements XmppTestContainerSupport 
 		builder.setHost(XmppTestContainerSupport.getXmppHost());
 		builder.setPort(XmppTestContainerSupport.getXmppMappedPort());
 		builder.setResource(SERVICE_NAME);
-		builder.setUsernameAndPassword(JANE_USER, USER_PW)
-				.setXmppDomain(SERVICE_NAME);
+		builder.setUsernameAndPassword(JANE_USER, USER_PW).setXmppDomain(SERVICE_NAME);
 		this.clientConnection = new XMPPTCPConnection(builder.build());
 		this.clientConnection.connect();
 		this.clientConnection.login();
@@ -102,37 +95,35 @@ public class XmppConsumerConfigurationTests implements XmppTestContainerSupport 
 
 	@Test
 	void messageHandlerConfiguration() {
-		var collector
-				= this.clientConnection.createStanzaCollector(StanzaTypeFilter.MESSAGE);
+		var collector = this.clientConnection.createStanzaCollector(StanzaTypeFilter.MESSAGE);
 
-		var testMessage =
-				MessageBuilder.withPayload("test")
-						.setHeader(XmppHeaders.TO, JANE_USER + "@" + SERVICE_NAME)
-						.build();
+		var testMessage = MessageBuilder.withPayload("test")
+			.setHeader(XmppHeaders.TO, JANE_USER + "@" + SERVICE_NAME)
+			.build();
 
-		await().atMost(Duration.ofSeconds(20)).pollDelay(Duration.ofMillis(100))
-				.untilAsserted(() -> {
-					xmppConsumer.accept(testMessage);
-					Stanza stanza = collector.nextResult();
-					assertStanza(stanza);
-				});
+		await().atMost(Duration.ofSeconds(20)).pollDelay(Duration.ofMillis(100)).untilAsserted(() -> {
+			xmppConsumer.accept(testMessage);
+			Stanza stanza = collector.nextResult();
+			assertStanza(stanza);
+		});
 	}
 
 	@Test
 	void xmppMessageHandlerConfiguration() throws XmppStringprepException {
-		var collector
-				= this.clientConnection.createStanzaCollector(StanzaTypeFilter.MESSAGE);
+		var collector = this.clientConnection.createStanzaCollector(StanzaTypeFilter.MESSAGE);
 
-		var testMessage =
-				MessageBuilder.withPayload(org.jivesoftware.smack.packet.MessageBuilder.buildMessage().addBody("en_us", "test").to(JANE_USER + "@" + SERVICE_NAME).build())
-						.build();
+		var testMessage = MessageBuilder
+			.withPayload(org.jivesoftware.smack.packet.MessageBuilder.buildMessage()
+				.addBody("en_us", "test")
+				.to(JANE_USER + "@" + SERVICE_NAME)
+				.build())
+			.build();
 
-		await().atMost(Duration.ofSeconds(20)).pollDelay(Duration.ofMillis(100))
-				.untilAsserted(() -> {
-					xmppConsumer.accept(testMessage);
-					Stanza stanza = collector.nextResult();
-					assertStanza(stanza);
-				});
+		await().atMost(Duration.ofSeconds(20)).pollDelay(Duration.ofMillis(100)).untilAsserted(() -> {
+			xmppConsumer.accept(testMessage);
+			Stanza stanza = collector.nextResult();
+			assertStanza(stanza);
+		});
 	}
 
 	private void assertStanza(Stanza stanza) {
@@ -151,6 +142,8 @@ public class XmppConsumerConfigurationTests implements XmppTestContainerSupport 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
 	@Import(XmppConsumerConfiguration.class)
-	static class XmppConsumerTestApplication { }
+	static class XmppConsumerTestApplication {
+
+	}
 
 }

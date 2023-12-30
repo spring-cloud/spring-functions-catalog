@@ -48,7 +48,6 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.MimeTypeUtils;
 
 /**
- *
  * @author Christian Tzolov
  * @author Artem Bilan
  */
@@ -58,6 +57,7 @@ import org.springframework.util.MimeTypeUtils;
 public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAware {
 
 	private static final Log logger = LogFactory.getLog(DebeziumReactiveConsumerConfiguration.class);
+
 	/**
 	 * ORG_SPRINGFRAMEWORK_KAFKA_SUPPORT_KAFKA_NULL.
 	 */
@@ -77,15 +77,16 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 	}
 
 	/**
-	 * Reactive Streams, single subscriber, sink used to push down the change event signals received from the Debezium
-	 * Engine.
+	 * Reactive Streams, single subscriber, sink used to push down the change event
+	 * signals received from the Debezium Engine.
 	 */
 	private final Sinks.Many<Message<?>> eventSink = Sinks.many().unicast().onBackpressureError();
 
 	/**
-	 * Debezium Engine is designed to be submitted to an {@link ExecutorService} for execution by a single thread, and a
-	 * running connector can be stopped either by calling {@link #stop()} from another thread or by interrupting the
-	 * running thread (e.g., as is the case with {@link ExecutorService#shutdownNow()}).
+	 * Debezium Engine is designed to be submitted to an {@link ExecutorService} for
+	 * execution by a single thread, and a running connector can be stopped either by
+	 * calling {@link #stop()} from another thread or by interrupting the running thread
+	 * (e.g., as is the case with {@link ExecutorService#shutdownNow()}).
 	 */
 	private final ExecutorService debeziumExecutor = Executors.newSingleThreadExecutor();
 
@@ -101,8 +102,8 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 	public Supplier<Flux<Message<?>>> debeziumSupplier(DebeziumEngine<ChangeEvent<byte[], byte[]>> debeziumEngine) {
 
 		return () -> this.eventSink.asFlux()
-				.doOnRequest(r -> debeziumExecutor.execute(debeziumEngine))
-				.doOnTerminate(debeziumExecutor::shutdownNow);
+			.doOnRequest(r -> debeziumExecutor.execute(debeziumEngine))
+			.doOnTerminate(debeziumExecutor::shutdownNow);
 	}
 
 	@Bean
@@ -111,8 +112,7 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 			DebeziumSupplierProperties supplierProperties) {
 
 		return new ChangeEventConsumer<byte[]>(engineProperties.getPayloadFormat().contentType(),
-				supplierProperties.isCopyHeaders(),
-				this.eventSink);
+				supplierProperties.isCopyHeaders(), this.eventSink);
 	}
 
 	/**
@@ -121,7 +121,9 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 	private final class ChangeEventConsumer<T> implements Consumer<ChangeEvent<T, T>> {
 
 		private final String contentType;
+
 		private final boolean copyHeaders;
+
 		private final Sinks.Many<Message<?>> eventSink;
 
 		private ChangeEventConsumer(String contentType, boolean copyHeaders, Sinks.Many<Message<?>> eventSink) {
@@ -140,10 +142,14 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 			Object payload = changeEvent.value();
 			String destination = changeEvent.destination();
 
-			// When the tombstone event is enabled, Debezium serializes the payload to null (e.g. empty payload)
-			// while the metadata information is carried through the headers (debezium_key).
-			// Note: Event for none flattened responses, when the debezium.properties.tombstones.on.delete=true
-			// (default), tombstones are generate by Debezium and handled by the code below.
+			// When the tombstone event is enabled, Debezium serializes the payload to
+			// null (e.g. empty payload)
+			// while the metadata information is carried through the headers
+			// (debezium_key).
+			// Note: Event for none flattened responses, when the
+			// debezium.properties.tombstones.on.delete=true
+			// (default), tombstones are generate by Debezium and handled by the code
+			// below.
 			if (payload == null) {
 				payload = DebeziumReactiveConsumerConfiguration.this.kafkaNull;
 			}
@@ -154,14 +160,12 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 				return;
 			}
 
-			MessageBuilder<?> messageBuilder = MessageBuilder
-					.withPayload(payload)
-					.setHeader("debezium_key", key)
-					.setHeader("debezium_destination", destination)
-					.setHeader(MessageHeaders.CONTENT_TYPE,
-							(payload.equals(DebeziumReactiveConsumerConfiguration.this.kafkaNull))
-									? MimeTypeUtils.TEXT_PLAIN_VALUE
-									: this.contentType);
+			MessageBuilder<?> messageBuilder = MessageBuilder.withPayload(payload)
+				.setHeader("debezium_key", key)
+				.setHeader("debezium_destination", destination)
+				.setHeader(MessageHeaders.CONTENT_TYPE,
+						(payload.equals(DebeziumReactiveConsumerConfiguration.this.kafkaNull))
+								? MimeTypeUtils.TEXT_PLAIN_VALUE : this.contentType);
 
 			if (this.copyHeaders) {
 				List<Header<T>> headers = changeEvent.headers();
@@ -176,6 +180,7 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 
 			this.eventSink.tryEmitNext(messageBuilder.build());
 		}
+
 	}
 
 }

@@ -32,16 +32,13 @@ public class Tcp3164Tests extends AbstractSyslogSupplierTests {
 	public void test() throws Exception {
 		final Flux<Message<?>> messageFlux = syslogSupplier.get();
 
-		final StepVerifier stepVerifier = StepVerifier.create(messageFlux)
-				.assertNext((message) -> {
-							assertThat(((Map) message.getPayload()).get("HOST")).isEqualTo("WEBERN");
-						}
-				)
-				.thenCancel()
-				.verifyLater();
+		final StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(((Map) message.getPayload()).get("HOST")).isEqualTo("WEBERN");
+		}).thenCancel().verifyLater();
 
 		sendTcp(AbstractSyslogSupplierTests.RFC3164_PACKET + "\n");
 
 		stepVerifier.verify();
 	}
+
 }

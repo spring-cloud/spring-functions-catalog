@@ -24,11 +24,12 @@ import org.springframework.test.context.TestPropertySource;
 /**
  * @author Gary Russell
  */
-@TestPropertySource(properties = {"tcp.consumer.encoder = LF"})
+@TestPropertySource(properties = { "tcp.consumer.encoder = LF" })
 public class LFTests extends AbstractTcpConsumerTests {
 
 	@Test
 	public void test() throws Exception {
 		doTest(new ByteArrayLfSerializer());
 	}
+
 }

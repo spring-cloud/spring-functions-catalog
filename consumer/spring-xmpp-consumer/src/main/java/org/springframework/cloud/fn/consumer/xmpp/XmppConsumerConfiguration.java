@@ -31,7 +31,6 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
 /**
- *
  * @author Daniel Frey
  * @since 4.0.0
  */
@@ -47,13 +46,13 @@ public class XmppConsumerConfiguration {
 	}
 
 	@Bean
-	public Consumer<Message<?>> xmppConsumer(ChatMessageSendingMessageHandler chatMessageSendingMessageHandler, XmppConsumerProperties properties) {
+	public Consumer<Message<?>> xmppConsumer(ChatMessageSendingMessageHandler chatMessageSendingMessageHandler,
+			XmppConsumerProperties properties) {
 		return message -> {
 
-			var send = MessageBuilder
-					.fromMessage(message)
-					.setHeaderIfAbsent(XmppHeaders.TO, properties.getChatTo())
-					.build();
+			var send = MessageBuilder.fromMessage(message)
+				.setHeaderIfAbsent(XmppHeaders.TO, properties.getChatTo())
+				.build();
 
 			chatMessageSendingMessageHandler.handleMessage(send);
 

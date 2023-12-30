@@ -38,7 +38,8 @@ public class SftpConsumerProperties {
 	private final Factory factory = new Factory();
 
 	/**
-	 * A temporary directory where the file will be written if 'isUseTemporaryFilename()' is true.
+	 * A temporary directory where the file will be written if 'isUseTemporaryFilename()'
+	 * is true.
 	 */
 	private String temporaryRemoteDir = "/";
 
@@ -198,7 +199,6 @@ public class SftpConsumerProperties {
 		 */
 		private Expression knownHostsExpression = null;
 
-
 		@NotBlank
 		public String getHost() {
 			return this.host;
@@ -275,4 +275,5 @@ public class SftpConsumerProperties {
 		}
 
 	}
+
 }

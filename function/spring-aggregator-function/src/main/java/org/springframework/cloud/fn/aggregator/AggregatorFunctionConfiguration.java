@@ -63,17 +63,11 @@ public class AggregatorFunctionConfiguration {
 	private BeanFactory beanFactory;
 
 	@Bean
-	public Function<Flux<Message<?>>, Flux<Message<?>>> aggregatorFunction(
-		FluxMessageChannel inputChannel,
-		FluxMessageChannel outputChannel
-	) {
+	public Function<Flux<Message<?>>, Flux<Message<?>>> aggregatorFunction(FluxMessageChannel inputChannel,
+			FluxMessageChannel outputChannel) {
 		return input -> Flux.from(outputChannel)
-			.doOnRequest((request) ->
-					inputChannel.subscribeTo(
-							input.map((inputMessage) ->
-									MessageBuilder.fromMessage(inputMessage)
-											.removeHeader("kafka_consumer")
-											.build())));
+			.doOnRequest((request) -> inputChannel.subscribeTo(input.map((
+					inputMessage) -> MessageBuilder.fromMessage(inputMessage).removeHeader("kafka_consumer").build())));
 	}
 
 	@Bean
@@ -88,13 +82,10 @@ public class AggregatorFunctionConfiguration {
 
 	@Bean
 	@ServiceActivator(inputChannel = "inputChannel")
-	public AggregatorFactoryBean aggregator(
-		@Nullable CorrelationStrategy correlationStrategy,
-		@Nullable ReleaseStrategy releaseStrategy,
-		@Nullable MessageGroupProcessor messageGroupProcessor,
-		@Nullable MessageGroupStore messageStore,
-		@Qualifier("outputChannel") MessageChannel outputChannel,
-		@Nullable ComponentCustomizer<AggregatorFactoryBean> aggregatorCustomizer) {
+	public AggregatorFactoryBean aggregator(@Nullable CorrelationStrategy correlationStrategy,
+			@Nullable ReleaseStrategy releaseStrategy, @Nullable MessageGroupProcessor messageGroupProcessor,
+			@Nullable MessageGroupStore messageStore, @Qualifier("outputChannel") MessageChannel outputChannel,
+			@Nullable ComponentCustomizer<AggregatorFactoryBean> aggregatorCustomizer) {
 
 		AggregatorFactoryBean aggregator = new AggregatorFactoryBean();
 		aggregator.setExpireGroupsUponCompletion(true);
@@ -149,14 +140,10 @@ public class AggregatorFunctionConfiguration {
 		return new ExpressionEvaluatingMessageGroupProcessor(this.properties.getAggregation().getExpressionString());
 	}
 
-
 	@Configuration
 	@ConditionalOnMissingBean(MessageGroupStore.class)
-	@Import({
-		MessageStoreConfiguration.Mongo.class,
-		MessageStoreConfiguration.Redis.class,
-		MessageStoreConfiguration.Jdbc.class
-	})
+	@Import({ MessageStoreConfiguration.Mongo.class, MessageStoreConfiguration.Redis.class,
+			MessageStoreConfiguration.Jdbc.class })
 	protected static class MessageStoreAutoConfiguration {
 
 	}

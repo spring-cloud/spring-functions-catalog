@@ -24,7 +24,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- *
  * @author Daniel Frey
  * @since 4.0.0
  */
@@ -33,8 +32,8 @@ import org.springframework.validation.annotation.Validated;
 public class XmppConnectionFactoryProperties {
 
 	/**
-	 * The Resource to bind to on the XMPP Host.
-	 *   - Can be empty, server will generate one if not set
+	 * The Resource to bind to on the XMPP Host. - Can be empty, server will generate one
+	 * if not set
 	 */
 	private String resource;
 
@@ -59,8 +58,7 @@ public class XmppConnectionFactoryProperties {
 	private String host;
 
 	/**
-	 * Port for connecting to the host.
-	 *   - Default Client Port: 5222
+	 * Port for connecting to the host. - Default Client Port: 5222
 	 */
 	private int port = 5222;
 

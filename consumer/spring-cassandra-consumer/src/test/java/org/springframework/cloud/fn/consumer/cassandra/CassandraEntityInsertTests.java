@@ -32,31 +32,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Artem Bilan
  */
-@TestPropertySource(properties = {
-		"spring.cassandra.schema-action=RECREATE",
+@TestPropertySource(properties = { "spring.cassandra.schema-action=RECREATE",
 		"cassandra.cluster.entity-base-packages=org.springframework.cloud.fn.consumer.cassandra.domain" })
 class CassandraEntityInsertTests extends CassandraConsumerApplicationTests {
 
 	@Test
 	void testInsert() {
-		Book book =
-				new Book(
-						UUID.randomUUID(),
-						"Spring Integration Cassandra",
-						"Cassandra Guru",
-						521,
-						LocalDate.now(),
-						true);
+		Book book = new Book(UUID.randomUUID(), "Spring Integration Cassandra", "Cassandra Guru", 521, LocalDate.now(),
+				true);
 
 		Mono<? extends WriteResult> result = this.cassandraConsumer.apply(book);
 
 		StepVerifier.create(result)
-				.expectNextCount(1)
-				.then(() ->
-						assertThat(this.cassandraTemplate.query(Book.class)
-								.count())
-								.isEqualTo(1))
-				.verifyComplete();
+			.expectNextCount(1)
+			.then(() -> assertThat(this.cassandraTemplate.query(Book.class).count()).isEqualTo(1))
+			.verifyComplete();
 	}
 
 }

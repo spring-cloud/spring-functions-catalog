@@ -33,7 +33,7 @@ import org.springframework.integration.aws.support.S3SessionFactory;
  * @author Artem Bilan
  */
 @AutoConfiguration
-@AutoConfigureAfter({S3AutoConfiguration.class, S3CrtAsyncClientAutoConfiguration.class})
+@AutoConfigureAfter({ S3AutoConfiguration.class, S3CrtAsyncClientAutoConfiguration.class })
 public class AmazonS3Configuration {
 
 	@Bean

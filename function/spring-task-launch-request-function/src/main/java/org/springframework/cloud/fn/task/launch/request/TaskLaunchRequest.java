@@ -25,6 +25,7 @@ import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class TaskLaunchRequest {
+
 	@JsonProperty("args")
 	private List<String> commandlineArguments = new ArrayList<>();
 
@@ -62,4 +63,5 @@ public class TaskLaunchRequest {
 		this.commandlineArguments.addAll(args);
 		return this;
 	}
+
 }

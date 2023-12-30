@@ -33,13 +33,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DirtiesContext
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = {
-				"ftp.consumer.remoteDir = ftpTarget",
-				"ftp.factory.username = foo",
-				"ftp.factory.password = foo",
-				"ftp.consumer.mode = FAIL",
-				"ftp.consumer.filenameExpression = payload.name.toUpperCase()"
-		})
+		properties = { "ftp.consumer.remoteDir = ftpTarget", "ftp.factory.username = foo", "ftp.factory.password = foo",
+				"ftp.consumer.mode = FAIL", "ftp.consumer.filenameExpression = payload.name.toUpperCase()" })
 public class FtpConsumerTests extends FtpTestSupport {
 
 	@Autowired
@@ -72,5 +67,7 @@ public class FtpConsumerTests extends FtpTestSupport {
 
 	@SpringBootApplication
 	static class FtpConsumerTestApplication {
+
 	}
+
 }

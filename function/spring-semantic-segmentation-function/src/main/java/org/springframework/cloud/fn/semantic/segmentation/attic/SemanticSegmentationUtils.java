@@ -44,8 +44,8 @@ import static java.awt.image.BufferedImage.TYPE_3BYTE_BGR;
 
 /**
  *
- * Semantic image segmentation - the task of assigning a semantic label, such as "road", "sky", "person", "dog", to
- * every pixel in an image.
+ * Semantic image segmentation - the task of assigning a semantic label, such as "road",
+ * "sky", "person", "dog", to every pixel in an image.
  *
  * https://ai.googleblog.com/2018/03/semantic-image-segmentation-with.html
  * https://github.com/tensorflow/models/blob/master/research/deeplab/g3doc/model_zoo.md
@@ -65,11 +65,14 @@ public class SemanticSegmentationUtils {
 
 	/** INPUT_TENSOR_NAME . */
 	public static final String INPUT_TENSOR_NAME = "ImageTensor:0";
+
 	/** OUTPUT_TENSOR_NAME . */
 	public static final String OUTPUT_TENSOR_NAME = "SemanticPredictions:0";
 
 	private static final int BATCH_SIZE = 1;
+
 	private static final long CHANNELS = 3;
+
 	private static final int REQUIRED_INPUT_IMAGE_SIZE = 513;
 
 	public static BufferedImage scaledImage(String imagePath) {
@@ -100,9 +103,11 @@ public class SemanticSegmentationUtils {
 		int newHeight = (int) (originalImage.getHeight() * scale);
 
 		Image tmpImage = originalImage.getScaledInstance(newWidth, newHeight, Image.SCALE_DEFAULT);
-		//BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, TYPE_INT_BGR);
+		// BufferedImage resizedImage = new BufferedImage(newWidth, newHeight,
+		// TYPE_INT_BGR);
 		BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, TYPE_3BYTE_BGR);
-		//BufferedImage resizedImage = new BufferedImage(newWidth, newHeight, originalImage.getType());
+		// BufferedImage resizedImage = new BufferedImage(newWidth, newHeight,
+		// originalImage.getType());
 
 		Graphics2D g2d = resizedImage.createGraphics();
 		g2d.drawImage(tmpImage, 0, 0, null);
@@ -125,7 +130,8 @@ public class SemanticSegmentationUtils {
 		// ImageIO.read produces BGR-encoded images, while the model expects RGB.
 		byte[] data = bgrToRgb(toBytes(scaledImage));
 
-		// Expand dimensions since the model expects images to have shape: [1, None, None, 3]
+		// Expand dimensions since the model expects images to have shape: [1, None, None,
+		// 3]
 		long[] shape = new long[] { BATCH_SIZE, scaledImage.getHeight(), scaledImage.getWidth(), CHANNELS };
 
 		return Tensor.create(UInt8.class, shape, ByteBuffer.wrap(data));
@@ -201,7 +207,8 @@ public class SemanticSegmentationUtils {
 
 	public String serializeToJson(int[][] pixels) {
 		String masksBase64 = Base64.getEncoder().encodeToString(toBytes(pixels));
-		return String.format("{ \"columns\":%d, \"rows\":%d, \"masks\":\"%s\"}", pixels.length, pixels[0].length, masksBase64);
+		return String.format("{ \"columns\":%d, \"rows\":%d, \"masks\":\"%s\"}", pixels.length, pixels[0].length,
+				masksBase64);
 	}
 
 	public int[][] deserializeToMasks(String json) throws IOException {
@@ -221,7 +228,7 @@ public class SemanticSegmentationUtils {
 				b[bi + 0] = (byte) (i >> 24);
 				b[bi + 1] = (byte) (i >> 16);
 				b[bi + 2] = (byte) (i >> 8);
-				b[bi + 3] = (byte) (i /*>> 0*/);
+				b[bi + 3] = (byte) (i /* >> 0 */);
 				bi = bi + 4;
 			}
 		}
@@ -233,10 +240,7 @@ public class SemanticSegmentationUtils {
 		int bi = 0;
 		for (int i = 0; i < ic; i++) {
 			for (int j = 0; j < jc; j++) {
-				intResult[i][j] = (b[bi] << 24) +
-						(b[bi + 1] << 16) +
-						(b[bi + 2] << 8) +
-						b[bi + 3];
+				intResult[i][j] = (b[bi] << 24) + (b[bi + 1] << 16) + (b[bi + 2] << 8) + b[bi + 3];
 				bi = bi + 4;
 			}
 		}
@@ -246,14 +250,16 @@ public class SemanticSegmentationUtils {
 	public static void main(String[] args) throws IOException {
 
 		// PASCAL VOC 2012
-		//String tensorflowModelLocation = "file:/Users/ctzolov/Downloads/deeplabv3_mnv2_pascal_train_aug/frozen_inference_graph.pb";
-		//String imagePath = "classpath:/images/VikiMaxiAdi.jpg";
+		// String tensorflowModelLocation =
+		// "file:/Users/ctzolov/Downloads/deeplabv3_mnv2_pascal_train_aug/frozen_inference_graph.pb";
+		// String imagePath = "classpath:/images/VikiMaxiAdi.jpg";
 
 		// CITYSCAPE
-		//String tensorflowModelLocation = "file:/Users/ctzolov/Downloads/deeplabv3_mnv2_cityscapes_train/frozen_inference_graph.pb";
-		//String imagePath = "classpath:/images/amsterdam-cityscape1.jpg";
-		//String imagePath = "classpath:/images/amsterdam-channel.jpg";
-		//String imagePath = "classpath:/images/landsmeer.png";
+		// String tensorflowModelLocation =
+		// "file:/Users/ctzolov/Downloads/deeplabv3_mnv2_cityscapes_train/frozen_inference_graph.pb";
+		// String imagePath = "classpath:/images/amsterdam-cityscape1.jpg";
+		// String imagePath = "classpath:/images/amsterdam-channel.jpg";
+		// String imagePath = "classpath:/images/landsmeer.png";
 
 		// ADE20K
 		String tensorflowModelLocation = "file:/Users/ctzolov/Downloads/deeplabv3_xception_ade20k_train/frozen_inference_graph.pb";
@@ -261,7 +267,8 @@ public class SemanticSegmentationUtils {
 
 		BufferedImage inputImage = ImageIO.read(new DefaultResourceLoader().getResource(imagePath).getInputStream());
 
-		TensorFlowService tf = new TensorFlowService(new DefaultResourceLoader().getResource(tensorflowModelLocation), Arrays.asList(OUTPUT_TENSOR_NAME));
+		TensorFlowService tf = new TensorFlowService(new DefaultResourceLoader().getResource(tensorflowModelLocation),
+				Arrays.asList(OUTPUT_TENSOR_NAME));
 
 		SemanticSegmentationUtils segmentationService = new SemanticSegmentationUtils();
 
@@ -275,15 +282,24 @@ public class SemanticSegmentationUtils {
 
 		int height = (int) maskPixelsTensor.shape()[1];
 		int width = (int) maskPixelsTensor.shape()[2];
-		long[][] maskPixels = maskPixelsTensor.copyTo(new long[BATCH_SIZE][height][width])[0]; // take 0 because the batch size is 1.
+		long[][] maskPixels = maskPixelsTensor.copyTo(new long[BATCH_SIZE][height][width])[0]; // take
+																								// 0
+																								// because
+																								// the
+																								// batch
+																								// size
+																								// is
+																								// 1.
 
 		int[][] maskPixelsInt = segmentationService.toIntArray(maskPixels);
 
-		BufferedImage maskImage = segmentationService.createMaskImage(maskPixelsInt, scaledImage.getWidth(), scaledImage.getHeight(), 0.35);
+		BufferedImage maskImage = segmentationService.createMaskImage(maskPixelsInt, scaledImage.getWidth(),
+				scaledImage.getHeight(), 0.35);
 
 		BufferedImage blended = segmentationService.blendMask(maskImage, scaledImage);
 
 		ImageIO.write(maskImage, "png", new File("./semantic-segmentation/target/java2Dmask.jpg"));
 		ImageIO.write(blended, "png", new File("./semantic-segmentation/target/java2Dblended.jpg"));
 	}
+
 }

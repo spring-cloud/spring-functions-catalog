@@ -24,11 +24,12 @@ import org.springframework.test.context.TestPropertySource;
 /**
  * @author Gary Russell
  */
-@TestPropertySource(properties = {"tcp.consumer.encoder = RAW", "tcp.consumer.close = true"})
+@TestPropertySource(properties = { "tcp.consumer.encoder = RAW", "tcp.consumer.close = true" })
 public class RAWTests extends AbstractTcpConsumerTests {
 
 	@Test
 	public void test() throws Exception {
 		doTest(new ByteArrayRawSerializer());
 	}
+
 }

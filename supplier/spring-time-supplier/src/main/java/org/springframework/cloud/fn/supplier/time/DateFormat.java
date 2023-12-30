@@ -34,11 +34,11 @@ import jakarta.validation.Payload;
  * @author Eric Bottard
  * @author Soby Chacko
  */
-@Target({ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR,
-		ElementType.PARAMETER})
+@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.ANNOTATION_TYPE, ElementType.CONSTRUCTOR,
+		ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Constraint(validatedBy = {DateFormat.DateFormatValidator.class})
+@Constraint(validatedBy = { DateFormat.DateFormatValidator.class })
 public @interface DateFormat {
 
 	/**

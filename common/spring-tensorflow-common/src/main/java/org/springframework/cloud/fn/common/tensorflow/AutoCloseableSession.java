@@ -60,4 +60,5 @@ class AutoCloseableSession implements AutoCloseable {
 
 	protected void doClose() {
 	}
+
 }

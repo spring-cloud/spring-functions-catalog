@@ -123,4 +123,5 @@ public class JmsSupplierProperties {
 	public void setSessionTransacted(boolean sessionTransacted) {
 		this.sessionTransacted = sessionTransacted;
 	}
+
 }

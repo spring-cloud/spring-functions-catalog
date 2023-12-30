@@ -31,8 +31,8 @@ public class KeyValueListParserTests {
 
 	@Test
 	public void testParseSimpleDeploymentProperty() {
-		Map<String, String> deploymentProperties = KeyValueListParser.parseCommaDelimitedKeyValuePairs(
-				"app.sftp.param=value");
+		Map<String, String> deploymentProperties = KeyValueListParser
+			.parseCommaDelimitedKeyValuePairs("app.sftp.param=value");
 		assertTrue("Invalid number of deployment properties: " + deploymentProperties.size(),
 				deploymentProperties.size() == 1);
 		assertTrue("Expected deployment key not found", deploymentProperties.containsKey("app.sftp.param"));
@@ -41,8 +41,8 @@ public class KeyValueListParserTests {
 
 	@Test
 	public void testParseSimpleDeploymentPropertyMultipleValues() {
-		Map<String, String> deploymentProperties = KeyValueListParser.parseCommaDelimitedKeyValuePairs(
-				"app.sftp.param=value1,value2,value3");
+		Map<String, String> deploymentProperties = KeyValueListParser
+			.parseCommaDelimitedKeyValuePairs("app.sftp.param=value1,value2,value3");
 
 		assertTrue("Invalid number of deployment properties: " + deploymentProperties.size(),
 				deploymentProperties.size() == 1);
@@ -55,8 +55,7 @@ public class KeyValueListParserTests {
 		Map<String, String> argExpressions = KeyValueListParser.parseCommaDelimitedKeyValuePairs(
 				"arg1=payload.substr(0,2),arg2=headers['foo'],arg3=headers['bar']==false");
 
-		assertTrue("Invalid number of deployment properties: " + argExpressions.size(),
-				argExpressions.size() == 3);
+		assertTrue("Invalid number of deployment properties: " + argExpressions.size(), argExpressions.size() == 3);
 		assertTrue("Expected deployment key not found", argExpressions.containsKey("arg1"));
 		assertEquals("Invalid deployment value", "payload.substr(0,2)", argExpressions.get("arg1"));
 
@@ -69,8 +68,8 @@ public class KeyValueListParserTests {
 
 	@Test
 	public void testParseMultipleDeploymentPropertiesSingleValue() {
-		Map<String, String> deploymentProperties = KeyValueListParser.parseCommaDelimitedKeyValuePairs(
-				"app.sftp.param=value1,app.sftp.other.param=value2");
+		Map<String, String> deploymentProperties = KeyValueListParser
+			.parseCommaDelimitedKeyValuePairs("app.sftp.param=value1,app.sftp.other.param=value2");
 
 		assertTrue("Invalid number of deployment properties: " + deploymentProperties.size(),
 				deploymentProperties.size() == 2);
@@ -84,8 +83,8 @@ public class KeyValueListParserTests {
 	public void testParseMultipleDeploymentPropertiesMultipleValues() {
 		TaskLaunchRequestFunctionProperties taskLaunchRequestProperties = new TaskLaunchRequestFunctionProperties();
 
-		Map<String, String> deploymentProperties = KeyValueListParser.parseCommaDelimitedKeyValuePairs(
-				"app.sftp.param=value1,value2,app.sftp.other.param=other1,other2");
+		Map<String, String> deploymentProperties = KeyValueListParser
+			.parseCommaDelimitedKeyValuePairs("app.sftp.param=value1,value2,app.sftp.other.param=other1,other2");
 
 		assertTrue("Invalid number of deployment properties: " + deploymentProperties.size(),
 				deploymentProperties.size() == 2);
@@ -94,4 +93,5 @@ public class KeyValueListParserTests {
 		assertTrue("Expected deployment key not found", deploymentProperties.containsKey("app.sftp.other.param"));
 		assertEquals("Invalid deployment value", "other1,other2", deploymentProperties.get("app.sftp.other.param"));
 	}
+
 }

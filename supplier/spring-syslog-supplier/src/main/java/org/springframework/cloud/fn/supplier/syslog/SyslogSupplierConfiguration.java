@@ -60,19 +60,19 @@ public class SyslogSupplierConfiguration {
 	}
 
 	@Bean
-	public Supplier<Flux<Message<?>>> syslogSupplier(ObjectProvider<UdpSyslogReceivingChannelAdapter> udpAdapterProvider,
-												ObjectProvider<TcpSyslogReceivingChannelAdapter> tcpAdapterProvider) {
-		return () -> Flux.from(syslogInputChannel())
-				.doOnSubscribe(subscription -> {
-					final UdpSyslogReceivingChannelAdapter udpAdapter = udpAdapterProvider.getIfAvailable();
-					final TcpSyslogReceivingChannelAdapter tcpAdapter = tcpAdapterProvider.getIfAvailable();
-					if (udpAdapter != null) {
-						udpAdapter.start();
-					}
-					if (tcpAdapter != null) {
-						tcpAdapter.start();
-					}
-				});
+	public Supplier<Flux<Message<?>>> syslogSupplier(
+			ObjectProvider<UdpSyslogReceivingChannelAdapter> udpAdapterProvider,
+			ObjectProvider<TcpSyslogReceivingChannelAdapter> tcpAdapterProvider) {
+		return () -> Flux.from(syslogInputChannel()).doOnSubscribe(subscription -> {
+			final UdpSyslogReceivingChannelAdapter udpAdapter = udpAdapterProvider.getIfAvailable();
+			final TcpSyslogReceivingChannelAdapter tcpAdapter = tcpAdapterProvider.getIfAvailable();
+			if (udpAdapter != null) {
+				udpAdapter.start();
+			}
+			if (tcpAdapter != null) {
+				tcpAdapter.start();
+			}
+		});
 	}
 
 	@Bean
@@ -131,7 +131,6 @@ public class SyslogSupplierConfiguration {
 		adapter.setAutoStartup(false);
 	}
 
-
 	@Configuration
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "tcp", matchIfMissing = true)
 	protected static class TcpBits {
@@ -166,6 +165,7 @@ public class SyslogSupplierConfiguration {
 				return decoder;
 			}
 		}
+
 	}
 
 	@Configuration

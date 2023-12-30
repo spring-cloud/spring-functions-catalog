@@ -99,12 +99,13 @@ public class AwsS3ConsumerProperties {
 
 	@AssertTrue(message = "Exactly one of 'bucket' or 'bucketExpression' must be set")
 	public boolean isMutuallyExclusiveBucketAndBucketExpression() {
-		return (this.bucket != null && this.bucketExpression == null) ||
-				(this.bucket == null && this.bucketExpression != null);
+		return (this.bucket != null && this.bucketExpression == null)
+				|| (this.bucket == null && this.bucketExpression != null);
 	}
 
 	@AssertTrue(message = "Only one of 'acl' or 'aclExpression' must be set")
 	public boolean isMutuallyExclusiveAclAndAclExpression() {
 		return this.acl == null || this.aclExpression == null;
 	}
+
 }

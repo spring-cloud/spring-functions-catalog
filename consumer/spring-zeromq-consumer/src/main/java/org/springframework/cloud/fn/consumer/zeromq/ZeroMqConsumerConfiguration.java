@@ -33,7 +33,6 @@ import org.springframework.integration.zeromq.outbound.ZeroMqMessageHandler;
 import org.springframework.messaging.Message;
 
 /**
- *
  * @author Daniel Frey
  * @since 3.1.0
  */
@@ -70,8 +69,7 @@ public class ZeroMqConsumerConfiguration {
 
 	@Bean
 	public Function<Flux<Message<?>>, Mono<Void>> zeromqConsumer(ZeroMqMessageHandler zeromqMessageHandler) {
-		return input -> input.flatMap(zeromqMessageHandler::handleMessage)
-				.ignoreElements();
+		return input -> input.flatMap(zeromqMessageHandler::handleMessage).ignoreElements();
 	}
 
 }

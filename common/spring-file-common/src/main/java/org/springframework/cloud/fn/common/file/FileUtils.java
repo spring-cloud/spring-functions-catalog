@@ -39,35 +39,35 @@ public final class FileUtils {
 	/**
 	 * Enhance an {@link IntegrationFlowBuilder} to add flow snippets, depending on
 	 * {@link FileConsumerProperties}.
-	 *
-	 * @param flowBuilder            the flow builder.
+	 * @param flowBuilder the flow builder.
 	 * @param fileConsumerProperties the properties.
 	 * @return the updated flow builder.
 	 */
 	public static IntegrationFlowBuilder enhanceFlowForReadingMode(IntegrationFlowBuilder flowBuilder,
-																FileConsumerProperties fileConsumerProperties) {
+			FileConsumerProperties fileConsumerProperties) {
 		switch (fileConsumerProperties.getMode()) {
 			case contents:
 				flowBuilder.enrichHeaders(Collections.<String, Object>singletonMap(MessageHeaders.CONTENT_TYPE,
 						MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE))
-						.transform(new FileToByteArrayTransformer());
+					.transform(new FileToByteArrayTransformer());
 				break;
 			case lines:
 				Boolean withMarkers = fileConsumerProperties.getWithMarkers();
 				if (withMarkers == null) {
 					withMarkers = false;
 				}
-				flowBuilder.enrichHeaders(Collections.<String, Object>singletonMap(MessageHeaders.CONTENT_TYPE,
-						MimeTypeUtils.TEXT_PLAIN_VALUE))
-						.split(new FileSplitter(true, withMarkers, fileConsumerProperties.getMarkersJson()));
+				flowBuilder
+					.enrichHeaders(Collections.<String, Object>singletonMap(MessageHeaders.CONTENT_TYPE,
+							MimeTypeUtils.TEXT_PLAIN_VALUE))
+					.split(new FileSplitter(true, withMarkers, fileConsumerProperties.getMarkersJson()));
 				break;
 			case ref:
 				flowBuilder.enrichHeaders(Collections.<String, Object>singletonMap(MessageHeaders.CONTENT_TYPE,
 						MimeTypeUtils.APPLICATION_JSON_VALUE));
 				break;
 			default:
-				throw new IllegalArgumentException(fileConsumerProperties.getMode().name() +
-						" is not a supported file reading mode.");
+				throw new IllegalArgumentException(
+						fileConsumerProperties.getMode().name() + " is not a supported file reading mode.");
 		}
 		return flowBuilder;
 	}
@@ -75,32 +75,32 @@ public final class FileUtils {
 	/**
 	 * Enhance an {@link IntegrationFlowBuilder} to add flow snippets, depending on
 	 * {@link FileConsumerProperties}; used for streaming sources.
-	 *
-	 * @param flowBuilder            the flow builder.
+	 * @param flowBuilder the flow builder.
 	 * @param fileConsumerProperties the properties.
 	 * @return the updated flow builder.
 	 */
 	public static IntegrationFlowBuilder enhanceStreamFlowForReadingMode(IntegrationFlowBuilder flowBuilder,
-																		FileConsumerProperties fileConsumerProperties) {
+			FileConsumerProperties fileConsumerProperties) {
 		switch (fileConsumerProperties.getMode()) {
 			case contents:
 				flowBuilder.enrichHeaders(Collections.<String, Object>singletonMap(MessageHeaders.CONTENT_TYPE,
 						MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE))
-						.transform(new StreamTransformer());
+					.transform(new StreamTransformer());
 				break;
 			case lines:
 				Boolean withMarkers = fileConsumerProperties.getWithMarkers();
 				if (withMarkers == null) {
 					withMarkers = false;
 				}
-				flowBuilder.enrichHeaders(Collections.<String, Object>singletonMap(MessageHeaders.CONTENT_TYPE,
-						MimeTypeUtils.TEXT_PLAIN_VALUE))
-						.split(new FileSplitter(true, withMarkers, fileConsumerProperties.getMarkersJson()));
+				flowBuilder
+					.enrichHeaders(Collections.<String, Object>singletonMap(MessageHeaders.CONTENT_TYPE,
+							MimeTypeUtils.TEXT_PLAIN_VALUE))
+					.split(new FileSplitter(true, withMarkers, fileConsumerProperties.getMarkersJson()));
 				break;
 			case ref:
 			default:
-				throw new IllegalArgumentException(fileConsumerProperties.getMode().name() +
-						" is not a supported file reading mode when streaming.");
+				throw new IllegalArgumentException(fileConsumerProperties.getMode().name()
+						+ " is not a supported file reading mode when streaming.");
 		}
 		return flowBuilder;
 	}

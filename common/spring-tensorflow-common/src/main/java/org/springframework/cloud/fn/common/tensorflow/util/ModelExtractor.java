@@ -43,15 +43,16 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 
-
 /**
- * Extracts a pre-trained (frozen) Tensorflow model URI into byte array. The 'http://', 'file://' and 'classpath://'
- * URI schemas are supported.
+ * Extracts a pre-trained (frozen) Tensorflow model URI into byte array. The 'http://',
+ * 'file://' and 'classpath://' URI schemas are supported.
  *
- * Models can be extract either from raw files or form compressed archives. When  extracted from an archive the model
- * file name can optionally be provided as an URI fragment. For example for resource: http://myarchive.tar.gz#model.pb
- * the myarchive.tar.gz is traversed to uncompress and extract the model.pb file as byte array.
- * If the file name is not provided as URI fragment then the first file in the archive with extension .pb is extracted.
+ * Models can be extract either from raw files or form compressed archives. When extracted
+ * from an archive the model file name can optionally be provided as an URI fragment. For
+ * example for resource: http://myarchive.tar.gz#model.pb the myarchive.tar.gz is
+ * traversed to uncompress and extract the model.pb file as byte array. If the file name
+ * is not provided as URI fragment then the first file in the archive with extension .pb
+ * is extracted.
  *
  * @author Christian Tzolov
  */
@@ -60,9 +61,10 @@ public class ModelExtractor {
 	private static final String DEFAULT_FROZEN_GRAPH_FILE_EXTENSION = ".pb";
 
 	/**
-	 * When an archive resource if referred, but no fragment URI is provided (to specify the target file name in
-	 * the archive) then the extractor selects the first file in the archive with the extension that match
-	 * the frozenGraphFileExtension (defaults to .pb).
+	 * When an archive resource if referred, but no fragment URI is provided (to specify
+	 * the target file name in the archive) then the extractor selects the first file in
+	 * the archive with the extension that match the frozenGraphFileExtension (defaults to
+	 * .pb).
 	 */
 	public final String frozenGraphFileExtension;
 
@@ -89,11 +91,12 @@ public class ModelExtractor {
 			String compressor = archiveCompressor[1];
 			String fragment = modelResource.getURI().getFragment();
 
-
 			if (StringUtils.isNotBlank(compressor)) {
-				try (CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(compressor, bi)) {
+				try (CompressorInputStream cis = new CompressorStreamFactory().createCompressorInputStream(compressor,
+						bi)) {
 					if (StringUtils.isNotBlank(archive)) {
-						try (ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(archive, cis)) {
+						try (ArchiveInputStream ais = new ArchiveStreamFactory().createArchiveInputStream(archive,
+								cis)) {
 							// Compressor fromMemory Archive
 							return findInArchiveStream(fragment, ais);
 						}
@@ -119,22 +122,24 @@ public class ModelExtractor {
 	}
 
 	/**
-	 * Traverses the Archive to find either an entry that matches the modelFileNameInArchive name (if not empty) or
-	 * and entry that ends in .pb if the modelFileNameInArchive is empty.
-	 *
-	 * @param modelFileNameInArchive Optional name of the archive entry that represents the frozen model file. If empty
-	 *                               the archive will be searched for the first entry that ends in .pb
+	 * Traverses the Archive to find either an entry that matches the
+	 * modelFileNameInArchive name (if not empty) or and entry that ends in .pb if the
+	 * modelFileNameInArchive is empty.
+	 * @param modelFileNameInArchive Optional name of the archive entry that represents
+	 * the frozen model file. If empty the archive will be searched for the first entry
+	 * that ends in .pb
 	 * @param archive Archive stream to be traversed
 	 *
 	 */
 	private byte[] findInArchiveStream(String modelFileNameInArchive, ArchiveInputStream archive) throws IOException {
 		ArchiveEntry entry;
 		while ((entry = archive.getNextEntry()) != null) {
-			//System.out.println(entry.getName() + " : " + entry.isDirectory());
+			// System.out.println(entry.getName() + " : " + entry.isDirectory());
 
 			if (archive.canReadEntryData(entry) && !entry.isDirectory()) {
-				if ((StringUtils.isNotBlank(modelFileNameInArchive) && entry.getName().endsWith(modelFileNameInArchive)) ||
-						(!StringUtils.isNotBlank(modelFileNameInArchive) && entry.getName().endsWith(this.frozenGraphFileExtension))) {
+				if ((StringUtils.isNotBlank(modelFileNameInArchive) && entry.getName().endsWith(modelFileNameInArchive))
+						|| (!StringUtils.isNotBlank(modelFileNameInArchive)
+								&& entry.getName().endsWith(this.frozenGraphFileExtension))) {
 					return IOUtils.toByteArray(archive);
 				}
 			}
@@ -144,22 +149,20 @@ public class ModelExtractor {
 
 	/**
 	 * Detect the Archive and the Compressor from the file extension.
-	 *
 	 * @param fileName File name with extension.
-	 * @return Returns a tuple of the detected (Archive, Compressor). Null stands for not available
-	 * archive or detector. The (null, null) response stands for no Archive or Compressor discovered.
+	 * @return Returns a tuple of the detected (Archive, Compressor). Null stands for not
+	 * available archive or detector. The (null, null) response stands for no Archive or
+	 * Compressor discovered.
 	 */
 	private String[] detectArchiveAndCompressor(String fileName) {
 
 		String normalizedFileName = fileName.trim().toLowerCase();
 
-		if (normalizedFileName.endsWith(".tar.gz")
-				|| normalizedFileName.endsWith(".tgz")
+		if (normalizedFileName.endsWith(".tar.gz") || normalizedFileName.endsWith(".tgz")
 				|| normalizedFileName.endsWith(".taz")) {
 			return new String[] { ArchiveStreamFactory.TAR, CompressorStreamFactory.GZIP };
 		}
-		else if (normalizedFileName.endsWith(".tar.bz2")
-				|| normalizedFileName.endsWith(".tbz2")
+		else if (normalizedFileName.endsWith(".tar.bz2") || normalizedFileName.endsWith(".tbz2")
 				|| normalizedFileName.endsWith(".tbz")) {
 			return new String[] { ArchiveStreamFactory.TAR, CompressorStreamFactory.BZIP2 };
 		}
@@ -175,8 +178,7 @@ public class ModelExtractor {
 		else if (normalizedFileName.endsWith(".gzip")) {
 			return new String[] { null, CompressorStreamFactory.GZIP };
 		}
-		else if (normalizedFileName.endsWith(".bz2")
-				|| normalizedFileName.endsWith(".bz")) {
+		else if (normalizedFileName.endsWith(".bz2") || normalizedFileName.endsWith(".bz")) {
 			return new String[] { null, CompressorStreamFactory.BZIP2 };
 		}
 
@@ -190,7 +192,9 @@ public class ModelExtractor {
 
 	private Optional<String> findArchive(String normalizedFileName) {
 		return new ArchiveStreamFactory().getInputStreamArchiveNames()
-				.stream().filter(arch -> normalizedFileName.endsWith("." + arch)).findFirst();
+			.stream()
+			.filter(arch -> normalizedFileName.endsWith("." + arch))
+			.findFirst();
 	}
 
 	private boolean hasCompressor(String normalizedFileName) {
@@ -199,7 +203,9 @@ public class ModelExtractor {
 
 	private Optional<String> findCompressor(String normalizedFileName) {
 		return new CompressorStreamFactory().getInputStreamCompressorNames()
-				.stream().filter(compressor -> normalizedFileName.endsWith("." + compressor)).findFirst();
+			.stream()
+			.filter(compressor -> normalizedFileName.endsWith("." + compressor))
+			.findFirst();
 	}
 
 	static {
@@ -219,8 +225,7 @@ public class ModelExtractor {
 
 				public void checkServerTrusted(X509Certificate[] certs, String authType) {
 				}
-			}
-			};
+			} };
 
 			// Install the all-trusting trust manager
 			SSLContext sc = SSLContext.getInstance("SSL");

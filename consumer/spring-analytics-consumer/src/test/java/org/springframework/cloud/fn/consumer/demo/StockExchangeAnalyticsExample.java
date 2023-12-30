@@ -35,19 +35,17 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
 /**
- * Sample Spring Boot Application that uses the analyticsConsumer to compute running stats from
- * stock exchange messages.
+ * Sample Spring Boot Application that uses the analyticsConsumer to compute running stats
+ * from stock exchange messages.
  *
- * Counter configuration:
- * <code>
+ * Counter configuration: <code>
  *    --analytics.meter-type=counter
  *    --analytics.name=stocks
  *    --analytics.tag.expression.symbol=#jsonPath(payload,'$.data.symbol')
  *    --analytics.tag.expression.exchange=#jsonPath(payload,'$.data.exchange')
  * </code>
  *
- * Gauge configuration:
- * <code>
+ * Gauge configuration: <code>
  *    --analytics.meter-type=gauge
  *    --analytics.name=stocks
  *    --analytics.tag.expression.symbol=#jsonPath(payload,'$.data.symbol')
@@ -55,8 +53,7 @@ import org.springframework.messaging.support.MessageBuilder;
  *    --analytics.amount-expression=#jsonPath(payload,'$.data.volume')
  * </code>
  *
- * Sample Wavefront configuration:
- * <code>
+ * Sample Wavefront configuration: <code>
  *    --management.metrics.export.wavefront.enabled=true
  *    --management.metrics.export.wavefront.uri=YOUR_WAVEFRONT_SERVER_URI
  *    --management.metrics.export.wavefront.api-token=YOUR_API_TOKEN
@@ -74,23 +71,25 @@ public class StockExchangeAnalyticsExample {
 	}
 
 	@Bean
-	public CommandLineRunner commandLineRunner(Consumer<Message<?>> analyticsConsumer,
-			MeterRegistry meterRegistry, Supplier<String> stockMessageGenerator) {
+	public CommandLineRunner commandLineRunner(Consumer<Message<?>> analyticsConsumer, MeterRegistry meterRegistry,
+			Supplier<String> stockMessageGenerator) {
 
 		// Run every second.
 		return args -> Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
 
 			String message = stockMessageGenerator.get();
 
-			// Submit new message using the stockMessageGenerator to generate random stock messages.
+			// Submit new message using the stockMessageGenerator to generate random stock
+			// messages.
 			analyticsConsumer.accept(MessageBuilder.withPayload(message).build());
 
 			// Print current stock meters
-			System.out.println(meterRegistry.getMeters().stream()
-					.filter(meter -> meter.getId().getName().contains("stocks"))
-					.map(meter -> meter.getId().getType() + " | " + meter.getId() + " | " + meter.measure())
-					.collect(Collectors.joining("\n")) +
-					"\n=========================================================================");
+			System.out.println(meterRegistry.getMeters()
+				.stream()
+				.filter(meter -> meter.getId().getName().contains("stocks"))
+				.map(meter -> meter.getId().getType() + " | " + meter.getId() + " | " + meter.measure())
+				.collect(Collectors.joining("\n"))
+					+ "\n=========================================================================");
 
 		}, 0, 1000, TimeUnit.MILLISECONDS);
 	}
@@ -103,16 +102,11 @@ public class StockExchangeAnalyticsExample {
 
 		return () -> {
 			int stockIndex = random.nextInt(STOCKS.length);
-			return "{\n" +
-					"  \"data\": {\n" +
-					"      \"symbol\": \"" + STOCKS[stockIndex][1] + "\",\n" +
-					"      \"exchange\": \"" + STOCKS[stockIndex][0] + "\",\n" +
-					"      \"open\": " + (1 + 10 * random.nextDouble()) + ",\n" +
-					"      \"close\": " + (1 + 10 * random.nextDouble()) + ",\n" +
-					"      \"volume\": " + (1000 + 100000 * random.nextDouble()) + "\n" +
-					"  }\n" +
-					"}";
+			return "{\n" + "  \"data\": {\n" + "      \"symbol\": \"" + STOCKS[stockIndex][1] + "\",\n"
+					+ "      \"exchange\": \"" + STOCKS[stockIndex][0] + "\",\n" + "      \"open\": "
+					+ (1 + 10 * random.nextDouble()) + ",\n" + "      \"close\": " + (1 + 10 * random.nextDouble())
+					+ ",\n" + "      \"volume\": " + (1000 + 100000 * random.nextDouble()) + "\n" + "  }\n" + "}";
 		};
 	}
-}
 
+}

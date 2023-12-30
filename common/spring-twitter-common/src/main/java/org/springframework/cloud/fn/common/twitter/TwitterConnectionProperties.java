@@ -21,7 +21,6 @@ import jakarta.validation.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
-
 /**
  * @author Christian Tzolov
  */
@@ -60,8 +59,8 @@ public class TwitterConnectionProperties {
 
 	/**
 	 * Enable caching the original (raw) JSON objects as returned by the Twitter APIs.
-	 * When set to False the result will use the Twitter4J's json representations.
-	 * When set to True the result will use the original Twitter APISs json representations.
+	 * When set to False the result will use the Twitter4J's json representations. When
+	 * set to True the result will use the original Twitter APISs json representations.
 	 */
 	private boolean rawJson = true;
 
@@ -112,4 +111,5 @@ public class TwitterConnectionProperties {
 	public void setRawJson(boolean rawJson) {
 		this.rawJson = rawJson;
 	}
+
 }

@@ -57,9 +57,9 @@ public class TaskLaunchRequestFunctionProperties {
 	 */
 	private String taskName;
 
-
 	/**
-	 * A SpEL expression to extract the task name from each Message, using the Message as the evaluation context.
+	 * A SpEL expression to extract the task name from each Message, using the Message as
+	 * the evaluation context.
 	 */
 	private String taskNameExpression;
 

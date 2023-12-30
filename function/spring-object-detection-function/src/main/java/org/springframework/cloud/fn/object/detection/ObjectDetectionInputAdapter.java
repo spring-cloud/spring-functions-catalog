@@ -41,8 +41,10 @@ public class ObjectDetectionInputAdapter implements Function<byte[], Map<String,
 
 	/** Make checkstyle happy. **/
 	public static final String RAW_IMAGE = "raw_image";
+
 	/** Make checkstyle happy. **/
 	public static final String NORMALIZED_IMAGE = "normalized_image";
+
 	/** Make checkstyle happy. **/
 	public static final long CHANNELS = 3;
 
@@ -50,14 +52,14 @@ public class ObjectDetectionInputAdapter implements Function<byte[], Map<String,
 
 	public ObjectDetectionInputAdapter() {
 
-		this.imageLoaderGraph = new GraphRunner(RAW_IMAGE, NORMALIZED_IMAGE)
-				.withGraphDefinition(tf -> {
-					Placeholder<String> rawImage = tf.withName(RAW_IMAGE).placeholder(String.class);
-					Operand<UInt8> decodedImage = tf.dtypes.cast(
-							tf.image.decodeJpeg(rawImage, DecodeJpeg.channels(CHANNELS)), UInt8.class);
-					// Expand dimensions since the model expects images to have shape: [1, H, W, 3]
-					tf.withName(NORMALIZED_IMAGE).expandDims(decodedImage, tf.constant(0));
-				});
+		this.imageLoaderGraph = new GraphRunner(RAW_IMAGE, NORMALIZED_IMAGE).withGraphDefinition(tf -> {
+			Placeholder<String> rawImage = tf.withName(RAW_IMAGE).placeholder(String.class);
+			Operand<UInt8> decodedImage = tf.dtypes.cast(tf.image.decodeJpeg(rawImage, DecodeJpeg.channels(CHANNELS)),
+					UInt8.class);
+			// Expand dimensions since the model expects images to have shape: [1, H, W,
+			// 3]
+			tf.withName(NORMALIZED_IMAGE).expandDims(decodedImage, tf.constant(0));
+		});
 	}
 
 	@Override
@@ -73,4 +75,5 @@ public class ObjectDetectionInputAdapter implements Function<byte[], Map<String,
 			this.imageLoaderGraph.close();
 		}
 	}
+
 }

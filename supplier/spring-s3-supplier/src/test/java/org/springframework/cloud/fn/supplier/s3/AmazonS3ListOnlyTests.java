@@ -31,9 +31,7 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TestPropertySource(properties = {
-		"s3.supplier.list-only=true"
-})
+@TestPropertySource(properties = { "s3.supplier.list-only=true" })
 public class AmazonS3ListOnlyTests extends AbstractAwsS3SupplierMockTests {
 
 	@Test
@@ -43,27 +41,22 @@ public class AmazonS3ListOnlyTests extends AbstractAwsS3SupplierMockTests {
 		keys.add("subdir/1.test");
 		keys.add("subdir/2.test");
 		keys.add("subdir/otherFile");
-		StepVerifier stepVerifier = StepVerifier.create(messageFlux)
-				.assertNext(message -> {
-					String s3Object = (String) message.getPayload();
-					String key = jsonPathKey(s3Object);
-					assertThat(keys).contains(key);
-					keys.remove(key);
-				})
-				.assertNext(message -> {
-					String s3Object = (String) message.getPayload();
-					String key = jsonPathKey(s3Object);
-					assertThat(keys).contains(key);
-					keys.remove(key);
-				})
-				.assertNext(message -> {
-					String s3Object = (String) message.getPayload();
-					String key = jsonPathKey(s3Object);
-					assertThat(keys).contains(key);
-					keys.remove(key);
-				})
-				.thenCancel()
-				.verifyLater();
+		StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext(message -> {
+			String s3Object = (String) message.getPayload();
+			String key = jsonPathKey(s3Object);
+			assertThat(keys).contains(key);
+			keys.remove(key);
+		}).assertNext(message -> {
+			String s3Object = (String) message.getPayload();
+			String key = jsonPathKey(s3Object);
+			assertThat(keys).contains(key);
+			keys.remove(key);
+		}).assertNext(message -> {
+			String s3Object = (String) message.getPayload();
+			String key = jsonPathKey(s3Object);
+			assertThat(keys).contains(key);
+			keys.remove(key);
+		}).thenCancel().verifyLater();
 		standardIntegrationFlow.start();
 		stepVerifier.verify(Duration.ofSeconds(10));
 	}

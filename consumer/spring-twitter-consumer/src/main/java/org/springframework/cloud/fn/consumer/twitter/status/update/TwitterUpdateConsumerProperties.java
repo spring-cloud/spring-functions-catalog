@@ -24,7 +24,6 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.validation.annotation.Validated;
 
-
 /**
  * @author Christian Tzolov
  */
@@ -35,17 +34,19 @@ public class TwitterUpdateConsumerProperties {
 	private static final Expression DEFAULT_EXPRESSION = new SpelExpressionParser().parseExpression("payload");
 
 	/**
-	 * (SpEL expression) The text of the text update. URL encode as necessary. t.co link wrapping will
-	 * affect character counts. Defaults to message's payload
+	 * (SpEL expression) The text of the text update. URL encode as necessary. t.co link
+	 * wrapping will affect character counts. Defaults to message's payload
 	 */
 	@NotNull
 	private Expression text = DEFAULT_EXPRESSION;
 
 	/**
-	 * (SpEL expression) In order for a URL to not be counted in the text body of an extended Tweet, provide a URL as a Tweet attachment.
-	 * This URL must be a Tweet permalink, or Direct Message deep link. Arbitrary, non-Twitter URLs must remain in
-	 * the text text. URLs passed to the attachment_url parameter not matching either a Tweet permalink or Direct
-	 * Message deep link will fail at Tweet creation and cause an exception.
+	 * (SpEL expression) In order for a URL to not be counted in the text body of an
+	 * extended Tweet, provide a URL as a Tweet attachment. This URL must be a Tweet
+	 * permalink, or Direct Message deep link. Arbitrary, non-Twitter URLs must remain in
+	 * the text text. URLs passed to the attachment_url parameter not matching either a
+	 * Tweet permalink or Direct Message deep link will fail at Tweet creation and cause
+	 * an exception.
 	 */
 	private Expression attachmentUrl;
 
@@ -55,31 +56,37 @@ public class TwitterUpdateConsumerProperties {
 	private Expression placeId;
 
 	/**
-	 * (SpEL expression) The ID of an existing text that the update is in reply to. Note: This parameter will be ignored unless the
-	 * author of the Tweet this parameter references is mentioned within the text text. Therefore, you must
-	 * include @username, where username is the author of the referenced Tweet, within the update.
+	 * (SpEL expression) The ID of an existing text that the update is in reply to. Note:
+	 * This parameter will be ignored unless the author of the Tweet this parameter
+	 * references is mentioned within the text text. Therefore, you must
+	 * include @username, where username is the author of the referenced Tweet, within the
+	 * update.
 	 *
-	 * When inReplyToStatusId is set the auto_populate_reply_metadata is automatically set as well. Later ensures
-	 * that leading @mentions will be looked up from the original Tweet, and added to the new Tweet from there.
-	 * This wil append @mentions into the metadata of an extended Tweet as a reply chain grows, until the limit
-	 * on @mentions is reached. In cases where the original Tweet has been deleted,
-	 * the reply will fail.
+	 * When inReplyToStatusId is set the auto_populate_reply_metadata is automatically set
+	 * as well. Later ensures that leading @mentions will be looked up from the original
+	 * Tweet, and added to the new Tweet from there. This wil append @mentions into the
+	 * metadata of an extended Tweet as a reply chain grows, until the limit on @mentions
+	 * is reached. In cases where the original Tweet has been deleted, the reply will
+	 * fail.
 	 */
 	private Expression inReplyToStatusId;
 
 	/**
-	 * (SpEL expression) Whether or not to put a pin on the exact coordinates a Tweet has been sent from.
+	 * (SpEL expression) Whether or not to put a pin on the exact coordinates a Tweet has
+	 * been sent from.
 	 */
 	private Expression displayCoordinates;
 
 	/**
-	 * (SpEL expression) A comma-delimited list of media_ids to associate with the Tweet. You may include up to 4 photos or 1 animated
-	 * GIF or 1 video in a Tweet. See Uploading Media for further details on uploading media.
+	 * (SpEL expression) A comma-delimited list of media_ids to associate with the Tweet.
+	 * You may include up to 4 photos or 1 animated GIF or 1 video in a Tweet. See
+	 * Uploading Media for further details on uploading media.
 	 */
 	private Expression mediaIds;
 
 	/**
-	 * (SpEL expression) The location this Tweet refers to. Ignored if geo_enabled for the user is false!
+	 * (SpEL expression) The location this Tweet refers to. Ignored if geo_enabled for the
+	 * user is false!
 	 */
 	private final Location location = new Location();
 
@@ -142,16 +149,19 @@ public class TwitterUpdateConsumerProperties {
 	}
 
 	public static class Location {
+
 		/**
-		 * The latitude of the location this Tweet refers to. This parameter will be ignored unless it is inside the range
-		 * -90.0 to +90.0 (North is positive) inclusive. It will also be ignored if there is no corresponding long parameter.
+		 * The latitude of the location this Tweet refers to. This parameter will be
+		 * ignored unless it is inside the range -90.0 to +90.0 (North is positive)
+		 * inclusive. It will also be ignored if there is no corresponding long parameter.
 		 */
 		private Expression lat;
 
 		/**
-		 * The longitude of the location this Tweet refers to. The valid ranges for longitude are -180.0 to +180.0 (East
-		 * is positive) inclusive. This parameter will be ignored if outside that range, if it is not a number,
-		 * if geo_enabled is disabled, or if there no corresponding lat parameter.
+		 * The longitude of the location this Tweet refers to. The valid ranges for
+		 * longitude are -180.0 to +180.0 (East is positive) inclusive. This parameter
+		 * will be ignored if outside that range, if it is not a number, if geo_enabled is
+		 * disabled, or if there no corresponding lat parameter.
 		 */
 		private Expression lon;
 
@@ -170,5 +180,7 @@ public class TwitterUpdateConsumerProperties {
 		public void setLon(Expression lon) {
 			this.lon = lon;
 		}
+
 	}
+
 }

@@ -74,4 +74,5 @@ public class RsocketConsumerProperties {
 	public void setUri(URI uri) {
 		this.uri = uri;
 	}
+
 }

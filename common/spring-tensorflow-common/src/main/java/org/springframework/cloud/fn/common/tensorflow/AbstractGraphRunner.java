@@ -34,8 +34,9 @@ public abstract class AbstractGraphRunner implements Function<Map<String, Tensor
 	public abstract Session doGetSession();
 
 	/**
-	 * Names expected in the named Tensor inside the input {@link AbstractGraphRunner#apply(Map)}.
-	 * If the apply method will fail if the input map is missing some of the feedNames.
+	 * Names expected in the named Tensor inside the input
+	 * {@link AbstractGraphRunner#apply(Map)}. If the apply method will fail if the input
+	 * map is missing some of the feedNames.
 	 */
 	private final List<String> feedNames;
 
@@ -45,8 +46,9 @@ public abstract class AbstractGraphRunner implements Function<Map<String, Tensor
 	private final List<String> fetchNames;
 
 	/**
-	 * When set and the input takes a single feed, then the name of the input tensor is automatically mapped
-	 * to the expected input name. E.g. no need to rename the input names explicitly.
+	 * When set and the input takes a single feed, then the name of the input tensor is
+	 * automatically mapped to the expected input name. E.g. no need to rename the input
+	 * names explicitly.
 	 */
 	private boolean autoBinding;
 
@@ -69,8 +71,8 @@ public abstract class AbstractGraphRunner implements Function<Map<String, Tensor
 		}
 
 		if (this.isAutoBinding() && (feeds.size() != 1)) {
-			throw new IllegalArgumentException("Feed auto-binding expects a " +
-					"single feed tensors but found: " + feeds);
+			throw new IllegalArgumentException(
+					"Feed auto-binding expects a " + "single feed tensors but found: " + feeds);
 		}
 
 		Session.Runner runner = this.doGetSession().runner();
@@ -127,8 +129,8 @@ public abstract class AbstractGraphRunner implements Function<Map<String, Tensor
 
 	public AbstractGraphRunner enableAutoBinding() {
 		if (this.getFeedNames().size() != 1) {
-			throw new IllegalArgumentException("Auto-binding is permitted for Graphs with single input feed, but " +
-					" found: " + this.getFeedNames());
+			throw new IllegalArgumentException("Auto-binding is permitted for Graphs with single input feed, but "
+					+ " found: " + this.getFeedNames());
 		}
 		this.autoBinding = true;
 		return this;
@@ -136,7 +138,7 @@ public abstract class AbstractGraphRunner implements Function<Map<String, Tensor
 
 	@Override
 	public String toString() {
-		return String.format("(%s) -> (%s)", String.join(",", this.feedNames),
-				String.join(",", this.fetchNames));
+		return String.format("(%s) -> (%s)", String.join(",", this.feedNames), String.join(",", this.fetchNames));
 	}
+
 }

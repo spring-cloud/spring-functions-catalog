@@ -49,6 +49,7 @@ import org.springframework.validation.annotation.Validated;
 @ConfigurationProperties("sftp.supplier")
 @Validated
 public class SftpSupplierProperties {
+
 	/**
 	 * Session factory properties.
 	 */
@@ -75,7 +76,8 @@ public class SftpSupplierProperties {
 	private boolean deleteRemoteFiles = false;
 
 	/**
-	 * A SpEL expression resolving to the new name remote files must be renamed to after successful transfer.
+	 * A SpEL expression resolving to the new name remote files must be renamed to after
+	 * successful transfer.
 	 */
 	private Expression renameRemoteFilesTo = null;
 
@@ -120,15 +122,15 @@ public class SftpSupplierProperties {
 	private Duration delayWhenEmpty = Duration.ofSeconds(1);
 
 	/**
-	 * The maximum number of remote files to fetch per poll; default unlimited. Does not apply
-	 * when listing files or building task launch requests.
+	 * The maximum number of remote files to fetch per poll; default unlimited. Does not
+	 * apply when listing files or building task launch requests.
 	 */
 	private int maxFetch = Integer.MIN_VALUE;
 
 	/**
-	 * True for fair rotation of multiple servers/directories. This is false by default so if
-	 * a source has more than one entry, these will be received before the other sources are
-	 * visited.
+	 * True for fair rotation of multiple servers/directories. This is false by default so
+	 * if a source has more than one entry, these will be received before the other
+	 * sources are visited.
 	 */
 	private boolean fair;
 
@@ -143,8 +145,9 @@ public class SftpSupplierProperties {
 	private String[] directories;
 
 	/**
-	 * Sorting specification for remote files listings. If null, order of entries is undefined.
-	 * Otherwise, entries are sorted by the specified field and direction, according to the type canonical ordering.
+	 * Sorting specification for remote files listings. If null, order of entries is
+	 * undefined. Otherwise, entries are sorted by the specified field and direction,
+	 * according to the type canonical ordering.
 	 */
 	private SortSpec sortBy;
 
@@ -439,8 +442,10 @@ public class SftpSupplierProperties {
 	}
 
 	public static class SortSpec {
+
 		/**
-		 * Attribute of the file listing entry to sort by (FILENAME, ATIME: last access time, MTIME: last modified time).
+		 * Attribute of the file listing entry to sort by (FILENAME, ATIME: last access
+		 * time, MTIME: last modified time).
 		 */
 		private Attribute attribute;
 
@@ -468,6 +473,7 @@ public class SftpSupplierProperties {
 		}
 
 		public enum Attribute {
+
 			/**
 			 * Filename attribute.
 			 */
@@ -482,9 +488,11 @@ public class SftpSupplierProperties {
 			 * Last modified time attribute.
 			 */
 			MTIME
+
 		}
 
 		public enum Dir {
+
 			/**
 			 * Ascending sort direction.
 			 */
@@ -494,6 +502,7 @@ public class SftpSupplierProperties {
 			 * Descending sort direction.
 			 */
 			DESC
+
 		}
 
 		private Comparator<SftpClient.DirEntry> getAttributeComparator() {
@@ -513,5 +522,7 @@ public class SftpSupplierProperties {
 			Comparator<SftpClient.DirEntry> comparator = getAttributeComparator();
 			return dir == Dir.ASC ? comparator : comparator.reversed();
 		}
+
 	}
+
 }

@@ -54,18 +54,21 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 import static org.awaitility.Awaitility.await;
 
 /**
- * This test illustrate how to leverage the DebeziumEngineAutoConfiguration to build a consumer function with a custom
- * change event Consumer.
+ * This test illustrate how to leverage the DebeziumEngineAutoConfiguration to build a
+ * consumer function with a custom change event Consumer.
  *
  * @author Christian Tzolov
  */
 @Tag("integration")
 @Testcontainers
 public class DebeziumEngineBuilderAutoConfigurationIntegrationTest {
+
 	private static final Log logger = LogFactory.getLog(DebeziumEngineBuilderAutoConfigurationIntegrationTest.class);
 
 	private static final String DATABASE_NAME = "inventory";
+
 	public static final String IMAGE_TAG = "2.3.0.Final";
+
 	public static final String DEBEZIUM_EXAMPLE_MYSQL_IMAGE = "debezium/example-mysql:" + IMAGE_TAG;
 
 	@TempDir
@@ -73,70 +76,64 @@ public class DebeziumEngineBuilderAutoConfigurationIntegrationTest {
 
 	@Container
 	static GenericContainer<?> debeziumMySQL = new GenericContainer<>(DEBEZIUM_EXAMPLE_MYSQL_IMAGE)
-			.withEnv("MYSQL_ROOT_PASSWORD", "debezium")
-			.withEnv("MYSQL_USER", "mysqluser")
-			.withEnv("MYSQL_PASSWORD", "mysqlpw")
-			.withExposedPorts(3306);
+		.withEnv("MYSQL_ROOT_PASSWORD", "debezium")
+		.withEnv("MYSQL_USER", "mysqluser")
+		.withEnv("MYSQL_PASSWORD", "mysqlpw")
+		.withExposedPorts(3306);
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withUserConfiguration(DebeziumCustomConsumerApplication.class)
-			.withPropertyValues(
-					"spring.datasource.type=com.zaxxer.hikari.HikariDataSource",
+		.withUserConfiguration(DebeziumCustomConsumerApplication.class)
+		.withPropertyValues("spring.datasource.type=com.zaxxer.hikari.HikariDataSource",
 
-					"debezium.properties.offset.storage=org.apache.kafka.connect.storage.FileOffsetBackingStore",
-					"debezium.properties.offset.storage.file.filename=" + anotherTempDir.getAbsolutePath()
-							+ "offsets.dat",
-					"debezium.properties.offset.flush.interval.ms=60000",
+				"debezium.properties.offset.storage=org.apache.kafka.connect.storage.FileOffsetBackingStore",
+				"debezium.properties.offset.storage.file.filename=" + anotherTempDir.getAbsolutePath() + "offsets.dat",
+				"debezium.properties.offset.flush.interval.ms=60000",
 
-					"debezium.properties.schema.history.internal=io.debezium.storage.file.history.FileSchemaHistory", // new
-					"debezium.properties.schema.history.internal.file.filename=" + anotherTempDir.getAbsolutePath()
-							+ "schemahistory.dat",
+				"debezium.properties.schema.history.internal=io.debezium.storage.file.history.FileSchemaHistory", // new
+				"debezium.properties.schema.history.internal.file.filename=" + anotherTempDir.getAbsolutePath()
+						+ "schemahistory.dat",
 
-					"debezium.properties.topic.prefix=my-topic",
+				"debezium.properties.topic.prefix=my-topic",
 
-					"debezium.properties.name=my-sql-connector",
-					"debezium.properties.connector.class=io.debezium.connector.mysql.MySqlConnector",
+				"debezium.properties.name=my-sql-connector",
+				"debezium.properties.connector.class=io.debezium.connector.mysql.MySqlConnector",
 
-					"debezium.properties.database.user=debezium",
-					"debezium.properties.database.password=dbz",
-					"debezium.properties.database.hostname=localhost",
-					"debezium.properties.database.port=" + debeziumMySQL.getMappedPort(3306),
-					"debezium.properties.database.server.id=85744",
+				"debezium.properties.database.user=debezium", "debezium.properties.database.password=dbz",
+				"debezium.properties.database.hostname=localhost",
+				"debezium.properties.database.port=" + debeziumMySQL.getMappedPort(3306),
+				"debezium.properties.database.server.id=85744",
 
-					// JdbcTemplate configuration
-					String.format("app.datasource.url=jdbc:mysql://localhost:%d/%s?enabledTLSProtocols=TLSv1.2",
-							debeziumMySQL.getMappedPort(3306), DATABASE_NAME),
-					"app.datasource.username=root",
-					"app.datasource.password=debezium",
-					"app.datasource.driver-class-name=com.mysql.cj.jdbc.Driver",
-					"app.datasource.type=com.zaxxer.hikari.HikariDataSource");
+				// JdbcTemplate configuration
+				String.format("app.datasource.url=jdbc:mysql://localhost:%d/%s?enabledTLSProtocols=TLSv1.2",
+						debeziumMySQL.getMappedPort(3306), DATABASE_NAME),
+				"app.datasource.username=root", "app.datasource.password=debezium",
+				"app.datasource.driver-class-name=com.mysql.cj.jdbc.Driver",
+				"app.datasource.type=com.zaxxer.hikari.HikariDataSource");
 
 	@Test
 	public void consumerTest() {
 
 		logger.info("Temp dir: " + anotherTempDir.getAbsolutePath());
 
-		contextRunner
-				.withPropertyValues(
-						// Flattering:
-						// https://debezium.io/documentation/reference/stable/transformations/event-flattening.html
-						"debezium.properties.transforms=unwrap",
-						"debezium.properties.transforms.unwrap.type=io.debezium.transforms.ExtractNewRecordState",
-						"debezium.properties.transforms.unwrap.drop.tombstones=false",
-						"debezium.properties.transforms.unwrap.delete.handling.mode=rewrite",
-						"debezium.properties.transforms.unwrap.add.fields=name,db")
-				.run(context -> {
-					JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
+		contextRunner.withPropertyValues(
+				// Flattering:
+				// https://debezium.io/documentation/reference/stable/transformations/event-flattening.html
+				"debezium.properties.transforms=unwrap",
+				"debezium.properties.transforms.unwrap.type=io.debezium.transforms.ExtractNewRecordState",
+				"debezium.properties.transforms.unwrap.drop.tombstones=false",
+				"debezium.properties.transforms.unwrap.delete.handling.mode=rewrite",
+				"debezium.properties.transforms.unwrap.add.fields=name,db")
+			.run(context -> {
+				JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
 
-					DebeziumCustomConsumerApplication.TestDebeziumConsumer testConsumer = context
-							.getBean(DebeziumCustomConsumerApplication.TestDebeziumConsumer.class);
-					jdbcTemplate.update(
-							"insert into `customers`(`first_name`,`last_name`,`email`) " +
-									"VALUES('Test666', 'Test666', 'Test666@spring.org')");
-					JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "customers", "first_name = ?", "Test666");
+				DebeziumCustomConsumerApplication.TestDebeziumConsumer testConsumer = context
+					.getBean(DebeziumCustomConsumerApplication.TestDebeziumConsumer.class);
+				jdbcTemplate.update("insert into `customers`(`first_name`,`last_name`,`email`) "
+						+ "VALUES('Test666', 'Test666', 'Test666@spring.org')");
+				JdbcTestUtils.deleteFromTableWhere(jdbcTemplate, "customers", "first_name = ?", "Test666");
 
-					await().atMost(Duration.ofSeconds(30)).until(() -> (testConsumer.recordList.size() >= 52));
-				});
+				await().atMost(Duration.ofSeconds(30)).until(() -> (testConsumer.recordList.size() >= 52));
+			});
 	}
 
 	@SpringBootConfiguration
@@ -157,16 +154,14 @@ public class DebeziumEngineBuilderAutoConfigurationIntegrationTest {
 
 		@Bean
 		public HikariDataSource dataSource(DataSourceProperties dataSourceProperties) {
-			return dataSourceProperties.initializeDataSourceBuilder()
-					.type(HikariDataSource.class)
-					.build();
+			return dataSourceProperties.initializeDataSourceBuilder().type(HikariDataSource.class).build();
 		}
 
 		@Bean
 		public EmbeddedEngineExecutorService embeddedEngine(Consumer<ChangeEvent<byte[], byte[]>> changeEventConsumer,
 				Builder<ChangeEvent<byte[], byte[]>> debeziumEngineBuilder) {
 			DebeziumEngine<ChangeEvent<byte[], byte[]>> b = debeziumEngineBuilder.notifying(changeEventConsumer)
-					.build();
+				.build();
 			return new EmbeddedEngineExecutorService(debeziumEngineBuilder.notifying(changeEventConsumer).build());
 		}
 
@@ -196,7 +191,9 @@ public class DebeziumEngineBuilderAutoConfigurationIntegrationTest {
 					System.out.println("[Debezium Event]: " + changeEvent.toString());
 				}
 			}
+
 		}
+
 	}
 
 }

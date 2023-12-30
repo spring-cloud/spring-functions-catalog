@@ -37,21 +37,22 @@ import org.springframework.util.StreamUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Converts the Tensorflow Object Detection result into {@link ObjectDetection} list.
- * The pre-trained Object Detection models (http://bit.ly/2osxMAY) produce 3 tensor outputs:
- *  (1) detection_classes - containing the ids of detected objects, (2) detection_scores - confidence probabilities of the
- *  detected object and (3) detection_boxes - the object bounding boxes withing the images.
+ * Converts the Tensorflow Object Detection result into {@link ObjectDetection} list. The
+ * pre-trained Object Detection models (http://bit.ly/2osxMAY) produce 3 tensor outputs:
+ * (1) detection_classes - containing the ids of detected objects, (2) detection_scores -
+ * confidence probabilities of the detected object and (3) detection_boxes - the object
+ * bounding boxes withing the images.
  *
- *  The MASK based models provide to 2 additional tensors: (4) num_detections and (5) detection_masks.
+ * The MASK based models provide to 2 additional tensors: (4) num_detections and (5)
+ * detection_masks.
  *
- * All outputs tensors are float arrays, having:
- * - 1 as the first dimension
- * - maxObjects as the second dimension
- * While boxesT will have 4 as the third dimension (2 sets of (x, y) coordinates).
- * This can be verified by looking at scoresT.shape() etc.
+ * All outputs tensors are float arrays, having: - 1 as the first dimension - maxObjects
+ * as the second dimension While boxesT will have 4 as the third dimension (2 sets of (x,
+ * y) coordinates). This can be verified by looking at scoresT.shape() etc.
  *
- * The format detected classes (e.g. labels) names is defined by the 'string_int_labels_map.proto'. The input list
- * is available at: https://github.com/tensorflow/models/tree/master/research/object_detection/data
+ * The format detected classes (e.g. labels) names is defined by the
+ * 'string_int_labels_map.proto'. The input list is available at:
+ * https://github.com/tensorflow/models/tree/master/research/object_detection/data
  *
  * @author Christian Tzolov
  */
@@ -61,17 +62,23 @@ public class ObjectDetectionOutputConverter implements Function<Map<String, Tens
 
 	/** DETECTION_CLASSES. */
 	public static final String DETECTION_CLASSES = "detection_classes";
+
 	/** DETECTION_SCORES. */
 	public static final String DETECTION_SCORES = "detection_scores";
+
 	/** DETECTION_BOXES. */
 	public static final String DETECTION_BOXES = "detection_boxes";
+
 	/** DETECTION_MASKS. */
 	public static final String DETECTION_MASKS = "detection_masks";
+
 	/** NUM_DETECTIONS. */
 	public static final String NUM_DETECTIONS = "num_detections";
 
 	private final String[] labels;
+
 	private float confidence;
+
 	private List<String> modelFetch;
 
 	public ObjectDetectionOutputConverter(Resource labelsResource, float confidence, List<String> modelFetch) {
@@ -96,15 +103,16 @@ public class ObjectDetectionOutputConverter implements Function<Map<String, Tens
 	private static String[] loadLabels(Resource labelsResource) throws Exception {
 		try (InputStream is = labelsResource.getInputStream()) {
 			String text = StreamUtils.copyToString(is, Charset.forName("UTF-8"));
-			StringIntLabelMapOuterClass.StringIntLabelMap.Builder builder =
-					StringIntLabelMapOuterClass.StringIntLabelMap.newBuilder();
+			StringIntLabelMapOuterClass.StringIntLabelMap.Builder builder = StringIntLabelMapOuterClass.StringIntLabelMap
+				.newBuilder();
 			TextFormat.merge(text, builder);
 			StringIntLabelMapOuterClass.StringIntLabelMap proto = builder.build();
 
-			int maxLabelId = proto.getItemList().stream()
-					.map(StringIntLabelMapOuterClass.StringIntLabelMapItem::getId)
-					.max(Comparator.comparing(i -> i))
-					.orElse(-1);
+			int maxLabelId = proto.getItemList()
+				.stream()
+				.map(StringIntLabelMapOuterClass.StringIntLabelMapItem::getId)
+				.max(Comparator.comparing(i -> i))
+				.orElse(-1);
 
 			String[] labelIdToNameMap = new String[maxLabelId + 1];
 			for (StringIntLabelMapOuterClass.StringIntLabelMapItem item : proto.getItemList()) {
@@ -112,7 +120,8 @@ public class ObjectDetectionOutputConverter implements Function<Map<String, Tens
 					labelIdToNameMap[item.getId()] = item.getDisplayName();
 				}
 				else {
-					// Common practice is to set the name to a MID or Synsets Id. Synset is a set of synonyms that
+					// Common practice is to set the name to a MID or Synsets Id. Synset
+					// is a set of synonyms that
 					// share a common meaning: https://en.wikipedia.org/wiki/WordNet
 					labelIdToNameMap[item.getId()] = item.getName();
 				}
@@ -125,13 +134,13 @@ public class ObjectDetectionOutputConverter implements Function<Map<String, Tens
 	public List<List<ObjectDetection>> apply(Map<String, Tensor<?>> tensorMap) {
 
 		try (Tensor<Float> scoresTensor = tensorMap.get(DETECTION_SCORES).expect(Float.class);
-			Tensor<Float> classesTensor = tensorMap.get(DETECTION_CLASSES).expect(Float.class);
-			Tensor<Float> boxesTensor = tensorMap.get(DETECTION_BOXES).expect(Float.class)
-		) {
+				Tensor<Float> classesTensor = tensorMap.get(DETECTION_CLASSES).expect(Float.class);
+				Tensor<Float> boxesTensor = tensorMap.get(DETECTION_BOXES).expect(Float.class)) {
 			// All these tensors have:
 			// - 1 as the first dimension
 			// - maxObjects as the second dimension
-			// While boxesT will have 4 as the third dimension (2 sets of (x, y) coordinates).
+			// While boxesT will have 4 as the third dimension (2 sets of (x, y)
+			// coordinates).
 			// This can be verified by looking at scoresT.shape() etc.
 			int batchSize = (int) scoresTensor.shape()[0];
 			int maxObjects = (int) scoresTensor.shape()[1];
@@ -143,10 +152,10 @@ public class ObjectDetectionOutputConverter implements Function<Map<String, Tens
 
 			for (int batchIndex = 0; batchIndex < batchSize; batchIndex++) {
 
-
 				List<ObjectDetection> objectDetections = new ArrayList<>();
 
-				// Collect only the objects whose scores are at above the configured confidence threshold.
+				// Collect only the objects whose scores are at above the configured
+				// confidence threshold.
 				for (int i = 0; i < scores[batchIndex].length; ++i) {
 					if (scores[batchIndex][i] >= confidence) {
 						String category = labels[(int) classes[batchIndex][i]];
@@ -169,7 +178,8 @@ public class ObjectDetectionOutputConverter implements Function<Map<String, Tens
 
 							if (masksTensor != null) {
 								long[] shape = masksTensor.shape();
-								float[][][][] masks = masksTensor.copyTo(new float[(int) shape[0]][(int) shape[1]][(int) shape[2]][(int) shape[3]]);
+								float[][][][] masks = masksTensor
+									.copyTo(new float[(int) shape[0]][(int) shape[1]][(int) shape[2]][(int) shape[3]]);
 								od.setMask(masks[batchIndex][i]);
 								logger.debug(String.format("Num detections: %s, Masks: %s", nd, masks));
 							}
@@ -184,4 +194,5 @@ public class ObjectDetectionOutputConverter implements Function<Map<String, Tens
 			return batchObjectDetections;
 		}
 	}
+
 }

@@ -54,27 +54,18 @@ public class AbstractTcpSupplierTests {
 	protected TcpSupplierProperties properties;
 
 	/*
-	 * Sends two messages with <prefix><payload><suffix> and asserts the
-	 * payload is received on the other side.
+	 * Sends two messages with <prefix><payload><suffix> and asserts the payload is
+	 * received on the other side.
 	 */
 	protected void doTest(String prefix, String payload, String suffix) throws Exception {
 
 		final Flux<Message<?>> messageFlux = tcpSupplier.get();
 
-		final StepVerifier stepVerifier = StepVerifier.create(messageFlux)
-				.assertNext((message) -> {
-							assertThat(message.getPayload())
-									.isEqualTo(payload.getBytes());
-						}
-				)
-				.assertNext((message) -> {
-							assertThat(message.getPayload())
-									.isEqualTo(payload.getBytes());
-						}
-				)
-				.thenCancel()
-				.verifyLater();
-
+		final StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(message.getPayload()).isEqualTo(payload.getBytes());
+		}).assertNext((message) -> {
+			assertThat(message.getPayload()).isEqualTo(payload.getBytes());
+		}).thenCancel().verifyLater();
 
 		int port = getPort();
 		Socket socket = SocketFactory.getDefault().createSocket("localhost", port);
@@ -108,4 +99,5 @@ public class AbstractTcpSupplierTests {
 	public static class TcpSupplierTestApplication {
 
 	}
+
 }

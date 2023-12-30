@@ -30,7 +30,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Used to configure those Redis Sink module options that are not related to connecting to Redis.
+ * Used to configure those Redis Sink module options that are not related to connecting to
+ * Redis.
  *
  * @author Eric Bottard
  * @author Mark Pollack
@@ -145,7 +146,8 @@ public class RedisConsumerProperties {
 		this.topic = topic;
 	}
 
-	// The javabean property name is what will be reported in case of violation. Make it meaningful
+	// The javabean property name is what will be reported in case of violation. Make it
+	// meaningful
 	@AssertTrue(message = "Exactly one of 'queue', 'queueExpression', 'key', 'keyExpression', "
 			+ "'topic' and 'topicExpression' must be set")
 	public boolean isMutuallyExclusive() {

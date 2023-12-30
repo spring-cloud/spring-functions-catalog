@@ -28,14 +28,12 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TestPropertySource(properties = {
-	"mail.supplier.url=imap://user:pw@localhost:${test.mail.server.imap.port}/INBOX",
-	"mail.supplier.charset=cp1251"})
+@TestPropertySource(properties = { "mail.supplier.url=imap://user:pw@localhost:${test.mail.server.imap.port}/INBOX",
+		"mail.supplier.charset=cp1251" })
 public class ImapFailTests extends AbstractMailSupplierTests {
 
 	@Autowired
 	protected MailToStringTransformer mailToStringTransformer;
-
 
 	@Test
 	public void testSimpleTest() {
@@ -45,12 +43,9 @@ public class ImapFailTests extends AbstractMailSupplierTests {
 		final Flux<Message<?>> messageFlux = mailSupplier.get();
 		// then
 		assertThat(TestUtils.getPropertyValue(mailToStringTransformer, "charset").equals("cp1251")).isTrue();
-		StepVerifier.create(messageFlux)
-			.assertNext((message) -> {
-					assertThat(((String) message.getPayload())).isNotEqualTo("Test Mail");
-				}
-			)
-			.thenCancel()
-			.verify();
+		StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(((String) message.getPayload())).isNotEqualTo("Test Mail");
+		}).thenCancel().verify();
 	}
+
 }

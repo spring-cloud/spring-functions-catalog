@@ -54,4 +54,5 @@ public class AbstractRedisConsumerTests implements RedisTestContainerSupport {
 	static class RedisConsumerTestApplication {
 
 	}
+
 }

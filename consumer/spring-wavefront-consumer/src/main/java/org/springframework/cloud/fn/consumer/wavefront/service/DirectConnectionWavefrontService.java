@@ -33,7 +33,9 @@ public class DirectConnectionWavefrontService implements WavefrontService {
 	private static final Log logger = LogFactory.getLog(DirectConnectionWavefrontService.class);
 
 	private final RestTemplate restTemplate;
+
 	private final String wavefrontDomain;
+
 	private final String wavefrontToken;
 
 	public DirectConnectionWavefrontService(final RestTemplateBuilder restTemplateBuilder,
@@ -53,4 +55,5 @@ public class DirectConnectionWavefrontService implements WavefrontService {
 		final HttpEntity<String> httpEntity = new HttpEntity<>(metricInWavefrontFormat, headers);
 		restTemplate.exchange(wavefrontDomain + "/report", HttpMethod.POST, httpEntity, Void.class);
 	}
+
 }

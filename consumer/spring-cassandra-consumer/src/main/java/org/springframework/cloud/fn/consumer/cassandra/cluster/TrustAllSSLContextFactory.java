@@ -25,10 +25,9 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-
 /**
- * Helper to provide an SSL Context that does not validate
- * certificates presented in the SSL handshake.
+ * Helper to provide an SSL Context that does not validate certificates presented in the
+ * SSL handshake.
  *
  * The usual caveats apply.
  *
@@ -43,24 +42,22 @@ final class TrustAllSSLContextFactory {
 
 	static SSLContext getSslContext() throws NoSuchAlgorithmException, KeyManagementException {
 
-		TrustManager[] trustAllCerts = new TrustManager[] {
-				new X509TrustManager() {
+		TrustManager[] trustAllCerts = new TrustManager[] { new X509TrustManager() {
 
-					@Override
-					public X509Certificate[] getAcceptedIssuers() {
-						return new X509Certificate[0];
-					}
+			@Override
+			public X509Certificate[] getAcceptedIssuers() {
+				return new X509Certificate[0];
+			}
 
-					@Override
-					public void checkClientTrusted(X509Certificate[] certs, String authType) {
-					}
+			@Override
+			public void checkClientTrusted(X509Certificate[] certs, String authType) {
+			}
 
-					@Override
-					public void checkServerTrusted(X509Certificate[] certs, String authType) {
-					}
+			@Override
+			public void checkServerTrusted(X509Certificate[] certs, String authType) {
+			}
 
-				}
-		};
+		} };
 
 		SSLContext sc = SSLContext.getInstance("SSL");
 		sc.init(null, trustAllCerts, new SecureRandom());

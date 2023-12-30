@@ -25,6 +25,7 @@ import org.springframework.integration.IntegrationMessageHeaderAccessor;
 import org.springframework.messaging.Message;
 
 final public class HeaderUtils {
+
 	private HeaderUtils() {
 	}
 
@@ -35,4 +36,5 @@ final public class HeaderUtils {
 		headers.removeIf(accessor::isReadOnly);
 		return headers;
 	}
+
 }

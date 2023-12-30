@@ -40,8 +40,8 @@ public class SpelFunctionConfiguration {
 	public ExpressionEvaluatingTransformer expressionEvaluatingTransformer(
 			SpelFunctionProperties spelFunctionProperties) {
 
-		return new ExpressionEvaluatingTransformer(new SpelExpressionParser()
-				.parseExpression(spelFunctionProperties.getExpression()));
+		return new ExpressionEvaluatingTransformer(
+				new SpelExpressionParser().parseExpression(spelFunctionProperties.getExpression()));
 	}
 
 }

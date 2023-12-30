@@ -40,7 +40,7 @@ public class HttpSupplierProperties {
 	/**
 	 * Headers that will be mapped.
 	 */
-	private String[] mappedRequestHeaders = {DefaultHttpHeaderMapper.HTTP_REQUEST_HEADER_NAME_PATTERN};
+	private String[] mappedRequestHeaders = { DefaultHttpHeaderMapper.HTTP_REQUEST_HEADER_NAME_PATTERN };
 
 	/**
 	 * CORS properties.
@@ -77,15 +77,16 @@ public class HttpSupplierProperties {
 		/**
 		 * List of allowed origins, e.g. https://domain1.com.
 		 */
-		private String[] allowedOrigins = {CorsConfiguration.ALL};
+		private String[] allowedOrigins = { CorsConfiguration.ALL };
 
 		/**
 		 * List of request headers that can be used during the actual request.
 		 */
-		private String[] allowedHeaders = {CorsConfiguration.ALL};
+		private String[] allowedHeaders = { CorsConfiguration.ALL };
 
 		/**
-		 * Whether the browser should include any cookies associated with the domain of the request being annotated.
+		 * Whether the browser should include any cookies associated with the domain of
+		 * the request being annotated.
 		 */
 		private Boolean allowCredentials;
 

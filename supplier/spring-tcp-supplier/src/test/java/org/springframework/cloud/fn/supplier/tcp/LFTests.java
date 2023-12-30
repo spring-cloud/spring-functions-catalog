@@ -30,4 +30,5 @@ public class LFTests extends AbstractTcpSupplierTests {
 	public void test() throws Exception {
 		doTest("", "foo", "\n");
 	}
+
 }

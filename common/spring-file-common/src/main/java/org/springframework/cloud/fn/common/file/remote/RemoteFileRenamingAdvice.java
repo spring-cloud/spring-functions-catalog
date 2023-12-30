@@ -24,7 +24,6 @@ import org.springframework.integration.file.remote.RemoteFileTemplate;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
-
 /**
  * A {@link MessageSourceMutator} that renames a remote file on success.
  *
@@ -45,9 +44,7 @@ public class RemoteFileRenamingAdvice implements MessageSourceMutator {
 	 * @param remoteFileSeparator the separator.
 	 * @param newNameExp the SpEl expression for the new name.
 	 */
-	public RemoteFileRenamingAdvice(RemoteFileTemplate<?> template,
-									String remoteFileSeparator,
-									Expression newNameExp) {
+	public RemoteFileRenamingAdvice(RemoteFileTemplate<?> template, String remoteFileSeparator, Expression newNameExp) {
 		this.template = template;
 		this.remoteFileSeparator = remoteFileSeparator;
 		this.newName = newNameExp;
@@ -66,4 +63,5 @@ public class RemoteFileRenamingAdvice implements MessageSourceMutator {
 		}
 		return result;
 	}
+
 }

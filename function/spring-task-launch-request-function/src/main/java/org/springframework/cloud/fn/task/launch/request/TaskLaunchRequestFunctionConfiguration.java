@@ -36,13 +36,17 @@ import org.springframework.messaging.Message;
 import org.springframework.util.StringUtils;
 
 /**
- * Configuration for a {@link TaskLaunchRequestFunction}, provided as a common function that can be composed with other Suppliers or
- * Functions to transform any {@link Message} to a {@link TaskLaunchRequest} which may be used as input to the {@code TaskLauncherFunction} to launch a task.
+ * Configuration for a {@link TaskLaunchRequestFunction}, provided as a common function
+ * that can be composed with other Suppliers or Functions to transform any {@link Message}
+ * to a {@link TaskLaunchRequest} which may be used as input to the
+ * {@code TaskLauncherFunction} to launch a task.
  *
- * Command line arguments used by the task, as well as the task name itself may be statically configured or extracted from
- * the message contents, using SpEL. See {@link TaskLaunchRequestFunctionProperties} for details.
+ * Command line arguments used by the task, as well as the task name itself may be
+ * statically configured or extracted from the message contents, using SpEL. See
+ * {@link TaskLaunchRequestFunctionProperties} for details.
  *
- * It is also possible to provide your own implementations of {@link CommandLineArgumentsMessageMapper} and {@link TaskNameMessageMapper}.
+ * It is also possible to provide your own implementations of
+ * {@link CommandLineArgumentsMessageMapper} and {@link TaskNameMessageMapper}.
  *
  * @author David Turanski
  **/
@@ -58,9 +62,8 @@ public class TaskLaunchRequestFunctionConfiguration {
 	/**
 	 * A {@link java.util.function.Function} to transform a {@link Message} payload to a
 	 * {@link TaskLaunchRequest}.
-	 *
-	 * @param taskLaunchRequestMessageProcessor a {@link TaskLaunchRequestMessageProcessor}.
-	 *
+	 * @param taskLaunchRequestMessageProcessor a
+	 * {@link TaskLaunchRequestMessageProcessor}.
 	 * @return a {@code TaskLaunchRequest} Message.
 	 */
 	@Bean(name = TASK_LAUNCH_REQUEST_FUNCTION_NAME)
@@ -78,10 +81,8 @@ public class TaskLaunchRequestFunctionConfiguration {
 	@SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
 	@Bean
 	public TaskLaunchRequestMessageProcessor taskLaunchRequestMessageProcessor(
-			TaskLaunchRequestSupplier taskLaunchRequestInitializer,
-			TaskLaunchRequestFunctionProperties properties,
-			EvaluationContext evaluationContext,
-			@Nullable TaskNameMessageMapper taskNameMessageMapper,
+			TaskLaunchRequestSupplier taskLaunchRequestInitializer, TaskLaunchRequestFunctionProperties properties,
+			EvaluationContext evaluationContext, @Nullable TaskNameMessageMapper taskNameMessageMapper,
 			@Nullable CommandLineArgumentsMessageMapper commandLineArgumentsMessageMapper) {
 
 		if (taskNameMessageMapper == null) {
@@ -92,8 +93,7 @@ public class TaskLaunchRequestFunctionConfiguration {
 			commandLineArgumentsMessageMapper = commandLineArgumentsMessageMapper(properties, evaluationContext);
 		}
 
-		return new TaskLaunchRequestMessageProcessor(taskLaunchRequestInitializer,
-				taskNameMessageMapper,
+		return new TaskLaunchRequestMessageProcessor(taskLaunchRequestInitializer, taskNameMessageMapper,
 				commandLineArgumentsMessageMapper);
 	}
 
@@ -103,11 +103,11 @@ public class TaskLaunchRequestFunctionConfiguration {
 	}
 
 	private TaskNameMessageMapper taskNameMessageMapper(TaskLaunchRequestFunctionProperties taskLaunchRequestProperties,
-														EvaluationContext evaluationContext) {
+			EvaluationContext evaluationContext) {
 		if (StringUtils.hasText(taskLaunchRequestProperties.getTaskNameExpression())) {
 			SpelExpressionParser expressionParser = new SpelExpressionParser();
 			Expression taskNameExpression = expressionParser
-					.parseExpression(taskLaunchRequestProperties.getTaskNameExpression());
+				.parseExpression(taskLaunchRequestProperties.getTaskNameExpression());
 			return new ExpressionEvaluatingTaskNameMessageMapper(taskNameExpression, evaluationContext);
 		}
 
@@ -122,23 +122,23 @@ public class TaskLaunchRequestFunctionConfiguration {
 	}
 
 	private static class TaskLaunchRequestPropertiesInitializer extends TaskLaunchRequestSupplier {
-		TaskLaunchRequestPropertiesInitializer(
-				TaskLaunchRequestFunctionProperties taskLaunchRequestProperties) {
 
-			this.commandLineArgumentSupplier(
-					() -> new ArrayList<>(taskLaunchRequestProperties.getArgs()));
+		TaskLaunchRequestPropertiesInitializer(TaskLaunchRequestFunctionProperties taskLaunchRequestProperties) {
 
-			this.deploymentPropertiesSupplier(
-					() -> KeyValueListParser.parseCommaDelimitedKeyValuePairs(
-							taskLaunchRequestProperties.getDeploymentProperties()));
+			this.commandLineArgumentSupplier(() -> new ArrayList<>(taskLaunchRequestProperties.getArgs()));
+
+			this.deploymentPropertiesSupplier(() -> KeyValueListParser
+				.parseCommaDelimitedKeyValuePairs(taskLaunchRequestProperties.getDeploymentProperties()));
 
 			this.taskNameSupplier(() -> taskLaunchRequestProperties.getTaskName());
 		}
+
 	}
 
 	private static class ExpressionEvaluatingTaskNameMessageMapper implements TaskNameMessageMapper {
 
 		private final Expression expression;
+
 		private final EvaluationContext evaluationContext;
 
 		ExpressionEvaluatingTaskNameMessageMapper(Expression expression, EvaluationContext evaluationContext) {
@@ -150,9 +150,11 @@ public class TaskLaunchRequestFunctionConfiguration {
 		public String processMessage(Message<?> message) {
 			return expression.getValue(evaluationContext, message).toString();
 		}
+
 	}
 
 	private static class ExpressionEvaluatingCommandLineArgsMapper implements CommandLineArgumentsMessageMapper {
+
 		private final Map<String, Expression> argExpressionsMap;
 
 		private final EvaluationContext evaluationContext;
@@ -163,8 +165,8 @@ public class TaskLaunchRequestFunctionConfiguration {
 			if (StringUtils.hasText(argExpressions)) {
 				SpelExpressionParser expressionParser = new SpelExpressionParser();
 
-				KeyValueListParser.parseCommaDelimitedKeyValuePairs(argExpressions).forEach(
-						(k, v) -> argExpressionsMap.put(k, expressionParser.parseExpression(v)));
+				KeyValueListParser.parseCommaDelimitedKeyValuePairs(argExpressions)
+					.forEach((k, v) -> argExpressionsMap.put(k, expressionParser.parseExpression(v)));
 			}
 		}
 
@@ -176,9 +178,10 @@ public class TaskLaunchRequestFunctionConfiguration {
 		private Collection<String> evaluateArgExpressions(Message<?> message) {
 			List<String> results = new LinkedList<>();
 			this.argExpressionsMap.forEach((k, expression) -> results
-					.add(String.format("%s=%s", k, expression.getValue(this.evaluationContext, message))));
+				.add(String.format("%s=%s", k, expression.getValue(this.evaluationContext, message))));
 			return results;
 		}
+
 	}
 
 }

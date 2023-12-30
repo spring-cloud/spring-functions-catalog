@@ -126,10 +126,10 @@ public class JdbcConsumerConfiguration {
 
 	@Bean
 	IntegrationFlow jdbcConsumerFlow(@Qualifier("aggregator") MessageHandler aggregator,
-									JdbcMessageHandler jdbcMessageHandler) {
+			JdbcMessageHandler jdbcMessageHandler) {
 
-		final IntegrationFlowBuilder builder =
-				IntegrationFlow.from(Consumer.class, gateway -> gateway.beanName("jdbcConsumer"));
+		final IntegrationFlowBuilder builder = IntegrationFlow.from(Consumer.class,
+				gateway -> gateway.beanName("jdbcConsumer"));
 		if (properties.getBatchSize() > 1 || properties.getIdleTimeout() > 0) {
 			builder.handle(aggregator);
 		}
@@ -172,8 +172,8 @@ public class JdbcConsumerConfiguration {
 							this.spelExpressionParser.parseExpression(qualified));
 				}
 				catch (SpelParseException e) {
-					logger.info("failed to parse qualified fallback expression " + qualified +
-							"; be sure your expression uses the 'payload.' prefix where necessary");
+					logger.info("failed to parse qualified fallback expression " + qualified
+							+ "; be sure your expression uses the 'payload.' prefix where necessary");
 				}
 			}
 		}
@@ -189,17 +189,17 @@ public class JdbcConsumerConfiguration {
 							? message.getHeaders().get(MessageHeaders.CONTENT_TYPE).toString()
 							: MimeTypeUtils.APPLICATION_JSON_VALUE;
 					if (message.getPayload() instanceof Iterable) {
-						Stream<Object> messageStream =
-								StreamSupport.stream(((Iterable<?>) message.getPayload()).spliterator(), false)
-										.map(payload -> {
-											if (payload instanceof byte[]) {
-												return convertibleContentType(contentType) ?
-														new String(((byte[]) payload)) : payload;
-											}
-											else {
-												return payload;
-											}
-										});
+						Stream<Object> messageStream = StreamSupport
+							.stream(((Iterable<?>) message.getPayload()).spliterator(), false)
+							.map(payload -> {
+								if (payload instanceof byte[]) {
+									return convertibleContentType(contentType) ? new String(((byte[]) payload))
+											: payload;
+								}
+								else {
+									return payload;
+								}
+							});
 						convertedMessage = new MutableMessage<>(messageStream.collect(Collectors.toList()),
 								message.getHeaders());
 					}
@@ -213,8 +213,8 @@ public class JdbcConsumerConfiguration {
 				super.handleMessageInternal(convertedMessage);
 			}
 		};
-		SqlParameterSourceFactory parameterSourceFactory =
-				new ParameterFactory(columnExpressionVariations, this.evaluationContext);
+		SqlParameterSourceFactory parameterSourceFactory = new ParameterFactory(columnExpressionVariations,
+				this.evaluationContext);
 		jdbcMessageHandler.setSqlParameterSourceFactory(parameterSourceFactory);
 		return jdbcMessageHandler;
 	}
@@ -228,9 +228,8 @@ public class JdbcConsumerConfiguration {
 		databasePopulator.setIgnoreFailedDrops(true);
 		dataSourceInitializer.setDatabasePopulator(databasePopulator);
 		if ("true".equals(properties.getInitialize())) {
-			databasePopulator.addScript(
-					new DefaultInitializationScriptResource(this.properties.getTableName(),
-							this.properties.getColumnsMap().keySet()));
+			databasePopulator.addScript(new DefaultInitializationScriptResource(this.properties.getTableName(),
+					this.properties.getColumnsMap().keySet()));
 		}
 		else {
 			databasePopulator.addScript(resourceLoader.getResource(this.properties.getInitialize()));

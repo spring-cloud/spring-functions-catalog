@@ -43,9 +43,7 @@ import static org.awaitility.Awaitility.await;
  * @author David Turanski
  * @author Chris Bono
  */
-@SpringBootTest(properties = {
-		"mongodb.consumer.collection=testing"
-})
+@SpringBootTest(properties = { "mongodb.consumer.collection=testing" })
 class MongoDbConsumerApplicationTests implements MongoDbTestContainerSupport {
 
 	@DynamicPropertySource
@@ -72,9 +70,7 @@ class MongoDbConsumerApplicationTests implements MongoDbTestContainerSupport {
 		data2.put("firstName", "Foo");
 		data2.put("lastName", "Bar");
 
-		Flux<Message<?>> messages = Flux.just(
-				new GenericMessage<>(data1),
-				new GenericMessage<>(data2),
+		Flux<Message<?>> messages = Flux.just(new GenericMessage<>(data1), new GenericMessage<>(data2),
 				new GenericMessage<>("{\"my_data\": \"THE DATA\"}"));
 
 		messages.map(message -> {
@@ -84,24 +80,27 @@ class MongoDbConsumerApplicationTests implements MongoDbTestContainerSupport {
 		}).subscribe();
 
 		await().timeout(Duration.ofSeconds(10))
-				.until(() -> mongoTemplate.findAll(Document.class, properties.getCollection()).count().block() == 3L);
+			.until(() -> mongoTemplate.findAll(Document.class, properties.getCollection()).count().block() == 3L);
 
-		StepVerifier.create(this.mongoTemplate.findAll(Document.class, properties.getCollection())
+		StepVerifier
+			.create(this.mongoTemplate.findAll(Document.class, properties.getCollection())
 				.sort(Comparator.comparing(d -> d.get("_id").toString())))
-				.assertNext(document -> {
-					assertThat(document.get("foo")).isEqualTo("bar");
-				})
-				.assertNext(document -> {
-					assertThat(document.get("firstName")).isEqualTo("Foo");
-					assertThat(document.get("lastName")).isEqualTo("Bar");
-				})
-				.assertNext(document -> {
-					assertThat(document.get("my_data")).isEqualTo("THE DATA");
-				})
-				.verifyComplete();
+			.assertNext(document -> {
+				assertThat(document.get("foo")).isEqualTo("bar");
+			})
+			.assertNext(document -> {
+				assertThat(document.get("firstName")).isEqualTo("Foo");
+				assertThat(document.get("lastName")).isEqualTo("Bar");
+			})
+			.assertNext(document -> {
+				assertThat(document.get("my_data")).isEqualTo("THE DATA");
+			})
+			.verifyComplete();
 	}
 
 	@SpringBootApplication
 	static class MongoDbConsumerTestApplication {
+
 	}
+
 }

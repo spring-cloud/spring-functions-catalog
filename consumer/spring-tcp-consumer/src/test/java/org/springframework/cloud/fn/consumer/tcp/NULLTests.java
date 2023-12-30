@@ -24,11 +24,12 @@ import org.springframework.test.context.TestPropertySource;
 /**
  * @author Gary Russell
  */
-@TestPropertySource(properties = {"tcp.consumer.encoder = NULL"})
+@TestPropertySource(properties = { "tcp.consumer.encoder = NULL" })
 public class NULLTests extends AbstractTcpConsumerTests {
 
 	@Test
 	public void test() throws Exception {
 		doTest(new ByteArraySingleTerminatorSerializer((byte) 0));
 	}
+
 }

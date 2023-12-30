@@ -28,12 +28,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Christian Tzolov
  */
-@TestPropertySource(properties = {
-		"analytics.name=counter666",
-		"analytics.tag.fixed.foo=",
+@TestPropertySource(properties = { "analytics.name=counter666", "analytics.tag.fixed.foo=",
 		"analytics.tag.expression.tag666=#jsonPath(payload,'$..noField')",
-		"analytics.tag.expression.test=#jsonPath(payload,'$..test')"
-})
+		"analytics.tag.expression.test=#jsonPath(payload,'$..test')" })
 class EmptyTagsTests extends AnalyticsConsumerParentTest {
 
 	@Test
@@ -46,10 +43,12 @@ class EmptyTagsTests extends AnalyticsConsumerParentTest {
 
 		Collection<Counter> expressionTagsCounters = meterRegistry.find("counter666").tagKeys("tag666").counters();
 		assertThat(expressionTagsCounters.size()).isEqualTo(1);
-		assertThat(meterRegistry.find("counter666").meter().getId().getTag("tag666")).isEqualTo(AnalyticsConsumerConfiguration.UNAVAILABLE_TAG);
+		assertThat(meterRegistry.find("counter666").meter().getId().getTag("tag666"))
+			.isEqualTo(AnalyticsConsumerConfiguration.UNAVAILABLE_TAG);
 
 		Collection<Counter> testExpTagsCounters = meterRegistry.find("counter666").tagKeys("test").counters();
 		assertThat(testExpTagsCounters.size()).isEqualTo(1);
 		assertThat(meterRegistry.find("counter666").meter().getId().getTag("test")).isEqualTo("Bar");
 	}
+
 }

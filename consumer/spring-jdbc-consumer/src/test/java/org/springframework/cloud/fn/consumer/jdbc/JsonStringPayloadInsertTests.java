@@ -47,15 +47,15 @@ public class JsonStringPayloadInsertTests extends JdbcConsumerApplicationTests {
 		jdbcConsumer.accept(message2);
 		final Message<String> message3 = MessageBuilder.withPayload(stringC).build();
 		jdbcConsumer.accept(message3);
-		assertThat(jdbcOperations.queryForObject(
-				"select count(*) from messages where a = ? and b = ?",
-				Integer.class, "hello1", 42)).isEqualTo(1);
-		assertThat(jdbcOperations.queryForObject(
-				"select count(*) from messages where a = ? and b IS NULL",
-				Integer.class, "hello2")).isEqualTo(1);
-		assertThat(jdbcOperations.queryForObject(
-				"select count(*) from messages where a = ? and b IS NULL",
-				Integer.class, "hello3")).isEqualTo(1);
+		assertThat(jdbcOperations.queryForObject("select count(*) from messages where a = ? and b = ?", Integer.class,
+				"hello1", 42))
+			.isEqualTo(1);
+		assertThat(jdbcOperations.queryForObject("select count(*) from messages where a = ? and b IS NULL",
+				Integer.class, "hello2"))
+			.isEqualTo(1);
+		assertThat(jdbcOperations.queryForObject("select count(*) from messages where a = ? and b IS NULL",
+				Integer.class, "hello3"))
+			.isEqualTo(1);
 	}
 
 }

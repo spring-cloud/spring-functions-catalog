@@ -39,7 +39,9 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
- * Search pagination with max_id and since_id: https://developer.twitter.com/en/docs/tweets/timelines/guides/working-with-timelines.html .
+ * Search pagination with max_id and since_id:
+ * https://developer.twitter.com/en/docs/tweets/timelines/guides/working-with-timelines.html
+ * .
  *
  * @author Christian Tzolov
  * @author Chris Bono
@@ -61,11 +63,9 @@ public class TwitterSearchSupplierConfiguration {
 
 	@Bean
 	public SearchPagination searchPage() {
-		return new SearchPagination(
-				this.searchProperties.getPage(),
+		return new SearchPagination(this.searchProperties.getPage(),
 				this.searchProperties.isRestartFromMostRecentOnEmptyResponse());
 	}
-
 
 	@Bean
 	public Supplier<Message<byte[]>> twitterSearchSupplier(SearchPagination searchPage) {
@@ -108,11 +108,9 @@ public class TwitterSearchSupplierConfiguration {
 		}
 		if (searchProperties.getGeocode().isValid()) {
 			query.setGeoCode(
-					new GeoLocation(
-							searchProperties.getGeocode().getLatitude(),
+					new GeoLocation(searchProperties.getGeocode().getLatitude(),
 							searchProperties.getGeocode().getLongitude()),
-					searchProperties.getGeocode().getRadius(),
-					Query.KILOMETERS);
+					searchProperties.getGeocode().getRadius(), Query.KILOMETERS);
 		}
 
 		if (searchProperties.getResultType() != Query.ResultType.mixed) {
@@ -132,4 +130,5 @@ public class TwitterSearchSupplierConfiguration {
 
 		return query;
 	}
+
 }

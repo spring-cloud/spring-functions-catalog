@@ -38,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Artem Bilan
  * @author Soby Chacko
  */
-@TestPropertySource(properties = {"file.consumer.mode=lines", "file.consumer.withMarkers = true"})
+@TestPropertySource(properties = { "file.consumer.mode=lines", "file.consumer.withMarkers = true" })
 public class LinesAndMarkersAsJsonPayloadTests extends AbstractFileSupplierTests {
 
 	@Test
@@ -49,35 +49,33 @@ public class LinesAndMarkersAsJsonPayloadTests extends AbstractFileSupplierTests
 
 		final Flux<Message<?>> messageFlux = fileSupplier.get();
 
-		StepVerifier.create(messageFlux)
-				.assertNext((message) -> {
-							try {
-								final Object evaluate = JsonPathUtils.evaluate(message.getPayload(), "$.mark");
-								assertThat(evaluate).isEqualTo(FileSplitter.FileMarker.Mark.START.name());
-							}
-							catch (IOException e) {
-								// passt through
-							}
-						}
-				)
-				.assertNext((message) -> assertThat(message.getPayload()).isEqualTo("first line"))
-				.assertNext((message) -> assertThat(message.getPayload()).isEqualTo("second line"))
-				.assertNext((message) -> {
-							try {
-								final Object fileMarker = JsonPathUtils.evaluate(message.getPayload(), "$.mark");
-								assertThat(fileMarker).isEqualTo(FileSplitter.FileMarker.Mark.END.name());
-								FileSplitter.FileMarker fileMarker1 = JsonObjectMapperProvider.newInstance()
-										.fromJson(fileMarker, FileSplitter.FileMarker.class);
-								assertThat(FileSplitter.FileMarker.Mark.END).isEqualTo(fileMarker1.getMark());
-								assertThat(firstFile.toAbsolutePath()).isEqualTo(fileMarker1.getFilePath());
-								assertThat(fileMarker1.getLineCount()).isEqualTo(2);
-							}
-							catch (IOException e) {
-								// passt through
-							}
-						}
-				)
-				.thenCancel()
-				.verify();
+		StepVerifier.create(messageFlux).assertNext((message) -> {
+			try {
+				final Object evaluate = JsonPathUtils.evaluate(message.getPayload(), "$.mark");
+				assertThat(evaluate).isEqualTo(FileSplitter.FileMarker.Mark.START.name());
+			}
+			catch (IOException e) {
+				// passt through
+			}
+		})
+			.assertNext((message) -> assertThat(message.getPayload()).isEqualTo("first line"))
+			.assertNext((message) -> assertThat(message.getPayload()).isEqualTo("second line"))
+			.assertNext((message) -> {
+				try {
+					final Object fileMarker = JsonPathUtils.evaluate(message.getPayload(), "$.mark");
+					assertThat(fileMarker).isEqualTo(FileSplitter.FileMarker.Mark.END.name());
+					FileSplitter.FileMarker fileMarker1 = JsonObjectMapperProvider.newInstance()
+						.fromJson(fileMarker, FileSplitter.FileMarker.class);
+					assertThat(FileSplitter.FileMarker.Mark.END).isEqualTo(fileMarker1.getMark());
+					assertThat(firstFile.toAbsolutePath()).isEqualTo(fileMarker1.getFilePath());
+					assertThat(fileMarker1.getLineCount()).isEqualTo(2);
+				}
+				catch (IOException e) {
+					// passt through
+				}
+			})
+			.thenCancel()
+			.verify();
 	}
+
 }

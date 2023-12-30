@@ -58,14 +58,10 @@ import static org.mockserver.verify.VerificationTimes.once;
 /**
  * @author Christian Tzolov
  */
-@SpringBootTest(
-		webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = {
-				"twitter.connection.consumerKey=consumerKey666",
-				"twitter.connection.consumerSecret=consumerSecret666",
-				"twitter.connection.accessToken=accessToken666",
-				"twitter.connection.accessTokenSecret=accessTokenSecret666"
-		})
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
+		properties = { "twitter.connection.consumerKey=consumerKey666",
+				"twitter.connection.consumerSecret=consumerSecret666", "twitter.connection.accessToken=accessToken666",
+				"twitter.connection.accessTokenSecret=accessTokenSecret666" })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class TwitterGeoFunctionTest {
 
@@ -83,18 +79,12 @@ public abstract class TwitterGeoFunctionTest {
 	public static void recordRequestExpectation(Map<String, List<String>> parameters) {
 
 		mockClient
-				.when(
-						request()
-								.withMethod("GET")
-								.withPath("/geo/search.json")
-								.withQueryStringParameters(parameters),
-						unlimited())
-				.respond(
-						response()
-								.withStatusCode(200)
-								.withHeader("Content-Type", "application/json; charset=utf-8")
-								.withBody(TwitterTestUtils.asString("classpath:/response/search_places_amsterdam.json"))
-								.withDelay(TimeUnit.SECONDS, 1));
+			.when(request().withMethod("GET").withPath("/geo/search.json").withQueryStringParameters(parameters),
+					unlimited())
+			.respond(response().withStatusCode(200)
+				.withHeader("Content-Type", "application/json; charset=utf-8")
+				.withBody(TwitterTestUtils.asString("classpath:/response/search_places_amsterdam.json"))
+				.withDelay(TimeUnit.SECONDS, 1));
 
 	}
 
@@ -109,10 +99,8 @@ public abstract class TwitterGeoFunctionTest {
 		mockServer.stop();
 	}
 
-	@TestPropertySource(properties = {
-			"twitter.geo.search.ip='127.0.0.1'",
-			"twitter.geo.search.query=payload.toUpperCase()"
-	})
+	@TestPropertySource(
+			properties = { "twitter.geo.search.ip='127.0.0.1'", "twitter.geo.search.query=payload.toUpperCase()" })
 	public static class TwitterGeoSearchByIPAndQueryTests extends TwitterGeoFunctionTest {
 
 		@Test
@@ -128,12 +116,10 @@ public abstract class TwitterGeoFunctionTest {
 
 			Message<?> received = twitterUsersFunction.apply(MessageBuilder.withPayload(inPayload).build());
 
-			mockClient.verify(request()
-							.withMethod("GET")
-							.withPath("/geo/search.json")
-							.withQueryStringParameter("ip", "127.0.0.1")
-							.withQueryStringParameter("query", "AMSTERDAM"),
-					once());
+			mockClient.verify(request().withMethod("GET")
+				.withPath("/geo/search.json")
+				.withQueryStringParameter("ip", "127.0.0.1")
+				.withQueryStringParameter("query", "AMSTERDAM"), once());
 
 			String outPayload = new String((byte[]) received.getPayload());
 
@@ -142,13 +128,11 @@ public abstract class TwitterGeoFunctionTest {
 			List places = new ObjectMapper().readValue(outPayload, List.class);
 			assertThat(places).hasSize(12);
 		}
+
 	}
 
-	@TestPropertySource(properties = {
-			"twitter.geo.location.lat='52.378'",
-			"twitter.geo.location.lon='4.9'",
-			"twitter.geo.search.query=payload.toUpperCase()"
-	})
+	@TestPropertySource(properties = { "twitter.geo.location.lat='52.378'", "twitter.geo.location.lon='4.9'",
+			"twitter.geo.search.query=payload.toUpperCase()" })
 	public static class TwitterGeoSearchByLocationTests extends TwitterGeoFunctionTest {
 
 		@Test
@@ -165,13 +149,11 @@ public abstract class TwitterGeoFunctionTest {
 
 			Message<?> received = twitterUsersFunction.apply(MessageBuilder.withPayload(inPayload).build());
 
-			mockClient.verify(request()
-							.withMethod("GET")
-							.withPath("/geo/search.json")
-							.withQueryStringParameter("lat", "52.378")
-							.withQueryStringParameter("long", "4.9")
-							.withQueryStringParameter("query", "Amsterdam"),
-					once());
+			mockClient.verify(request().withMethod("GET")
+				.withPath("/geo/search.json")
+				.withQueryStringParameter("lat", "52.378")
+				.withQueryStringParameter("long", "4.9")
+				.withQueryStringParameter("query", "Amsterdam"), once());
 
 			String outPayload = new String((byte[]) received.getPayload());
 
@@ -180,13 +162,11 @@ public abstract class TwitterGeoFunctionTest {
 			List places = new ObjectMapper().readValue(outPayload, List.class);
 			assertThat(places).hasSize(12);
 		}
+
 	}
 
-	@TestPropertySource(properties = {
-			"twitter.geo.type=reverse",
-			"twitter.geo.location.lat='52.378'",
-			"twitter.geo.location.lon='4.9'"
-	})
+	@TestPropertySource(properties = { "twitter.geo.type=reverse", "twitter.geo.location.lat='52.378'",
+			"twitter.geo.location.lon='4.9'" })
 	public static class TwitterGeoSearchByLocation2Tests extends TwitterGeoFunctionTest {
 
 		@Test
@@ -202,12 +182,10 @@ public abstract class TwitterGeoFunctionTest {
 
 			Message<?> received = twitterUsersFunction.apply(MessageBuilder.withPayload(inPayload).build());
 
-			mockClient.verify(request()
-							.withMethod("GET")
-							.withPath("/geo/search.json")
-							.withQueryStringParameter("lat", "52.378")
-							.withQueryStringParameter("long", "4.9"),
-					once());
+			mockClient.verify(request().withMethod("GET")
+				.withPath("/geo/search.json")
+				.withQueryStringParameter("lat", "52.378")
+				.withQueryStringParameter("long", "4.9"), once());
 
 			String outPayload = new String((byte[]) received.getPayload());
 
@@ -216,13 +194,12 @@ public abstract class TwitterGeoFunctionTest {
 			List places = new ObjectMapper().readValue(outPayload, List.class);
 			assertThat(places).hasSize(12);
 		}
+
 	}
 
-	@TestPropertySource(properties = {
-			"twitter.geo.location.lat=#jsonPath(new String(payload),'$.location.lat')",
+	@TestPropertySource(properties = { "twitter.geo.location.lat=#jsonPath(new String(payload),'$.location.lat')",
 			"twitter.geo.location.lon=#jsonPath(new String(payload),'$.location.lon')",
-			"twitter.geo.search.query=#jsonPath(new String(payload),'$.country')"
-	})
+			"twitter.geo.search.query=#jsonPath(new String(payload),'$.country')" })
 	public static class TwitterGeoSearchJsonPathTests extends TwitterGeoFunctionTest {
 
 		@Test
@@ -237,18 +214,15 @@ public abstract class TwitterGeoFunctionTest {
 
 			String inPayload = "{ \"country\" : \"Netherlands\", \"location\" : { \"lat\" : 52.00 , \"lon\" : 5.0 } }";
 
-			Message<?> received = twitterUsersFunction.apply(MessageBuilder
-					.withPayload(inPayload)
-					.setHeader("contentType", MimeTypeUtils.APPLICATION_JSON_VALUE)
-					.build());
+			Message<?> received = twitterUsersFunction.apply(MessageBuilder.withPayload(inPayload)
+				.setHeader("contentType", MimeTypeUtils.APPLICATION_JSON_VALUE)
+				.build());
 
-			mockClient.verify(request()
-							.withMethod("GET")
-							.withPath("/geo/search.json")
-							.withQueryStringParameter("lat", "52.0")
-							.withQueryStringParameter("long", "5.0")
-							.withQueryStringParameter("query", "Netherlands"),
-					once());
+			mockClient.verify(request().withMethod("GET")
+				.withPath("/geo/search.json")
+				.withQueryStringParameter("lat", "52.0")
+				.withQueryStringParameter("long", "5.0")
+				.withQueryStringParameter("query", "Netherlands"), once());
 
 			String outPayload = new String((byte[]) received.getPayload());
 
@@ -257,23 +231,26 @@ public abstract class TwitterGeoFunctionTest {
 			List places = new ObjectMapper().readValue(outPayload, List.class);
 			assertThat(places).hasSize(12);
 		}
+
 	}
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
 	@Import(TwitterGeoFunctionConfiguration.class)
 	public static class TwitterGeoFunctionTestApplication {
+
 		@Bean
 		@Primary
 		public twitter4j.conf.Configuration twitterConfiguration2(TwitterConnectionProperties properties,
 				Function<TwitterConnectionProperties, ConfigurationBuilder> toConfigurationBuilder) {
 
-			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration =
-					toConfigurationBuilder.andThen(
-							new TwitterTestUtils().mockTwitterUrls(
-									String.format("http://%s:%s", MOCK_SERVER_IP, MOCK_SERVER_PORT)));
+			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration = toConfigurationBuilder
+				.andThen(new TwitterTestUtils()
+					.mockTwitterUrls(String.format("http://%s:%s", MOCK_SERVER_IP, MOCK_SERVER_PORT)));
 
 			return mockedConfiguration.apply(properties).build();
 		}
+
 	}
+
 }

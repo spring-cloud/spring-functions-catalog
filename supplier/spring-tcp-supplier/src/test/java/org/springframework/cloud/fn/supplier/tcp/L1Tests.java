@@ -30,4 +30,5 @@ public class L1Tests extends AbstractTcpSupplierTests {
 	public void test() throws Exception {
 		doTest("\u0003", "foo", "");
 	}
+
 }

@@ -29,6 +29,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class DebeziumProperties {
 
 	public enum DebeziumFormat {
+
 		/**
 		 * JSON change event format.
 		 */
@@ -51,11 +52,12 @@ public class DebeziumProperties {
 		public final String contentType() {
 			return contentType;
 		}
+
 	};
 
 	/**
-	 * Spring pass-trough wrapper for debezium configuration properties. All properties with a 'debezium.properties.*'
-	 * prefix are native Debezium properties.
+	 * Spring pass-trough wrapper for debezium configuration properties. All properties
+	 * with a 'debezium.properties.*' prefix are native Debezium properties.
 	 */
 	private Map<String, String> properties = new HashMap<>();
 
@@ -95,21 +97,24 @@ public class DebeziumProperties {
 	}
 
 	public enum DebeziumOffsetCommitPolicy {
+
 		/**
-		 * Commits offsets as frequently as possible. This may result in reduced performance, but it has the least
-		 * potential for seeing source records more than once upon restart.
+		 * Commits offsets as frequently as possible. This may result in reduced
+		 * performance, but it has the least potential for seeing source records more than
+		 * once upon restart.
 		 */
 		ALWAYS,
 		/**
-		 * Commits offsets no more than the specified time period. If the specified time is less than {@code 0} then the
-		 * policy will behave as ALWAYS policy. Requires the 'debezium.properties.offset.flush.interval.ms' native
-		 * property to be set.
+		 * Commits offsets no more than the specified time period. If the specified time
+		 * is less than {@code 0} then the policy will behave as ALWAYS policy. Requires
+		 * the 'debezium.properties.offset.flush.interval.ms' native property to be set.
 		 */
 		PERIODIC,
 		/**
 		 * Uses the default Debezium engine policy (PERIODIC).
 		 */
 		DEFAULT;
+
 	}
 
 	public DebeziumOffsetCommitPolicy getOffsetCommitPolicy() {
@@ -121,11 +126,13 @@ public class DebeziumProperties {
 	}
 
 	/**
-	 * Converts the Spring Framework "debezium.properties.*" properties into native Debezium configuration.
+	 * Converts the Spring Framework "debezium.properties.*" properties into native
+	 * Debezium configuration.
 	 */
 	public Properties getDebeziumNativeConfiguration() {
 		Properties outProps = new java.util.Properties();
 		outProps.putAll(this.getProperties());
 		return outProps;
 	}
+
 }

@@ -38,8 +38,8 @@ public class JdbcConsumerProperties {
 	private String tableName = "messages";
 
 	/**
-	 * The comma separated colon-based pairs of column names and SpEL expressions for values to insert/update.
-	 * Names are used at initialization time to issue the DDL.
+	 * The comma separated colon-based pairs of column names and SpEL expressions for
+	 * values to insert/update. Names are used at initialization time to issue the DDL.
 	 */
 	private String columns = "payload:payload.toString()";
 
@@ -106,4 +106,5 @@ public class JdbcConsumerProperties {
 		}
 		return this.columnsMap;
 	}
+
 }

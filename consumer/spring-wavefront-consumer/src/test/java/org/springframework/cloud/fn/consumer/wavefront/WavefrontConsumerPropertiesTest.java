@@ -36,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class WavefrontConsumerPropertiesTest {
 
 	private final Expression testExpression = new SpelExpressionParser().parseExpression("#jsonPath(payload,'$')");
+
 	private Validator validator;
 
 	@BeforeEach
@@ -46,7 +47,8 @@ public class WavefrontConsumerPropertiesTest {
 
 	@Test
 	void testRequiredProperties() {
-		final WavefrontConsumerProperties properties = new WavefrontConsumerProperties("v", "v", testExpression, null, null, null, null, "proxy");
+		final WavefrontConsumerProperties properties = new WavefrontConsumerProperties("v", "v", testExpression, null,
+				null, null, null, "proxy");
 		final List<String> emptyValues = Arrays.asList(null, "");
 
 		emptyValues.forEach(emptyValue -> {
@@ -68,8 +70,10 @@ public class WavefrontConsumerPropertiesTest {
 
 	@Test
 	void testValidMetricNameValues() {
-		final WavefrontConsumerProperties properties = new WavefrontConsumerProperties("v", "v", testExpression, null, null, null, null, "proxy");
-		final List<String> validMetricNameValues = Arrays.asList("b", "B", "2", ".", "/", "_", ",", "-", "c.8W-2h_dE_,J-h/");
+		final WavefrontConsumerProperties properties = new WavefrontConsumerProperties("v", "v", testExpression, null,
+				null, null, null, "proxy");
+		final List<String> validMetricNameValues = Arrays.asList("b", "B", "2", ".", "/", "_", ",", "-",
+				"c.8W-2h_dE_,J-h/");
 		assertThat(validator.validate(properties).isEmpty()).isTrue();
 
 		validMetricNameValues.forEach(validMetricNameValue -> {
@@ -86,7 +90,8 @@ public class WavefrontConsumerPropertiesTest {
 
 	@Test
 	void testValidSourceValues() {
-		final WavefrontConsumerProperties properties = new WavefrontConsumerProperties("v", "v", testExpression, null, null, null, null, "proxy");
+		final WavefrontConsumerProperties properties = new WavefrontConsumerProperties("v", "v", testExpression, null,
+				null, null, null, "proxy");
 		final List<String> validSourceValues = Arrays.asList("b", "B", "2", ".", "_", "-", "c.8W-2h_dE_J-h",
 				createStringOfLength(128));
 		assertThat(validator.validate(properties).isEmpty()).isTrue();
@@ -96,7 +101,8 @@ public class WavefrontConsumerPropertiesTest {
 			assertThat(validator.validate(properties).isEmpty()).isTrue();
 		});
 
-		final List<String> invalidSourceValues = Arrays.asList(" ", ":", "a B", "#", "/", ",", createStringOfLength(129));
+		final List<String> invalidSourceValues = Arrays.asList(" ", ":", "a B", "#", "/", ",",
+				createStringOfLength(129));
 		invalidSourceValues.forEach(invalidSourceValue -> {
 			properties.setSource(invalidSourceValue);
 			assertThat(validator.validate(properties).isEmpty()).isFalse();
@@ -108,4 +114,5 @@ public class WavefrontConsumerPropertiesTest {
 		Arrays.fill(chars, 'a');
 		return new String(chars);
 	}
+
 }

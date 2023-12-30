@@ -32,4 +32,5 @@ public class NotNioTests extends AbstractSyslogSupplierTests {
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(0);
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "deserializer.maxMessageSize")).isEqualTo(2048);
 	}
+
 }

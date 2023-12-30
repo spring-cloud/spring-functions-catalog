@@ -25,9 +25,8 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TestPropertySource(properties = {
-	"mail.supplier.idle-imap=true",
-	"mail.supplier.url=imap://user:pw@localhost:${test.mail.server.imap.port}/INBOX"})
+@TestPropertySource(properties = { "mail.supplier.idle-imap=true",
+		"mail.supplier.url=imap://user:pw@localhost:${test.mail.server.imap.port}/INBOX" })
 public class ImapIdlePassTests extends AbstractMailSupplierTests {
 
 	@Test
@@ -37,13 +36,10 @@ public class ImapIdlePassTests extends AbstractMailSupplierTests {
 		// when
 		final Flux<Message<?>> messageFlux = mailSupplier.get();
 		// then
-		StepVerifier.create(messageFlux)
-			.assertNext((message) -> {
-					System.out.println("Message:" + message);
-					assertThat(((String) message.getPayload())).isEqualTo("foo");
-				}
-			)
-			.thenCancel()
-			.verify();
+		StepVerifier.create(messageFlux).assertNext((message) -> {
+			System.out.println("Message:" + message);
+			assertThat(((String) message.getPayload())).isEqualTo("foo");
+		}).thenCancel().verify();
 	}
+
 }

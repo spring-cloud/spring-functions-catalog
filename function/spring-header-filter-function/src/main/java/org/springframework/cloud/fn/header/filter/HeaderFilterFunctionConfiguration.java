@@ -37,7 +37,9 @@ import org.springframework.util.StringUtils;
 @EnableConfigurationProperties(HeaderFilterFunctionProperties.class)
 @ConditionalOnExpression("'${header.filter.remove}'!='' or '${header.filter.delete-all}' != ''")
 public class HeaderFilterFunctionConfiguration {
+
 	private final HeaderFilterFunctionProperties properties;
+
 	public HeaderFilterFunctionConfiguration(HeaderFilterFunctionProperties properties) {
 		this.properties = properties;
 	}
@@ -46,7 +48,7 @@ public class HeaderFilterFunctionConfiguration {
 	public Function<Message<?>, Message<?>> headerFilterFunction() {
 		if (properties.isDeleteAll()) {
 			return (message) -> {
-				var  accessor = new IntegrationMessageHeaderAccessor(message);
+				var accessor = new IntegrationMessageHeaderAccessor(message);
 				var headers = new HashSet<>(message.getHeaders().keySet());
 				headers.removeIf(accessor::isReadOnly);
 				HeaderFilter filter = new HeaderFilter(headers.toArray(new String[0]));

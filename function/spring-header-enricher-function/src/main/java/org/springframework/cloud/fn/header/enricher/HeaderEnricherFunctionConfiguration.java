@@ -58,8 +58,8 @@ public class HeaderEnricherFunctionConfiguration {
 		Enumeration<?> enumeration = props.propertyNames();
 		while (enumeration.hasMoreElements()) {
 			String propertyName = (String) enumeration.nextElement();
-			ExpressionEvaluatingHeaderValueMessageProcessor<?> headerValueMessageProcessor =
-					new ExpressionEvaluatingHeaderValueMessageProcessor<>(props.getProperty(propertyName), null);
+			ExpressionEvaluatingHeaderValueMessageProcessor<?> headerValueMessageProcessor = new ExpressionEvaluatingHeaderValueMessageProcessor<>(
+					props.getProperty(propertyName), null);
 			headerValueMessageProcessor.setBeanFactory(beanFactory);
 			headersToAdd.put(propertyName, headerValueMessageProcessor);
 		}

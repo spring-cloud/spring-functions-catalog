@@ -24,7 +24,6 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.MimeTypeUtils;
 
 /**
- *
  * @author Christian Tzolov
  */
 public class ByteArrayTextToString implements Function<Message<?>, Message<?>> {
@@ -35,17 +34,17 @@ public class ByteArrayTextToString implements Function<Message<?>, Message<?>> {
 		if (message.getPayload() instanceof byte[]) {
 			final MessageHeaders headers = message.getHeaders();
 			String contentType = headers.containsKey(MessageHeaders.CONTENT_TYPE)
-					? headers.get(MessageHeaders.CONTENT_TYPE).toString()
-					: MimeTypeUtils.APPLICATION_JSON_VALUE;
+					? headers.get(MessageHeaders.CONTENT_TYPE).toString() : MimeTypeUtils.APPLICATION_JSON_VALUE;
 
-			if (contentType.contains("text") || contentType.contains("json") || contentType.contains("x-spring-tuple")) {
+			if (contentType.contains("text") || contentType.contains("json")
+					|| contentType.contains("x-spring-tuple")) {
 				message = MessageBuilder.withPayload(new String(((byte[]) message.getPayload())))
-						.copyHeaders(message.getHeaders())
-						.build();
+					.copyHeaders(message.getHeaders())
+					.build();
 			}
 		}
 
 		return message;
 	}
-}
 
+}

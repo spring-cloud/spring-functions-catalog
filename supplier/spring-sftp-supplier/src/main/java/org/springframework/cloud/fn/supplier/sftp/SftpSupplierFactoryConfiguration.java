@@ -63,18 +63,14 @@ public class SftpSupplierFactoryConfiguration {
 	@Bean
 	StandardRotationPolicy rotationPolicy(SftpSupplierProperties properties, DelegatingFactoryWrapper factory) {
 
-		return properties.isMultiSource()
-				? new StandardRotationPolicy(factory.getFactory(),
-				SftpSupplierProperties.keyDirectories(properties), properties.isFair())
-				: null;
+		return properties.isMultiSource() ? new StandardRotationPolicy(factory.getFactory(),
+				SftpSupplierProperties.keyDirectories(properties), properties.isFair()) : null;
 	}
 
 	@Bean
 	public SftpSupplierRotator rotatingAdvice(SftpSupplierProperties properties,
 			@Nullable StandardRotationPolicy rotationPolicy) {
-		return properties.isMultiSource()
-				? new SftpSupplierRotator(properties, rotationPolicy)
-				: null;
+		return properties.isMultiSource() ? new SftpSupplierRotator(properties, rotationPolicy) : null;
 	}
 
 	static SessionFactory<SftpClient.DirEntry> buildFactory(ApplicationContext applicationContext,
@@ -90,7 +86,7 @@ public class SftpSupplierFactoryConfiguration {
 		sftpSessionFactory.setAllowUnknownKeys(factory.isAllowUnknownKeys());
 		if (factory.getKnownHostsExpression() != null) {
 			String knownHostsLocation = factory.getKnownHostsExpression()
-					.getValue(IntegrationContextUtils.getEvaluationContext(applicationContext), String.class);
+				.getValue(IntegrationContextUtils.getEvaluationContext(applicationContext), String.class);
 			Resource knownHostsResource = applicationContext.getResource(knownHostsLocation);
 			sftpSessionFactory.setKnownHostsResource(knownHostsResource);
 		}
@@ -107,8 +103,9 @@ public class SftpSupplierFactoryConfiguration {
 		DelegatingFactoryWrapper(SftpSupplierProperties properties, SessionFactory<SftpClient.DirEntry> defaultFactory,
 				ApplicationContext applicationContext) {
 
-			properties.getFactories().forEach((key, factory) ->
-					this.factories.put(key, SftpSupplierFactoryConfiguration.buildFactory(applicationContext, factory)));
+			properties.getFactories()
+				.forEach((key, factory) -> this.factories.put(key,
+						SftpSupplierFactoryConfiguration.buildFactory(applicationContext, factory)));
 			this.delegatingSessionFactory = new DelegatingSessionFactory<>(this.factories, defaultFactory);
 		}
 

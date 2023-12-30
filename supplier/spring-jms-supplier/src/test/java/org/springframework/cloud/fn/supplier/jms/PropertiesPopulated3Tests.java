@@ -33,14 +33,11 @@ import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@TestPropertySource(properties = {
-		"jms.supplier.sessionTransacted = true", "jms.supplier.destination = jmssource.test.queue",
-		"jms.supplier.messageSelector = JMSCorrelationId=foo",
+@TestPropertySource(properties = { "jms.supplier.sessionTransacted = true",
+		"jms.supplier.destination = jmssource.test.queue", "jms.supplier.messageSelector = JMSCorrelationId=foo",
 		"jms.supplier.subscriptionDurable = false", "jms.supplier.subscriptionShared = false",
-		"spring.jms.listener.acknowledgeMode = AUTO",
-		"spring.jms.listener.concurrency = 3",
-		"spring.jms.listener.maxConcurrency = 4",
-		"spring.jms.pubSubDomain = false" })
+		"spring.jms.listener.acknowledgeMode = AUTO", "spring.jms.listener.concurrency = 3",
+		"spring.jms.listener.maxConcurrency = 4", "spring.jms.pubSubDomain = false" })
 public class PropertiesPopulated3Tests extends AbstractJmsSupplierTests {
 
 	@Autowired
@@ -66,17 +63,13 @@ public class PropertiesPopulated3Tests extends AbstractJmsSupplierTests {
 
 		final Flux<Message<?>> messageFlux = jmsSupplier.get();
 
-		final StepVerifier stepVerifier = StepVerifier.create(messageFlux)
-				.assertNext((message) -> {
-							assertThat(message.getPayload())
-									.isEqualTo("Hello, world!");
-						}
-				)
-				.thenCancel()
-				.verifyLater();
+		final StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
+			assertThat(message.getPayload()).isEqualTo("Hello, world!");
+		}).thenCancel().verifyLater();
 
 		template.convertAndSend("jmssource.test.queue", "Hello, world!");
 
 		stepVerifier.verify();
 	}
+
 }

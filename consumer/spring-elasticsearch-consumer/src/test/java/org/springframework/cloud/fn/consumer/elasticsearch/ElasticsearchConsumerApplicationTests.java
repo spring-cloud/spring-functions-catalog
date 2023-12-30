@@ -65,9 +65,8 @@ public class ElasticsearchConsumerApplicationTests {
 
 	@Container
 	static final ElasticsearchContainer elasticsearch = new ElasticsearchContainer(
-		DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch")
-			.withTag("7.17.7")
-	).withStartupTimeout(Duration.ofSeconds(120))
+			DockerImageName.parse("docker.elastic.co/elasticsearch/elasticsearch").withTag("7.17.7"))
+		.withStartupTimeout(Duration.ofSeconds(120))
 		.withStartupAttempts(3);
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
@@ -78,12 +77,12 @@ public class ElasticsearchConsumerApplicationTests {
 	public void testBasicJsonString() {
 		this.contextRunner
 			.withPropertyValues("elasticsearch.consumer.index=foo", "elasticsearch.consumer.id=1",
-				"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
+					"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
 			.run(context -> {
-				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer", Consumer.class);
+				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer",
+						Consumer.class);
 
-				final String jsonObject = "{\"age\":10,\"dateOfBirth\":1471466076564,"
-					+ "\"fullName\":\"John Doe\"}";
+				final String jsonObject = "{\"age\":10,\"dateOfBirth\":1471466076564," + "\"fullName\":\"John Doe\"}";
 				final Message<String> message = MessageBuilder.withPayload(jsonObject).build();
 
 				elasticsearchConsumer.accept(message);
@@ -102,14 +101,15 @@ public class ElasticsearchConsumerApplicationTests {
 	public void testIdPassedAsMessageHeader() {
 		this.contextRunner
 			.withPropertyValues("elasticsearch.consumer.index=foo",
-				"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
+					"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
 			.run(context -> {
-				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer", Consumer.class);
+				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer",
+						Consumer.class);
 
-				final String jsonObject = "{\"age\":10,\"dateOfBirth\":1471466076564,"
-					+ "\"fullName\":\"John Doe\"}";
+				final String jsonObject = "{\"age\":10,\"dateOfBirth\":1471466076564," + "\"fullName\":\"John Doe\"}";
 				final Message<String> message = MessageBuilder.withPayload(jsonObject)
-					.setHeader(ElasticsearchConsumerConfiguration.INDEX_ID_HEADER, "2").build();
+					.setHeader(ElasticsearchConsumerConfiguration.INDEX_ID_HEADER, "2")
+					.build();
 				log.info("elasticsearchConsumer.accept:{}", message);
 				elasticsearchConsumer.accept(message);
 
@@ -124,13 +124,14 @@ public class ElasticsearchConsumerApplicationTests {
 	}
 
 	@Test
-	@SuppressWarnings({ "unchecked", "rawtypes"})
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void testJsonAsMap() {
 		this.contextRunner
 			.withPropertyValues("elasticsearch.consumer.index=foo", "elasticsearch.consumer.id=3",
-				"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
+					"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
 			.run(context -> {
-				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer", Consumer.class);
+				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer",
+						Consumer.class);
 
 				final Map<String, Object> jsonMap = new HashMap<>();
 				jsonMap.put("age", 10);
@@ -160,13 +161,13 @@ public class ElasticsearchConsumerApplicationTests {
 	public void testAsyncIndexing() {
 		this.contextRunner
 			.withPropertyValues("elasticsearch.consumer.index=foo", "elasticsearch.consumer.async=true",
-				"elasticsearch.consumer.id=5",
-				"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
+					"elasticsearch.consumer.id=5",
+					"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
 			.run(context -> {
-				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer", Consumer.class);
+				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer",
+						Consumer.class);
 
-				final String jsonObject = "{\"age\":10,\"dateOfBirth\":1471466076564,"
-					+ "\"fullName\":\"John Doe\"}";
+				final String jsonObject = "{\"age\":10,\"dateOfBirth\":1471466076564," + "\"fullName\":\"John Doe\"}";
 				final Message<String> message = MessageBuilder.withPayload(jsonObject).build();
 				log.info("elasticsearchConsumer.accept:{}", message);
 				elasticsearchConsumer.accept(message);
@@ -185,16 +186,20 @@ public class ElasticsearchConsumerApplicationTests {
 	@SuppressWarnings("unchecked")
 	public void testBulkIndexingWithIdFromHeader() {
 		this.contextRunner
-			.withPropertyValues("elasticsearch.consumer.index=foo_" + UUID.randomUUID(), "elasticsearch.consumer.batch-size=10",
-				"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
+			.withPropertyValues("elasticsearch.consumer.index=foo_" + UUID.randomUUID(),
+					"elasticsearch.consumer.batch-size=10",
+					"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
 			.run(context -> {
-				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer", Consumer.class);
-				final ElasticsearchConsumerProperties properties = context.getBean(ElasticsearchConsumerProperties.class);
+				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer",
+						Consumer.class);
+				final ElasticsearchConsumerProperties properties = context
+					.getBean(ElasticsearchConsumerProperties.class);
 				final ElasticsearchClient elasticsearchClient = context.getBean(ElasticsearchClient.class);
 
-
 				for (int i = 0; i < properties.getBatchSize(); i++) {
-					final GetRequest getRequest = new GetRequest.Builder().index(properties.getIndex()).id(Integer.toString(i)).build();
+					final GetRequest getRequest = new GetRequest.Builder().index(properties.getIndex())
+						.id(Integer.toString(i))
+						.build();
 					assertThatExceptionOfType(ElasticsearchException.class)
 						.isThrownBy(() -> elasticsearchClient.get(getRequest, JsonData.class))
 						.withFailMessage("Expected index not found exception for message %d")
@@ -202,7 +207,7 @@ public class ElasticsearchConsumerApplicationTests {
 
 					final Message<String> message = MessageBuilder
 						.withPayload("{\"seq\":" + i + ",\"age\":10,\"dateOfBirth\":1471466076564,"
-							+ "\"fullName\":\"John Doe\"}")
+								+ "\"fullName\":\"John Doe\"}")
 						.setHeader(ElasticsearchConsumerConfiguration.INDEX_ID_HEADER, Integer.toString(i))
 						.build();
 					log.info("elasticsearchConsumer.accept:{}", message);
@@ -210,13 +215,14 @@ public class ElasticsearchConsumerApplicationTests {
 				}
 
 				for (int i = 0; i < properties.getBatchSize(); i++) {
-					final GetRequest getRequest = new GetRequest.Builder().index(properties.getIndex()).id(Integer.toString(i)).build();
+					final GetRequest getRequest = new GetRequest.Builder().index(properties.getIndex())
+						.id(Integer.toString(i))
+						.build();
 					final GetResponse<JsonData> response = elasticsearchClient.get(getRequest, JsonData.class);
 
-					assertThat(response.found())
-						.withFailMessage("Document with id=%d cannot be found.", i)
-						.isTrue();
-					assertThat(response.source().toJson().asJsonObject().get("seq").toString()).isEqualTo(Integer.toString(i));
+					assertThat(response.found()).withFailMessage("Document with id=%d cannot be found.", i).isTrue();
+					assertThat(response.source().toJson().asJsonObject().get("seq").toString())
+						.isEqualTo(Integer.toString(i));
 				}
 			});
 	}
@@ -225,16 +231,20 @@ public class ElasticsearchConsumerApplicationTests {
 	@SuppressWarnings("unchecked")
 	public void testBulkIndexingItemFailure() {
 		this.contextRunner
-			.withPropertyValues("elasticsearch.consumer.index=foo_" + UUID.randomUUID(), "elasticsearch.consumer.batch-size=10",
-				"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
+			.withPropertyValues("elasticsearch.consumer.index=foo_" + UUID.randomUUID(),
+					"elasticsearch.consumer.batch-size=10",
+					"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
 			.run(context -> {
-				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer", Consumer.class);
-				final ElasticsearchConsumerProperties properties = context.getBean(ElasticsearchConsumerProperties.class);
+				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer",
+						Consumer.class);
+				final ElasticsearchConsumerProperties properties = context
+					.getBean(ElasticsearchConsumerProperties.class);
 				final ElasticsearchClient elasticsearchClient = context.getBean(ElasticsearchClient.class);
 
-
 				for (int i = 0; i < properties.getBatchSize(); i++) {
-					final GetRequest getRequest = new GetRequest.Builder().index(properties.getIndex()).id(Integer.toString(i)).build();
+					final GetRequest getRequest = new GetRequest.Builder().index(properties.getIndex())
+						.id(Integer.toString(i))
+						.build();
 					assertThatExceptionOfType(ElasticsearchException.class)
 						.isThrownBy(() -> elasticsearchClient.get(getRequest, JsonData.class))
 						.withFailMessage("Expected index not found exception for message %d")
@@ -242,12 +252,13 @@ public class ElasticsearchConsumerApplicationTests {
 
 					MessageBuilder<String> builder = MessageBuilder
 						.withPayload("{\"seq\":" + i + ",\"age\":10,\"dateOfBirth\":1471466076564,"
-							+ "\"fullName\":\"John Doe\"}")
+								+ "\"fullName\":\"John Doe\"}")
 						.setHeader(ElasticsearchConsumerConfiguration.INDEX_ID_HEADER, Integer.toString(i));
 
 					if (i == 0) {
 						// set an invalid index name to make the first request fail
-						builder.setHeader(ElasticsearchConsumerConfiguration.INDEX_NAME_HEADER, "_" + properties.getIndex());
+						builder.setHeader(ElasticsearchConsumerConfiguration.INDEX_NAME_HEADER,
+								"_" + properties.getIndex());
 					}
 
 					final Message<String> message = builder.build();
@@ -258,8 +269,7 @@ public class ElasticsearchConsumerApplicationTests {
 					}
 					else {
 						// last invocation
-						assertThatIllegalStateException()
-							.isThrownBy(() -> elasticsearchConsumer.accept(message))
+						assertThatIllegalStateException().isThrownBy(() -> elasticsearchConsumer.accept(message))
 							.withMessageContaining("Bulk indexing operation completed with failures");
 					}
 				}
@@ -271,15 +281,16 @@ public class ElasticsearchConsumerApplicationTests {
 	public void testIndexFromMessageHeader() {
 		this.contextRunner
 			.withPropertyValues("elasticsearch.consumer.index=foo",
-				"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
+					"spring.elasticsearch.rest.uris=http://" + elasticsearch.getHttpHostAddress())
 			.run(context -> {
-				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer", Consumer.class);
-				final ElasticsearchConsumerProperties properties = context.getBean(ElasticsearchConsumerProperties.class);
+				final Consumer<Message<?>> elasticsearchConsumer = context.getBean("elasticsearchConsumer",
+						Consumer.class);
+				final ElasticsearchConsumerProperties properties = context
+					.getBean(ElasticsearchConsumerProperties.class);
 
 				final String dynamicIndex = properties.getIndex() + "-2";
 
-				final String jsonObject = "{\"age\":10,\"dateOfBirth\":1471466076564,"
-					+ "\"fullName\":\"John Doe\"}";
+				final String jsonObject = "{\"age\":10,\"dateOfBirth\":1471466076564," + "\"fullName\":\"John Doe\"}";
 				final Message<String> message = MessageBuilder.withPayload(jsonObject)
 					.setHeader(ElasticsearchConsumerConfiguration.INDEX_ID_HEADER, "2")
 					.setHeader(ElasticsearchConsumerConfiguration.INDEX_NAME_HEADER, dynamicIndex)
@@ -299,16 +310,18 @@ public class ElasticsearchConsumerApplicationTests {
 
 	@SpringBootApplication
 	static class ElasticsearchConsumerTestApplication {
+
 	}
 
 	@Configuration
 	static class Config extends ElasticsearchConfiguration {
+
 		@NonNull
 		@Override
 		public ClientConfiguration clientConfiguration() {
-			return ClientConfiguration.builder()
-				.connectedTo(elasticsearch.getHttpHostAddress())
-				.build();
+			return ClientConfiguration.builder().connectedTo(elasticsearch.getHttpHostAddress()).build();
 		}
+
 	}
+
 }

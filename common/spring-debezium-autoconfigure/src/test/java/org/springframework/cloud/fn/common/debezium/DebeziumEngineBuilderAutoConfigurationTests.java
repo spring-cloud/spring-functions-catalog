@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DebeziumEngineBuilderAutoConfigurationTests {
 
 	private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
-			.withConfiguration(AutoConfigurations.of(DebeziumEngineBuilderAutoConfiguration.class));
+		.withConfiguration(AutoConfigurations.of(DebeziumEngineBuilderAutoConfiguration.class));
 
 	// We have the debezium connectors on the classpath by default.
 
@@ -47,10 +47,10 @@ public class DebeziumEngineBuilderAutoConfigurationTests {
 	@Test
 	void noConnectorWithProperty() {
 		this.contextRunner.withPropertyValues("debezium.properties.connector.class=Dummy")
-				.withClassLoader(new FilteredClassLoader("io.debezium.connector"))
-				.run((context) -> {
-					assertThat(context).doesNotHaveBean(DebeziumEngine.Builder.class);
-				});
+			.withClassLoader(new FilteredClassLoader("io.debezium.connector"))
+			.run((context) -> {
+				assertThat(context).doesNotHaveBean(DebeziumEngine.Builder.class);
+			});
 	}
 
 	@Test

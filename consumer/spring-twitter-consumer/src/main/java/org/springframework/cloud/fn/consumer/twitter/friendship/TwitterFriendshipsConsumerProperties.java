@@ -25,7 +25,6 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
-
 /**
  * @author Christian Tzolov
  */
@@ -35,8 +34,10 @@ import org.springframework.validation.annotation.Validated;
 public class TwitterFriendshipsConsumerProperties {
 
 	public enum OperationType {
+
 		/** Friendship operation types. */
 		create, update, destroy
+
 	}
 
 	/**
@@ -102,6 +103,7 @@ public class TwitterFriendshipsConsumerProperties {
 	}
 
 	public static class Create {
+
 		/**
 		 * The ID of the user to follow (boolean).
 		 */
@@ -115,9 +117,11 @@ public class TwitterFriendshipsConsumerProperties {
 		public void setFollow(Expression follow) {
 			this.follow = follow;
 		}
+
 	}
 
 	public static class Update {
+
 		/**
 		 * Enable/disable device notifications from the target user.
 		 */
@@ -145,5 +149,7 @@ public class TwitterFriendshipsConsumerProperties {
 		public void setRetweets(Expression retweets) {
 			this.retweets = retweets;
 		}
+
 	}
+
 }

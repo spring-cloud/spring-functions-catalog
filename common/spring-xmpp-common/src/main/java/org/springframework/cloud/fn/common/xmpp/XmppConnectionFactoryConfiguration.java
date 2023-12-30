@@ -33,7 +33,8 @@ public class XmppConnectionFactoryConfiguration {
 
 	@Bean
 	@ConditionalOnMissingBean
-	public XmppConnectionFactoryBean xmppConnectionFactoryBean(XmppConnectionFactoryProperties properties) throws XmppStringprepException {
+	public XmppConnectionFactoryBean xmppConnectionFactoryBean(XmppConnectionFactoryProperties properties)
+			throws XmppStringprepException {
 
 		XmppConnectionFactoryBean xmppConnectionFactoryBean = new XmppConnectionFactoryBean();
 		xmppConnectionFactoryBean.setSubscriptionMode(properties.getSubscriptionMode());
@@ -48,11 +49,12 @@ public class XmppConnectionFactoryConfiguration {
 
 		if (StringUtils.hasText(properties.getServiceName())) {
 			builder.setUsernameAndPassword(properties.getUser(), properties.getPassword())
-					.setXmppDomain(properties.getServiceName());
+				.setXmppDomain(properties.getServiceName());
 		}
 		else {
-			builder.setUsernameAndPassword(XmppStringUtils.parseLocalpart(properties.getUser()), properties.getPassword())
-					.setXmppDomain(properties.getUser());
+			builder
+				.setUsernameAndPassword(XmppStringUtils.parseLocalpart(properties.getUser()), properties.getPassword())
+				.setXmppDomain(properties.getUser());
 		}
 
 		xmppConnectionFactoryBean.setConnectionConfiguration(builder.build());

@@ -27,31 +27,25 @@ import org.tensorflow.Tensor;
 public class ReleaseTensorParameters implements AutoCloseable {
 
 	private final GraphRunner graph1;
+
 	private final GraphRunner graph2;
 
 	public ReleaseTensorParameters() {
-		this.graph1 = new GraphRunner("x1", "y1")
-				.withGraphDefinition(tf -> tf.withName("y1").math.mul(
-						tf.withName("x1").placeholder(Integer.class),
-						tf.constant(2)));
+		this.graph1 = new GraphRunner("x1", "y1").withGraphDefinition(
+				tf -> tf.withName("y1").math.mul(tf.withName("x1").placeholder(Integer.class), tf.constant(2)));
 
-		this.graph2 = new GraphRunner("x2", "y2")
-				.withGraphDefinition(tf -> tf.withName("y2").math.add(
-						tf.withName("x2").placeholder(Integer.class),
-						tf.constant(20)));
+		this.graph2 = new GraphRunner("x2", "y2").withGraphDefinition(
+				tf -> tf.withName("y2").math.add(tf.withName("x2").placeholder(Integer.class), tf.constant(20)));
 	}
 
 	// y = (x * 2) + 20
 	public int compute(Integer input) {
-		try (
-				Tensor x = Tensor.create(input);
-				GraphRunnerMemory memory = new GraphRunnerMemory();
-		) {
+		try (Tensor x = Tensor.create(input); GraphRunnerMemory memory = new GraphRunnerMemory();) {
 
-			Map<String, Tensor<?>> result =
-					this.graph1.andThen(memory)
-							.andThen(graph2).andThen(memory)
-							.apply(Collections.singletonMap("x", x));
+			Map<String, Tensor<?>> result = this.graph1.andThen(memory)
+				.andThen(graph2)
+				.andThen(memory)
+				.apply(Collections.singletonMap("x", x));
 
 			memory.getTensorMap().entrySet().forEach(e -> System.out.println("  " + e));
 
@@ -73,5 +67,5 @@ public class ReleaseTensorParameters implements AutoCloseable {
 			}
 		}
 	}
-}
 
+}

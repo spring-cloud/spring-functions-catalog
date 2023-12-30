@@ -57,39 +57,33 @@ public class HttpSupplierConfiguration {
 
 	@Bean
 	public Publisher<Message<byte[]>> httpSupplierFlow(HttpSupplierProperties httpSupplierProperties,
-			HeaderMapper<HttpHeaders> httpHeaderMapper,
-			ServerCodecConfigurer serverCodecConfigurer) {
+			HeaderMapper<HttpHeaders> httpHeaderMapper, ServerCodecConfigurer serverCodecConfigurer) {
 
-		return IntegrationFlow.from(
-						WebFlux.inboundChannelAdapter(httpSupplierProperties.getPathPattern())
-								.requestPayloadType(byte[].class)
-								.statusCodeExpression(new ValueExpression<>(HttpStatus.ACCEPTED))
-								.headerMapper(httpHeaderMapper)
-								.codecConfigurer(serverCodecConfigurer)
-								.crossOrigin(crossOrigin ->
-										crossOrigin.origin(httpSupplierProperties.getCors().getAllowedOrigins())
-												.allowedHeaders(httpSupplierProperties.getCors().getAllowedHeaders())
-												.allowCredentials(httpSupplierProperties.getCors().getAllowCredentials()))
-								.autoStartup(false))
-				.enrichHeaders((headers) ->
-						headers.headerFunction(MessageHeaders.CONTENT_TYPE,
-								(message) ->
-										(MediaType.APPLICATION_FORM_URLENCODED.equals(
-												message.getHeaders().get(MessageHeaders.CONTENT_TYPE, MediaType.class)))
-												? MediaType.APPLICATION_JSON
-												: null,
-								true))
-				.toReactivePublisher();
+		return IntegrationFlow
+			.from(WebFlux.inboundChannelAdapter(httpSupplierProperties.getPathPattern())
+				.requestPayloadType(byte[].class)
+				.statusCodeExpression(new ValueExpression<>(HttpStatus.ACCEPTED))
+				.headerMapper(httpHeaderMapper)
+				.codecConfigurer(serverCodecConfigurer)
+				.crossOrigin(crossOrigin -> crossOrigin.origin(httpSupplierProperties.getCors().getAllowedOrigins())
+					.allowedHeaders(httpSupplierProperties.getCors().getAllowedHeaders())
+					.allowCredentials(httpSupplierProperties.getCors().getAllowCredentials()))
+				.autoStartup(false))
+			.enrichHeaders((headers) -> headers.headerFunction(MessageHeaders.CONTENT_TYPE,
+					(message) -> (MediaType.APPLICATION_FORM_URLENCODED
+						.equals(message.getHeaders().get(MessageHeaders.CONTENT_TYPE, MediaType.class)))
+								? MediaType.APPLICATION_JSON : null,
+					true))
+			.toReactivePublisher();
 	}
 
 	@Bean
-	public Supplier<Flux<Message<byte[]>>> httpSupplier(
-			Publisher<Message<byte[]>> httpRequestPublisher,
+	public Supplier<Flux<Message<byte[]>>> httpSupplier(Publisher<Message<byte[]>> httpRequestPublisher,
 			WebFluxInboundEndpoint webFluxInboundEndpoint) {
 
 		return () -> Flux.from(httpRequestPublisher)
-				.doOnSubscribe((subscription) -> webFluxInboundEndpoint.start())
-				.doOnTerminate(webFluxInboundEndpoint::stop);
+			.doOnSubscribe((subscription) -> webFluxInboundEndpoint.start())
+			.doOnTerminate(webFluxInboundEndpoint::stop);
 	}
 
 }

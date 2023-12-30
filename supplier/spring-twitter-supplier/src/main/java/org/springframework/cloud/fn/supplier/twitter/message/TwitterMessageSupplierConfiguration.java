@@ -38,7 +38,6 @@ import org.springframework.integration.metadata.SimpleMetadataStore;
 import org.springframework.messaging.Message;
 
 /**
- *
  * @author Christian Tzolov
  */
 @EnableConfigurationProperties({ TwitterMessageSupplierProperties.class })
@@ -65,16 +64,17 @@ public class TwitterMessageSupplierConfiguration {
 		return () -> {
 			try {
 				String cs = cursorState.getCursor();
-				DirectMessageList messages = (cursorState.getCursor() == null) ?
-						twitter.getDirectMessages(properties.getCount()) :
-						twitter.getDirectMessages(properties.getCount(), cursorState.getCursor());
+				DirectMessageList messages = (cursorState.getCursor() == null)
+						? twitter.getDirectMessages(properties.getCount())
+						: twitter.getDirectMessages(properties.getCount(), cursorState.getCursor());
 
 				if (messages != null) {
 					cursorState.updateCursor(messages.getNextCursor());
 					return messages;
 				}
 
-				logger.error(String.format("NULL messages response for properties: %s and cursor: %s!", properties, cursorState));
+				logger.error(String.format("NULL messages response for properties: %s and cursor: %s!", properties,
+						cursorState));
 				cursorState.updateCursor(null);
 			}
 			catch (TwitterException e) {
@@ -100,12 +100,14 @@ public class TwitterMessageSupplierConfiguration {
 	}
 
 	@Bean
-	public Supplier<Message<byte[]>> twitterMessageSupplier(Function<List<DirectMessage>, List<DirectMessage>> messageDeduplicate,
+	public Supplier<Message<byte[]>> twitterMessageSupplier(
+			Function<List<DirectMessage>, List<DirectMessage>> messageDeduplicate,
 			Function<Object, Message<byte[]>> managedJson, Supplier<List<DirectMessage>> directMessagesSupplier) {
 		return () -> messageDeduplicate.andThen(managedJson).apply(directMessagesSupplier.get());
 	}
 
 	public static class MessageCursor {
+
 		private String cursor = null;
 
 		public String getCursor() {
@@ -118,9 +120,9 @@ public class TwitterMessageSupplierConfiguration {
 
 		@Override
 		public String toString() {
-			return "Cursor{" +
-					"cursor=" + cursor +
-					'}';
+			return "Cursor{" + "cursor=" + cursor + '}';
 		}
+
 	}
+
 }

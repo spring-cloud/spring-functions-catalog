@@ -58,12 +58,12 @@ public class ProtoBufGraphDefinition implements GraphDefinition {
 				: new ModelExtractor().getModel(this.modelLocation);
 		// Import the pre-trained model
 		((Graph) tf.scope().env()).importGraphDef(model);
-		//try {
-		//	((Graph) tf.scope().env()).importGraphDef(GraphDef.parseFrom(model));
-		//}
-		//catch (InvalidProtocolBufferException e) {
-		//	throw new RuntimeException(e);
-		//}
+		// try {
+		// ((Graph) tf.scope().env()).importGraphDef(GraphDef.parseFrom(model));
+		// }
+		// catch (InvalidProtocolBufferException e) {
+		// throw new RuntimeException(e);
+		// }
 
 		Graph graph = ((Graph) tf.scope().env());
 		Iterator<Operation> ops = graph.operations();
@@ -71,4 +71,5 @@ public class ProtoBufGraphDefinition implements GraphDefinition {
 			System.out.println(ops.next().name());
 		}
 	}
+
 }

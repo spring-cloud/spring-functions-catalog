@@ -43,13 +43,9 @@ import org.springframework.integration.test.util.TestUtils;
 public class AmazonS3ConfigurationTests {
 
 	private final ApplicationContextRunner runner = new ApplicationContextRunner()
-			.withConfiguration(
-					AutoConfigurations.of(
-							AwsAutoConfiguration.class,
-							S3AutoConfiguration.class,
-							S3CrtAsyncClientAutoConfiguration.class,
-							AmazonS3Configuration.class))
-			.withUserConfiguration(TestConfiguration.class);
+		.withConfiguration(AutoConfigurations.of(AwsAutoConfiguration.class, S3AutoConfiguration.class,
+				S3CrtAsyncClientAutoConfiguration.class, AmazonS3Configuration.class))
+		.withUserConfiguration(TestConfiguration.class);
 
 	private static final String TEST_REGION_NAME = "eu-central-1";
 
@@ -61,22 +57,21 @@ public class AmazonS3ConfigurationTests {
 			S3Utilities utilities = amazonS3.utilities();
 			Assertions.assertEquals(TEST_REGION_NAME,
 					TestUtils.getPropertyValue(utilities, "region", Region.class).id());
-			Assertions.assertTrue(
-					utilities.getUrl(GetUrlRequest.builder().bucket("b").key("k").build()).toString()
-							.startsWith("https://s3.eu-central-1.amazonaws.com"));
+			Assertions.assertTrue(utilities.getUrl(GetUrlRequest.builder().bucket("b").key("k").build())
+				.toString()
+				.startsWith("https://s3.eu-central-1.amazonaws.com"));
 		});
 	}
 
 	@Test
 	public void testAmazonS3ConfigurationForS3CompatibleStorage() {
-		runner.withPropertyValues(
-				"spring.cloud.aws.s3.endpoint=http://localhost:8080"
-		).run(context -> {
+		runner.withPropertyValues("spring.cloud.aws.s3.endpoint=http://localhost:8080").run(context -> {
 			S3Client amazonS3 = context.getBean(S3Client.class);
 			Assertions.assertNotNull(amazonS3);
 			S3Utilities utilities = amazonS3.utilities();
-			Assertions.assertTrue(utilities.getUrl(GetUrlRequest.builder().bucket("b").key("k").build()).toString()
-					.startsWith("http://localhost:8080"));
+			Assertions.assertTrue(utilities.getUrl(GetUrlRequest.builder().bucket("b").key("k").build())
+				.toString()
+				.startsWith("http://localhost:8080"));
 		});
 	}
 

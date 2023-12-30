@@ -56,10 +56,8 @@ public class JmsSupplierConfiguration {
 	}
 
 	@Bean
-	public Publisher<Message<byte[]>> jmsPublisher(
-			AbstractMessageListenerContainer container,
-			@Nullable ComponentCustomizer<JmsMessageDrivenChannelAdapterSpec<?>>
-					jmsMessageDrivenChannelAdapterSpecCustomizer) {
+	public Publisher<Message<byte[]>> jmsPublisher(AbstractMessageListenerContainer container,
+			@Nullable ComponentCustomizer<JmsMessageDrivenChannelAdapterSpec<?>> jmsMessageDrivenChannelAdapterSpecCustomizer) {
 
 		JmsMessageDrivenChannelAdapterSpec<?> messageProducerSpec = Jms.messageDrivenChannelAdapter(container);
 
@@ -67,8 +65,7 @@ public class JmsSupplierConfiguration {
 			jmsMessageDrivenChannelAdapterSpecCustomizer.customize(messageProducerSpec);
 		}
 
-		return IntegrationFlow.from(messageProducerSpec)
-				.toReactivePublisher(true);
+		return IntegrationFlow.from(messageProducerSpec).toReactivePublisher(true);
 	}
 
 	@Bean
@@ -89,7 +86,7 @@ public class JmsSupplierConfiguration {
 		else {
 			SimpleMessageListenerContainer smlc = new SimpleMessageListenerContainer();
 			smlc.setSessionTransacted(false);
-			if (listenerProperties != null  && listenerProperties.getConcurrency() != null) {
+			if (listenerProperties != null && listenerProperties.getConcurrency() != null) {
 				smlc.setConcurrentConsumers(listenerProperties.getConcurrency());
 			}
 			container = smlc;
@@ -103,8 +100,7 @@ public class JmsSupplierConfiguration {
 			container.setMessageSelector(this.properties.getMessageSelector());
 		}
 		container.setPubSubDomain(this.jmsProperties.isPubSubDomain());
-		if (this.properties.getMessageSelector() != null
-				&& listenerProperties.getAcknowledgeMode() != null) {
+		if (this.properties.getMessageSelector() != null && listenerProperties.getAcknowledgeMode() != null) {
 			container.setSessionAcknowledgeMode(listenerProperties.getAcknowledgeMode().getMode());
 		}
 		if (this.properties.getSubscriptionDurable() != null) {

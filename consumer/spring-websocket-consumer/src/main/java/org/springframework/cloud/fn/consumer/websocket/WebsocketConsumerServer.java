@@ -33,9 +33,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Bootstraps a Netty server using the {@link WebsocketConsumerServerInitializer}. Also adds
- * a {@link LoggingHandler} and uses the <code>logLevel</code>
- * from {@link WebsocketConsumerProperties#logLevel}.
+ * Bootstraps a Netty server using the {@link WebsocketConsumerServerInitializer}. Also
+ * adds a {@link LoggingHandler} and uses the <code>logLevel</code> from
+ * {@link WebsocketConsumerProperties#logLevel}.
  *
  * @author Oliver Moser
  * @author Gary Russell
@@ -57,7 +57,8 @@ public class WebsocketConsumerServer {
 
 	private int port;
 
-	public WebsocketConsumerServer(WebsocketConsumerProperties properties, WebsocketConsumerServerInitializer initializer) {
+	public WebsocketConsumerServer(WebsocketConsumerProperties properties,
+			WebsocketConsumerServerInitializer initializer) {
 		this.properties = properties;
 		this.initializer = initializer;
 	}
@@ -80,12 +81,12 @@ public class WebsocketConsumerServer {
 
 	public void run() throws InterruptedException {
 		NioServerSocketChannel channel = (NioServerSocketChannel) new ServerBootstrap().group(bossGroup, workerGroup)
-				.channel(NioServerSocketChannel.class)
-				.handler(new LoggingHandler(nettyLogLevel()))
-				.childHandler(initializer)
-				.bind(properties.getPort())
-				.sync()
-				.channel();
+			.channel(NioServerSocketChannel.class)
+			.handler(new LoggingHandler(nettyLogLevel()))
+			.childHandler(initializer)
+			.bind(properties.getPort())
+			.sync()
+			.channel();
 		this.port = channel.localAddress().getPort();
 		dumpProperties();
 	}

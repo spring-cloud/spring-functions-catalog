@@ -75,10 +75,9 @@ public class AbstractTcpConsumerTests {
 		server.shutDown();
 	}
 
-
 	/*
-	 * Sends two messages and asserts they arrive as expected on the other side using
-	 * the supplied decoder.
+	 * Sends two messages and asserts they arrive as expected on the other side using the
+	 * supplied decoder.
 	 */
 	protected void doTest(AbstractByteArraySerializer decoder) throws Exception {
 		server.setDecoder(decoder);
@@ -93,8 +92,8 @@ public class AbstractTcpConsumerTests {
 	}
 
 	/**
-	 * TCP server that uses the supplied {@link AbstractByteArraySerializer}
-	 * to decode the input stream and put the resulting message in a queue.
+	 * TCP server that uses the supplied {@link AbstractByteArraySerializer} to decode the
+	 * input stream and put the resulting message in a queue.
 	 *
 	 */
 	private static class TestTCPServer implements Runnable {
@@ -173,10 +172,12 @@ public class AbstractTcpConsumerTests {
 			catch (IOException e) {
 			}
 		}
+
 	}
 
 	@SpringBootApplication
 	public static class TcpConsumerTestApplication {
 
 	}
+
 }

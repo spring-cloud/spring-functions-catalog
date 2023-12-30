@@ -41,10 +41,12 @@ public class ProxyConnectionWavefrontServiceTest {
 		final String metricInWavefrontFormat = "testMetric";
 		final String wavefrontProxyUrl = "testWavefrontProxyUrl";
 
-		final WavefrontService service = new ProxyConnectionWavefrontService(restTemplateBuilderMock, wavefrontProxyUrl);
+		final WavefrontService service = new ProxyConnectionWavefrontService(restTemplateBuilderMock,
+				wavefrontProxyUrl);
 		service.send(metricInWavefrontFormat);
 
-		verify(restTemplateMock, Mockito.times(1))
-				.postForEntity(eq(wavefrontProxyUrl), eq(metricInWavefrontFormat), eq(Void.class));
+		verify(restTemplateMock, Mockito.times(1)).postForEntity(eq(wavefrontProxyUrl), eq(metricInWavefrontFormat),
+				eq(Void.class));
 	}
+
 }

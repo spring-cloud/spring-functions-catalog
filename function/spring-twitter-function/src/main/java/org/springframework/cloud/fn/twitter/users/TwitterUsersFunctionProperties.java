@@ -34,8 +34,10 @@ public class TwitterUsersFunctionProperties {
 	private static final Expression DEFAULT_EXPRESSION = new SpelExpressionParser().parseExpression("payload");
 
 	public enum UserQueryType {
+
 		/** User retrieval types. */
 		search, lookup
+
 	}
 
 	/**
@@ -45,14 +47,14 @@ public class TwitterUsersFunctionProperties {
 	private UserQueryType type = UserQueryType.search;
 
 	/**
-	 * Returns fully-hydrated user objects for specified by comma-separated values passed to the user_id and/or
-	 * screen_name parameters.
+	 * Returns fully-hydrated user objects for specified by comma-separated values passed
+	 * to the user_id and/or screen_name parameters.
 	 */
 	private final Lookup lookup = new Lookup();
 
 	/**
-	 * relevance-based search interface for querying by topical interest, full name, company name, location,
-	 * or other criteria.
+	 * relevance-based search interface for querying by topical interest, full name,
+	 * company name, location, or other criteria.
 	 */
 	private final Search search = new Search();
 
@@ -85,6 +87,7 @@ public class TwitterUsersFunctionProperties {
 	}
 
 	public static class Lookup {
+
 		/**
 		 * A comma separated list of user IDs, up to 100 are allowed in a single request.
 		 * You are strongly encouraged to use a POST for larger requests.
@@ -92,8 +95,9 @@ public class TwitterUsersFunctionProperties {
 		private Expression userId;
 
 		/**
-		 * A comma separated list of screen names, up to 100 are allowed in a single request.
-		 * You are strongly encouraged to use a POST for larger (up to 100 screen names) requests.
+		 * A comma separated list of screen names, up to 100 are allowed in a single
+		 * request. You are strongly encouraged to use a POST for larger (up to 100 screen
+		 * names) requests.
 		 */
 		private Expression screenName;
 
@@ -112,9 +116,11 @@ public class TwitterUsersFunctionProperties {
 		public void setScreenName(Expression screenName) {
 			this.screenName = screenName;
 		}
+
 	}
 
 	public static class Search {
+
 		/**
 		 * The search query to run against people search.
 		 */
@@ -140,5 +146,7 @@ public class TwitterUsersFunctionProperties {
 		public void setPage(int page) {
 			this.page = page;
 		}
+
 	}
+
 }

@@ -34,7 +34,7 @@ public class FilterFunctionConfiguration {
 
 	@Bean
 	public Function<Message<?>, Message<?>> filterFunction(
-		ExpressionEvaluatingTransformer filterExpressionEvaluatingTransformer) {
+			ExpressionEvaluatingTransformer filterExpressionEvaluatingTransformer) {
 
 		return message -> {
 			if ((Boolean) filterExpressionEvaluatingTransformer.transform(message).getPayload()) {
@@ -48,7 +48,7 @@ public class FilterFunctionConfiguration {
 
 	@Bean
 	public ExpressionEvaluatingTransformer filterExpressionEvaluatingTransformer(
-		FilterFunctionProperties filterFunctionProperties) {
+			FilterFunctionProperties filterFunctionProperties) {
 
 		return new ExpressionEvaluatingTransformer(filterFunctionProperties.getExpression());
 	}

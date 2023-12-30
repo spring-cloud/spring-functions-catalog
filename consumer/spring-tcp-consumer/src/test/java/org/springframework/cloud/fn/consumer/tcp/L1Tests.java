@@ -24,11 +24,12 @@ import org.springframework.test.context.TestPropertySource;
 /**
  * @author Gary Russell
  */
-@TestPropertySource(properties = {"tcp.consumer.encoder = L1"})
+@TestPropertySource(properties = { "tcp.consumer.encoder = L1" })
 public class L1Tests extends AbstractTcpConsumerTests {
 
 	@Test
 	public void test() throws Exception {
 		doTest(new ByteArrayLengthHeaderSerializer(1));
 	}
+
 }

@@ -45,8 +45,11 @@ public final class ImageRecognitionExample2 {
 		System.out.println(inceptions.recognizeTopK(inputImage));
 		System.out.println(ImageRecognition.toRecognitionResponse(inceptions.recognizeTopK(inputImage)));
 
-		IOUtils.write(augmenter.apply(inputImage, ImageRecognition.toRecognitionResponse(inceptions.recognizeTopK(inputImage))),
-				new FileOutputStream("./functions/function/image-recognition-function/target/image-augmented-inceptions.jpg"));
+		IOUtils.write(
+				augmenter.apply(inputImage,
+						ImageRecognition.toRecognitionResponse(inceptions.recognizeTopK(inputImage))),
+				new FileOutputStream(
+						"./functions/function/image-recognition-function/target/image-augmented-inceptions.jpg"));
 		inceptions.close();
 
 		ImageRecognition mobileNetV2 = ImageRecognition.mobileNetV2(
@@ -54,8 +57,11 @@ public final class ImageRecognitionExample2 {
 				224, 10, true);
 		System.out.println(mobileNetV2.recognizeMax(inputImage));
 		System.out.println(mobileNetV2.recognizeTopK(inputImage));
-		IOUtils.write(augmenter.apply(inputImage, ImageRecognition.toRecognitionResponse(mobileNetV2.recognizeTopK(inputImage))),
-				new FileOutputStream("./functions/function/image-recognition-function/target/image-augmented-mobilnetV2.jpg"));
+		IOUtils.write(
+				augmenter.apply(inputImage,
+						ImageRecognition.toRecognitionResponse(mobileNetV2.recognizeTopK(inputImage))),
+				new FileOutputStream(
+						"./functions/function/image-recognition-function/target/image-augmented-mobilnetV2.jpg"));
 		mobileNetV2.close();
 
 		ImageRecognition mobileNetV1 = ImageRecognition.mobileNetV1(
@@ -63,8 +69,12 @@ public final class ImageRecognitionExample2 {
 				224, 10, true);
 		System.out.println(mobileNetV1.recognizeMax(inputImage));
 		System.out.println(mobileNetV1.recognizeTopK(inputImage));
-		IOUtils.write(augmenter.apply(inputImage, ImageRecognition.toRecognitionResponse(mobileNetV1.recognizeTopK(inputImage))),
-				new FileOutputStream("./functions/function/image-recognition-function/target/image-augmented-mobilnetV1.jpg"));
+		IOUtils.write(
+				augmenter.apply(inputImage,
+						ImageRecognition.toRecognitionResponse(mobileNetV1.recognizeTopK(inputImage))),
+				new FileOutputStream(
+						"./functions/function/image-recognition-function/target/image-augmented-mobilnetV1.jpg"));
 		mobileNetV1.close();
 	}
+
 }

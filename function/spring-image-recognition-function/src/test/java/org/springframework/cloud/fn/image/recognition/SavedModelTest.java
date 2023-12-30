@@ -18,7 +18,6 @@ package org.springframework.cloud.fn.image.recognition;
 
 import java.util.Map;
 
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.tensorflow.SavedModelBundle;
 import org.tensorflow.framework.MetaGraphDef;
@@ -40,11 +39,13 @@ public final class SavedModelTest {
 	 *
 	 */
 	public static void main(String[] args) throws InvalidProtocolBufferException {
-		SavedModelBundle savedModelBundle =
-				SavedModelBundle.load("/Users/ctzolov/Downloads/ssd_mobilenet_v1_coco_2017_11_17/saved_model", "serve");
-				//SavedModelBundle.load("/Users/ctzolov/Downloads/aiy_vision_classifier_plants_V1_1/", "serve");
-		//SavedModelBundle savedModelBundle =
-		//		SavedModelBundle.load("/Users/ctzolov/Downloads/mnasnet-a1/saved_model", "serve");
+		SavedModelBundle savedModelBundle = SavedModelBundle
+			.load("/Users/ctzolov/Downloads/ssd_mobilenet_v1_coco_2017_11_17/saved_model", "serve");
+		// SavedModelBundle.load("/Users/ctzolov/Downloads/aiy_vision_classifier_plants_V1_1/",
+		// "serve");
+		// SavedModelBundle savedModelBundle =
+		// SavedModelBundle.load("/Users/ctzolov/Downloads/mnasnet-a1/saved_model",
+		// "serve");
 
 		MetaGraphDef meta = MetaGraphDef.parseFrom(savedModelBundle.metaGraphDef());
 
@@ -54,10 +55,11 @@ public final class SavedModelTest {
 
 		savedModelBundle.session();
 
-		//Iterator<Operation> itr = savedModelBundle.graph().operations();
+		// Iterator<Operation> itr = savedModelBundle.graph().operations();
 		//
-		//while (itr.hasNext()) {
-		//	System.out.println("Operation: " + itr.next());
-		//}
+		// while (itr.hasNext()) {
+		// System.out.println("Operation: " + itr.next());
+		// }
 	}
+
 }
