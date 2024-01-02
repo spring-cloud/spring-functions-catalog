@@ -1,0 +1,5 @@
+dependencies {
+    api 'org.springframework.integration:spring-integration-sftp'
+
+    testImplementation project(':spring-function-test-support')
+}

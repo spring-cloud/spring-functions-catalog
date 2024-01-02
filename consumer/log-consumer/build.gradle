@@ -1,5 +1,0 @@
-dependencies {
-    api project(':payload-converter-function')
-
-    optionalApi 'org.hibernate.validator:hibernate-validator'
-}

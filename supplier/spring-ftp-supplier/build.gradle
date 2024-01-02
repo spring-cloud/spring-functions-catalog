@@ -1,0 +1,8 @@
+dependencies {
+    api project(':spring-ftp-common')
+    api project(':spring-file-common')
+    api project(':spring-metadata-store-common')
+
+    testImplementation project(':spring-function-test-support')
+    testImplementation ftpserverCore
+}

@@ -1,7 +1,0 @@
-dependencies {
-    api 'org.springframework.integration:spring-integration-sftp'
-    api project(':file-common')
-    api project(':metadata-store-common')
-
-    testImplementation project(':function-test-support')
-}

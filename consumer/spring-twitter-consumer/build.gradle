@@ -1,0 +1,4 @@
+dependencies {
+    api project(':spring-twitter-common')
+    api project(':spring-payload-converter-function')
+}

@@ -1,8 +1,0 @@
-dependencies {
-    api project(':ftp-common')
-    api project(':file-common')
-    api project(':metadata-store-common')
-
-    testImplementation project(':function-test-support')
-    testImplementation ftpserverCore
-}

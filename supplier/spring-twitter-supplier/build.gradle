@@ -1,0 +1,7 @@
+dependencies {
+    api project(':spring-twitter-common')
+    api 'org.springframework.integration:spring-integration-jms'
+    api 'jakarta.jms:jakarta.jms-api'
+
+    testImplementation mockserverNetty
+}

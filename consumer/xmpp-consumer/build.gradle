@@ -1,5 +1,0 @@
-dependencies {
-    api project(':xmpp-common')
-
-    testImplementation project(':function-test-support')
-}
