@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,11 +21,10 @@ import java.util.function.Supplier;
 import org.jivesoftware.smack.XMPPConnection;
 import reactor.core.publisher.Flux;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.xmpp.XmppConnectionFactoryConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.integration.channel.FluxMessageChannel;
 import org.springframework.integration.xmpp.inbound.ChatMessageListeningEndpoint;
 import org.springframework.messaging.Message;
@@ -36,12 +35,11 @@ import org.springframework.messaging.Message;
  * @author Daniel Frey
  * @since 4.0.0
  */
-@Configuration
+@AutoConfiguration(after = XmppConnectionFactoryConfiguration.class)
 @EnableConfigurationProperties(XmppSupplierProperties.class)
-@Import(XmppConnectionFactoryConfiguration.class)
 public class XmppSupplierConfiguration {
 
-	private FluxMessageChannel output = new FluxMessageChannel();
+	private final FluxMessageChannel output = new FluxMessageChannel();
 
 	@Bean
 	public ChatMessageListeningEndpoint chatMessageListeningEndpoint(XMPPConnection xmppConnection,
@@ -54,7 +52,7 @@ public class XmppSupplierConfiguration {
 		}
 
 		chatMessageListeningEndpoint.setStanzaFilter(properties.getStanzaFilter());
-		chatMessageListeningEndpoint.setOutputChannel(output);
+		chatMessageListeningEndpoint.setOutputChannel(this.output);
 		chatMessageListeningEndpoint.setAutoStartup(false);
 
 		return chatMessageListeningEndpoint;
@@ -62,7 +60,7 @@ public class XmppSupplierConfiguration {
 
 	@Bean
 	public Supplier<Flux<Message<?>>> xmppSupplier(ChatMessageListeningEndpoint chatMessageListeningEndpoint) {
-		return () -> Flux.from(output).doOnSubscribe(subscription -> chatMessageListeningEndpoint.start());
+		return () -> Flux.from(this.output).doOnSubscribe((subscription) -> chatMessageListeningEndpoint.start());
 	}
 
 }

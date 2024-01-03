@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,14 +20,19 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 import org.jxmpp.stringprep.XmppStringprepException;
 import org.jxmpp.util.XmppStringUtils;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.xmpp.config.XmppConnectionFactoryBean;
 import org.springframework.util.StringUtils;
 
-@Configuration
+/**
+ * The XMPP connection factory auto-configuration.
+ *
+ * @author Daniel Frey
+ */
+@AutoConfiguration
 @EnableConfigurationProperties(XmppConnectionFactoryProperties.class)
 public class XmppConnectionFactoryConfiguration {
 

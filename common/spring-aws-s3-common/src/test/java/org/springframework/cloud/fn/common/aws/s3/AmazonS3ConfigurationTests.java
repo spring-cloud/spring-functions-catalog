@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@ import io.awspring.cloud.autoconfigure.core.AwsAutoConfiguration;
 import io.awspring.cloud.autoconfigure.s3.S3AutoConfiguration;
 import io.awspring.cloud.autoconfigure.s3.S3CrtAsyncClientAutoConfiguration;
 import io.awspring.cloud.core.region.StaticRegionProvider;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
@@ -35,6 +34,8 @@ import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.test.util.TestUtils;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Timo Salm
@@ -51,27 +52,24 @@ public class AmazonS3ConfigurationTests {
 
 	@Test
 	public void testAmazonS3Configuration() {
-		runner.withPropertyValues().run(context -> {
+		runner.withPropertyValues().run((context) -> {
 			S3Client amazonS3 = context.getBean(S3Client.class);
-			Assertions.assertNotNull(amazonS3);
+			assertThat(amazonS3).isNotNull();
 			S3Utilities utilities = amazonS3.utilities();
-			Assertions.assertEquals(TEST_REGION_NAME,
-					TestUtils.getPropertyValue(utilities, "region", Region.class).id());
-			Assertions.assertTrue(utilities.getUrl(GetUrlRequest.builder().bucket("b").key("k").build())
-				.toString()
-				.startsWith("https://s3.eu-central-1.amazonaws.com"));
+			assertThat(TestUtils.getPropertyValue(utilities, "region", Region.class).id()).isEqualTo(TEST_REGION_NAME);
+			assertThat(utilities.getUrl(GetUrlRequest.builder().bucket("b").key("k").build()).toString())
+				.startsWith("https://s3.eu-central-1.amazonaws.com");
 		});
 	}
 
 	@Test
 	public void testAmazonS3ConfigurationForS3CompatibleStorage() {
-		runner.withPropertyValues("spring.cloud.aws.s3.endpoint=http://localhost:8080").run(context -> {
+		runner.withPropertyValues("spring.cloud.aws.s3.endpoint=http://localhost:8080").run((context) -> {
 			S3Client amazonS3 = context.getBean(S3Client.class);
-			Assertions.assertNotNull(amazonS3);
+			assertThat(amazonS3).isNotNull();
 			S3Utilities utilities = amazonS3.utilities();
-			Assertions.assertTrue(utilities.getUrl(GetUrlRequest.builder().bucket("b").key("k").build())
-				.toString()
-				.startsWith("http://localhost:8080"));
+			assertThat(utilities.getUrl(GetUrlRequest.builder().bucket("b").key("k").build()).toString())
+				.startsWith("http://localhost:8080");
 		});
 	}
 

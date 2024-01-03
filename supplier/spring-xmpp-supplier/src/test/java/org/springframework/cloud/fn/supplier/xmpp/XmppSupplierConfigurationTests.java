@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,11 +36,9 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.fn.test.support.xmpp.XmppTestContainerSupport;
-import org.springframework.context.annotation.Import;
 import org.springframework.integration.xmpp.XmppHeaders;
 import org.springframework.messaging.Message;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -122,9 +120,7 @@ public class XmppSupplierConfigurationTests implements XmppTestContainerSupport 
 
 	}
 
-	@SpringBootConfiguration
-	@EnableAutoConfiguration
-	@Import(XmppSupplierConfiguration.class)
+	@SpringBootApplication
 	static class XmppSupplierTestApplication {
 
 	}

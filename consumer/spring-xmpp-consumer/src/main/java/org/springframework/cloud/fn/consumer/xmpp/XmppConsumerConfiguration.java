@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,35 +20,35 @@ import java.util.function.Consumer;
 
 import org.jivesoftware.smack.XMPPConnection;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.xmpp.XmppConnectionFactoryConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.integration.xmpp.XmppHeaders;
 import org.springframework.integration.xmpp.outbound.ChatMessageSendingMessageHandler;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 
 /**
+ * The XMPP consumer auto-configuration.
+ *
  * @author Daniel Frey
  * @since 4.0.0
  */
-@Configuration
+@AutoConfiguration(after = XmppConnectionFactoryConfiguration.class)
 @EnableConfigurationProperties(XmppConsumerProperties.class)
-@Import(XmppConnectionFactoryConfiguration.class)
 public class XmppConsumerConfiguration {
 
 	@Bean
 	public ChatMessageSendingMessageHandler chatMessageSendingMessageHandler(XMPPConnection xmppConnection) {
-
 		return new ChatMessageSendingMessageHandler(xmppConnection);
 	}
 
 	@Bean
 	public Consumer<Message<?>> xmppConsumer(ChatMessageSendingMessageHandler chatMessageSendingMessageHandler,
 			XmppConsumerProperties properties) {
-		return message -> {
+
+		return (message) -> {
 
 			var send = MessageBuilder.fromMessage(message)
 				.setHeaderIfAbsent(XmppHeaders.TO, properties.getChatTo())

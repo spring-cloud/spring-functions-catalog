@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The properties for XMPP connection factory.
+ *
  * @author Daniel Frey
  * @since 4.0.0
  */
@@ -71,7 +73,7 @@ public class XmppConnectionFactoryProperties {
 	}
 
 	public String getResource() {
-		return resource;
+		return this.resource;
 	}
 
 	public void setUser(String user) {
@@ -80,7 +82,7 @@ public class XmppConnectionFactoryProperties {
 
 	@NotEmpty(message = "user is required")
 	public String getUser() {
-		return user;
+		return this.user;
 	}
 
 	public void setPassword(String password) {
@@ -89,7 +91,7 @@ public class XmppConnectionFactoryProperties {
 
 	@NotEmpty(message = "password is required")
 	public String getPassword() {
-		return password;
+		return this.password;
 	}
 
 	public void setServiceName(String serviceName) {
@@ -97,7 +99,7 @@ public class XmppConnectionFactoryProperties {
 	}
 
 	public String getServiceName() {
-		return serviceName;
+		return this.serviceName;
 	}
 
 	public void setHost(String host) {
@@ -106,7 +108,7 @@ public class XmppConnectionFactoryProperties {
 
 	@NotEmpty(message = "host is required")
 	public String getHost() {
-		return host;
+		return this.host;
 	}
 
 	public void setPort(int port) {
@@ -114,7 +116,7 @@ public class XmppConnectionFactoryProperties {
 	}
 
 	public int getPort() {
-		return port;
+		return this.port;
 	}
 
 	public void setSubscriptionMode(Roster.SubscriptionMode subscriptionMode) {
@@ -122,7 +124,7 @@ public class XmppConnectionFactoryProperties {
 	}
 
 	public Roster.SubscriptionMode getSubscriptionMode() {
-		return subscriptionMode;
+		return this.subscriptionMode;
 	}
 
 	public void setSecurityMode(ConnectionConfiguration.SecurityMode securityMode) {
@@ -130,7 +132,7 @@ public class XmppConnectionFactoryProperties {
 	}
 
 	public ConnectionConfiguration.SecurityMode getSecurityMode() {
-		return securityMode;
+		return this.securityMode;
 	}
 
 }
