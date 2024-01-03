@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = { "analytics.name=counter666", "analytics.tag.fixed.foo=",
 		"analytics.tag.expression.tag666=#jsonPath(payload,'$..noField')",
 		"analytics.tag.expression.test=#jsonPath(payload,'$..test')" })
-public class NullTagsTests extends AnalyticsConsumerParentTest {
+public class NullTagsTests extends AnalyticsConsumerParentTests {
 
 	@Test
 	void testАnalyticsSink() {

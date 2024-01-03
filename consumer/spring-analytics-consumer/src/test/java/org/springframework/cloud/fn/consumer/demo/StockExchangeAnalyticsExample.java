@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -75,7 +75,7 @@ public class StockExchangeAnalyticsExample {
 			Supplier<String> stockMessageGenerator) {
 
 		// Run every second.
-		return args -> Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+		return (args) -> Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
 
 			String message = stockMessageGenerator.get();
 
@@ -86,8 +86,8 @@ public class StockExchangeAnalyticsExample {
 			// Print current stock meters
 			System.out.println(meterRegistry.getMeters()
 				.stream()
-				.filter(meter -> meter.getId().getName().contains("stocks"))
-				.map(meter -> meter.getId().getType() + " | " + meter.getId() + " | " + meter.measure())
+				.filter((meter) -> meter.getId().getName().contains("stocks"))
+				.map((meter) -> meter.getId().getType() + " | " + meter.getId() + " | " + meter.measure())
 				.collect(Collectors.joining("\n"))
 					+ "\n=========================================================================");
 

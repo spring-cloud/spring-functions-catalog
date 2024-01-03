@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ package org.springframework.cloud.fn.consumer.analytics;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
+import io.micrometer.core.instrument.Measurement;
 import io.micrometer.core.instrument.Meter;
 import org.junit.jupiter.api.Test;
 
@@ -32,15 +33,15 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @TestPropertySource(
 		properties = { "analytics.name=counter666", "analytics.tag.fixed.foo=bar", "analytics.tag.fixed.gork=bork" })
-public class FixedTagsTests extends AnalyticsConsumerParentTest {
+public class FixedTagsTests extends AnalyticsConsumerParentTests {
 
 	@Test
 	void testAnalyticsSink() {
-		IntStream.range(0, 13).forEach(i -> analyticsConsumer.accept(new GenericMessage<>("hello")));
+		IntStream.range(0, 13).forEach((i) -> analyticsConsumer.accept(new GenericMessage<>("hello")));
 		Meter counterMeter = meterRegistry.find("counter666").meter();
-		assertThat(
-				StreamSupport.stream(counterMeter.measure().spliterator(), false).mapToDouble(m -> m.getValue()).sum())
-			.isEqualTo(13.0);
+		assertThat(StreamSupport.stream(counterMeter.measure().spliterator(), false)
+			.mapToDouble(Measurement::getValue)
+			.sum()).isEqualTo(13.0);
 
 		assertThat(counterMeter.getId().getTags().size()).isEqualTo(2);
 		assertThat(counterMeter.getId().getTag("foo")).isEqualTo("bar");

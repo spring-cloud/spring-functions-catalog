@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,10 +24,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
 import org.springframework.expression.common.LiteralExpression;
+import org.springframework.integration.expression.ValueExpression;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The properties for analytics consumer.
+ *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
 @ConfigurationProperties("analytics")
 @Validated
@@ -86,11 +90,11 @@ public class AnalyticsConsumerProperties {
 	private final MetricsTag tag = new MetricsTag();
 
 	public MetricsTag getTag() {
-		return tag;
+		return this.tag;
 	}
 
 	public MeterType getMeterType() {
-		return meterType;
+		return this.meterType;
 	}
 
 	public void setMeterType(MeterType meterType) {
@@ -98,10 +102,10 @@ public class AnalyticsConsumerProperties {
 	}
 
 	public String getName() {
-		if (name == null && nameExpression == null) {
-			return defaultName;
+		if (this.name == null && this.nameExpression == null) {
+			return this.defaultName;
 		}
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -109,7 +113,7 @@ public class AnalyticsConsumerProperties {
 	}
 
 	public Expression getNameExpression() {
-		return nameExpression;
+		return this.nameExpression;
 	}
 
 	public void setNameExpression(Expression nameExpression) {
@@ -117,7 +121,7 @@ public class AnalyticsConsumerProperties {
 	}
 
 	public Expression getAmountExpression() {
-		return amountExpression;
+		return this.amountExpression;
 	}
 
 	public void setAmountExpression(Expression amountExpression) {
@@ -125,11 +129,11 @@ public class AnalyticsConsumerProperties {
 	}
 
 	public Expression getComputedAmountExpression() {
-		return (amountExpression != null ? amountExpression : new LiteralExpression("1.0"));
+		return (this.amountExpression != null) ? this.amountExpression : new ValueExpression<>(1.0);
 	}
 
 	public Expression getComputedNameExpression() {
-		return (nameExpression != null ? nameExpression : new LiteralExpression(getName()));
+		return (this.nameExpression != null) ? this.nameExpression : new LiteralExpression(getName());
 	}
 
 	@AssertTrue(message = "exactly one of 'name' and 'nameExpression' must be set")
@@ -139,19 +143,17 @@ public class AnalyticsConsumerProperties {
 
 	@Override
 	public String toString() {
-		return "AnalyticsFunctionProperties{" + "defaultName='" + defaultName + '\'' + ", name=" + name + ", tag=" + tag
-				+ '}';
+		return "AnalyticsFunctionProperties{" + "defaultName='" + this.defaultName + '\'' + ", name=" + this.name
+				+ ", tag=" + this.tag + '}';
 	}
 
 	public static class MetricsTag {
 
 		/**
 		 * DEPRECATED: Please use the analytics.tag.expression with literal SpEL
-		 * expression.
-		 *
-		 * Custom, fixed Tags. Those tags have constant values, created once and then sent
-		 * along with every published metrics. The convention to define a fixed Tags is:
-		 * <code>
+		 * expression. Custom, fixed Tags. Those tags have constant values, created once
+		 * and then sent along with every published metrics. The convention to define a
+		 * fixed Tags is: <code>
 		 *   analytics.tag.fixed.[tag-name]=[tag-value]
 		 * </code>
 		 */
@@ -167,7 +169,7 @@ public class AnalyticsConsumerProperties {
 		private Map<String, Expression> expression;
 
 		public Map<String, String> getFixed() {
-			return fixed;
+			return this.fixed;
 		}
 
 		public void setFixed(Map<String, String> fixed) {
@@ -175,7 +177,7 @@ public class AnalyticsConsumerProperties {
 		}
 
 		public Map<String, Expression> getExpression() {
-			return expression;
+			return this.expression;
 		}
 
 		public void setExpression(Map<String, Expression> expression) {
@@ -184,7 +186,7 @@ public class AnalyticsConsumerProperties {
 
 		@Override
 		public String toString() {
-			return "MetricsTag{" + "fixed=" + fixed + ", expression=" + expression + '}';
+			return "MetricsTag{" + "fixed=" + this.fixed + ", expression=" + this.expression + '}';
 		}
 
 	}

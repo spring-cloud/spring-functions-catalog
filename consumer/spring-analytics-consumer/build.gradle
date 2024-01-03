@@ -1,7 +1,7 @@
 dependencies {
     api project(':spring-payload-converter-function')
     api 'io.micrometer:micrometer-core'
+    api 'org.springframework.boot:spring-boot-starter-actuator'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-actuator'
     testImplementation 'io.micrometer:micrometer-registry-wavefront'
 }

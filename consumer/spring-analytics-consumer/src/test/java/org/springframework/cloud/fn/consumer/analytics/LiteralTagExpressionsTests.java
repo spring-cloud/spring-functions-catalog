@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,11 +31,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @TestPropertySource(properties = { "analytics.name=counter666", "analytics.tag.expression.foo='bar'",
 		"analytics.tag.expression.gork='bork'" })
-public class LiteralTagExpressionsTests extends AnalyticsConsumerParentTest {
+public class LiteralTagExpressionsTests extends AnalyticsConsumerParentTests {
 
 	@Test
 	void testCounterSink() {
-		IntStream.range(0, 13).forEach(i -> analyticsConsumer.accept(new GenericMessage<>("hello")));
+		IntStream.range(0, 13).forEach((i) -> analyticsConsumer.accept(new GenericMessage<>("hello")));
 
 		Counter fooCounter = meterRegistry.find("counter666").tag("foo", "bar").counter();
 		assertThat(fooCounter.count()).isEqualTo(13.0);

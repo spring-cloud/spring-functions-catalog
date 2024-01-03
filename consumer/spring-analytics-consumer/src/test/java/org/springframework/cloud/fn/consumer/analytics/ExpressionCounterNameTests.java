@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,11 +29,11 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Christian Tzolov
  */
 @TestPropertySource(properties = { "analytics.name-expression=payload" })
-public class ExpressionCounterNameTests extends AnalyticsConsumerParentTest {
+public class ExpressionCounterNameTests extends AnalyticsConsumerParentTests {
 
 	@Test
 	void testCounterSink() {
-		IntStream.range(0, 13).forEach(i -> analyticsConsumer.accept(new GenericMessage<>("hello")));
+		IntStream.range(0, 13).forEach((i) -> analyticsConsumer.accept(new GenericMessage<>("hello")));
 		assertThat(meterRegistry.find("hello").counter().count()).isEqualTo(13.0);
 	}
 
