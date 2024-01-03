@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ class MessageStoreConfiguration {
 	static class Mongo {
 
 		@Bean
-		public MessageGroupStore messageStore(MongoTemplate mongoTemplate, AggregatorFunctionProperties properties) {
+		MessageGroupStore messageStore(MongoTemplate mongoTemplate, AggregatorFunctionProperties properties) {
 			if (StringUtils.hasText(properties.getMessageStoreEntity())) {
 				return new ConfigurableMongoDbMessageStore(mongoTemplate, properties.getMessageStoreEntity());
 			}
@@ -68,7 +68,7 @@ class MessageStoreConfiguration {
 
 		@Bean
 		@Primary
-		public MongoCustomConversions mongoDbCustomConversions() {
+		MongoCustomConversions mongoDbCustomConversions() {
 			return new MongoCustomConversions(
 					Arrays.asList(new MessageToBinaryConverter(), new BinaryToMessageConverter()));
 		}
@@ -82,7 +82,7 @@ class MessageStoreConfiguration {
 	static class Redis {
 
 		@Bean
-		public MessageGroupStore messageStore(RedisTemplate<?, ?> redisTemplate) {
+		MessageGroupStore messageStore(RedisTemplate<?, ?> redisTemplate) {
 			return new RedisMessageStore(redisTemplate.getConnectionFactory());
 		}
 
@@ -95,7 +95,7 @@ class MessageStoreConfiguration {
 	static class Jdbc {
 
 		@Bean
-		public MessageGroupStore messageStore(JdbcTemplate jdbcTemplate, AggregatorFunctionProperties properties) {
+		MessageGroupStore messageStore(JdbcTemplate jdbcTemplate, AggregatorFunctionProperties properties) {
 			JdbcMessageStore messageStore = new JdbcMessageStore(jdbcTemplate);
 			if (StringUtils.hasText(properties.getMessageStoreEntity())) {
 				messageStore.setTablePrefix(properties.getMessageStoreEntity());

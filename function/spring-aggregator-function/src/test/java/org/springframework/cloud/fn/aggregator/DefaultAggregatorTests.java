@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import java.time.Duration;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
@@ -41,8 +39,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @TestPropertySource(properties = "aggregator.message-store-type=simple")
 public class DefaultAggregatorTests extends AbstractAggregatorFunctionTests {
 
-	private static final Logger logger = LoggerFactory.getLogger(DefaultAggregatorTests.class);
-
 	@Test
 	public void test() {
 		Flux<Message<?>> input = Flux.just(
@@ -58,13 +54,17 @@ public class DefaultAggregatorTests extends AbstractAggregatorFunctionTests {
 					.build());
 
 		Flux<Message<?>> output = this.aggregatorFunction.apply(input.log("DefaultAggregatorTests:input"));
-		output.log("DefaultAggregatorTests:output").as(StepVerifier::create).assertNext((message) -> {
-			assertThat(message).extracting(Message::getPayload).asList().hasSize(2).contains("1", "2");
-		}).thenCancel().verify(Duration.ofSeconds(30));
+		output.log("DefaultAggregatorTests:output")
+			.as(StepVerifier::create)
+			.assertNext((message) -> assertThat(message).extracting(Message::getPayload)
+				.asList()
+				.hasSize(2)
+				.contains("1", "2"))
+			.thenCancel()
+			.verify(Duration.ofSeconds(30));
 
 		assertThat(this.messageGroupStore).isNull();
 		assertThat(this.aggregatingMessageHandler.getMessageStore()).isInstanceOf(SimpleMessageStore.class);
-
 	}
 
 }

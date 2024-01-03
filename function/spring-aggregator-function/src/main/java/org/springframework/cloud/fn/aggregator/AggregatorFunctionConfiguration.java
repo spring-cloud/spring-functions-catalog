@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,6 +49,8 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
 /**
+ * The auto-configuration for aggregator function.
+ *
  * @author Artem Bilan
  * @author Corneil du Plessis
  */
@@ -65,7 +67,7 @@ public class AggregatorFunctionConfiguration {
 	@Bean
 	public Function<Flux<Message<?>>, Flux<Message<?>>> aggregatorFunction(FluxMessageChannel inputChannel,
 			FluxMessageChannel outputChannel) {
-		return input -> Flux.from(outputChannel)
+		return (input) -> Flux.from(outputChannel)
 			.doOnRequest((request) -> inputChannel.subscribeTo(input.map((
 					inputMessage) -> MessageBuilder.fromMessage(inputMessage).removeHeader("kafka_consumer").build())));
 	}
