@@ -6,7 +6,7 @@ buildscript {
 plugins {
 	id 'base'
 	id 'io.spring.dependency-management' version '1.1.4'
-	id "io.spring.javaformat" version "${javaFormatVersion}" apply false
+	id 'io.spring.javaformat' version "${javaFormatVersion}"
 	id 'com.github.spotbugs' version '6.0.4'
 	id 'com.google.protobuf' version '0.9.4' apply false
 }
@@ -66,8 +66,9 @@ configure(javaProjects) { subproject ->
 	apply plugin: 'java-library'
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
+	apply plugin: 'checkstyle'
+	apply plugin: 'io.spring.javaformat'
 	apply from: "${rootDir}/publish-maven.gradle"
-	apply from: "${rootDir}/gradle/checkstyle-conventions.gradle"
 
 	sourceSets {
 		test {
@@ -137,6 +138,22 @@ configure(javaProjects) { subproject ->
 	}
 
 	[compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:all,-options,-processing', '-parameters']
+
+	checkstyle {
+		toolVersion = '10.3'
+		configDirectory = rootProject.file('etc/checkstyle')
+		ignoreFailures = true
+	}
+
+	dependencies {
+		// NOTE: We explicitly specify checkstyle dep before javaformat checkstyle due to antlr class mismatch
+		checkstyle("com.puppycrawl.tools:checkstyle:${checkstyle.toolVersion}")
+		checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:${javaFormatVersion}")
+	}
+
+	tasks.named('checkFormatMain') {
+		exclude 'org/springframework/cloud/fn/object/detection/protos'
+	}
 
 	test {
 		maxHeapSize = '2g'
