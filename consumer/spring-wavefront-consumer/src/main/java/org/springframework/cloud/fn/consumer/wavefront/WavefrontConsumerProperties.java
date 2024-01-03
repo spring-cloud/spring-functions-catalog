@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The configuration properties for Wavefront consumer.
+ *
  * @author Timo Salm
  */
 @ConfigurationProperties("wavefront")
@@ -104,7 +106,7 @@ public class WavefrontConsumerProperties {
 	@NotEmpty
 	@Pattern(regexp = "^[a-zA-Z0-9./_,-]+")
 	public String getMetricName() {
-		return metricName;
+		return this.metricName;
 	}
 
 	public void setMetricName(String metricName) {
@@ -115,7 +117,7 @@ public class WavefrontConsumerProperties {
 	@Size(max = 128)
 	@Pattern(regexp = "^[a-zA-Z0-9._-]+")
 	public String getSource() {
-		return source;
+		return this.source;
 	}
 
 	public void setSource(String source) {
@@ -124,7 +126,7 @@ public class WavefrontConsumerProperties {
 
 	@NotNull
 	public Expression getMetricExpression() {
-		return metricExpression;
+		return this.metricExpression;
 	}
 
 	public void setMetricExpression(Expression metricExpression) {
@@ -132,7 +134,7 @@ public class WavefrontConsumerProperties {
 	}
 
 	public Expression getTimestampExpression() {
-		return timestampExpression;
+		return this.timestampExpression;
 	}
 
 	public void setTimestampExpression(Expression timestampExpression) {
@@ -140,7 +142,7 @@ public class WavefrontConsumerProperties {
 	}
 
 	public Map<String, Expression> getTagExpression() {
-		return tagExpression;
+		return this.tagExpression;
 	}
 
 	public void setTagExpression(Map<String, Expression> tagExpression) {
@@ -148,7 +150,7 @@ public class WavefrontConsumerProperties {
 	}
 
 	public String getUri() {
-		return uri;
+		return this.uri;
 	}
 
 	public void setUri(String uri) {
@@ -156,7 +158,7 @@ public class WavefrontConsumerProperties {
 	}
 
 	public String getApiToken() {
-		return apiToken;
+		return this.apiToken;
 	}
 
 	public void setApiToken(String apiToken) {
@@ -164,7 +166,7 @@ public class WavefrontConsumerProperties {
 	}
 
 	public String getProxyUri() {
-		return proxyUri;
+		return this.proxyUri;
 	}
 
 	public void setProxyUri(String proxyUri) {
@@ -173,8 +175,10 @@ public class WavefrontConsumerProperties {
 
 	@AssertTrue(message = "Exactly one of 'proxy-uri' or the pair of ('uri' and 'api-token') must be set!")
 	public boolean isMutuallyExclusiveProxyAndDirectAccessWavefrontConfiguration() {
-		return StringUtils.isEmpty(getProxyUri())
-				^ (StringUtils.isEmpty(getUri()) || StringUtils.isEmpty(getApiToken()));
+		boolean hasProxyUri = StringUtils.hasText(getProxyUri());
+		boolean hasUri = StringUtils.hasText(getUri());
+		boolean hasApiToken = StringUtils.hasText(getApiToken());
+		return (hasProxyUri && !hasUri && !hasApiToken) || (!hasProxyUri && hasUri && hasApiToken);
 	}
 
 }

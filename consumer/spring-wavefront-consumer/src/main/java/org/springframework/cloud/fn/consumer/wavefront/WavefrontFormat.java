@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,11 +32,13 @@ import org.springframework.expression.spel.SpelEvaluationException;
 import org.springframework.messaging.Message;
 
 /**
+ * The format for Wavefront messages.
+ *
  * @author Timo Salm
  */
 public class WavefrontFormat {
 
-	private static final Log logger = LogFactory.getLog(WavefrontFormat.class);
+	private static final Log LOGGER = LogFactory.getLog(WavefrontFormat.class);
 
 	private final WavefrontConsumerProperties properties;
 
@@ -50,62 +52,64 @@ public class WavefrontFormat {
 	public String getFormattedString() {
 		final Number metricValue = extractMetricValueFromPayload();
 
-		final Map<String, Object> pointTagsMap = extractPointTagsMapFromPayload(properties.getTagExpression(), message);
+		final Map<String, Object> pointTagsMap = extractPointTagsMapFromPayload(this.properties.getTagExpression(),
+				this.message);
 		validatePointTagsKeyValuePairs(pointTagsMap);
 		final String formattedPointTagsPart = getFormattedPointTags(pointTagsMap);
 
-		if (properties.getTimestampExpression() == null) {
+		if (this.properties.getTimestampExpression() == null) {
 			return String
-				.format("\"%s\" %s source=%s %s", properties.getMetricName(), metricValue, properties.getSource(),
-						formattedPointTagsPart)
+				.format("\"%s\" %s source=%s %s", this.properties.getMetricName(), metricValue,
+						this.properties.getSource(), formattedPointTagsPart)
 				.trim();
 		}
 
 		final Long timestamp = extractTimestampFromPayload();
 		return String
-			.format("\"%s\" %s %d source=%s %s", properties.getMetricName(), metricValue, timestamp,
-					properties.getSource(), formattedPointTagsPart)
+			.format("\"%s\" %s %d source=%s %s", this.properties.getMetricName(), metricValue, timestamp,
+					this.properties.getSource(), formattedPointTagsPart)
 			.trim();
 	}
 
 	private Long extractTimestampFromPayload() {
 		try {
-			return properties.getTimestampExpression().getValue(message, Long.class);
+			return this.properties.getTimestampExpression().getValue(this.message, Long.class);
 		}
-		catch (SpelEvaluationException e) {
+		catch (SpelEvaluationException ex) {
 			throw new ValidationException(
 					"The timestamp value has to be a number that reflects the epoch seconds of the "
 							+ "metric (e.g. 1382754475).",
-					e);
+					ex);
 		}
 	}
 
 	private Number extractMetricValueFromPayload() {
 		try {
-			return properties.getMetricExpression().getValue(message, Number.class);
+			return this.properties.getMetricExpression().getValue(this.message, Number.class);
 		}
-		catch (SpelEvaluationException e) {
+		catch (SpelEvaluationException ex) {
 			throw new ValidationException("The metric value has to be a double-precision floating point number or a "
-					+ "long integer. It can be positive, negative, or 0.", e);
+					+ "long integer. It can be positive, negative, or 0.", ex);
 		}
 	}
 
 	private String getFormattedPointTags(Map<String, Object> pointTagsMap) {
 		return pointTagsMap.entrySet()
 			.stream()
-			.map(it -> String.format("%s=\"%s\"", it.getKey(), it.getValue()))
+			.map((it) -> String.format("%s=\"%s\"", it.getKey(), it.getValue()))
 			.collect(Collectors.joining(" "));
 	}
 
 	private Map<String, Object> extractPointTagsMapFromPayload(Map<String, Expression> pointTagsExpressionsPointValue,
 			Message<?> message) {
-		return pointTagsExpressionsPointValue.entrySet().stream().map(it -> {
+
+		return pointTagsExpressionsPointValue.entrySet().stream().map((it) -> {
 			try {
-				final Object pointValue = it.getValue().getValue(message);
+				final Object pointValue = it.getValue().getValue(this.message);
 				return new AbstractMap.SimpleEntry<>(it.getKey(), pointValue);
 			}
-			catch (EvaluationException e) {
-				logger.warn("Unable to extract point tag for key " + it.getKey() + " from payload", e);
+			catch (EvaluationException ex) {
+				LOGGER.warn("Unable to extract point tag for key " + it.getKey() + " from payload", ex);
 				return null;
 			}
 		}).filter(Objects::nonNull).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -120,7 +124,7 @@ public class WavefrontFormat {
 
 			final int keyValueCombinationLength = key.length() + value.toString().length();
 			if (keyValueCombinationLength > 254) {
-				logger.warn("Maximum allowed length for a combination of a point tag key and value "
+				LOGGER.warn("Maximum allowed length for a combination of a point tag key and value "
 						+ "is 254 characters. The length of combination for key " + key + " is "
 						+ keyValueCombinationLength + ".");
 			}

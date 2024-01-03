@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,13 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.client.RestTemplate;
 
 /**
+ * The {@link WavefrontService} implementation for connection over proxy.
+ *
  * @author Timo Salm
  */
 public class ProxyConnectionWavefrontService implements WavefrontService {
 
-	private static final Log logger = LogFactory.getLog(ProxyConnectionWavefrontService.class);
+	private static final Log LOGGER = LogFactory.getLog(ProxyConnectionWavefrontService.class);
 
 	private final RestTemplate restTemplate;
 
@@ -35,16 +37,15 @@ public class ProxyConnectionWavefrontService implements WavefrontService {
 
 	public ProxyConnectionWavefrontService(final RestTemplateBuilder restTemplateBuilder,
 			final String wavefrontProxyUri) {
+
 		this.restTemplate = restTemplateBuilder.build();
 		this.wavefrontProxyUrl = wavefrontProxyUri;
 	}
 
 	@Override
 	public void send(String metricInWavefrontFormat) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Send metric to Wavefront proxy");
-		}
-		restTemplate.postForEntity(wavefrontProxyUrl, metricInWavefrontFormat, Void.class);
+		LOGGER.debug("Send metric to Wavefront proxy");
+		this.restTemplate.postForEntity(this.wavefrontProxyUrl, metricInWavefrontFormat, Void.class);
 	}
 
 }

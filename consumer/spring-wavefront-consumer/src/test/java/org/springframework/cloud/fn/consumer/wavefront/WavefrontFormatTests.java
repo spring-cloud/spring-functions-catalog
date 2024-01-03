@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
@@ -45,11 +44,13 @@ import org.springframework.integration.json.JsonPathUtils;
 import org.springframework.messaging.support.GenericMessage;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatRuntimeException;
 
 /**
  * @author Timo Salm
+ * @author Artem Bilan
  */
-public class WavefrontFormatTest {
+public class WavefrontFormatTests {
 
 	private final SpelExpressionParser parser = new SpelExpressionParser();
 
@@ -110,10 +111,11 @@ public class WavefrontFormatTest {
 		final String dataJsonString = "{ \"value\": a}";
 		final WavefrontConsumerProperties properties = new WavefrontConsumerProperties("testMetricName", "testSource",
 				expression("$.value"), null, Collections.emptyMap(), null, null, null);
-		final Exception exception = Assertions.assertThrows(RuntimeException.class,
-				() -> new WavefrontFormat(properties, new GenericMessage<>(dataJsonString)).getFormattedString());
-		assertThat(exception.getLocalizedMessage().startsWith("The metric value has to be a double-precision floating"))
-			.isTrue();
+
+		assertThatRuntimeException()
+			.isThrownBy(
+					() -> new WavefrontFormat(properties, new GenericMessage<>(dataJsonString)).getFormattedString())
+			.withMessageContaining("The metric value has to be a double-precision floating");
 	}
 
 	@Test
@@ -121,9 +123,10 @@ public class WavefrontFormatTest {
 		final String dataJsonString = "{ \"value\": 1.5, \"timestamp\": 2020-06-02T13:53:18+0000}";
 		final WavefrontConsumerProperties properties = new WavefrontConsumerProperties("testMetricName", "testSource",
 				expression("$.value"), expression("$.timestamp"), Collections.emptyMap(), null, null, null);
-		final Exception exception = Assertions.assertThrows(RuntimeException.class,
-				() -> new WavefrontFormat(properties, new GenericMessage<>(dataJsonString)).getFormattedString());
-		assertThat(exception.getLocalizedMessage().startsWith("The timestamp value has to be a number")).isTrue();
+		assertThatRuntimeException()
+			.isThrownBy(
+					() -> new WavefrontFormat(properties, new GenericMessage<>(dataJsonString)).getFormattedString())
+			.withMessageContaining("The timestamp value has to be a number");
 	}
 
 	@Test
@@ -145,7 +148,7 @@ public class WavefrontFormatTest {
 				+ createStringOfLength(254 - testPointTagKey.length()) + "\" }";
 		new WavefrontFormat(properties, new GenericMessage<>(dataJsonString)).getFormattedString();
 		assertThat(listAppender.list.stream()
-			.filter(event -> event.getMessage().startsWith("Maximum allowed length for a combination"))
+			.filter((event) -> event.getMessage().startsWith("Maximum allowed length for a combination"))
 			.count()).isEqualTo(0);
 
 		final String dataJsonStringWithTooLongValue = "{ \"value\": 1.5, \"testPoint1\": \""
@@ -153,7 +156,7 @@ public class WavefrontFormatTest {
 		new WavefrontFormat(properties, new GenericMessage<>(dataJsonStringWithTooLongValue)).getFormattedString();
 
 		assertThat(listAppender.list.stream()
-			.filter(event -> event.getMessage().startsWith("Maximum allowed length for a combination")
+			.filter((event) -> event.getMessage().startsWith("Maximum allowed length for a combination")
 					&& event.getLevel().equals(Level.WARN))
 			.count()).isEqualTo(1);
 	}
@@ -174,17 +177,16 @@ public class WavefrontFormatTest {
 
 		final List<String> invalidPointTagKeys = Arrays.asList(" ", ":", "a B", "#", "/", ",");
 
-		invalidPointTagKeys.forEach(invalidPointTagKey -> {
+		invalidPointTagKeys.forEach((invalidPointTagKey) -> {
 			final Map<String, Expression> pointTagsExpressionsPointValueMap = Stream
 				.of(new AbstractMap.SimpleEntry<>(invalidPointTagKey, expression("$.testPoint1")))
 				.collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 			final WavefrontConsumerProperties properties = new WavefrontConsumerProperties("testMetricName",
 					"testSource", expression("$.value"), null, pointTagsExpressionsPointValueMap, null, null, null);
 
-			final Exception exception = Assertions.assertThrows(RuntimeException.class,
-					() -> new WavefrontFormat(properties, new GenericMessage<>(dataJsonString)).getFormattedString());
-			assertThat(exception.getLocalizedMessage()
-				.startsWith("Point tag key \"" + invalidPointTagKey + "\" contains invalid characters")).isTrue();
+			assertThatRuntimeException().isThrownBy(
+					() -> new WavefrontFormat(properties, new GenericMessage<>(dataJsonString)).getFormattedString())
+				.withMessageContaining("Point tag key \"" + invalidPointTagKey + "\" contains invalid characters");
 		});
 	}
 

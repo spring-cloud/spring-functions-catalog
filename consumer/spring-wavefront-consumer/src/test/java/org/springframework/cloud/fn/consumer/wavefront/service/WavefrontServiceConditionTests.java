@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,9 @@ import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.boot.context.annotation.UserConfigurations;
+import org.springframework.boot.autoconfigure.AutoConfigurations;
+import org.springframework.boot.autoconfigure.integration.IntegrationAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.fn.common.config.SpelExpressionConverterConfiguration;
 import org.springframework.cloud.fn.consumer.wavefront.WavefrontConsumerConfiguration;
@@ -32,17 +34,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Timo Salm
  */
-public class WavefrontServiceConditionTest {
+public class WavefrontServiceConditionTests {
 
 	private final ApplicationContextRunner runner = new ApplicationContextRunner().withConfiguration(
-			UserConfigurations.of(WavefrontConsumerConfiguration.class, SpelExpressionConverterConfiguration.class));
+			AutoConfigurations.of(IntegrationAutoConfiguration.class, RestTemplateAutoConfiguration.class,
+					SpelExpressionConverterConfiguration.class, WavefrontConsumerConfiguration.class));
 
 	@Test
 	public void proxyConnectionShouldBeUsedIfWavefrontProxyAddressSet() {
 		runner.withPropertyValues("wavefront.metric-name=vehicle-location", "wavefront.source=vehicle-api",
 				"wavefront.metric-expression=#jsonPath(payload,'$.mileage')",
 				"wavefront.proxy-uri=http://wavefront-proxy.internal:2878", "wavefront.uri=", "wavefront.api-token=")
-			.run(context -> {
+			.run((context) -> {
 				assertThat(context).hasSingleBean(ProxyConnectionWavefrontService.class);
 				assertThat(context).doesNotHaveBean(DirectConnectionWavefrontService.class);
 			});
@@ -55,9 +58,9 @@ public class WavefrontServiceConditionTest {
 					"wavefront.metric-expression=#jsonPath(payload,'$.mileage')",
 					"wavefront.proxy-uri=http://wavefront-proxy.internal:2878",
 					"wavefront.uri=https://my.wavefront.com", "wavefront.api-token=" + UUID.randomUUID())
-			.run(context -> {
+			.run((context) -> {
 				assertThat(context).hasFailed();
-				final Throwable rootCause = NestedExceptionUtils.getRootCause(context.getStartupFailure());
+				Throwable rootCause = NestedExceptionUtils.getRootCause(context.getStartupFailure());
 				assertThat(Objects.requireNonNull(rootCause).getLocalizedMessage())
 					.contains("Exactly one of 'proxy-uri' or the pair of ('uri' and 'api-token') must be set!");
 			});
@@ -69,7 +72,7 @@ public class WavefrontServiceConditionTest {
 			.withPropertyValues("wavefront.metric-name=vehicle-location", "wavefront.source=vehicle-api",
 					"wavefront.metric-expression=#jsonPath(payload,'$.mileage')", "wavefront.proxy-uri=",
 					"wavefront.uri=https://my.wavefront.com", "wavefront.api-token=" + UUID.randomUUID())
-			.run(context -> {
+			.run((context) -> {
 				assertThat(context).hasSingleBean(DirectConnectionWavefrontService.class);
 				assertThat(context).doesNotHaveBean(ProxyConnectionWavefrontService.class);
 			});
@@ -81,7 +84,7 @@ public class WavefrontServiceConditionTest {
 			.withPropertyValues("wavefront.metric-name=vehicle-location", "wavefront.source=vehicle-api",
 					"wavefront.metric-expression=#jsonPath(payload,'$.mileage')", "wavefront.proxy-uri=",
 					"wavefront.uri=", "wavefront.api-token=")
-			.run(context -> {
+			.run((context) -> {
 				assertThat(context).hasFailed();
 				final Throwable rootCause = NestedExceptionUtils.getRootCause(context.getStartupFailure());
 				assertThat(Objects.requireNonNull(rootCause).getLocalizedMessage())

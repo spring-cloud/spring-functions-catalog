@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,11 +26,13 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 
 /**
+ * The {@link WavefrontService} implementation for direct connection.
+ *
  * @author Timo Salm
  */
 public class DirectConnectionWavefrontService implements WavefrontService {
 
-	private static final Log logger = LogFactory.getLog(DirectConnectionWavefrontService.class);
+	private static final Log LOGGER = LogFactory.getLog(DirectConnectionWavefrontService.class);
 
 	private final RestTemplate restTemplate;
 
@@ -40,6 +42,7 @@ public class DirectConnectionWavefrontService implements WavefrontService {
 
 	public DirectConnectionWavefrontService(final RestTemplateBuilder restTemplateBuilder,
 			final String wavefrontServerUri, final String wavefrontApiToken) {
+
 		this.restTemplate = restTemplateBuilder.build();
 		this.wavefrontDomain = wavefrontServerUri;
 		this.wavefrontToken = wavefrontApiToken;
@@ -47,13 +50,11 @@ public class DirectConnectionWavefrontService implements WavefrontService {
 
 	@Override
 	public void send(String metricInWavefrontFormat) {
-		if (logger.isDebugEnabled()) {
-			logger.debug("Send metric directly to Wavefront");
-		}
+		LOGGER.debug("Send metric directly to Wavefront");
 		final HttpHeaders headers = new HttpHeaders();
-		headers.setBearerAuth(wavefrontToken);
+		headers.setBearerAuth(this.wavefrontToken);
 		final HttpEntity<String> httpEntity = new HttpEntity<>(metricInWavefrontFormat, headers);
-		restTemplate.exchange(wavefrontDomain + "/report", HttpMethod.POST, httpEntity, Void.class);
+		this.restTemplate.exchange(this.wavefrontDomain + "/report", HttpMethod.POST, httpEntity, Void.class);
 	}
 
 }

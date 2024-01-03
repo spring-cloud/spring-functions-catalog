@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,20 +23,20 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.client.RestTemplate;
 
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Timo Salm
  */
-public class ProxyConnectionWavefrontServiceTest {
+public class ProxyConnectionWavefrontServiceTests {
 
 	@Test
 	void testSendMetricInWavefrontFormat() {
 		final RestTemplateBuilder restTemplateBuilderMock = mock(RestTemplateBuilder.class);
 		final RestTemplate restTemplateMock = mock(RestTemplate.class);
-		when(restTemplateBuilderMock.build()).thenReturn(restTemplateMock);
+		given(restTemplateBuilderMock.build()).willReturn(restTemplateMock);
 
 		final String metricInWavefrontFormat = "testMetric";
 		final String wavefrontProxyUrl = "testWavefrontProxyUrl";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,20 +29,21 @@ import org.springframework.web.client.RestTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 /**
  * @author Timo Salm
+ * @author Artem Bilan
  */
-public class DirectConnectionWavefrontServiceTest {
+public class DirectConnectionWavefrontServiceTests {
 
 	@Test
 	void testSendMetricInWavefrontFormat() {
 		final RestTemplateBuilder restTemplateBuilderMock = mock(RestTemplateBuilder.class);
 		final RestTemplate restTemplateMock = mock(RestTemplate.class);
-		when(restTemplateBuilderMock.build()).thenReturn(restTemplateMock);
+		given(restTemplateBuilderMock.build()).willReturn(restTemplateMock);
 
 		final String metricInWavefrontFormat = "testMetric";
 		final String wavefrontServerUri = "testWavefrontDomain";
@@ -52,7 +53,7 @@ public class DirectConnectionWavefrontServiceTest {
 				wavefrontServerUri, wavefrontApiToken);
 		service.send(metricInWavefrontFormat);
 
-		final ArgumentCaptor<HttpEntity> argument = ArgumentCaptor.forClass(HttpEntity.class);
+		ArgumentCaptor<HttpEntity<?>> argument = ArgumentCaptor.captor();
 		verify(restTemplateMock, Mockito.times(1)).exchange(eq(wavefrontServerUri + "/report"), eq(HttpMethod.POST),
 				argument.capture(), eq(Void.class));
 		assertThat(Objects.requireNonNull(argument.getValue().getHeaders().get("Authorization")).get(0))

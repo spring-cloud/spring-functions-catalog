@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ import org.springframework.messaging.support.GenericMessage;
 		"wavefront.timestamp-expression=#jsonPath(payload,'$.receivedAt')",
 		"wavefront.tag-expression.vin=#jsonPath(payload,'$.vin')",
 		"wavefront.tag-expression.latitude=#jsonPath(payload,'$.location.latitude')", "wavefront.proxy-uri=testUrl" })
-public class WavefrontConsumerConfigurationTest {
+public class WavefrontConsumerConfigurationTests {
 
 	@Autowired
 	private Consumer<Message<?>> wavefrontConsumer;
@@ -59,7 +59,7 @@ public class WavefrontConsumerConfigurationTest {
 		final String dataJsonString = "{ \"mileage\": 1.5, \"receivedAt\": " + timestamp + ", \"vin\": \"test-vin\", "
 				+ "\"location\": {\"latitude\": 4.53, \"longitude\": 2.89 }}";
 
-		wavefrontConsumer.accept(new GenericMessage(dataJsonString.getBytes()));
+		wavefrontConsumer.accept(new GenericMessage<>(dataJsonString.getBytes()));
 
 		final String formattedString = "\"vehicle-location\" 1.5 " + timestamp + " source=vehicle-api "
 				+ "latitude=\"4.53\" vin=\"test-vin\"";

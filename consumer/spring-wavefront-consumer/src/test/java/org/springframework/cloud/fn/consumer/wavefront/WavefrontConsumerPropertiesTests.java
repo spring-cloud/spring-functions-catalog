@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Timo Salm
  */
-public class WavefrontConsumerPropertiesTest {
+public class WavefrontConsumerPropertiesTests {
 
 	private final Expression testExpression = new SpelExpressionParser().parseExpression("#jsonPath(payload,'$')");
 
@@ -51,7 +51,7 @@ public class WavefrontConsumerPropertiesTest {
 				null, null, null, "proxy");
 		final List<String> emptyValues = Arrays.asList(null, "");
 
-		emptyValues.forEach(emptyValue -> {
+		emptyValues.forEach((emptyValue) -> {
 			assertThat(validator.validate(properties).isEmpty()).isTrue();
 			properties.setMetricName(emptyValue);
 			assertThat(validator.validate(properties).isEmpty()).isFalse();
@@ -76,13 +76,13 @@ public class WavefrontConsumerPropertiesTest {
 				"c.8W-2h_dE_,J-h/");
 		assertThat(validator.validate(properties).isEmpty()).isTrue();
 
-		validMetricNameValues.forEach(validMetricNameValue -> {
+		validMetricNameValues.forEach((validMetricNameValue) -> {
 			properties.setMetricName(validMetricNameValue);
 			assertThat(validator.validate(properties).isEmpty()).isTrue();
 		});
 
 		final List<String> invalidMetricNameValues = Arrays.asList(" ", ":", "a B", "#");
-		invalidMetricNameValues.forEach(invalidMetricNameValue -> {
+		invalidMetricNameValues.forEach((invalidMetricNameValue) -> {
 			properties.setMetricName(invalidMetricNameValue);
 			assertThat(validator.validate(properties).isEmpty()).isFalse();
 		});
@@ -96,14 +96,14 @@ public class WavefrontConsumerPropertiesTest {
 				createStringOfLength(128));
 		assertThat(validator.validate(properties).isEmpty()).isTrue();
 
-		validSourceValues.forEach(validSourceValue -> {
+		validSourceValues.forEach((validSourceValue) -> {
 			properties.setSource(validSourceValue);
 			assertThat(validator.validate(properties).isEmpty()).isTrue();
 		});
 
 		final List<String> invalidSourceValues = Arrays.asList(" ", ":", "a B", "#", "/", ",",
 				createStringOfLength(129));
-		invalidSourceValues.forEach(invalidSourceValue -> {
+		invalidSourceValues.forEach((invalidSourceValue) -> {
 			properties.setSource(invalidSourceValue);
 			assertThat(validator.validate(properties).isEmpty()).isFalse();
 		});
