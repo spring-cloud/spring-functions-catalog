@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The Twitter update properties.
+ *
  * @author Christian Tzolov
  */
 @ConfigurationProperties("twitter.update")
@@ -44,9 +46,9 @@ public class TwitterUpdateConsumerProperties {
 	 * (SpEL expression) In order for a URL to not be counted in the text body of an
 	 * extended Tweet, provide a URL as a Tweet attachment. This URL must be a Tweet
 	 * permalink, or Direct Message deep link. Arbitrary, non-Twitter URLs must remain in
-	 * the text text. URLs passed to the attachment_url parameter not matching either a
-	 * Tweet permalink or Direct Message deep link will fail at Tweet creation and cause
-	 * an exception.
+	 * the text. URLs passed to the attachment_url parameter not matching either a Tweet
+	 * permalink or Direct Message deep link will fail at Tweet creation and cause an
+	 * exception.
 	 */
 	private Expression attachmentUrl;
 
@@ -58,12 +60,10 @@ public class TwitterUpdateConsumerProperties {
 	/**
 	 * (SpEL expression) The ID of an existing text that the update is in reply to. Note:
 	 * This parameter will be ignored unless the author of the Tweet this parameter
-	 * references is mentioned within the text text. Therefore, you must
-	 * include @username, where username is the author of the referenced Tweet, within the
-	 * update.
-	 *
-	 * When inReplyToStatusId is set the auto_populate_reply_metadata is automatically set
-	 * as well. Later ensures that leading @mentions will be looked up from the original
+	 * references is mentioned within the text. Therefore, you must include @username,
+	 * where username is the author of the referenced Tweet, within the update. When
+	 * inReplyToStatusId is set the auto_populate_reply_metadata is automatically set as
+	 * well. Later ensures that leading @mentions will be looked up from the original
 	 * Tweet, and added to the new Tweet from there. This wil append @mentions into the
 	 * metadata of an extended Tweet as a reply chain grows, until the limit on @mentions
 	 * is reached. In cases where the original Tweet has been deleted, the reply will
@@ -72,8 +72,8 @@ public class TwitterUpdateConsumerProperties {
 	private Expression inReplyToStatusId;
 
 	/**
-	 * (SpEL expression) Whether or not to put a pin on the exact coordinates a Tweet has
-	 * been sent from.
+	 * (SpEL expression) Whether to put a pin on the exact coordinates a Tweet has been
+	 * sent from.
 	 */
 	private Expression displayCoordinates;
 
@@ -91,7 +91,7 @@ public class TwitterUpdateConsumerProperties {
 	private final Location location = new Location();
 
 	public Expression getText() {
-		return text;
+		return this.text;
 	}
 
 	public void setText(Expression text) {
@@ -99,7 +99,7 @@ public class TwitterUpdateConsumerProperties {
 	}
 
 	public Expression getAttachmentUrl() {
-		return attachmentUrl;
+		return this.attachmentUrl;
 	}
 
 	public void setAttachmentUrl(Expression attachmentUrl) {
@@ -107,7 +107,7 @@ public class TwitterUpdateConsumerProperties {
 	}
 
 	public Expression getPlaceId() {
-		return placeId;
+		return this.placeId;
 	}
 
 	public void setPlaceId(Expression placeId) {
@@ -115,7 +115,7 @@ public class TwitterUpdateConsumerProperties {
 	}
 
 	public Expression getInReplyToStatusId() {
-		return inReplyToStatusId;
+		return this.inReplyToStatusId;
 	}
 
 	public void setInReplyToStatusId(Expression inReplyToStatusId) {
@@ -123,7 +123,7 @@ public class TwitterUpdateConsumerProperties {
 	}
 
 	public Expression getDisplayCoordinates() {
-		return displayCoordinates;
+		return this.displayCoordinates;
 	}
 
 	public void setDisplayCoordinates(Expression displayCoordinates) {
@@ -131,7 +131,7 @@ public class TwitterUpdateConsumerProperties {
 	}
 
 	public Expression getMediaIds() {
-		return mediaIds;
+		return this.mediaIds;
 	}
 
 	public void setMediaIds(Expression mediaIds) {
@@ -139,13 +139,13 @@ public class TwitterUpdateConsumerProperties {
 	}
 
 	public Location getLocation() {
-		return location;
+		return this.location;
 	}
 
 	@AssertTrue(message = "Lat and Long must be set together or both not being set")
 	public boolean validateLatLon() {
-		return (this.getLocation().getLat() != null && this.getLocation().getLon() != null)
-				|| (this.getLocation().getLat() == null && this.getLocation().getLon() == null);
+		return (getLocation().getLat() != null && getLocation().getLon() != null)
+				|| (getLocation().getLat() == null && getLocation().getLon() == null);
 	}
 
 	public static class Location {
@@ -161,12 +161,12 @@ public class TwitterUpdateConsumerProperties {
 		 * The longitude of the location this Tweet refers to. The valid ranges for
 		 * longitude are -180.0 to +180.0 (East is positive) inclusive. This parameter
 		 * will be ignored if outside that range, if it is not a number, if geo_enabled is
-		 * disabled, or if there no corresponding lat parameter.
+		 * disabled, or if there is no corresponding lat parameter.
 		 */
 		private Expression lon;
 
 		public Expression getLat() {
-			return lat;
+			return this.lat;
 		}
 
 		public void setLat(Expression lat) {
@@ -174,7 +174,7 @@ public class TwitterUpdateConsumerProperties {
 		}
 
 		public Expression getLon() {
-			return lon;
+			return this.lon;
 		}
 
 		public void setLon(Expression lon) {

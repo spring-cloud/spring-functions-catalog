@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,35 +27,35 @@ import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 
 /**
+ * The auto-configuration for Twitter messages.
+ *
  * @author Christian Tzolov
  */
-@Configuration
+@AutoConfiguration(after = TwitterConnectionConfiguration.class)
 @EnableConfigurationProperties(TwitterUpdateConsumerProperties.class)
-@Import(TwitterConnectionConfiguration.class)
 public class TwitterUpdateConsumerConfiguration {
 
-	private static final Log logger = LogFactory.getLog(TwitterUpdateConsumerConfiguration.class);
+	private static final Log LOGGER = LogFactory.getLog(TwitterUpdateConsumerConfiguration.class);
 
 	@Bean
 	public Consumer<StatusUpdate> updateStatus(Twitter twitter) {
-		return statusUpdate -> {
+		return (statusUpdate) -> {
 			try {
 				Status status = twitter.updateStatus(statusUpdate);
 
-				if (logger.isDebugEnabled()) {
-					logger.debug(status);
+				if (LOGGER.isDebugEnabled()) {
+					LOGGER.debug(status);
 				}
 			}
-			catch (TwitterException e) {
-				logger.error("Failed apply update status: " + statusUpdate, e);
+			catch (TwitterException ex) {
+				LOGGER.error("Failed apply update status: " + statusUpdate, ex);
 			}
 		};
 	}
@@ -64,7 +64,7 @@ public class TwitterUpdateConsumerConfiguration {
 	public Function<Message<?>, StatusUpdate> messageToStatusUpdateFunction(
 			TwitterUpdateConsumerProperties updateProperties) {
 
-		return message -> {
+		return (message) -> {
 
 			String updateText = updateProperties.getText().getValue(message, String.class);
 
@@ -106,7 +106,8 @@ public class TwitterUpdateConsumerConfiguration {
 	@Bean
 	public Consumer<Message<?>> twitterStatusUpdateConsumer(Function<Message<?>, StatusUpdate> statusUpdateQuery,
 			Consumer<StatusUpdate> updateStatus) {
-		return message -> updateStatus.accept(statusUpdateQuery.apply(message));
+
+		return (message) -> updateStatus.accept(statusUpdateQuery.apply(message));
 	}
 
 }

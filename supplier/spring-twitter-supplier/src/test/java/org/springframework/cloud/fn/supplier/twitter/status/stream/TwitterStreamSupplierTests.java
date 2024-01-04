@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.fn.supplier.twitter.status.stream;
 
-import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -33,18 +32,15 @@ import reactor.test.StepVerifier;
 import twitter4j.conf.ConfigurationBuilder;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionProperties;
 import org.springframework.cloud.fn.common.twitter.util.TwitterTestUtils;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.util.TestSocketUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockserver.matchers.Times.exactly;
@@ -62,10 +58,6 @@ import static org.mockserver.verify.VerificationTimes.once;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class TwitterStreamSupplierTests {
 
-	private static final String MOCK_SERVER_IP = "127.0.0.1";
-
-	private static final Integer MOCK_SERVER_PORT = TestSocketUtils.findAvailableTcpPort();
-
 	private static ClientAndServer mockServer;
 
 	private static MockServerClient mockClient;
@@ -81,10 +73,8 @@ public abstract class TwitterStreamSupplierTests {
 
 	@BeforeAll
 	public static void startServer() {
-
-		mockServer = ClientAndServer.startClientAndServer(MOCK_SERVER_PORT);
-
-		mockClient = new MockServerClient(MOCK_SERVER_IP, MOCK_SERVER_PORT);
+		mockServer = ClientAndServer.startClientAndServer();
+		mockClient = new MockServerClient("localhost", mockServer.getPort());
 
 		streamFilterRequest = mockClientRecordRequest(request().withMethod("POST")
 			.withPath("/stream/statuses/filter.json")
@@ -112,12 +102,11 @@ public abstract class TwitterStreamSupplierTests {
 			.respond(response().withStatusCode(200)
 				.withHeaders(new Header("Content-Type", "application/json; charset=utf-8"),
 						new Header("Cache-Control", "public, max-age=86400"))
-				.withBody(TwitterTestUtils.asString("classpath:/response/stream_test_1.json"))
-				.withDelay(TimeUnit.SECONDS, 10));
+				.withBody(TwitterTestUtils.asString("classpath:/response/stream_test_1.json")));
 		return request;
 	}
 
-	@TestPropertySource(properties = { "twitter.stream.type=sample" })
+	@TestPropertySource(properties = { "twitter.stream.enabled=true", "twitter.stream.type=sample" })
 	public static class TwitterStreamSampleTests extends TwitterStreamSupplierTests {
 
 		@Test
@@ -137,7 +126,8 @@ public abstract class TwitterStreamSupplierTests {
 
 	}
 
-	@TestPropertySource(properties = { "twitter.stream.type=filter", "twitter.stream.filter.track=Java,Python" })
+	@TestPropertySource(properties = { "twitter.stream.enabled=true", "twitter.stream.type=filter",
+			"twitter.stream.filter.track=Java,Python" })
 	public static class TwitterStreamFilterTests extends TwitterStreamSupplierTests {
 
 		@Test
@@ -157,7 +147,7 @@ public abstract class TwitterStreamSupplierTests {
 
 	}
 
-	@TestPropertySource(properties = { "twitter.stream.type=firehose" })
+	@TestPropertySource(properties = { "twitter.stream.enabled=true", "twitter.stream.type=firehose" })
 	public static class TwitterStreamFirehoseTests extends TwitterStreamSupplierTests {
 
 		@Test
@@ -177,9 +167,7 @@ public abstract class TwitterStreamSupplierTests {
 
 	}
 
-	@SpringBootConfiguration
-	@EnableAutoConfiguration
-	@Import(TwitterStreamSupplierConfiguration.class)
+	@SpringBootApplication
 	public static class TwitterStreamSupplierTestApplication {
 
 		@Bean
@@ -188,8 +176,7 @@ public abstract class TwitterStreamSupplierTests {
 				Function<TwitterConnectionProperties, ConfigurationBuilder> toConfigurationBuilder) {
 
 			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration = toConfigurationBuilder
-				.andThen(new TwitterTestUtils()
-					.mockTwitterUrls(String.format("http://%s:%s", MOCK_SERVER_IP, MOCK_SERVER_PORT)));
+				.andThen(new TwitterTestUtils().mockTwitterUrls("http://localhost:" + mockServer.getPort()));
 
 			return mockedConfiguration.apply(properties).build();
 		}

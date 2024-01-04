@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,15 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.integration.expression.ValueExpression;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The Twitter friendships properties.
+ *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
 @Component
 @ConfigurationProperties("twitter.friendships.update")
@@ -58,15 +62,15 @@ public class TwitterFriendshipsConsumerProperties {
 	/**
 	 * Additional properties for the Friendships create requests.
 	 */
-	private Create create = new Create();
+	private final Create create = new Create();
 
 	/**
 	 * Additional properties for the Friendships update requests.
 	 */
-	private Update update = new Update();
+	private final Update update = new Update();
 
 	public Expression getScreenName() {
-		return screenName;
+		return this.screenName;
 	}
 
 	public void setScreenName(Expression screenName) {
@@ -74,7 +78,7 @@ public class TwitterFriendshipsConsumerProperties {
 	}
 
 	public Expression getUserId() {
-		return userId;
+		return this.userId;
 	}
 
 	public void setUserId(Expression userId) {
@@ -82,7 +86,7 @@ public class TwitterFriendshipsConsumerProperties {
 	}
 
 	public Expression getType() {
-		return type;
+		return this.type;
 	}
 
 	public void setType(Expression type) {
@@ -90,11 +94,11 @@ public class TwitterFriendshipsConsumerProperties {
 	}
 
 	public Create getCreate() {
-		return create;
+		return this.create;
 	}
 
 	public Update getUpdate() {
-		return update;
+		return this.update;
 	}
 
 	@AssertTrue(message = "Either userId or screenName must be provided")
@@ -108,10 +112,10 @@ public class TwitterFriendshipsConsumerProperties {
 		 * The ID of the user to follow (boolean).
 		 */
 		@NotNull
-		private Expression follow = new SpelExpressionParser().parseExpression("'true'");
+		private Expression follow = new ValueExpression<>(true);
 
 		public Expression getFollow() {
-			return follow;
+			return this.follow;
 		}
 
 		public void setFollow(Expression follow) {
@@ -126,16 +130,16 @@ public class TwitterFriendshipsConsumerProperties {
 		 * Enable/disable device notifications from the target user.
 		 */
 		@NotNull
-		private Expression device = new SpelExpressionParser().parseExpression("'true'");
+		private Expression device = new ValueExpression<>(true);
 
 		/**
 		 * Enable/disable Retweets from the target user.
 		 */
 		@NotNull
-		private Expression retweets = new SpelExpressionParser().parseExpression("'true'");
+		private Expression retweets = new ValueExpression<>(true);
 
 		public Expression getDevice() {
-			return device;
+			return this.device;
 		}
 
 		public void setDevice(Expression device) {
@@ -143,7 +147,7 @@ public class TwitterFriendshipsConsumerProperties {
 		}
 
 		public Expression getRetweets() {
-			return retweets;
+			return this.retweets;
 		}
 
 		public void setRetweets(Expression retweets) {

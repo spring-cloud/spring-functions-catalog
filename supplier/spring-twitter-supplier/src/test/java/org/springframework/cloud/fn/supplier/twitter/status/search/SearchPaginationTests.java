@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.fn.supplier.twitter.status.search;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -155,6 +156,9 @@ public class SearchPaginationTests {
 	}
 
 	public static class MyStatus implements Status {
+
+		@Serial
+		private static final long serialVersionUID = -6461195536943679985L;
 
 		private long id;
 

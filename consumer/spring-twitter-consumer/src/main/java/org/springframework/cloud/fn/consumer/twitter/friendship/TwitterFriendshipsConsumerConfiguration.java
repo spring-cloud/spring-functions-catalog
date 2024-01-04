@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,26 +21,26 @@ import java.util.function.Consumer;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 
 /**
+ * The auto-configuration for Twitter Friendships.
+ *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
-@Configuration
+@AutoConfiguration(after = TwitterConnectionConfiguration.class)
 @EnableConfigurationProperties(TwitterFriendshipsConsumerProperties.class)
-@Import(TwitterConnectionConfiguration.class)
 public class TwitterFriendshipsConsumerConfiguration {
 
 	@Bean
 	@SuppressWarnings("Duplicates")
 	public Consumer<Message<?>> friendshipConsumer(TwitterFriendshipsConsumerProperties properties, Twitter twitter) {
-
-		return message -> {
+		return (message) -> {
 			try {
 				TwitterFriendshipsConsumerProperties.OperationType type = properties.getType()
 					.getValue(message, TwitterFriendshipsConsumerProperties.OperationType.class);
@@ -49,43 +49,39 @@ public class TwitterFriendshipsConsumerConfiguration {
 				if (properties.getUserId() != null) {
 					Long userId = properties.getUserId().getValue(message, long.class);
 					switch (type) {
-						case create:
+						case create -> {
 							boolean follow = properties.getCreate().getFollow().getValue(message, boolean.class);
 							twitter.createFriendship(userId, follow);
-							return;
-
-						case update:
+						}
+						case update -> {
 							boolean enableDeviceNotification = properties.getUpdate()
 								.getDevice()
 								.getValue(message, boolean.class);
 							boolean retweets = properties.getUpdate().getRetweets().getValue(message, boolean.class);
 							twitter.updateFriendship(userId, enableDeviceNotification, retweets);
-							return;
-
-						case destroy:
+						}
+						case destroy -> {
 							twitter.destroyFriendship(userId);
-							return;
+						}
 					}
 				}
 				else if (properties.getScreenName() != null) {
 					String screenName = properties.getScreenName().getValue(message, String.class);
 					switch (type) {
-						case create:
+						case create -> {
 							boolean follow = properties.getCreate().getFollow().getValue(message, boolean.class);
 							twitter.createFriendship(screenName, follow);
-							return;
-
-						case update:
+						}
+						case update -> {
 							boolean enableDeviceNotification = properties.getUpdate()
 								.getDevice()
 								.getValue(message, boolean.class);
 							boolean retweets = properties.getUpdate().getRetweets().getValue(message, boolean.class);
 							twitter.updateFriendship(screenName, enableDeviceNotification, retweets);
-							return;
-
-						case destroy:
+						}
+						case destroy -> {
 							twitter.destroyFriendship(screenName);
-							return;
+						}
 					}
 				}
 				else {

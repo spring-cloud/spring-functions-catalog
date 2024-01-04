@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,27 +23,29 @@ import org.apache.commons.logging.LogFactory;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 
 /**
+ * The auto-configuration for Twitter messages.
+ *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
-@Configuration
+@AutoConfiguration(after = TwitterConnectionConfiguration.class)
 @EnableConfigurationProperties(TwitterMessageConsumerProperties.class)
-@Import(TwitterConnectionConfiguration.class)
 public class TwitterMessageConsumerConfiguration {
 
-	private static final Log logger = LogFactory.getLog(TwitterMessageConsumerConfiguration.class);
+	private static final Log LOGGER = LogFactory.getLog(TwitterMessageConsumerConfiguration.class);
 
 	@Bean
 	public Consumer<Message<?>> sendDirectMessageConsumer(TwitterMessageConsumerProperties messageProperties,
 			Twitter twitter) {
-		return message -> {
+
+		return (message) -> {
 			try {
 				String messageText = messageProperties.getText().getValue(message, String.class);
 
@@ -63,8 +65,8 @@ public class TwitterMessageConsumerConfiguration {
 					throw new RuntimeException("Either the UserId or screenName must be set");
 				}
 			}
-			catch (TwitterException e) {
-				logger.error("Failed to process message:" + message, e);
+			catch (TwitterException ex) {
+				LOGGER.error("Failed to process message: " + message, ex);
 			}
 		};
 	}

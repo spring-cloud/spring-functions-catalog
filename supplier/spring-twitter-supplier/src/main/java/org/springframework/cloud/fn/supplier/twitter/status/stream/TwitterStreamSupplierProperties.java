@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,6 +26,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The Twitter streaming supplier properties.
+ *
  * @author Christian Tzolov
  */
 @ConfigurationProperties("twitter.stream")
@@ -70,16 +72,29 @@ public class TwitterStreamSupplierProperties {
 
 	}
 
+	/**
+	 * Whether to enable Twitter streaming supplier.
+	 */
+	private boolean enabled;
+
 	private StreamType type = StreamType.sample;
 
-	private Filter filter = new Filter();
+	private final Filter filter = new Filter();
+
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 
 	public Filter getFilter() {
-		return filter;
+		return this.filter;
 	}
 
 	public StreamType getType() {
-		return type;
+		return this.type;
 	}
 
 	public void setType(StreamType type) {
@@ -116,7 +131,7 @@ public class TwitterStreamSupplierProperties {
 		 * invalid: 52.38, 4.90, 51.51, -0.12. The first pair must be the SW corner of the
 		 * box
 		 */
-		private List<BoundingBox> locations = new ArrayList<>();
+		private final List<BoundingBox> locations = new ArrayList<>();
 
 		/**
 		 * Specifies the tweets language of the stream.
@@ -130,7 +145,7 @@ public class TwitterStreamSupplierProperties {
 		private FilterLevel filterLevel = FilterLevel.all;
 
 		public int getCount() {
-			return count;
+			return this.count;
 		}
 
 		public void setCount(int count) {
@@ -138,7 +153,7 @@ public class TwitterStreamSupplierProperties {
 		}
 
 		public List<Long> getFollow() {
-			return follow;
+			return this.follow;
 		}
 
 		public void setFollow(List<Long> follow) {
@@ -146,7 +161,7 @@ public class TwitterStreamSupplierProperties {
 		}
 
 		public List<String> getTrack() {
-			return track;
+			return this.track;
 		}
 
 		public void setTrack(List<String> track) {
@@ -154,7 +169,7 @@ public class TwitterStreamSupplierProperties {
 		}
 
 		public List<String> getLanguage() {
-			return language;
+			return this.language;
 		}
 
 		public void setLanguage(List<String> language) {
@@ -162,11 +177,11 @@ public class TwitterStreamSupplierProperties {
 		}
 
 		public List<BoundingBox> getLocations() {
-			return locations;
+			return this.locations;
 		}
 
 		public FilterLevel getFilterLevel() {
-			return filterLevel;
+			return this.filterLevel;
 		}
 
 		public void setFilterLevel(FilterLevel filterLevel) {
@@ -192,7 +207,7 @@ public class TwitterStreamSupplierProperties {
 			}
 
 			if (!CollectionUtils.isEmpty(this.language)) {
-				filterQuery.language(this.language.toArray(new String[this.language.size()]));
+				filterQuery.language(this.language.toArray(new String[0]));
 			}
 
 			if (!CollectionUtils.isEmpty(this.locations)) {
@@ -216,7 +231,7 @@ public class TwitterStreamSupplierProperties {
 		}
 
 		public boolean isValid() {
-			return count > 0 || !CollectionUtils.isEmpty(this.track) || !CollectionUtils.isEmpty(this.follow)
+			return this.count > 0 || !CollectionUtils.isEmpty(this.track) || !CollectionUtils.isEmpty(this.follow)
 					|| !CollectionUtils.isEmpty(this.language) || this.filterLevel != FilterLevel.all;
 		}
 
@@ -233,7 +248,7 @@ public class TwitterStreamSupplierProperties {
 			private Geocode ne;
 
 			public Geocode getSw() {
-				return sw;
+				return this.sw;
 			}
 
 			public void setSw(Geocode sw) {
@@ -241,7 +256,7 @@ public class TwitterStreamSupplierProperties {
 			}
 
 			public Geocode getNe() {
-				return ne;
+				return this.ne;
 			}
 
 			public void setNe(Geocode ne) {
@@ -263,7 +278,7 @@ public class TwitterStreamSupplierProperties {
 			private double lon = -1;
 
 			public double getLat() {
-				return lat;
+				return this.lat;
 			}
 
 			public void setLat(double lat) {
@@ -271,7 +286,7 @@ public class TwitterStreamSupplierProperties {
 			}
 
 			public double getLon() {
-				return lon;
+				return this.lon;
 			}
 
 			public void setLon(double lon) {

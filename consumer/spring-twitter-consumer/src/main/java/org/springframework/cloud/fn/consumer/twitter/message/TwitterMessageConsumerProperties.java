@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The Twitter messages properties.
+ *
  * @author Christian Tzolov
  */
 @ConfigurationProperties("twitter.message.update")
@@ -52,7 +54,7 @@ public class TwitterMessageConsumerProperties {
 	private Expression mediaId;
 
 	public Expression getUserId() {
-		return userId;
+		return this.userId;
 	}
 
 	public void setUserId(Expression userId) {
@@ -64,11 +66,11 @@ public class TwitterMessageConsumerProperties {
 	}
 
 	public Expression getText() {
-		return text;
+		return this.text;
 	}
 
 	public Expression getScreenName() {
-		return screenName;
+		return this.screenName;
 	}
 
 	public void setScreenName(Expression screenName) {
@@ -76,7 +78,7 @@ public class TwitterMessageConsumerProperties {
 	}
 
 	public Expression getMediaId() {
-		return mediaId;
+		return this.mediaId;
 	}
 
 	public void setMediaId(Expression mediaId) {

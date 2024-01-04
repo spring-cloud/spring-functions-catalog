@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,24 +25,24 @@ import org.springframework.util.Assert;
 /**
  * Searched tweets are ordered from top to bottom by their IDs. The higher the ID, more
  * recent the tweet is.
- *
+ * <p>
  * The search goes backwards - from most recent to the oldest tweets and it uses the
  * sinceId and the maxId to retrieve only tweets with IDs in the [sinceId, maxId) range.
  * The -1 stands for unbounded sinceId or maxId.
- *
+ * <p>
  * The first `pageCount` number requests are performed backwards, leaving the bottom
  * boundary (sinceId) unbounded and adjusting the upper boundary (maxId) to the lowest
  * tweet ID received. This ensures that no already processed tweets are returned.
- *
+ * <p>
  * The pageCounter is used the to count the number of pages retrieved in the pageCount
  * range. Is starts from pageCount and goes backward until 0. On 0 the pageCounter is
  * reset back to pageCount.
- *
+ * <p>
  * After performing pageCount number requests (e.g. pageCounter = 0), we start new
  * iteration of searches from the top, most recent tweets but now the bottom boundary
  * (sinceId) is adjusted to the max ID received so far. That means that only the newly
  * added tweets will be processed
- *
+ * <p>
  * Search pagination with max_id and since_id:
  * https://developer.twitter.com/en/docs/tweets/timelines/guides/working-with-timelines.html
  *
@@ -56,10 +56,9 @@ public class SearchPagination {
 	public static final long UNBOUNDED = -1;
 
 	/**
-	 * Number of pages to search in history before start form the top again.
-	 *
-	 * Note that the search goes backwards - from most recent to the oldest tweets. (eg.
-	 * maxId == To max ID , sinceId == From min ID)
+	 * Number of pages to search in history before start form the top again. Note that the
+	 * search goes backwards - from most recent to the oldest tweets. (e.g. maxId == To
+	 * max ID , sinceId == From min ID)
 	 */
 	private final int pageCount;
 
@@ -86,7 +85,7 @@ public class SearchPagination {
 	/**
 	 * When set it.
 	 */
-	boolean searchBackwardsUntilEmptyResponse = false;
+	boolean searchBackwardsUntilEmptyResponse;
 
 	public SearchPagination(int pageCount, boolean searchBackwardsUntilEmptyResponse) {
 
@@ -101,38 +100,34 @@ public class SearchPagination {
 	}
 
 	public long getSinceId() {
-		return sinceId;
+		return this.sinceId;
 	}
 
 	public long getMaxId() {
-		return maxId;
+		return this.maxId;
 	}
 
 	public long getPageMaxId() {
-		return pageMaxId;
+		return this.pageMaxId;
 	}
 
 	public int getPageCounter() {
-		return pageCounter;
+		return this.pageCounter;
 	}
 
 	public void update(List<Status> tweets) {
+		tweets.stream().mapToLong(Status::getId).min().ifPresent((tweetsMinId) -> this.maxId = tweetsMinId - 1);
 
-		tweets.stream().mapToLong(t -> t.getId()).min().ifPresent(tweetsMinId -> {
-			this.maxId = tweetsMinId - 1;
-		});
-
-		tweets.stream().mapToLong(t -> t.getId()).max().ifPresent(tweetsMaxId -> {
+		tweets.stream().mapToLong(Status::getId).max().ifPresent((tweetsMaxId) -> {
 			Assert.isTrue(this.sinceId <= tweetsMaxId,
 					String.format("MAX_ID (%s) must be bigger then current SINCE_ID(%s)", tweetsMaxId, this.sinceId));
 			this.pageMaxId = Math.max(this.pageMaxId, tweetsMaxId);
 		});
 
-		this.countDown(tweets.size());
+		countDown(tweets.size());
 	}
 
 	private void countDown(int responseSize) {
-
 		if (this.sinceId == UNBOUNDED) { // == first pass before reset
 			if (this.pageCounter <= 0) {
 				this.restartSearchFromMostRecent();

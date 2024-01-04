@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 package org.springframework.cloud.fn.common.twitter.util;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Function;
 
 import twitter4j.conf.ConfigurationBuilder;
@@ -26,12 +26,16 @@ import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.util.StreamUtils;
 
 /**
+ * The test utilities for Twitter applications.
+ *
  * @author Christian Tzolov
  */
 public class TwitterTestUtils {
 
+	private static final DefaultResourceLoader RESOURCE_LOADER = new DefaultResourceLoader();
+
 	public Function<ConfigurationBuilder, ConfigurationBuilder> mockTwitterUrls(String baseUrl) {
-		return configBuilder -> {
+		return (configBuilder) -> {
 			configBuilder.setRestBaseURL(baseUrl + "/");
 			configBuilder.setStreamBaseURL(baseUrl + "/stream/");
 			configBuilder.setUserStreamBaseURL(baseUrl + "/user/");
@@ -51,18 +55,16 @@ public class TwitterTestUtils {
 
 	/**
 	 * Load Spring Resource as String.
-	 * @param resourcePath Resource path (accepts file:// , classpath:// and http:// uri
-	 * schemas)
-	 * @return Returns text (UTF8) representation of the resource pointed by the
-	 * resourcePath
+	 * @param resourcePath accepts file://, classpath:// and http:// uri schemas
+	 * @return the text (UTF8) representation of the resource pointed by the resourcePath
 	 */
 	public static String asString(String resourcePath) {
 		try {
-			return StreamUtils.copyToString(new DefaultResourceLoader().getResource(resourcePath).getInputStream(),
-					Charset.forName("UTF-8"));
+			return StreamUtils.copyToString(RESOURCE_LOADER.getResource(resourcePath).getInputStream(),
+					StandardCharsets.UTF_8);
 		}
-		catch (IOException e) {
-			throw new RuntimeException("Can not load resource:" + resourcePath, e);
+		catch (IOException ex) {
+			throw new RuntimeException("Can not load resource:" + resourcePath, ex);
 		}
 	}
 

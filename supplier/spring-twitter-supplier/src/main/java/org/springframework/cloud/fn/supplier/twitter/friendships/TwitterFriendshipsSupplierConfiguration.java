@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,27 +28,29 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.User;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.twitter.Cursor;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.integration.metadata.MetadataStore;
 import org.springframework.integration.metadata.SimpleMetadataStore;
 import org.springframework.messaging.Message;
 
 /**
+ * The auto-configuration for receiving Twitter friendship updates via supplier.
+ *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
-@Configuration
+@ConditionalOnProperty(prefix = "twitter.friendships.source", name = "enabled")
 @EnableConfigurationProperties(TwitterFriendshipsSupplierProperties.class)
-@Import(TwitterConnectionConfiguration.class)
+@AutoConfiguration(after = TwitterConnectionConfiguration.class)
 public class TwitterFriendshipsSupplierConfiguration {
 
-	private static final Log logger = LogFactory.getLog(TwitterFriendshipsSupplierConfiguration.class);
+	private static final Log LOGGER = LogFactory.getLog(TwitterFriendshipsSupplierConfiguration.class);
 
 	@Bean
 	@ConditionalOnMissingBean
@@ -66,6 +68,7 @@ public class TwitterFriendshipsSupplierConfiguration {
 	@ConditionalOnProperty(name = "twitter.friendships.source.type", havingValue = "followers")
 	public Supplier<List<User>> followersSupplier(TwitterFriendshipsSupplierProperties properties, Twitter twitter,
 			Cursor cursorState) {
+
 		return () -> {
 			try {
 				PagableResponseList<User> users;
@@ -83,12 +86,12 @@ public class TwitterFriendshipsSupplierConfiguration {
 					return users;
 				}
 
-				logger.error(String.format("NULL users response for properties: %s and cursor: %s!", properties,
+				LOGGER.error(String.format("NULL users response for properties: %s and cursor: %s!", properties,
 						cursorState));
 				cursorState.updateCursor(-1);
 			}
-			catch (TwitterException e) {
-				logger.error("Twitter API error:", e);
+			catch (TwitterException ex) {
+				LOGGER.error("Twitter API error:", ex);
 			}
 
 			return new ArrayList<>();
@@ -99,6 +102,7 @@ public class TwitterFriendshipsSupplierConfiguration {
 	@ConditionalOnProperty(name = "twitter.friendships.source.type", havingValue = "friends")
 	public Supplier<List<User>> friendsSupplier(TwitterFriendshipsSupplierProperties properties, Twitter twitter,
 			Cursor cursorState) {
+
 		return () -> {
 			try {
 				PagableResponseList<User> users;
@@ -116,12 +120,12 @@ public class TwitterFriendshipsSupplierConfiguration {
 					return users;
 				}
 
-				logger.error(String.format("NULL users response for properties: %s and cursor: %s!", properties,
+				LOGGER.error(String.format("NULL users response for properties: %s and cursor: %s!", properties,
 						cursorState));
 				cursorState.updateCursor(-1);
 			}
-			catch (TwitterException e) {
-				logger.error("Twitter API error:", e);
+			catch (TwitterException ex) {
+				LOGGER.error("Twitter API error:", ex);
 			}
 
 			return new ArrayList<>();
@@ -130,7 +134,7 @@ public class TwitterFriendshipsSupplierConfiguration {
 
 	@Bean
 	public Function<List<User>, List<User>> userDeduplicate(MetadataStore metadataStore) {
-		return users -> {
+		return (users) -> {
 			List<User> uniqueUsers = new ArrayList<>();
 			for (User user : users) {
 				if (metadataStore.get(user.getId() + "") == null) {
@@ -145,6 +149,7 @@ public class TwitterFriendshipsSupplierConfiguration {
 	@Bean
 	public Supplier<Message<byte[]>> deduplicatedFriendsJsonSupplier(Function<List<User>, List<User>> userDeduplication,
 			Supplier<List<User>> userRetriever, Function<Object, Message<byte[]>> managedJson) {
+
 		return () -> userDeduplication.andThen(managedJson).apply(userRetriever.get());
 	}
 

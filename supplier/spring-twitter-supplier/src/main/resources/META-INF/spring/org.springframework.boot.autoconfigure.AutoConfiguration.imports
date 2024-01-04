@@ -1,0 +1,4 @@
+org.springframework.cloud.fn.supplier.twitter.friendships.TwitterFriendshipsSupplierConfiguration
+org.springframework.cloud.fn.supplier.twitter.message.TwitterMessageSupplierConfiguration
+org.springframework.cloud.fn.supplier.twitter.status.search.TwitterSearchSupplierConfiguration
+org.springframework.cloud.fn.supplier.twitter.status.stream.TwitterStreamSupplierConfiguration

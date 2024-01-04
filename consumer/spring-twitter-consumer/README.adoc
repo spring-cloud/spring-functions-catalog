@@ -3,7 +3,7 @@
 
 ## 1. Twitter Status Update Consumer.
 
-Updates the authenticating user's current text (e.g Tweeting).
+Updates the authenticating user's current text (e.g. Tweeting).
 
 NOTE: For each update attempt, the update text is compared with the authenticating user's recent Tweets.
 Any attempt that would result in duplication will be blocked, resulting in a 403 error.
@@ -18,7 +18,7 @@ You can find details for the Update API here: https://developer.twitter.com/en/d
 
 ### 1.1 Beans for injection
 
-You can import `TwitterUpdateConsumerConfiguration` in the application and then inject the following beans.
+The `TwitterUpdateConsumerConfiguration` auto-configuration provides this beans:
 
 - `Consumer<StatusUpdate> updateStatus` - if you have an `StatusUpdate` instance you can use the `updateStatus` to apply it.
 
@@ -47,16 +47,16 @@ See this https://github.com/spring-cloud/stream-applications/blob/master/applica
 Send Direct Messages to a specified user from the authenticating user.
 Requires a JSON POST body and `Content-Type` header to be set to `application/json`.
 
-NOTE: When a message is received from a user you may send up to 5 messages in response within a 24 hour window.
-Each message received resets the 24 hour window and the 5 allotted messages.
-Sending a 6th message within a 24 hour window or sending a message outside of a 24 hour window will count towards rate-limiting.
+NOTE: When a message is received from a user you may send up to 5 messages in response within a 24-hour window.
+Each message received resets the 24-hour window and the 5 allotted messages.
+Sending a 6th message within a 24-hour window or sending a message outside a 24-hour window will count towards rate-limiting.
 This behavior only applies when using the POST direct_messages/events/new endpoint.
 
 SpEL expressions are used to compute the request parameters from the input message.
 
 ### 2.1 Beans for injection
 
-You can import `TwitterMessageConsumerConfiguration` in the application and then inject the following bean.
+The `TwitterMessageConsumerConfiguration` auto-configuration provides this beans:
 
 - `Consumer<Message<?>> sendDirectMessageConsumer`
 
@@ -92,7 +92,7 @@ Every operation type has its own parameters.
 
 ### 3.1 Beans for injection
 
-You can import `TwitterFriendshipsConsumerConfiguration` in the application and then inject the following bean.
+The `TwitterFriendshipsConsumerConfiguration` auto-configuration provides this beans:
 
 - `Consumer<Message<?>> friendshipConsumer`
 

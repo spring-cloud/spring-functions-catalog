@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The Twitter4J connection properties.
+ *
  * @author Christian Tzolov
  */
 @ConfigurationProperties("twitter.connection")
@@ -65,7 +67,7 @@ public class TwitterConnectionProperties {
 	private boolean rawJson = true;
 
 	public String getConsumerKey() {
-		return consumerKey;
+		return this.consumerKey;
 	}
 
 	public void setConsumerKey(String consumerKey) {
@@ -73,7 +75,7 @@ public class TwitterConnectionProperties {
 	}
 
 	public String getConsumerSecret() {
-		return consumerSecret;
+		return this.consumerSecret;
 	}
 
 	public void setConsumerSecret(String consumerSecret) {
@@ -81,7 +83,7 @@ public class TwitterConnectionProperties {
 	}
 
 	public String getAccessToken() {
-		return accessToken;
+		return this.accessToken;
 	}
 
 	public void setAccessToken(String accessToken) {
@@ -89,7 +91,7 @@ public class TwitterConnectionProperties {
 	}
 
 	public String getAccessTokenSecret() {
-		return accessTokenSecret;
+		return this.accessTokenSecret;
 	}
 
 	public void setAccessTokenSecret(String accessTokenSecret) {
@@ -97,7 +99,7 @@ public class TwitterConnectionProperties {
 	}
 
 	public boolean isDebugEnabled() {
-		return debugEnabled;
+		return this.debugEnabled;
 	}
 
 	public void setDebugEnabled(boolean debugEnabled) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The Twitter search supplier properties.
+ *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
 @ConfigurationProperties("twitter.search")
 @Validated
 public class TwitterSearchSupplierProperties {
+
+	/**
+	 * Whether to enable Twitter search supplier.
+	 */
+	private boolean enabled;
 
 	/**
 	 * Search tweets by search query string.
@@ -57,7 +65,7 @@ public class TwitterSearchSupplierProperties {
 
 	/**
 	 * Restricts searched tweets to the given language, given by an
-	 * http://en.wikipedia.org/wiki/ISO_639-1 .
+	 * http://en.wikipedia.org/wiki/ISO_639-1.
 	 */
 	private String lang = null;
 
@@ -73,7 +81,7 @@ public class TwitterSearchSupplierProperties {
 	 * given latitude/longitude, where the user's location is taken from their Twitter
 	 * profile. Should be formatted as
 	 */
-	private Geocode geocode = new Geocode();
+	private final Geocode geocode = new Geocode();
 
 	/**
 	 * Specifies what type of search results you would prefer to receive. The current
@@ -90,8 +98,16 @@ public class TwitterSearchSupplierProperties {
 	 */
 	private boolean restartFromMostRecentOnEmptyResponse = false;
 
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
 	public String getQuery() {
-		return query;
+		return this.query;
 	}
 
 	public void setQuery(String query) {
@@ -99,7 +115,7 @@ public class TwitterSearchSupplierProperties {
 	}
 
 	public String getLang() {
-		return lang;
+		return this.lang;
 	}
 
 	public void setLang(String lang) {
@@ -107,7 +123,7 @@ public class TwitterSearchSupplierProperties {
 	}
 
 	public int getPage() {
-		return page;
+		return this.page;
 	}
 
 	public void setPage(int page) {
@@ -115,7 +131,7 @@ public class TwitterSearchSupplierProperties {
 	}
 
 	public int getCount() {
-		return count;
+		return this.count;
 	}
 
 	public void setCount(int count) {
@@ -123,7 +139,7 @@ public class TwitterSearchSupplierProperties {
 	}
 
 	public String getSince() {
-		return since;
+		return this.since;
 	}
 
 	public void setSince(String since) {
@@ -131,11 +147,11 @@ public class TwitterSearchSupplierProperties {
 	}
 
 	public Geocode getGeocode() {
-		return geocode;
+		return this.geocode;
 	}
 
 	public Query.ResultType getResultType() {
-		return resultType;
+		return this.resultType;
 	}
 
 	public void setResultType(Query.ResultType resultType) {
@@ -143,7 +159,7 @@ public class TwitterSearchSupplierProperties {
 	}
 
 	public boolean isRestartFromMostRecentOnEmptyResponse() {
-		return restartFromMostRecentOnEmptyResponse;
+		return this.restartFromMostRecentOnEmptyResponse;
 	}
 
 	public void setRestartFromMostRecentOnEmptyResponse(boolean restartFromMostRecentOnEmptyResponse) {
@@ -168,7 +184,7 @@ public class TwitterSearchSupplierProperties {
 		private double radius = -1;
 
 		public double getLatitude() {
-			return latitude;
+			return this.latitude;
 		}
 
 		public void setLatitude(double latitude) {
@@ -176,7 +192,7 @@ public class TwitterSearchSupplierProperties {
 		}
 
 		public double getLongitude() {
-			return longitude;
+			return this.longitude;
 		}
 
 		public void setLongitude(double longitude) {
@@ -184,7 +200,7 @@ public class TwitterSearchSupplierProperties {
 		}
 
 		public double getRadius() {
-			return radius;
+			return this.radius;
 		}
 
 		public void setRadius(double radius) {

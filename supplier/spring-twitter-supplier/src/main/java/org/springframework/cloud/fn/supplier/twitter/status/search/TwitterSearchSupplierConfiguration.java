@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,10 +30,11 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
@@ -45,12 +46,14 @@ import org.springframework.util.StringUtils;
  *
  * @author Christian Tzolov
  * @author Chris Bono
+ * @author Artem Bilan
  */
-@EnableConfigurationProperties({ TwitterSearchSupplierProperties.class })
-@Import(TwitterConnectionConfiguration.class)
+@ConditionalOnProperty(prefix = "twitter.search", name = "enabled")
+@EnableConfigurationProperties(TwitterSearchSupplierProperties.class)
+@AutoConfiguration(after = TwitterConnectionConfiguration.class)
 public class TwitterSearchSupplierConfiguration {
 
-	private static final Log logger = LogFactory.getLog(TwitterSearchSupplierConfiguration.class);
+	private static final Log LOGGER = LogFactory.getLog(TwitterSearchSupplierConfiguration.class);
 
 	@Autowired
 	private TwitterSearchSupplierProperties searchProperties;
@@ -77,21 +80,21 @@ public class TwitterSearchSupplierConfiguration {
 
 				List<Status> tweets = result.getTweets();
 
-				logger.info(String.format("%s, size: %s", searchPage.status(), tweets.size()));
+				LOGGER.info(String.format("%s, size: %s", searchPage.status(), tweets.size()));
 
 				searchPage.update(tweets);
 
 				return this.json.apply(tweets);
 			}
-			catch (TwitterException e) {
-				logger.error("Twitter error", e);
+			catch (TwitterException ex) {
+				LOGGER.error("Twitter error", ex);
 			}
 
 			return null;
 		};
 	}
 
-	private Query toQuery(TwitterSearchSupplierProperties searchProperties, SearchPagination pagination) {
+	private static Query toQuery(TwitterSearchSupplierProperties searchProperties, SearchPagination pagination) {
 
 		Query query = new Query();
 		if (searchProperties.getCount() > 0) {

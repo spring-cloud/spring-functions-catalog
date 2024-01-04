@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The Twitter supplier friendship updates receiving properties.
+ *
  * @author Christian Tzolov
  */
 @ConfigurationProperties("twitter.friendships.source")
@@ -37,6 +39,11 @@ public class TwitterFriendshipsSupplierProperties {
 		followers, friends
 
 	}
+
+	/**
+	 * Whether to enable Twitter friendship updates receiving.
+	 */
+	private boolean enabled;
 
 	/**
 	 * Selects between followers or friends APIs.
@@ -77,8 +84,16 @@ public class TwitterFriendshipsSupplierProperties {
 	 */
 	private int pollInterval = 121000;
 
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
 	public FriendshipsRequestType getType() {
-		return type;
+		return this.type;
 	}
 
 	public void setType(FriendshipsRequestType type) {
@@ -86,7 +101,7 @@ public class TwitterFriendshipsSupplierProperties {
 	}
 
 	public String getScreenName() {
-		return screenName;
+		return this.screenName;
 	}
 
 	public void setScreenName(String screenName) {
@@ -94,7 +109,7 @@ public class TwitterFriendshipsSupplierProperties {
 	}
 
 	public Long getUserId() {
-		return userId;
+		return this.userId;
 	}
 
 	public void setUserId(Long userId) {
@@ -102,7 +117,7 @@ public class TwitterFriendshipsSupplierProperties {
 	}
 
 	public int getCount() {
-		return count;
+		return this.count;
 	}
 
 	public void setCount(int count) {
@@ -110,7 +125,7 @@ public class TwitterFriendshipsSupplierProperties {
 	}
 
 	public boolean isSkipStatus() {
-		return skipStatus;
+		return this.skipStatus;
 	}
 
 	public void setSkipStatus(boolean skipStatus) {
@@ -118,7 +133,7 @@ public class TwitterFriendshipsSupplierProperties {
 	}
 
 	public boolean isIncludeUserEntities() {
-		return includeUserEntities;
+		return this.includeUserEntities;
 	}
 
 	public void setIncludeUserEntities(boolean includeUserEntities) {
@@ -126,7 +141,7 @@ public class TwitterFriendshipsSupplierProperties {
 	}
 
 	public int getPollInterval() {
-		return pollInterval;
+		return this.pollInterval;
 	}
 
 	public void setPollInterval(int pollInterval) {
@@ -140,9 +155,9 @@ public class TwitterFriendshipsSupplierProperties {
 
 	@Override
 	public String toString() {
-		return "TwitterFriendshipsSourceProperties{" + "type=" + type + ", screenName='" + screenName + '\''
-				+ ", userId=" + userId + ", count=" + count + ", skipStatus=" + skipStatus + ", includeUserEntities="
-				+ includeUserEntities + ", pollInterval=" + pollInterval + '}';
+		return "TwitterFriendshipsSourceProperties{" + "type=" + this.type + ", screenName='" + this.screenName + '\''
+				+ ", userId=" + this.userId + ", count=" + this.count + ", skipStatus=" + this.skipStatus
+				+ ", includeUserEntities=" + this.includeUserEntities + ", pollInterval=" + this.pollInterval + '}';
 	}
 
 }

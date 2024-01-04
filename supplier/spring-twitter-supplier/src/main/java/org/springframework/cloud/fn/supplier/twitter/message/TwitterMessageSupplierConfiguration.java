@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,20 +28,25 @@ import twitter4j.DirectMessageList;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.integration.metadata.MetadataStore;
 import org.springframework.integration.metadata.SimpleMetadataStore;
 import org.springframework.messaging.Message;
 
 /**
+ * The auto-configuration for receiving Twitter messages via supplier.
+ *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
-@EnableConfigurationProperties({ TwitterMessageSupplierProperties.class })
-@Import(TwitterConnectionConfiguration.class)
+@ConditionalOnProperty(prefix = "twitter.message.source", name = "enabled")
+@AutoConfiguration(after = TwitterConnectionConfiguration.class)
+@EnableConfigurationProperties(TwitterMessageSupplierProperties.class)
 public class TwitterMessageSupplierConfiguration {
 
 	private static final Log logger = LogFactory.getLog(TwitterMessageSupplierConfiguration.class);
@@ -61,9 +66,9 @@ public class TwitterMessageSupplierConfiguration {
 	@Bean
 	public Supplier<List<DirectMessage>> directMessagesSupplier(TwitterMessageSupplierProperties properties,
 			Twitter twitter, MessageCursor cursorState) {
+
 		return () -> {
 			try {
-				String cs = cursorState.getCursor();
 				DirectMessageList messages = (cursorState.getCursor() == null)
 						? twitter.getDirectMessages(properties.getCount())
 						: twitter.getDirectMessages(properties.getCount(), cursorState.getCursor());
@@ -77,8 +82,8 @@ public class TwitterMessageSupplierConfiguration {
 						cursorState));
 				cursorState.updateCursor(null);
 			}
-			catch (TwitterException e) {
-				logger.error("Twitter API error:", e);
+			catch (TwitterException ex) {
+				logger.error("Twitter API error:", ex);
 			}
 
 			return new ArrayList<>();
@@ -87,11 +92,12 @@ public class TwitterMessageSupplierConfiguration {
 
 	@Bean
 	public Function<List<DirectMessage>, List<DirectMessage>> messageDeduplicate(MetadataStore metadataStore) {
-		return messages -> {
+		return (messages) -> {
 			List<DirectMessage> uniqueMessages = new ArrayList<>();
 			for (DirectMessage message : messages) {
-				if (metadataStore.get(message.getId() + "") == null) {
-					metadataStore.put(message.getId() + "", message.getCreatedAt() + "");
+				long id = message.getId();
+				if (metadataStore.get(id + "") == null) {
+					metadataStore.put(id + "", message.getCreatedAt() + "");
 					uniqueMessages.add(message);
 				}
 			}
@@ -103,6 +109,7 @@ public class TwitterMessageSupplierConfiguration {
 	public Supplier<Message<byte[]>> twitterMessageSupplier(
 			Function<List<DirectMessage>, List<DirectMessage>> messageDeduplicate,
 			Function<Object, Message<byte[]>> managedJson, Supplier<List<DirectMessage>> directMessagesSupplier) {
+
 		return () -> messageDeduplicate.andThen(managedJson).apply(directMessagesSupplier.get());
 	}
 
@@ -111,7 +118,7 @@ public class TwitterMessageSupplierConfiguration {
 		private String cursor = null;
 
 		public String getCursor() {
-			return cursor;
+			return this.cursor;
 		}
 
 		public void updateCursor(String newCursor) {
@@ -120,7 +127,7 @@ public class TwitterMessageSupplierConfiguration {
 
 		@Override
 		public String toString() {
-			return "Cursor{" + "cursor=" + cursor + '}';
+			return "Cursor{" + "cursor=" + this.cursor + '}';
 		}
 
 	}

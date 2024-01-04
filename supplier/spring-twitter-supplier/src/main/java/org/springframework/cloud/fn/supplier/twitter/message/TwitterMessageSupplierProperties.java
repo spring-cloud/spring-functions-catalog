@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,19 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The Twitter supplier messages receiving properties.
+ *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
 @ConfigurationProperties("twitter.message.source")
 @Validated
 public class TwitterMessageSupplierProperties {
+
+	/**
+	 * Whether to enable Twitter message receiving.
+	 */
+	private boolean enabled;
 
 	/**
 	 * Max number of events to be returned. 20 default. 50 max.
@@ -34,8 +42,16 @@ public class TwitterMessageSupplierProperties {
 	@Max(50)
 	private int count = 20;
 
+	public boolean isEnabled() {
+		return this.enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
 	public int getCount() {
-		return count;
+		return this.count;
 	}
 
 	public void setCount(int count) {
