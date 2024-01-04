@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,8 +22,6 @@ import java.util.Arrays;
 import org.apache.ftpserver.FtpServer;
 import org.apache.ftpserver.FtpServerFactory;
 import org.apache.ftpserver.ftplet.Authentication;
-import org.apache.ftpserver.ftplet.AuthenticationFailedException;
-import org.apache.ftpserver.ftplet.FtpException;
 import org.apache.ftpserver.ftplet.User;
 import org.apache.ftpserver.ftplet.UserManager;
 import org.apache.ftpserver.listener.ListenerFactory;
@@ -62,7 +60,7 @@ public class FtpTestSupport extends RemoteFileTestSupport {
 	}
 
 	@AfterAll
-	public static void stopServer() throws Exception {
+	public static void stopServer() {
 		server.stop();
 		System.clearProperty("ftp.factory.port");
 		System.clearProperty("ftp.localDir");
@@ -86,40 +84,40 @@ public class FtpTestSupport extends RemoteFileTestSupport {
 		}
 
 		@Override
-		public User getUserByName(String s) throws FtpException {
+		public User getUserByName(String s) {
 			return this.testUser;
 		}
 
 		@Override
-		public String[] getAllUserNames() throws FtpException {
+		public String[] getAllUserNames() {
 			return new String[] { "TEST_USER" };
 		}
 
 		@Override
-		public void delete(String s) throws FtpException {
+		public void delete(String s) {
 		}
 
 		@Override
-		public void save(User user) throws FtpException {
+		public void save(User user) {
 		}
 
 		@Override
-		public boolean doesExist(String s) throws FtpException {
+		public boolean doesExist(String s) {
 			return true;
 		}
 
 		@Override
-		public User authenticate(Authentication authentication) throws AuthenticationFailedException {
+		public User authenticate(Authentication authentication) {
 			return this.testUser;
 		}
 
 		@Override
-		public String getAdminName() throws FtpException {
+		public String getAdminName() {
 			return "admin";
 		}
 
 		@Override
-		public boolean isAdmin(String s) throws FtpException {
+		public boolean isAdmin(String s) {
 			return s.equals("admin");
 		}
 

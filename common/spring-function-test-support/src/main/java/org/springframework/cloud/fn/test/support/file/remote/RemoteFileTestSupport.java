@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2016 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,40 +88,40 @@ public abstract class RemoteFileTestSupport {
 	 * <p>
 	 * While a single server exists for all tests, the directory structure is rebuilt for
 	 * each test.
-	 * @throws IOException IO Exception.
+	 * @throws IOException the IO Exception.
 	 */
 	@BeforeEach
 	public void setupFolders() throws IOException {
 		String prefix = prefix();
 		recursiveDelete(new File(remoteTemporaryFolder.toFile(), prefix + "Source"));
 
-		sourceRemoteDirectory = new File(remoteTemporaryFolder.toFile(), prefix + "Source");
-		sourceRemoteDirectory.mkdirs();
+		this.sourceRemoteDirectory = new File(remoteTemporaryFolder.toFile(), prefix + "Source");
+		this.sourceRemoteDirectory.mkdirs();
 		recursiveDelete(new File(remoteTemporaryFolder.toFile(), prefix + "Target"));
-		targetRemoteDirectory = new File(remoteTemporaryFolder.toFile(), prefix + "Target");
-		targetRemoteDirectory.mkdirs();
+		this.targetRemoteDirectory = new File(remoteTemporaryFolder.toFile(), prefix + "Target");
+		this.targetRemoteDirectory.mkdirs();
 		recursiveDelete(new File(localTemporaryFolder.toFile(), "localSource"));
-		sourceLocalDirectory = new File(localTemporaryFolder.toFile(), "localSource");
-		sourceLocalDirectory.mkdirs();
+		this.sourceLocalDirectory = new File(localTemporaryFolder.toFile(), "localSource");
+		this.sourceLocalDirectory.mkdirs();
 		recursiveDelete(new File(localTemporaryFolder.toFile(), "localTarget"));
-		targetLocalDirectory = new File(localTemporaryFolder.toFile(), "localTarget");
-		targetLocalDirectory.mkdirs();
-		File file = new File(sourceRemoteDirectory, prefix + "Source1.txt");
+		this.targetLocalDirectory = new File(localTemporaryFolder.toFile(), "localTarget");
+		this.targetLocalDirectory.mkdirs();
+		File file = new File(this.sourceRemoteDirectory, prefix + "Source1.txt");
 		file.createNewFile();
 		FileOutputStream fos = new FileOutputStream(file);
 		fos.write("source1".getBytes());
 		fos.close();
-		file = new File(sourceRemoteDirectory, prefix + "Source2.txt");
+		file = new File(this.sourceRemoteDirectory, prefix + "Source2.txt");
 		file.createNewFile();
 		fos = new FileOutputStream(file);
 		fos.write("source2".getBytes());
 		fos.close();
-		file = new File(sourceLocalDirectory, "localSource1.txt");
+		file = new File(this.sourceLocalDirectory, "localSource1.txt");
 		file.createNewFile();
 		fos = new FileOutputStream(file);
 		fos.write("local1".getBytes());
 		fos.close();
-		file = new File(sourceLocalDirectory, "localSource2.txt");
+		file = new File(this.sourceLocalDirectory, "localSource2.txt");
 		file.createNewFile();
 		fos = new FileOutputStream(file);
 		fos.write("local2".getBytes());
