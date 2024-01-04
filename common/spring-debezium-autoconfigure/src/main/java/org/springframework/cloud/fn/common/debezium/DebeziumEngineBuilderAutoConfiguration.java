@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 the original author or authors.
+ * Copyright 2023-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.cloud.fn.common.debezium;
 
 import java.time.Clock;
-import java.time.Duration;
 import java.util.Objects;
 
 import io.debezium.engine.ChangeEvent;
@@ -40,7 +39,6 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.fn.common.debezium.DebeziumProperties.DebeziumFormat;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 
 /**
@@ -63,6 +61,7 @@ import org.springframework.core.annotation.Order;
  *
  * @author Christian Tzolov
  * @author Corneil du Plessis
+ * @author Artem Bilan
  */
 @AutoConfiguration
 @EnableConfigurationProperties(DebeziumProperties.class)
@@ -75,9 +74,10 @@ public class DebeziumEngineBuilderAutoConfiguration {
 	/**
 	 * The fully-qualified class name of the commit policy type. The default is a periodic
 	 * commit policy based upon time intervals.
-	 * @param properties The 'debezium.properties.offset.flush.interval.ms' configuration
+	 * @param properties the 'debezium.properties.offset.flush.interval.ms' configuration
 	 * is compulsory for the Periodic policy type. The ALWAYS and DEFAULT doesn't require
 	 * additional configuration.
+	 * @return {@link OffsetCommitPolicy} bean
 	 */
 	@Bean
 	@ConditionalOnMissingBean
@@ -98,7 +98,7 @@ public class DebeziumEngineBuilderAutoConfiguration {
 	 * Use the specified clock when needing to determine the current time. Defaults to
 	 * {@link Clock#systemDefaultZone() system clock}, but you can override the Bean in
 	 * your configuration with you {@link Clock implementation}. Returns
-	 * @return Clock for the system default zone.
+	 * @return {@link Clock} for the system default zone.
 	 */
 	@Bean
 	@ConditionalOnMissingBean
@@ -109,8 +109,8 @@ public class DebeziumEngineBuilderAutoConfiguration {
 	/**
 	 * When the engine's {@link DebeziumEngine#run()} method completes, call the supplied
 	 * function with the results.
-	 * @return Default completion callback that logs the completion status. The bean can
-	 * be overridden in custom implementation.
+	 * @return {@link CompletionCallback} that logs the completion status. The bean can be
+	 * overridden in custom implementation.
 	 */
 	@Bean
 	@ConditionalOnMissingBean
@@ -121,7 +121,8 @@ public class DebeziumEngineBuilderAutoConfiguration {
 	/**
 	 * During the engine run, provides feedback about the different stages according to
 	 * the completion state of each component running within the engine (connectors, tasks
-	 * etc). The bean can be overridden in custom implementation.
+	 * etc.). The bean can be overridden in custom implementation.
+	 * @return {@link ConnectorCallback}
 	 */
 	@Bean
 	@ConditionalOnMissingBean
@@ -151,34 +152,19 @@ public class DebeziumEngineBuilderAutoConfiguration {
 			.using((offsetCommitPolicy != NULL_OFFSET_COMMIT_POLICY) ? offsetCommitPolicy : null);
 	}
 
-	/**
-	 * Converts the {@link DebeziumFormat} enum into Debezium {@link SerializationFormat}
-	 * class.
-	 * @param debeziumFormat debezium format property.
-	 */
 	private Class<? extends SerializationFormat<byte[]>> serializationFormatClass(DebeziumFormat debeziumFormat) {
-		switch (debeziumFormat) {
-			case JSON:
-				return io.debezium.engine.format.JsonByteArray.class;
-			case AVRO:
-				return io.debezium.engine.format.Avro.class;
-			case PROTOBUF:
-				return io.debezium.engine.format.Protobuf.class;
-			default:
-				throw new IllegalArgumentException("Unknown debezium format: " + debeziumFormat);
-		}
+		return switch (debeziumFormat) {
+			case JSON -> io.debezium.engine.format.JsonByteArray.class;
+			case AVRO -> io.debezium.engine.format.Avro.class;
+			case PROTOBUF -> io.debezium.engine.format.Protobuf.class;
+		};
 	}
 
 	/**
 	 * A callback function to be notified when the connector completes.
 	 */
-	private static final CompletionCallback DEFAULT_COMPLETION_CALLBACK = new CompletionCallback() {
-		@Override
-		public void handle(boolean success, String message, Throwable error) {
-			logger.info(String.format("Debezium Engine completed with success:%s, message:%s ", success, message),
-					error);
-		}
-	};
+	private static final CompletionCallback DEFAULT_COMPLETION_CALLBACK = (success, message, error) -> logger
+		.info(String.format("Debezium Engine completed with success:%s, message:%s ", success, message), error);
 
 	/**
 	 * Callback function which informs users about the various stages a connector goes
@@ -219,18 +205,16 @@ public class DebeziumEngineBuilderAutoConfiguration {
 	/**
 	 * The policy that defines when the offsets should be committed to offset storage.
 	 */
-	private static final OffsetCommitPolicy NULL_OFFSET_COMMIT_POLICY = new OffsetCommitPolicy() {
-		@Override
-		public boolean performCommit(long numberOfMessagesSinceLastCommit, Duration timeSinceLastCommit) {
-			throw new UnsupportedOperationException("Unimplemented method 'performCommit'");
-		}
+	private static final OffsetCommitPolicy NULL_OFFSET_COMMIT_POLICY = (numberOfMessagesSinceLastCommit,
+			timeSinceLastCommit) -> {
+		throw new UnsupportedOperationException("Unimplemented method 'performCommit'");
 	};
 
 	/**
 	 * Determine if Debezium connector is available. This either kicks in if any debezium
 	 * connector is available.
 	 */
-	@Order(Ordered.LOWEST_PRECEDENCE)
+	@Order
 	static class OnDebeziumConnectorCondition extends AnyNestedCondition {
 
 		OnDebeziumConnectorCondition() {

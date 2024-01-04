@@ -29,28 +29,28 @@ publishing {
 					developer {
 						id = 'artembilan'
 						name = 'Artem Bilan'
-						email = 'abilan@vmware.com'
+						email = 'artem.bilan@broadcom.com'
 						roles = ['project lead']
 					}
 					developer {
 						id = 'corneil'
 						name = 'Corneil du Plessis'
-						email = 'pcorneil@vmware.com'
+						email = 'corneil.du-plessis@broadcom.com'
 					}
 					developer {
 						id = 'sobychacko'
 						name = 'Soby Chacko'
-						email = 'chackos@vmware.com'
+						email = 'soby.chacko@broadcom.com'
 					}
 					developer {
 						id = 'onobc'
 						name = 'Chris Bono'
-						email = 'cbono@vmware.com'
+						email = 'chris.bono@broadcom.com'
 					}
 					developer {
 						id = 'tzolov'
 						name = 'Christian Tzolov'
-						email = 'ctzolov@vmware.com'
+						email = 'christian.tzolov@broadcom.com'
 					}
 				}
 				issueManagement {

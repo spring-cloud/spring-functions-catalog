@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 the original author or authors.
+ * Copyright 2023-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,6 @@
 package org.springframework.cloud.fn.supplier.debezium;
 
 import java.lang.reflect.Field;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,15 +47,17 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.MimeTypeUtils;
 
 /**
+ * The Debezium supplier auto-configuration.
+ *
  * @author Christian Tzolov
  * @author Artem Bilan
  */
 @AutoConfiguration(after = DebeziumEngineBuilderAutoConfiguration.class)
-@EnableConfigurationProperties({ DebeziumSupplierProperties.class })
+@EnableConfigurationProperties(DebeziumSupplierProperties.class)
 @ConditionalOnBean(DebeziumEngine.Builder.class)
 public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAware {
 
-	private static final Log logger = LogFactory.getLog(DebeziumReactiveConsumerConfiguration.class);
+	private static final Log LOGGER = LogFactory.getLog(DebeziumReactiveConsumerConfiguration.class);
 
 	/**
 	 * ORG_SPRINGFRAMEWORK_KAFKA_SUPPORT_KAFKA_NULL.
@@ -72,7 +73,7 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 			Field field = clazz.getDeclaredField("INSTANCE");
 			this.kafkaNull = field.get(null);
 		}
-		catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+		catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException ex) {
 		}
 	}
 
@@ -85,7 +86,7 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 	/**
 	 * Debezium Engine is designed to be submitted to an {@link ExecutorService} for
 	 * execution by a single thread, and a running connector can be stopped either by
-	 * calling {@link #stop()} from another thread or by interrupting the running thread
+	 * calling {@code stop()} from another thread or by interrupting the running thread
 	 * (e.g., as is the case with {@link ExecutorService#shutdownNow()}).
 	 */
 	private final ExecutorService debeziumExecutor = Executors.newSingleThreadExecutor();
@@ -102,8 +103,8 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 	public Supplier<Flux<Message<?>>> debeziumSupplier(DebeziumEngine<ChangeEvent<byte[], byte[]>> debeziumEngine) {
 
 		return () -> this.eventSink.asFlux()
-			.doOnRequest(r -> debeziumExecutor.execute(debeziumEngine))
-			.doOnTerminate(debeziumExecutor::shutdownNow);
+			.doOnRequest((r) -> this.debeziumExecutor.execute(debeziumEngine))
+			.doOnTerminate(this.debeziumExecutor::shutdownNow);
 	}
 
 	@Bean
@@ -111,7 +112,7 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 	public Consumer<ChangeEvent<byte[], byte[]>> changeEventConsumer(DebeziumProperties engineProperties,
 			DebeziumSupplierProperties supplierProperties) {
 
-		return new ChangeEventConsumer<byte[]>(engineProperties.getPayloadFormat().contentType(),
+		return new ChangeEventConsumer<>(engineProperties.getPayloadFormat().contentType(),
 				supplierProperties.isCopyHeaders(), this.eventSink);
 	}
 
@@ -134,8 +135,8 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 
 		@Override
 		public void accept(ChangeEvent<T, T> changeEvent) {
-			if (logger.isDebugEnabled()) {
-				logger.debug("[Debezium Event]: " + changeEvent.key());
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("[Debezium Event]: " + changeEvent.key());
 			}
 
 			Object key = changeEvent.key();
@@ -156,7 +157,7 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 
 			// If payload is still null ignore the message.
 			if (payload == null) {
-				logger.info("Dropped null payload message");
+				LOGGER.info("Dropped null payload message");
 				return;
 			}
 
@@ -170,9 +171,7 @@ public class DebeziumReactiveConsumerConfiguration implements BeanClassLoaderAwa
 			if (this.copyHeaders) {
 				List<Header<T>> headers = changeEvent.headers();
 				if (headers != null && !headers.isEmpty()) {
-					Iterator<Header<T>> itr = headers.iterator();
-					while (itr.hasNext()) {
-						Header<T> header = itr.next();
+					for (Header<T> header : headers) {
 						messageBuilder.setHeader(header.getKey(), header.getValue());
 					}
 				}

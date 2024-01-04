@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 the original author or authors.
+ * Copyright 2023-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,25 +39,20 @@ public class DebeziumEngineBuilderAutoConfigurationTests {
 
 	@Test
 	void noConnectorNoProperty() {
-		this.contextRunner.run((context) -> {
-			assertThat(context).doesNotHaveBean(DebeziumEngine.Builder.class);
-		});
+		this.contextRunner.run((context) -> assertThat(context).doesNotHaveBean(DebeziumEngine.Builder.class));
 	}
 
 	@Test
 	void noConnectorWithProperty() {
 		this.contextRunner.withPropertyValues("debezium.properties.connector.class=Dummy")
 			.withClassLoader(new FilteredClassLoader("io.debezium.connector"))
-			.run((context) -> {
-				assertThat(context).doesNotHaveBean(DebeziumEngine.Builder.class);
-			});
+			.run((context) -> assertThat(context).doesNotHaveBean(DebeziumEngine.Builder.class));
 	}
 
 	@Test
 	void withConnectorWithProperty() {
-		this.contextRunner.withPropertyValues("debezium.properties.connector.class=Dummy").run((context) -> {
-			assertThat(context).hasSingleBean(DebeziumEngine.Builder.class);
-		});
+		this.contextRunner.withPropertyValues("debezium.properties.connector.class=Dummy")
+			.run((context) -> assertThat(context).hasSingleBean(DebeziumEngine.Builder.class));
 	}
 
 }

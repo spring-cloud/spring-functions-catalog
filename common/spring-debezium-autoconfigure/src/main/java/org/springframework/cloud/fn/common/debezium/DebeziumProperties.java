@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 the original author or authors.
+ * Copyright 2023-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,10 @@ import java.util.Properties;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
+ * Debezium engine auto-configuration properties.
+ *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
 @ConfigurationProperties("debezium")
 public class DebeziumProperties {
@@ -50,7 +53,7 @@ public class DebeziumProperties {
 		}
 
 		public final String contentType() {
-			return contentType;
+			return this.contentType;
 		}
 
 	};
@@ -59,15 +62,15 @@ public class DebeziumProperties {
 	 * Spring pass-trough wrapper for debezium configuration properties. All properties
 	 * with a 'debezium.properties.*' prefix are native Debezium properties.
 	 */
-	private Map<String, String> properties = new HashMap<>();
+	private final Map<String, String> properties = new HashMap<>();
 
 	/**
-	 * {@link ChangeEvent} Key and Payload formats. Defaults to 'JSON'.
+	 * {@code io.debezium.engine.ChangeEvent} Key and Payload formats. Defaults to 'JSON'.
 	 */
 	private DebeziumFormat payloadFormat = DebeziumFormat.JSON;
 
 	/**
-	 * {@link ChangeEvent} header format. Defaults to 'JSON'.
+	 * {@code io.debezium.engine.ChangeEvent} header format. Defaults to 'JSON'.
 	 */
 	private DebeziumFormat headerFormat = DebeziumFormat.JSON;
 
@@ -77,11 +80,11 @@ public class DebeziumProperties {
 	private DebeziumOffsetCommitPolicy offsetCommitPolicy = DebeziumOffsetCommitPolicy.DEFAULT;
 
 	public Map<String, String> getProperties() {
-		return properties;
+		return this.properties;
 	}
 
 	public DebeziumFormat getPayloadFormat() {
-		return payloadFormat;
+		return this.payloadFormat;
 	}
 
 	public void setPayloadFormat(DebeziumFormat format) {
@@ -89,7 +92,7 @@ public class DebeziumProperties {
 	}
 
 	public DebeziumFormat getHeaderFormat() {
-		return headerFormat;
+		return this.headerFormat;
 	}
 
 	public void setHeaderFormat(DebeziumFormat headerFormat) {
@@ -118,7 +121,7 @@ public class DebeziumProperties {
 	}
 
 	public DebeziumOffsetCommitPolicy getOffsetCommitPolicy() {
-		return offsetCommitPolicy;
+		return this.offsetCommitPolicy;
 	}
 
 	public void setOffsetCommitPolicy(DebeziumOffsetCommitPolicy offsetCommitPolicy) {
@@ -126,12 +129,13 @@ public class DebeziumProperties {
 	}
 
 	/**
-	 * Converts the Spring Framework "debezium.properties.*" properties into native
+	 * Convert the Spring Framework "debezium.properties.*" properties into native
 	 * Debezium configuration.
+	 * @return the properties for Debezium native configuration
 	 */
 	public Properties getDebeziumNativeConfiguration() {
 		Properties outProps = new java.util.Properties();
-		outProps.putAll(this.getProperties());
+		outProps.putAll(getProperties());
 		return outProps;
 	}
 

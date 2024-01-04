@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 the original author or authors.
+ * Copyright 2023-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +19,8 @@ package org.springframework.cloud.fn.supplier.debezium;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
+ * Debezium supplier configuration properties.
+ *
  * @author Christian Tzolov
  */
 @ConfigurationProperties("debezium.supplier")
@@ -30,7 +32,7 @@ public class DebeziumSupplierProperties {
 	private boolean copyHeaders = true;
 
 	public boolean isCopyHeaders() {
-		return copyHeaders;
+		return this.copyHeaders;
 	}
 
 	public void setCopyHeaders(boolean copyHeaders) {

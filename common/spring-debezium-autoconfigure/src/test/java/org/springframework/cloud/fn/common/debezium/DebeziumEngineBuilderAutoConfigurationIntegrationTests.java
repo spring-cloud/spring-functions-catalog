@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 the original author or authors.
+ * Copyright 2023-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,9 +61,9 @@ import static org.awaitility.Awaitility.await;
  */
 @Tag("integration")
 @Testcontainers
-public class DebeziumEngineBuilderAutoConfigurationIntegrationTest {
+public class DebeziumEngineBuilderAutoConfigurationIntegrationTests {
 
-	private static final Log logger = LogFactory.getLog(DebeziumEngineBuilderAutoConfigurationIntegrationTest.class);
+	private static final Log logger = LogFactory.getLog(DebeziumEngineBuilderAutoConfigurationIntegrationTests.class);
 
 	private static final String DATABASE_NAME = "inventory";
 
@@ -123,7 +123,7 @@ public class DebeziumEngineBuilderAutoConfigurationIntegrationTest {
 				"debezium.properties.transforms.unwrap.drop.tombstones=false",
 				"debezium.properties.transforms.unwrap.delete.handling.mode=rewrite",
 				"debezium.properties.transforms.unwrap.add.fields=name,db")
-			.run(context -> {
+			.run((context) -> {
 				JdbcTemplate jdbcTemplate = context.getBean(JdbcTemplate.class);
 
 				DebeziumCustomConsumerApplication.TestDebeziumConsumer testConsumer = context
