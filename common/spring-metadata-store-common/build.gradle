@@ -9,8 +9,8 @@ dependencies {
     optionalApi 'org.springframework.integration:spring-integration-zookeeper'
     optionalApi 'org.springframework.integration:spring-integration-hazelcast'
     optionalApi springIntegrationAws
-    api 'software.amazon.awssdk:dynamodb'
+    optionalApi 'software.amazon.awssdk:dynamodb'
 
     testImplementation 'org.hsqldb:hsqldb'
-    testImplementation 'org.apache.curator:curator-test:5.5.0'
+    testImplementation apacheCuratorTest
 }

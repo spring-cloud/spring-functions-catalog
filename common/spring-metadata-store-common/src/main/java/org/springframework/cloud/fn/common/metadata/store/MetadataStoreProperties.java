@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import org.springframework.integration.jdbc.metadata.JdbcMetadataStore;
 import org.springframework.integration.redis.metadata.RedisMetadataStore;
 
 /**
+ * The properties for metadata store.
+ *
  * @author Artem Bilan
  * @author David Turanski
  * @author Corneil du Plessis
@@ -252,7 +254,7 @@ public class MetadataStoreProperties {
 		private String root = "/SpringIntegration-MetadataStore";
 
 		public String getConnectString() {
-			return connectString;
+			return this.connectString;
 		}
 
 		public void setConnectString(String connectString) {

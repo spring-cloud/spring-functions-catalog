@@ -11,5 +11,6 @@ ext {
     mockserverNetty = 'org.mock-server:mockserver-netty:5.15.0'
     twitter4jStream = 'org.twitter4j:twitter4j-stream:4.0.7'
     greenmail = 'com.icegreen:greenmail:2.1.0-alpha-3'
+    apacheCuratorTest = 'org.apache.curator:curator-test:5.5.0'
     protobufJava = "com.google.protobuf:protobuf-java:$protobufVersion"
 }

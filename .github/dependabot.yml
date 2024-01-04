@@ -20,3 +20,4 @@ updates:
           - "org.ajoberstar.grgit"
           - "com.icegreen:greenmail"
           - "org.mock-server*"
+          - "org.apache.curator*"

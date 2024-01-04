@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.cloud.fn.common.metadata.store;
 
 import com.hazelcast.core.HazelcastInstance;
 import io.awspring.cloud.autoconfigure.core.AwsClientBuilderConfigurer;
+import io.awspring.cloud.autoconfigure.dynamodb.DynamoDbAutoConfiguration;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryForever;
@@ -28,6 +29,10 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
+import org.springframework.boot.autoconfigure.hazelcast.HazelcastAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -44,12 +49,15 @@ import org.springframework.integration.zookeeper.metadata.ZookeeperMetadataStore
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
+ * The auto-configuration for metadata store.
+ *
  * @author Artem Bilan
  * @author David Turanski
  * @author Corneil du Plessis
  * @since 2.0.2
  */
-@AutoConfiguration
+@AutoConfiguration(after = { RedisAutoConfiguration.class, MongoAutoConfiguration.class,
+		HazelcastAutoConfiguration.class, JdbcTemplateAutoConfiguration.class, DynamoDbAutoConfiguration.class })
 @ConditionalOnClass(ConcurrentMetadataStore.class)
 @EnableConfigurationProperties(MetadataStoreProperties.class)
 public class MetadataStoreAutoConfiguration {
@@ -66,7 +74,7 @@ public class MetadataStoreAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		public ConcurrentMetadataStore redisMetadataStore(RedisTemplate<String, ?> redisTemplate,
+		ConcurrentMetadataStore redisMetadataStore(RedisTemplate<String, ?> redisTemplate,
 				MetadataStoreProperties metadataStoreProperties) {
 
 			return new RedisMetadataStore(redisTemplate, metadataStoreProperties.getRedis().getKey());
@@ -79,7 +87,7 @@ public class MetadataStoreAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		public ConcurrentMetadataStore mongoDbMetadataStore(MongoTemplate mongoTemplate,
+		ConcurrentMetadataStore mongoDbMetadataStore(MongoTemplate mongoTemplate,
 				MetadataStoreProperties metadataStoreProperties) {
 
 			return new MongoDbMetadataStore(mongoTemplate, metadataStoreProperties.getMongoDb().getCollection());
@@ -92,13 +100,13 @@ public class MetadataStoreAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		public HazelcastInstance hazelcastInstance() {
+		HazelcastInstance hazelcastInstance() {
 			return com.hazelcast.core.Hazelcast.newHazelcastInstance();
 		}
 
 		@Bean
 		@ConditionalOnMissingBean
-		public ConcurrentMetadataStore hazelcastMetadataStore(HazelcastInstance hazelcastInstance,
+		ConcurrentMetadataStore hazelcastMetadataStore(HazelcastInstance hazelcastInstance,
 				ObjectProvider<MetadataStoreListener> metadataStoreListenerObjectProvider) {
 
 			HazelcastMetadataStore hazelcastMetadataStore = new HazelcastMetadataStore(hazelcastInstance);
@@ -113,7 +121,7 @@ public class MetadataStoreAutoConfiguration {
 
 		@Bean(initMethod = "start")
 		@ConditionalOnMissingBean
-		public CuratorFramework curatorFramework(MetadataStoreProperties metadataStoreProperties) {
+		CuratorFramework curatorFramework(MetadataStoreProperties metadataStoreProperties) {
 			MetadataStoreProperties.Zookeeper zookeeperProperties = metadataStoreProperties.getZookeeper();
 			return CuratorFrameworkFactory.newClient(zookeeperProperties.getConnectString(),
 					new RetryForever(zookeeperProperties.getRetryInterval()));
@@ -121,7 +129,7 @@ public class MetadataStoreAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		public ConcurrentMetadataStore zookeeperMetadataStore(CuratorFramework curatorFramework,
+		ConcurrentMetadataStore zookeeperMetadataStore(CuratorFramework curatorFramework,
 				MetadataStoreProperties metadataStoreProperties,
 				ObjectProvider<MetadataStoreListener> metadataStoreListenerObjectProvider) {
 
@@ -140,13 +148,13 @@ public class MetadataStoreAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		public DynamoDbAsyncClient dynamoDB(AwsClientBuilderConfigurer awsClientBuilderConfigurer) {
+		DynamoDbAsyncClient dynamoDB(AwsClientBuilderConfigurer awsClientBuilderConfigurer) {
 			return awsClientBuilderConfigurer.configure(DynamoDbAsyncClient.builder()).build();
 		}
 
 		@Bean
 		@ConditionalOnMissingBean
-		public ConcurrentMetadataStore dynamoDbMetadataStore(DynamoDbAsyncClient dynamoDB,
+		ConcurrentMetadataStore dynamoDbMetadataStore(DynamoDbAsyncClient dynamoDB,
 				MetadataStoreProperties metadataStoreProperties) {
 
 			MetadataStoreProperties.DynamoDb dynamoDbProperties = metadataStoreProperties.getDynamoDb();
@@ -172,7 +180,7 @@ public class MetadataStoreAutoConfiguration {
 
 		@Bean
 		@ConditionalOnMissingBean
-		public ConcurrentMetadataStore jdbcMetadataStore(JdbcTemplate jdbcTemplate,
+		ConcurrentMetadataStore jdbcMetadataStore(JdbcTemplate jdbcTemplate,
 				MetadataStoreProperties metadataStoreProperties) {
 
 			MetadataStoreProperties.Jdbc jdbcProperties = metadataStoreProperties.getJdbc();
