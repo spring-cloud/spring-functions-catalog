@@ -18,7 +18,6 @@ package org.springframework.cloud.fn.common.metadata.store;
 
 import com.hazelcast.core.HazelcastInstance;
 import io.awspring.cloud.autoconfigure.core.AwsClientBuilderConfigurer;
-import io.awspring.cloud.autoconfigure.dynamodb.DynamoDbAutoConfiguration;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryForever;
@@ -56,8 +55,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Corneil du Plessis
  * @since 2.0.2
  */
-@AutoConfiguration(after = { RedisAutoConfiguration.class, MongoAutoConfiguration.class,
-		HazelcastAutoConfiguration.class, JdbcTemplateAutoConfiguration.class, DynamoDbAutoConfiguration.class })
+@AutoConfiguration(
+		after = { RedisAutoConfiguration.class, MongoAutoConfiguration.class, HazelcastAutoConfiguration.class,
+				JdbcTemplateAutoConfiguration.class },
+		afterName = "io.awspring.cloud.autoconfigure.dynamodb.DynamoDbAutoConfiguration")
 @ConditionalOnClass(ConcurrentMetadataStore.class)
 @EnableConfigurationProperties(MetadataStoreProperties.class)
 public class MetadataStoreAutoConfiguration {
