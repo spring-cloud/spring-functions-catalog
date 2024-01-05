@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2022 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,12 @@ package org.springframework.cloud.fn.consumer.tcp;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.tcp.EncoderDecoderFactoryBean;
 import org.springframework.cloud.fn.common.tcp.TcpConnectionFactoryProperties;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.ip.config.TcpConnectionFactoryFactoryBean;
 import org.springframework.integration.ip.tcp.TcpSendingMessageHandler;
 import org.springframework.integration.ip.tcp.connection.AbstractConnectionFactory;
@@ -39,7 +39,7 @@ import org.springframework.messaging.Message;
  * @author Christian Tzolov
  * @author Chris Bono
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties({ TcpConsumerProperties.class, TcpConnectionFactoryProperties.class })
 public class TcpConsumerConfiguration {
 
@@ -49,6 +49,7 @@ public class TcpConsumerConfiguration {
 
 	public TcpConsumerConfiguration(TcpConsumerProperties properties,
 			TcpConnectionFactoryProperties tcpConnectionProperties) {
+
 		this.properties = properties;
 		this.tcpConnectionProperties = tcpConnectionProperties;
 	}
@@ -61,6 +62,7 @@ public class TcpConsumerConfiguration {
 	@Bean
 	public TcpSendingMessageHandlerSmartLifeCycle handler(
 			@Qualifier("tcpSinkConnectionFactory") AbstractConnectionFactory connectionFactory) {
+
 		TcpSendingMessageHandlerSmartLifeCycle tcpMessageHandler = new TcpSendingMessageHandlerSmartLifeCycle();
 		tcpMessageHandler.setConnectionFactory(connectionFactory);
 		return tcpMessageHandler;
@@ -69,7 +71,8 @@ public class TcpConsumerConfiguration {
 	@Bean
 	public TcpConnectionFactoryFactoryBean tcpSinkConnectionFactory(
 			@Qualifier("tcpSinkEncoder") AbstractByteArraySerializer encoder,
-			@Qualifier("tcpSinkMapper") TcpMessageMapper mapper) throws Exception {
+			@Qualifier("tcpSinkMapper") TcpMessageMapper mapper) {
+
 		TcpConnectionFactoryFactoryBean factoryBean = new TcpConnectionFactoryFactoryBean();
 		factoryBean.setType("client");
 		factoryBean.setHost(this.properties.getHost());

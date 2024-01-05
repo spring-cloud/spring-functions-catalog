@@ -58,7 +58,7 @@ public class MqttConsumerTests implements MosquittoContainerTest {
 	protected QueueChannel queue;
 
 	@DynamicPropertySource
-	static void mongoDbProperties(DynamicPropertyRegistry registry) {
+	static void mqttConnectionProperties(DynamicPropertyRegistry registry) {
 		registry.add("mqtt.url", MosquittoContainerTest::mqttUrl);
 	}
 

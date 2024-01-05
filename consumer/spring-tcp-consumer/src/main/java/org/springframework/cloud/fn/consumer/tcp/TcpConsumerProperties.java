@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ public class TcpConsumerProperties {
 
 	@NotNull
 	public String getHost() {
-		return host;
+		return this.host;
 	}
 
 	public void setHost(String host) {
@@ -73,7 +73,7 @@ public class TcpConsumerProperties {
 
 	@NotNull
 	public String getCharset() {
-		return charset;
+		return this.charset;
 	}
 
 	public void setCharset(String charset) {
@@ -81,7 +81,7 @@ public class TcpConsumerProperties {
 	}
 
 	public boolean isClose() {
-		return close;
+		return this.close;
 	}
 
 	public void setClose(boolean close) {

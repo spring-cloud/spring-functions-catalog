@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2021 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,22 +61,22 @@ public class AbstractTcpSupplierTests {
 
 		final Flux<Message<?>> messageFlux = tcpSupplier.get();
 
-		final StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
-			assertThat(message.getPayload()).isEqualTo(payload.getBytes());
-		}).assertNext((message) -> {
-			assertThat(message.getPayload()).isEqualTo(payload.getBytes());
-		}).thenCancel().verifyLater();
+		final StepVerifier stepVerifier = StepVerifier.create(messageFlux)
+			.assertNext((message) -> assertThat(message.getPayload()).isEqualTo(payload.getBytes()))
+			.assertNext((message) -> assertThat(message.getPayload()).isEqualTo(payload.getBytes()))
+			.thenCancel()
+			.verifyLater();
 
 		int port = getPort();
 		Socket socket = SocketFactory.getDefault().createSocket("localhost", port);
 		socket.getOutputStream().write((prefix + payload + suffix).getBytes());
-		if (prefix.length() == 0 && suffix.length() == 0) {
+		if (prefix.isEmpty() && suffix.isEmpty()) {
 			socket.close(); // RAW - for the others, close AFTER the messages are decoded.
 			socket = SocketFactory.getDefault().createSocket("localhost", port);
 		}
 
 		socket.getOutputStream().write((prefix + payload + suffix).getBytes());
-		if (prefix.length() == 0 && suffix.length() == 0) {
+		if (prefix.isEmpty() && suffix.isEmpty()) {
 			socket.close(); // RAW - for the others, close AFTER the messages are decoded.
 		}
 		socket.close();

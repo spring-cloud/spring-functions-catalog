@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,36 +62,17 @@ public class EncoderDecoderFactoryBean extends AbstractFactoryBean<AbstractByteA
 	}
 
 	@Override
-	protected AbstractByteArraySerializer createInstance() throws Exception {
-		AbstractByteArraySerializer codec;
-		switch (this.encoding) {
-			case CRLF:
-				codec = new ByteArrayCrLfSerializer();
-				break;
-			case LF:
-				codec = new ByteArrayLfSerializer();
-				break;
-			case NULL:
-				codec = new ByteArraySingleTerminatorSerializer((byte) 0);
-				break;
-			case STXETX:
-				codec = new ByteArrayStxEtxSerializer();
-				break;
-			case L1:
-				codec = new ByteArrayLengthHeaderSerializer(1);
-				break;
-			case L2:
-				codec = new ByteArrayLengthHeaderSerializer(2);
-				break;
-			case L4:
-				codec = new ByteArrayLengthHeaderSerializer(4);
-				break;
-			case RAW:
-				codec = new ByteArrayRawSerializer();
-				break;
-			default:
-				throw new IllegalArgumentException("Invalid encoding: " + this.encoding);
-		}
+	protected AbstractByteArraySerializer createInstance() {
+		AbstractByteArraySerializer codec = switch (this.encoding) {
+			case CRLF -> new ByteArrayCrLfSerializer();
+			case LF -> new ByteArrayLfSerializer();
+			case NULL -> new ByteArraySingleTerminatorSerializer((byte) 0);
+			case STXETX -> new ByteArrayStxEtxSerializer();
+			case L1 -> new ByteArrayLengthHeaderSerializer(1);
+			case L2 -> new ByteArrayLengthHeaderSerializer(2);
+			case L4 -> new ByteArrayLengthHeaderSerializer(4);
+			case RAW -> new ByteArrayRawSerializer();
+		};
 		codec.setApplicationEventPublisher(this.applicationEventPublisher);
 		if (this.maxMessageSize != null) {
 			codec.setMaxMessageSize(this.maxMessageSize);

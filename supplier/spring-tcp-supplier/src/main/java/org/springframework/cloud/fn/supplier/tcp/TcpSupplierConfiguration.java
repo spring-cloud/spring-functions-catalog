@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.tcp.EncoderDecoderFactoryBean;
 import org.springframework.cloud.fn.common.tcp.TcpConnectionFactoryProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.ip.IpHeaders;
 import org.springframework.integration.ip.config.TcpConnectionFactoryFactoryBean;
@@ -36,14 +36,14 @@ import org.springframework.integration.ip.tcp.serializer.AbstractByteArraySerial
 import org.springframework.messaging.Message;
 
 /**
- * A source module that receives data over TCP.
+ * A supplier that receives data over TCP.
  *
  * @author Gary Russell
  * @author Christian Tzolov
  * @author Soby Chacko
  * @author Artem Bilan
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties({ TcpSupplierProperties.class, TcpConnectionFactoryProperties.class })
 public class TcpSupplierConfiguration {
 
@@ -82,14 +82,12 @@ public class TcpSupplierConfiguration {
 
 	@Bean
 	public Publisher<Message<Object>> tcpSupplierFlow(TcpReceivingChannelAdapter adapter) {
-		return IntegrationFlow.from(adapter).headerFilter(IpHeaders.LOCAL_ADDRESS).toReactivePublisher();
+		return IntegrationFlow.from(adapter).headerFilter(IpHeaders.LOCAL_ADDRESS).toReactivePublisher(true);
 	}
 
 	@Bean
-	public Supplier<Flux<Message<Object>>> tcpSupplier(Publisher<Message<Object>> tcpSupplierFlow,
-			TcpReceivingChannelAdapter tcpReceivingChannelAdapter) {
-
-		return () -> Flux.from(tcpSupplierFlow).doOnSubscribe(subscription -> tcpReceivingChannelAdapter.start());
+	public Supplier<Flux<Message<Object>>> tcpSupplier(Publisher<Message<Object>> tcpSupplierFlow) {
+		return () -> Flux.from(tcpSupplierFlow);
 	}
 
 }

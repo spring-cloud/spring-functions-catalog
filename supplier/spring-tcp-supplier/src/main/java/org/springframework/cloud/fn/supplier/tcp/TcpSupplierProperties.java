@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.springframework.cloud.fn.common.tcp.Encoding;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Properties for the TCP Source.
+ * Properties for the TCP supplier.
  *
  * @author Gary Russell
  * @author Christian Tzolov
@@ -53,7 +53,7 @@ public class TcpSupplierProperties {
 	}
 
 	public int getBufferSize() {
-		return bufferSize;
+		return this.bufferSize;
 	}
 
 	public void setBufferSize(int bufferSize) {

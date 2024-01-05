@@ -57,7 +57,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MqttSupplierTests implements MosquittoContainerTest {
 
 	@DynamicPropertySource
-	static void mongoDbProperties(DynamicPropertyRegistry registry) {
+	static void mqttConnectionProperties(DynamicPropertyRegistry registry) {
 		registry.add("mqtt.url", MosquittoContainerTest::mqttUrl);
 	}
 

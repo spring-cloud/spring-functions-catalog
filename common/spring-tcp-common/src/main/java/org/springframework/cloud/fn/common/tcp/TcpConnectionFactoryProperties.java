@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,12 +45,12 @@ public class TcpConnectionFactoryProperties {
 	private int socketTimeout = 120000;
 
 	/**
-	 * Whether or not to use NIO.
+	 * Whether to use NIO.
 	 */
 	private boolean nio = false;
 
 	/**
-	 * Whether or not to use direct buffers.
+	 * Whether to use direct buffers.
 	 */
 	private boolean useDirectBuffers = false;
 

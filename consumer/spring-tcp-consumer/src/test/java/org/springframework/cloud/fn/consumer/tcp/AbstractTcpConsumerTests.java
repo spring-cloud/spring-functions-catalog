@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,8 @@ import org.springframework.integration.ip.tcp.serializer.SoftEndOfStreamExceptio
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -52,8 +54,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Gary Russell
  * @author Soby Chacko
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = { "tcp.consumer.host = localhost", "tcp.port = ${tcp.consumer.test.port}" })
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, properties = "tcp.consumer.host = localhost")
 @DirtiesContext
 public class AbstractTcpConsumerTests {
 
@@ -68,6 +69,11 @@ public class AbstractTcpConsumerTests {
 	@BeforeAll
 	public static void startup() {
 		server = new TestTCPServer();
+	}
+
+	@DynamicPropertySource
+	static void tcpConnectionProperties(DynamicPropertyRegistry registry) {
+		registry.add("tcp.port", () -> server.serverSocket.getLocalPort());
 	}
 
 	@AfterAll
@@ -115,11 +121,10 @@ public class AbstractTcpConsumerTests {
 			ExecutorService executor = null;
 			try {
 				serverSocket = ServerSocketFactory.getDefault().createServerSocket(0);
-				System.setProperty("tcp.consumer.test.port", Integer.toString(serverSocket.getLocalPort()));
 				executor = Executors.newSingleThreadExecutor();
 			}
-			catch (IOException e) {
-				e.printStackTrace();
+			catch (IOException ex) {
+				logger.error(ex);
 			}
 			this.serverSocket = serverSocket;
 			this.executor = executor;
@@ -143,10 +148,10 @@ public class AbstractTcpConsumerTests {
 						queue.offer(new String(data));
 					}
 				}
-				catch (SoftEndOfStreamException e) {
+				catch (SoftEndOfStreamException ex) {
 					// normal close
 				}
-				catch (IOException e) {
+				catch (IOException ex) {
 					try {
 						if (socket != null) {
 							socket.close();
@@ -154,7 +159,7 @@ public class AbstractTcpConsumerTests {
 					}
 					catch (IOException e1) {
 					}
-					logger.error(e.getMessage());
+					logger.error(ex.getMessage());
 					if (this.stopped) {
 						logger.info("Server stopped on " + this.serverSocket.getLocalPort());
 						break;
@@ -169,7 +174,7 @@ public class AbstractTcpConsumerTests {
 				this.serverSocket.close();
 				this.executor.shutdownNow();
 			}
-			catch (IOException e) {
+			catch (IOException ex) {
 			}
 		}
 

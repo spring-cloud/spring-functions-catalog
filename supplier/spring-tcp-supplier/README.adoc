@@ -9,7 +9,7 @@ Users have to subscribe to this `Flux` and then receive the data.
 
 ## Beans for injection
 
-You can import the `TcpSupplierConfiguration` in the application and then inject the following bean: `tcpSupplier`.
+The `TcpSupplierConfiguration` auto-configuration provides the following bean: `tcpSupplier`.
 
 You need to inject this as `Supplier<Flux<Message<?>>>`.
 
