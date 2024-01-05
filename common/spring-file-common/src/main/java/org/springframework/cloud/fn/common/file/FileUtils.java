@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.springframework.cloud.fn.common.file;
 
-import java.util.Collections;
+import java.util.Map;
 
 import org.springframework.integration.dsl.IntegrationFlowBuilder;
 import org.springframework.integration.file.splitter.FileSplitter;
@@ -26,6 +26,8 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.util.MimeTypeUtils;
 
 /**
+ * The utilities for file-based functions.
+ *
  * @author Gary Russell
  * @author Artem Bilan
  * @author Christian Tzolov
@@ -45,29 +47,23 @@ public final class FileUtils {
 	 */
 	public static IntegrationFlowBuilder enhanceFlowForReadingMode(IntegrationFlowBuilder flowBuilder,
 			FileConsumerProperties fileConsumerProperties) {
+
 		switch (fileConsumerProperties.getMode()) {
-			case contents:
-				flowBuilder.enrichHeaders(Collections.<String, Object>singletonMap(MessageHeaders.CONTENT_TYPE,
-						MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE))
-					.transform(new FileToByteArrayTransformer());
-				break;
-			case lines:
+			case contents -> flowBuilder
+				.enrichHeaders(Map.of(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE))
+				.transform(new FileToByteArrayTransformer());
+			case lines -> {
 				Boolean withMarkers = fileConsumerProperties.getWithMarkers();
 				if (withMarkers == null) {
 					withMarkers = false;
 				}
-				flowBuilder
-					.enrichHeaders(Collections.<String, Object>singletonMap(MessageHeaders.CONTENT_TYPE,
-							MimeTypeUtils.TEXT_PLAIN_VALUE))
+				flowBuilder.enrichHeaders(Map.of(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.TEXT_PLAIN_VALUE))
 					.split(new FileSplitter(true, withMarkers, fileConsumerProperties.getMarkersJson()));
-				break;
-			case ref:
-				flowBuilder.enrichHeaders(Collections.<String, Object>singletonMap(MessageHeaders.CONTENT_TYPE,
-						MimeTypeUtils.APPLICATION_JSON_VALUE));
-				break;
-			default:
-				throw new IllegalArgumentException(
-						fileConsumerProperties.getMode().name() + " is not a supported file reading mode.");
+			}
+			case ref ->
+				flowBuilder.enrichHeaders(Map.of(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE));
+			default -> throw new IllegalArgumentException(
+					fileConsumerProperties.getMode().name() + " is not a supported file reading mode.");
 		}
 		return flowBuilder;
 	}
@@ -81,26 +77,21 @@ public final class FileUtils {
 	 */
 	public static IntegrationFlowBuilder enhanceStreamFlowForReadingMode(IntegrationFlowBuilder flowBuilder,
 			FileConsumerProperties fileConsumerProperties) {
+
 		switch (fileConsumerProperties.getMode()) {
-			case contents:
-				flowBuilder.enrichHeaders(Collections.<String, Object>singletonMap(MessageHeaders.CONTENT_TYPE,
-						MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE))
-					.transform(new StreamTransformer());
-				break;
-			case lines:
+			case contents -> flowBuilder
+				.enrichHeaders(Map.of(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_OCTET_STREAM_VALUE))
+				.transform(new StreamTransformer());
+			case lines -> {
 				Boolean withMarkers = fileConsumerProperties.getWithMarkers();
 				if (withMarkers == null) {
 					withMarkers = false;
 				}
-				flowBuilder
-					.enrichHeaders(Collections.<String, Object>singletonMap(MessageHeaders.CONTENT_TYPE,
-							MimeTypeUtils.TEXT_PLAIN_VALUE))
+				flowBuilder.enrichHeaders(Map.of(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.TEXT_PLAIN_VALUE))
 					.split(new FileSplitter(true, withMarkers, fileConsumerProperties.getMarkersJson()));
-				break;
-			case ref:
-			default:
-				throw new IllegalArgumentException(fileConsumerProperties.getMode().name()
-						+ " is not a supported file reading mode when streaming.");
+			}
+			default -> throw new IllegalArgumentException(
+					fileConsumerProperties.getMode().name() + " is not a supported file reading mode when streaming.");
 		}
 		return flowBuilder;
 	}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ public class FtpConsumerProperties {
 	private String temporaryRemoteDir = "/";
 
 	/**
-	 * Whether or not to create the remote directory.
+	 * Whether to create the remote directory.
 	 */
 	private boolean autoCreateDir = true;
 
@@ -59,7 +59,7 @@ public class FtpConsumerProperties {
 	private FileExistsMode mode = FileExistsMode.REPLACE;
 
 	/**
-	 * Whether or not to write to a temporary file and rename.
+	 * Whether to write to a temporary file and rename.
 	 */
 	private boolean useTemporaryFilename = true;
 

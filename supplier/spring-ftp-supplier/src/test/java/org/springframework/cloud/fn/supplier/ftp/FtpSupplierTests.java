@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,13 +60,13 @@ public class FtpSupplierTests extends FtpTestSupport {
 	public void testSourceFileAsRef() {
 		final Flux<Message<?>> messageFlux = ftpSupplier.get();
 		assertThat(this.sessionFactory).isInstanceOf(CachingSessionFactory.class);
-		StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
-			assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
-				.isEqualTo(new File(this.config.getLocalDir(), "ftpSource1.txt"));
-		}).assertNext((message) -> {
-			assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
-				.isEqualTo(new File(this.config.getLocalDir(), "ftpSource2.txt"));
-		}).thenCancel().verifyLater();
+		StepVerifier stepVerifier = StepVerifier.create(messageFlux)
+			.assertNext((message) -> assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
+				.isEqualTo(new File(this.config.getLocalDir(), "ftpSource1.txt")))
+			.assertNext((message) -> assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
+				.isEqualTo(new File(this.config.getLocalDir(), "ftpSource2.txt")))
+			.thenCancel()
+			.verifyLater();
 		stepVerifier.verify();
 	}
 
@@ -80,7 +80,7 @@ public class FtpSupplierTests extends FtpTestSupport {
 		// This way, it is less error-prone from typos.
 		@Bean
 		@Primary
-		public FtpSupplierProperties ftpSupplierProperties() {
+		FtpSupplierProperties ftpSupplierProperties() {
 			final FtpSupplierProperties ftpSupplierProperties = new FtpSupplierProperties();
 			ftpSupplierProperties.setRemoteDir("ftpSource");
 			ftpSupplierProperties.setFilenamePattern("*");

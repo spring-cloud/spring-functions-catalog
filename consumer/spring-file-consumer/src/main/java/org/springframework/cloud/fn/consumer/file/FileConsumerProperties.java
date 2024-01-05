@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,12 +21,13 @@ import java.io.File;
 import jakarta.validation.constraints.AssertTrue;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.expression.Expression;
 import org.springframework.integration.file.support.FileExistsMode;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Properties for the file sink.
+ * Properties for the file consumer.
  *
  * @author Mark Fisher
  * @author Gary Russell
@@ -40,7 +41,8 @@ public class FileConsumerProperties {
 	private static final String DEFAULT_NAME = "file-consumer";
 
 	/**
-	 * A flag to indicate whether adding a newline after the write should be suppressed.
+	 * A flag to indicate whether adding a newline after the write operation should be
+	 * suppressed.
 	 */
 	private boolean binary = false;
 
@@ -57,7 +59,7 @@ public class FileConsumerProperties {
 	/**
 	 * The expression to evaluate for the parent directory of the target file.
 	 */
-	private String directoryExpression;
+	private Expression directoryExpression;
 
 	/**
 	 * The FileExistsMode to use if the target file already exists.
@@ -80,7 +82,7 @@ public class FileConsumerProperties {
 	private String suffix = "";
 
 	public boolean isBinary() {
-		return binary;
+		return this.binary;
 	}
 
 	public void setBinary(boolean binary) {
@@ -88,7 +90,7 @@ public class FileConsumerProperties {
 	}
 
 	public String getCharset() {
-		return charset;
+		return this.charset;
 	}
 
 	public void setCharset(String charset) {
@@ -96,23 +98,23 @@ public class FileConsumerProperties {
 	}
 
 	public File getDirectory() {
-		return directory;
+		return this.directory;
 	}
 
 	public void setDirectory(File directory) {
 		this.directory = directory;
 	}
 
-	public String getDirectoryExpression() {
-		return directoryExpression;
+	public Expression getDirectoryExpression() {
+		return this.directoryExpression;
 	}
 
-	public void setDirectoryExpression(String directoryExpression) {
+	public void setDirectoryExpression(Expression directoryExpression) {
 		this.directoryExpression = directoryExpression;
 	}
 
 	public FileExistsMode getMode() {
-		return mode;
+		return this.mode;
 	}
 
 	public void setMode(FileExistsMode mode) {
@@ -120,7 +122,7 @@ public class FileConsumerProperties {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -128,7 +130,8 @@ public class FileConsumerProperties {
 	}
 
 	public String getNameExpression() {
-		return (nameExpression != null) ? nameExpression + " + '" + getSuffix() + "'" : "'" + name + getSuffix() + "'";
+		return (this.nameExpression != null) ? this.nameExpression + " + '" + getSuffix() + "'"
+				: "'" + this.name + getSuffix() + "'";
 	}
 
 	public void setNameExpression(String nameExpression) {
@@ -137,8 +140,8 @@ public class FileConsumerProperties {
 
 	public String getSuffix() {
 		String suffixWithDotIfNecessary = "";
-		if (StringUtils.hasText(suffix)) {
-			suffixWithDotIfNecessary = suffix.startsWith(".") ? suffix : "." + suffix;
+		if (StringUtils.hasText(this.suffix)) {
+			suffixWithDotIfNecessary = this.suffix.startsWith(".") ? this.suffix : "." + this.suffix;
 		}
 		return suffixWithDotIfNecessary;
 	}
@@ -149,12 +152,12 @@ public class FileConsumerProperties {
 
 	@AssertTrue(message = "Exactly one of 'name' or 'nameExpression' must be set")
 	public boolean isMutuallyExclusiveNameAndNameExpression() {
-		return DEFAULT_NAME.equals(name) || nameExpression == null;
+		return DEFAULT_NAME.equals(this.name) || this.nameExpression == null;
 	}
 
 	@AssertTrue(message = "Exactly one of 'directory' or 'directoryExpression' must be set")
 	public boolean isMutuallyExclusiveDirectoryAndDirectoryExpression() {
-		return new File(DEFAULT_DIR).equals(directory) || directoryExpression == null;
+		return new File(DEFAULT_DIR).equals(this.directory) || this.directoryExpression == null;
 	}
 
 }

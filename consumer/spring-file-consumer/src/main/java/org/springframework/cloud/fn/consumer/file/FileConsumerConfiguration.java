@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2022 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,12 +18,11 @@ package org.springframework.cloud.fn.consumer.file;
 
 import java.util.function.Consumer;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.Expression;
 import org.springframework.integration.file.DefaultFileNameGenerator;
 import org.springframework.integration.file.FileNameGenerator;
 import org.springframework.integration.file.FileWritingMessageHandler;
@@ -31,15 +30,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**
+ * The auto-configuration for file consumer.
+ *
  * @author Mark Fisher
  * @author Artem Bilan
  * @author Soby Chacko
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(FileConsumerProperties.class)
 public class FileConsumerConfiguration {
-
-	private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
 
 	private final FileConsumerProperties properties;
 
@@ -56,15 +55,15 @@ public class FileConsumerConfiguration {
 	public FileWritingMessageHandler fileWritingMessageHandler(FileNameGenerator fileNameGenerator,
 			@Nullable ComponentCustomizer<FileWritingMessageHandler> fileWritingMessageHandlerCustomizer) {
 
-		FileWritingMessageHandler handler = this.properties.getDirectoryExpression() != null
-				? new FileWritingMessageHandler(
-						EXPRESSION_PARSER.parseExpression(this.properties.getDirectoryExpression()))
+		Expression directoryExpression = this.properties.getDirectoryExpression();
+		FileWritingMessageHandler handler = (directoryExpression != null)
+				? new FileWritingMessageHandler(directoryExpression)
 				: new FileWritingMessageHandler(this.properties.getDirectory());
 		handler.setAutoCreateDirectory(true);
-		handler.setAppendNewLine(!properties.isBinary());
-		handler.setCharset(properties.getCharset());
+		handler.setAppendNewLine(!this.properties.isBinary());
+		handler.setCharset(this.properties.getCharset());
 		handler.setExpectReply(false);
-		handler.setFileExistsMode(properties.getMode());
+		handler.setFileExistsMode(this.properties.getMode());
 		handler.setFileNameGenerator(fileNameGenerator);
 
 		if (fileWritingMessageHandlerCustomizer != null) {
@@ -76,7 +75,7 @@ public class FileConsumerConfiguration {
 	@Bean
 	public FileNameGenerator fileNameGenerator() {
 		DefaultFileNameGenerator fileNameGenerator = new DefaultFileNameGenerator();
-		fileNameGenerator.setExpression(properties.getNameExpression());
+		fileNameGenerator.setExpression(this.properties.getNameExpression());
 		return fileNameGenerator;
 	}
 

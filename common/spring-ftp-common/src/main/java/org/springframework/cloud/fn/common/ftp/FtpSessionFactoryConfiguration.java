@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,15 +18,15 @@ package org.springframework.cloud.fn.common.ftp;
 
 import org.apache.commons.net.ftp.FTPFile;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.file.remote.session.CachingSessionFactory;
 import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.ftp.session.DefaultFtpSessionFactory;
 
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties(FtpSessionFactoryProperties.class)
 public class FtpSessionFactoryConfiguration {
 
@@ -40,8 +40,7 @@ public class FtpSessionFactoryConfiguration {
 		ftpSessionFactory.setPassword(properties.getPassword());
 		ftpSessionFactory.setClientMode(properties.getClientMode().getMode());
 		if (properties.getCacheSessions() != null) {
-			CachingSessionFactory<FTPFile> csf = new CachingSessionFactory<>(ftpSessionFactory);
-			return csf;
+			return new CachingSessionFactory<>(ftpSessionFactory);
 		}
 		else {
 			return ftpSessionFactory;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,7 +41,6 @@ public class FilePayloadWithPatternTests extends AbstractFileSupplierTests {
 
 	@Test
 	public void testPattern() throws IOException {
-
 		Path txtFile1 = tempDir.resolve("test1.txt");
 		Files.write(txtFile1, "one".getBytes());
 		Path nonTxtExtension = tempDir.resolve("hello.bin");
@@ -49,13 +48,14 @@ public class FilePayloadWithPatternTests extends AbstractFileSupplierTests {
 		Path txtFile2 = tempDir.resolve("test2.txt");
 		Files.write(txtFile2, "two".getBytes());
 
-		final Flux<Message<?>> messageFlux = fileSupplier.get();
+		Flux<Message<?>> messageFlux = fileSupplier.get();
 
-		StepVerifier.create(messageFlux).assertNext((message) -> {
-			assertThat(message.getPayload()).isEqualTo(txtFile1.toAbsolutePath().toFile());
-		}).assertNext((message) -> {
-			assertThat(message.getPayload()).isEqualTo(txtFile2.toAbsolutePath().toFile());
-		}).expectNoEvent(Duration.ofSeconds(1)).thenCancel().verify();
+		StepVerifier.create(messageFlux)
+			.assertNext((message) -> assertThat(message.getPayload()).isEqualTo(txtFile1.toAbsolutePath().toFile()))
+			.assertNext((message) -> assertThat(message.getPayload()).isEqualTo(txtFile2.toAbsolutePath().toFile()))
+			.expectNoEvent(Duration.ofSeconds(1))
+			.thenCancel()
+			.verify();
 	}
 
 }

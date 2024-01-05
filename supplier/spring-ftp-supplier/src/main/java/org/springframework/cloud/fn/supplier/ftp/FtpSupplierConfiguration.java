@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import reactor.core.scheduler.Schedulers;
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
@@ -36,8 +37,6 @@ import org.springframework.cloud.fn.common.file.FileReadingMode;
 import org.springframework.cloud.fn.common.file.FileUtils;
 import org.springframework.cloud.fn.common.ftp.FtpSessionFactoryConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.file.filters.ChainFileListFilter;
@@ -55,15 +54,16 @@ import org.springframework.messaging.Message;
 import org.springframework.util.StringUtils;
 
 /**
+ * The auto-configuration for FTP supplier.
+ *
  * @author David Turanski
  * @author Marius Bogoevici
  * @author Gary Russell
  * @author Artem Bilan
  * @author Christian Tzolov
  */
-@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties({ FtpSupplierProperties.class, FileConsumerProperties.class })
-@Import(FtpSessionFactoryConfiguration.class)
+@AutoConfiguration(after = FtpSessionFactoryConfiguration.class)
 public class FtpSupplierConfiguration {
 
 	private final FtpSupplierProperties ftpSupplierProperties;
@@ -93,7 +93,7 @@ public class FtpSupplierConfiguration {
 	public FtpInboundChannelAdapterSpec ftpMessageSource(
 			@Nullable ComponentCustomizer<FtpInboundChannelAdapterSpec> ftpInboundChannelAdapterSpecCustomizer) {
 
-		FtpInboundChannelAdapterSpec messageSourceBuilder = Ftp.inboundAdapter(ftpSessionFactory)
+		FtpInboundChannelAdapterSpec messageSourceBuilder = Ftp.inboundAdapter(this.ftpSessionFactory)
 			.preserveTimestamp(this.ftpSupplierProperties.isPreserveTimestamp())
 			.remoteDirectory(this.ftpSupplierProperties.getRemoteDir())
 			.remoteFileSeparator(this.ftpSupplierProperties.getRemoteFileSeparator())
@@ -126,9 +126,9 @@ public class FtpSupplierConfiguration {
 	public Flux<Message<?>> ftpMessageFlux() {
 		return Mono
 			.<Message<?>>create(
-					monoSink -> monoSink.onRequest(value -> monoSink.success(this.ftpMessageSource.receive())))
+					(monoSink) -> monoSink.onRequest((value) -> monoSink.success(this.ftpMessageSource.receive())))
 			.subscribeOn(Schedulers.boundedElastic())
-			.repeatWhenEmpty(it -> it.delayElements(this.ftpSupplierProperties.getDelayWhenEmpty()))
+			.repeatWhenEmpty((it) -> it.delayElements(this.ftpSupplierProperties.getDelayWhenEmpty()))
 			.repeat();
 	}
 
@@ -138,7 +138,7 @@ public class FtpSupplierConfiguration {
 		return FileUtils
 			.enhanceFlowForReadingMode(
 					IntegrationFlow.from(IntegrationReactiveUtils.messageSourceToFlux(ftpMessageSource)),
-					fileConsumerProperties)
+					this.fileConsumerProperties)
 			.toReactivePublisher();
 	}
 

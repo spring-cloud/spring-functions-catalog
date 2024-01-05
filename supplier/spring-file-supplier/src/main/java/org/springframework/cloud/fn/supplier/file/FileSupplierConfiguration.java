@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
@@ -33,7 +35,6 @@ import org.springframework.cloud.fn.common.file.FileConsumerProperties;
 import org.springframework.cloud.fn.common.file.FileReadingMode;
 import org.springframework.cloud.fn.common.file.FileUtils;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlowBuilder;
@@ -51,10 +52,12 @@ import org.springframework.messaging.Message;
 import org.springframework.util.StringUtils;
 
 /**
+ * The auto-configuration for file supplier.
+ *
  * @author Artem Bilan
  * @author Soby Chacko
  */
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties({ FileSupplierProperties.class, FileConsumerProperties.class })
 public class FileSupplierConfiguration {
 
@@ -110,27 +113,33 @@ public class FileSupplierConfiguration {
 	public Flux<Message<?>> fileMessageFlux() {
 		return Mono
 			.<Message<?>>create(
-					monoSink -> monoSink.onRequest(value -> monoSink.success(this.fileMessageSource.receive())))
+					(monoSink) -> monoSink.onRequest((value) -> monoSink.success(this.fileMessageSource.receive())))
 			.subscribeOn(Schedulers.boundedElastic())
-			.repeatWhenEmpty(it -> it.delayElements(this.fileSupplierProperties.getDelayWhenEmpty()))
+			.repeatWhenEmpty((it) -> it.delayElements(this.fileSupplierProperties.getDelayWhenEmpty()))
 			.repeat()
-			.doOnRequest(r -> this.fileMessageSource.start());
+			.doOnRequest((r) -> this.fileMessageSource.start());
 	}
 
 	@Bean
 	@ConditionalOnExpression("environment['file.consumer.mode'] != 'ref'")
-	public Publisher<Message<Object>> fileReadingFlow() {
-		IntegrationFlowBuilder flowBuilder = IntegrationFlow.from(fileMessageFlux());
+	public Publisher<Message<Object>> fileReadingFlow(Flux<Message<?>> fileMessageFlux) {
+		IntegrationFlowBuilder flowBuilder = IntegrationFlow.from(fileMessageFlux);
 		return FileUtils.enhanceFlowForReadingMode(flowBuilder, this.fileConsumerProperties).toReactivePublisher();
 	}
 
 	@Bean
-	public Supplier<Flux<Message<?>>> fileSupplier() {
+	public Supplier<Flux<Message<?>>> fileSupplier(Flux<Message<?>> fileMessageFlux,
+			@Nullable Publisher<Message<Object>> fileReadingFlow) {
+
 		if (this.fileConsumerProperties.getMode() == FileReadingMode.ref) {
-			return this::fileMessageFlux;
+			return () -> fileMessageFlux;
+		}
+		else if (fileReadingFlow != null) {
+			return () -> Flux.from(fileReadingFlow);
 		}
 		else {
-			return () -> Flux.from(fileReadingFlow());
+			throw new BeanInitializationException(
+					"Cannot creat 'fileSupplier' bean: no 'fileReadingFlow' dependency and is not 'FileReadingMode.ref'.");
 		}
 	}
 
