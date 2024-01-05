@@ -96,3 +96,8 @@ This functions catalog is also a foundation for https://spring.io/projects/sprin
 |
 |link:consumer/spring-xmpp-consumer/README.adoc[XMPP]
 |===
+
+
+== Guidelines
+
+See link:CONTRIBUTING.adoc[Contributor Guidelines].
