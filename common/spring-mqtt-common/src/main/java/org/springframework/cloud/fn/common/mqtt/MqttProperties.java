@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 the original author or authors.
+ * Copyright 2017-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Generic mqtt connection properties.
+ * The MQTT client properties.
  *
  * @author Janne Valkealahti
  * @author Artem Bilan
@@ -81,7 +81,7 @@ public class MqttProperties {
 
 	@Size(min = 1)
 	public String[] getUrl() {
-		return url;
+		return this.url;
 	}
 
 	public void setUrl(String[] url) {
@@ -89,7 +89,7 @@ public class MqttProperties {
 	}
 
 	public String getUsername() {
-		return username;
+		return this.username;
 	}
 
 	public void setUsername(String username) {
@@ -97,7 +97,7 @@ public class MqttProperties {
 	}
 
 	public String getPassword() {
-		return password;
+		return this.password;
 	}
 
 	public void setPassword(String password) {
@@ -105,7 +105,7 @@ public class MqttProperties {
 	}
 
 	public boolean isCleanSession() {
-		return cleanSession;
+		return this.cleanSession;
 	}
 
 	public void setCleanSession(boolean cleanSession) {
@@ -113,7 +113,7 @@ public class MqttProperties {
 	}
 
 	public int getKeepAliveInterval() {
-		return keepAliveInterval;
+		return this.keepAliveInterval;
 	}
 
 	public void setKeepAliveInterval(int keepAliveInterval) {
@@ -121,7 +121,7 @@ public class MqttProperties {
 	}
 
 	public int getConnectionTimeout() {
-		return connectionTimeout;
+		return this.connectionTimeout;
 	}
 
 	public void setConnectionTimeout(int connectionTimeout) {
@@ -129,7 +129,7 @@ public class MqttProperties {
 	}
 
 	public String getPersistence() {
-		return persistence;
+		return this.persistence;
 	}
 
 	public void setPersistence(String persistence) {
@@ -137,7 +137,7 @@ public class MqttProperties {
 	}
 
 	public String getPersistenceDirectory() {
-		return persistenceDirectory;
+		return this.persistenceDirectory;
 	}
 
 	public void setPersistenceDirectory(String persistenceDirectory) {

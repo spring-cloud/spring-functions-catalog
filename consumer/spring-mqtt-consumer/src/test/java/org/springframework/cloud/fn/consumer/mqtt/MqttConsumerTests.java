@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2021 the original author or authors.
+ * Copyright 2017-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,21 +16,19 @@
 
 package org.springframework.cloud.fn.consumer.mqtt;
 
-import java.time.Duration;
 import java.util.Properties;
 import java.util.function.Consumer;
 
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.internal.security.SSLSocketFactoryFactory;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.GenericContainer;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.fn.test.support.mqtt.MosquittoContainerTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
@@ -39,6 +37,8 @@ import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -46,19 +46,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 		"mqtt.ssl-properties.com.ibm.ssl.keyStoreType=TEST" })
 @DirtiesContext
 @Tag("integration")
-public class MqttConsumerTests {
-
-	static {
-		GenericContainer<?> mosquitto = new GenericContainer<>("eclipse-mosquitto:2.0.13")
-			.withCommand("mosquitto -c /mosquitto-no-auth.conf")
-			.withReuse(true)
-			.withExposedPorts(1883)
-			.withStartupTimeout(Duration.ofSeconds(120))
-			.withStartupAttempts(3);
-		mosquitto.start();
-		final Integer mappedPort = mosquitto.getMappedPort(1883);
-		System.setProperty("mqtt.url", "tcp://localhost:" + mappedPort);
-	}
+public class MqttConsumerTests implements MosquittoContainerTest {
 
 	@Autowired
 	private MqttPahoMessageDrivenChannelAdapter mqttPahoMessageDrivenChannelAdapter;
@@ -69,9 +57,9 @@ public class MqttConsumerTests {
 	@Autowired
 	protected QueueChannel queue;
 
-	@AfterAll
-	public static void cleanup() {
-		System.clearProperty("mqtt.url");
+	@DynamicPropertySource
+	static void mongoDbProperties(DynamicPropertyRegistry registry) {
+		registry.add("mqtt.url", () -> "tcp://localhost:" + MOSQUITTO_CONTAINER.getMappedPort(1883));
 	}
 
 	@Test
@@ -91,11 +79,10 @@ public class MqttConsumerTests {
 	@SpringBootApplication
 	static class MqttConsumerTestApplication {
 
-		@Autowired
-		private MqttPahoClientFactory mqttClientFactory;
-
 		@Bean
-		public MqttPahoMessageDrivenChannelAdapter mqttInbound(BeanFactory beanFactory) {
+		MqttPahoMessageDrivenChannelAdapter mqttInbound(MqttPahoClientFactory mqttClientFactory,
+				BeanFactory beanFactory) {
+
 			MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter("test",
 					mqttClientFactory, "test");
 			adapter.setQos(0);
@@ -104,7 +91,7 @@ public class MqttConsumerTests {
 			return adapter;
 		}
 
-		public DefaultPahoMessageConverter pahoMessageConverter(BeanFactory beanFactory) {
+		DefaultPahoMessageConverter pahoMessageConverter(BeanFactory beanFactory) {
 			DefaultPahoMessageConverter converter = new DefaultPahoMessageConverter(1, true, "UTF-8");
 			converter.setPayloadAsBytes(false);
 			converter.setBeanFactory(beanFactory);
@@ -112,7 +99,7 @@ public class MqttConsumerTests {
 		}
 
 		@Bean
-		public QueueChannel queue() {
+		QueueChannel queue() {
 			return new QueueChannel();
 		}
 

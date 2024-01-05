@@ -1,6 +1,6 @@
 # FTP Supplier
 
-This module provides a FTP supplier that can be reused and composed in other applications.
+This module provides an FTP supplier that can be reused and composed in other applications.
 The `Supplier` uses the `FtpInboundChannelAdapter` from Spring Integration.
 `FtpSupplier` is implemented as a `java.util.function.Supplier`.
 This supplier gives you a reactive stream of files from the provided directory as the supplier has a signature of `Supplier<Flux<Message<?>>>`.
@@ -8,7 +8,7 @@ Users have to subscribe to this `Flux` and receive the data.
 
 ## Beans for injection
 
-You can import the `FtpSupplierConfiguration` in the application and then inject the following bean.
+The `FtpSupplierConfiguration` auto-configuration provides the following bean:
 
 `ftpSupplier`
 
@@ -24,7 +24,7 @@ All configuration properties are prefixed with `ftp.supplier`.
 There are also properties that need to be used with the prefix `file.consumer`.
 
 For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/supplier/ftp/FtpSupplierProperties.java[FtpSupplierProperties].
-See link:src/main/java/org/springframework/cloud/fn/supplier/file/FileConsumerProperties.java[this] also.
+See `FileConsumerProperties` also.
 
 A `ComponentCustomizer<FtpInboundChannelAdapterSpec>` bean can be added in the target project to provide any custom options for the `FtpInboundChannelAdapterSpec` configuration used by the `ftpSupplier`.
 

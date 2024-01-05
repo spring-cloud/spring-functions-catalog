@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2023 the original author or authors.
+ * Copyright 2017-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,11 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.cloud.fn.common.mqtt.MqttConfiguration;
-import org.springframework.cloud.fn.common.mqtt.MqttProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
@@ -38,24 +35,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**
- * A source module that receives data from Mqtt.
+ * A supplier that receives data from MQTT.
  *
  * @author Janne Valkealahti
  * @author Soby Chacko
  */
-@Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties({ MqttProperties.class, MqttSupplierProperties.class })
-@Import(MqttConfiguration.class)
+@EnableConfigurationProperties(MqttSupplierProperties.class)
+@AutoConfiguration(after = MqttConfiguration.class)
 public class MqttSupplierConfiguration {
-
-	@Autowired
-	private MqttSupplierProperties properties;
-
-	@Autowired
-	private MqttPahoClientFactory mqttClientFactory;
-
-	@Autowired
-	private BeanFactory beanFactory;
 
 	@Bean
 	public Supplier<Flux<Message<?>>> mqttSupplier(Publisher<Message<?>> mqttPublisher) {
@@ -63,13 +50,14 @@ public class MqttSupplierConfiguration {
 	}
 
 	@Bean
-	public MqttPahoMessageDrivenChannelAdapter mqttInbound(
+	public MqttPahoMessageDrivenChannelAdapter mqttInbound(MqttSupplierProperties properties,
+			MqttPahoClientFactory mqttClientFactory, BeanFactory beanFactory,
 			@Nullable ComponentCustomizer<MqttPahoMessageDrivenChannelAdapter> mqttMessageProducerCustomizer) {
 
-		MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(
-				this.properties.getClientId(), this.mqttClientFactory, this.properties.getTopics());
-		adapter.setQos(this.properties.getQos());
-		adapter.setConverter(pahoMessageConverter(this.beanFactory));
+		MqttPahoMessageDrivenChannelAdapter adapter = new MqttPahoMessageDrivenChannelAdapter(properties.getClientId(),
+				mqttClientFactory, properties.getTopics());
+		adapter.setQos(properties.getQos());
+		adapter.setConverter(pahoMessageConverter(properties, beanFactory));
 		adapter.setAutoStartup(false);
 
 		if (mqttMessageProducerCustomizer != null) {
@@ -84,7 +72,8 @@ public class MqttSupplierConfiguration {
 		return IntegrationFlow.from(mqttInbound).toReactivePublisher(true);
 	}
 
-	private DefaultPahoMessageConverter pahoMessageConverter(BeanFactory beanFactory) {
+	private DefaultPahoMessageConverter pahoMessageConverter(MqttSupplierProperties properties,
+			BeanFactory beanFactory) {
 		DefaultPahoMessageConverter converter = new DefaultPahoMessageConverter(properties.getCharset());
 		converter.setPayloadAsBytes(properties.isBinary());
 		converter.setBeanFactory(beanFactory);

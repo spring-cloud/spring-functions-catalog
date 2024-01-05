@@ -5,7 +5,7 @@ The consumer uses the `FileWritingMessageHandler` from Spring Integration.
 
 ## Beans for injection
 
-You can import `FileConsumerConfiguration` in the application and then inject the following bean.
+The `FileConsumerConfiguration` auto-configuration provides the following bean:
 
 `Consumer<Message<?>> fileConsumer`
 

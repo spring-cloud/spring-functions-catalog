@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 the original author or authors.
+ * Copyright 2017-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,28 +23,25 @@ import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.eclipse.paho.client.mqttv3.persist.MqttDefaultFilePersistence;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.util.ObjectUtils;
 
 /**
- * Generic mqtt configuration.
+ * The MQTT client auto-configuration.
  *
  * @author Janne Valkealahti
  * @author Artem Bilan
  */
-@Configuration
+@AutoConfiguration
+@EnableConfigurationProperties(MqttProperties.class)
 public class MqttConfiguration {
 
-	@Autowired
-	private MqttProperties mqttProperties;
-
 	@Bean
-	public MqttPahoClientFactory mqttClientFactory() {
-
+	public MqttPahoClientFactory mqttClientFactory(MqttProperties mqttProperties) {
 		MqttConnectOptions mqttConnectOptions = new MqttConnectOptions();
 		mqttConnectOptions.setServerURIs(mqttProperties.getUrl());
 		mqttConnectOptions.setUserName(mqttProperties.getUsername());

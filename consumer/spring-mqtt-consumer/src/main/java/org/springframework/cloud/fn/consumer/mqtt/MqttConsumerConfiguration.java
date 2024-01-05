@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 the original author or authors.
+ * Copyright 2017-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,11 @@ package org.springframework.cloud.fn.consumer.mqtt;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.cloud.fn.common.mqtt.MqttConfiguration;
-import org.springframework.cloud.fn.common.mqtt.MqttProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.integration.mqtt.core.MqttPahoClientFactory;
 import org.springframework.integration.mqtt.outbound.MqttPahoMessageHandler;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
@@ -35,24 +32,14 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 
 /**
- * A consumer that sends data to Mqtt.
+ * A consumer that sends data to MQTT.
  *
  * @author Janne Valkealahti
- *
+ * @author Artem Bilan
  */
-@Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties({ MqttProperties.class, MqttConsumerProperties.class })
-@Import(MqttConfiguration.class)
+@EnableConfigurationProperties(MqttConsumerProperties.class)
+@AutoConfiguration(after = MqttConfiguration.class)
 public class MqttConsumerConfiguration {
-
-	@Autowired
-	private MqttConsumerProperties properties;
-
-	@Autowired
-	private MqttPahoClientFactory mqttClientFactory;
-
-	@Autowired
-	private BeanFactory beanFactory;
 
 	@Bean
 	public Consumer<Message<?>> mqttConsumer(MessageHandler mqttOutbound) {
@@ -60,20 +47,22 @@ public class MqttConsumerConfiguration {
 	}
 
 	@Bean
-	public MessageHandler mqttOutbound(
+	public MessageHandler mqttOutbound(MqttConsumerProperties properties, MqttPahoClientFactory mqttClientFactory,
+			BeanFactory beanFactory,
 			@Nullable ComponentCustomizer<MqttPahoMessageHandler> mqttMessageHandlerCustomizer) {
 
 		MqttPahoMessageHandler messageHandler = new MqttPahoMessageHandler(properties.getClientId(), mqttClientFactory);
 		messageHandler.setAsync(properties.isAsync());
 		messageHandler.setDefaultTopic(properties.getTopic());
-		messageHandler.setConverter(pahoMessageConverter());
+		messageHandler.setConverter(pahoMessageConverter(properties, beanFactory));
 		if (mqttMessageHandlerCustomizer != null) {
 			mqttMessageHandlerCustomizer.customize(messageHandler);
 		}
 		return messageHandler;
 	}
 
-	public DefaultPahoMessageConverter pahoMessageConverter() {
+	private DefaultPahoMessageConverter pahoMessageConverter(MqttConsumerProperties properties,
+			BeanFactory beanFactory) {
 		DefaultPahoMessageConverter converter = new DefaultPahoMessageConverter(properties.getQos(),
 				properties.isRetained(), properties.getCharset());
 		converter.setBeanFactory(beanFactory);

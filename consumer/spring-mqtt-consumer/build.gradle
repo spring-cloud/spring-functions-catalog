@@ -1,3 +1,5 @@
 dependencies {
     api project(':spring-mqtt-common')
+
+    testImplementation project(':spring-function-test-support')
 }

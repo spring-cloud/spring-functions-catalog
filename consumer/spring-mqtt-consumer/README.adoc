@@ -4,7 +4,7 @@ A consumer that allows you to send messages using the MQTT protocol.
 
 ## Beans for injection
 
-You can import `MqttConsumerConfiguration` in the application and then inject the following bean.
+The `MqttConsumerConfiguration` auto-configuration provides the following bean:
 
 `Consumer<Message<?>> mqttConsumer`
 

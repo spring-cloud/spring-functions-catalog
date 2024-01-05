@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 the original author or authors.
+ * Copyright 2017-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Properties for the Mqtt Source.
+ * Properties for the MQTT supplier.
  *
  * @author Janne Valkealahti
  * @author Soby Chacko
@@ -34,28 +34,28 @@ import org.springframework.validation.annotation.Validated;
 public class MqttSupplierProperties {
 
 	/**
-	 * identifies the client.
+	 * Identifies the client.
 	 */
 	private String clientId = "stream.client.id.source";
 
 	/**
-	 * the topic(s) (comma-delimited) to which the source will subscribe.
+	 * The topic(s) (comma-delimited) to which the source will subscribe.
 	 */
 	private String[] topics = new String[] { "stream.mqtt" };
 
 	/**
-	 * the qos; a single value for all topics or a comma-delimited list to match the
+	 * The qos; a single value for all topics or a comma-delimited list to match the
 	 * topics.
 	 */
 	private int[] qos = new int[] { 0 };
 
 	/**
-	 * true to leave the payload as bytes.
+	 * True to leave the payload as bytes.
 	 */
 	private boolean binary = false;
 
 	/**
-	 * the charset used to convert bytes to String (when binary is false).
+	 * The charset used to convert bytes to String (when binary is false).
 	 */
 	private String charset = "UTF-8";
 

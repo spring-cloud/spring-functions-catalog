@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2020 the original author or authors.
+ * Copyright 2017-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Properties for the Mqtt Consumer.
+ * Properties for the MQTT Consumer.
  *
  * @author Janne Valkealahti
  *
@@ -34,32 +34,32 @@ import org.springframework.validation.annotation.Validated;
 public class MqttConsumerProperties {
 
 	/**
-	 * identifies the client.
+	 * Identifies the client.
 	 */
 	private String clientId = "stream.client.id.sink";
 
 	/**
-	 * the topic to which the sink will publish.
+	 * The topic to which the sink will publish.
 	 */
 	private String topic = "stream.mqtt";
 
 	/**
-	 * the quality of service to use.
+	 * The quality of service to use.
 	 */
 	private int qos = 1;
 
 	/**
-	 * whether to set the 'retained' flag.
+	 * Whether to set the 'retained' flag.
 	 */
 	private boolean retained = false;
 
 	/**
-	 * the charset used to convert a String payload to byte[].
+	 * The charset used to convert a String payload to byte[].
 	 */
 	private String charset = "UTF-8";
 
 	/**
-	 * whether or not to use async sends.
+	 * Whether to use async sends.
 	 */
 	private boolean async = false;
 
