@@ -59,12 +59,8 @@ public class SftpTestSupport extends RemoteFileTestSupport {
 	public static void createServer() throws Exception {
 		server = SshServer.setUpDefaultServer();
 		server.setPasswordAuthenticator(
-				(username, password, session) -> StringUtils.hasText(password) && !"badPassword".equals(password)); // fail
-																													// if
-																													// pub
-																													// key
-																													// validation
-																													// failed
+				// fail if pub key validation failed
+				(username, password, session) -> StringUtils.hasText(password) && !"badPassword".equals(password));
 		server.setPublickeyAuthenticator((username, key, session) -> key.equals(decodePublicKey("id_rsa_pp.pub")));
 		server.setPort(0);
 		server.setKeyPairProvider(new SimpleGeneratorHostKeyProvider(new File("hostkey.ser").toPath()));

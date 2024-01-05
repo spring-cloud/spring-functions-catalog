@@ -59,7 +59,7 @@ public class MqttConsumerTests implements MosquittoContainerTest {
 
 	@DynamicPropertySource
 	static void mongoDbProperties(DynamicPropertyRegistry registry) {
-		registry.add("mqtt.url", () -> "tcp://localhost:" + MOSQUITTO_CONTAINER.getMappedPort(1883));
+		registry.add("mqtt.url", MosquittoContainerTest::mqttUrl);
 	}
 
 	@Test

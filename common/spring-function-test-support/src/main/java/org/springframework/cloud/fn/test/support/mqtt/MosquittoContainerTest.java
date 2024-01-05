@@ -32,6 +32,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers(disabledWithoutDocker = true)
 public interface MosquittoContainerTest {
 
+	/**
+	 * The Mosquitto Testcontainers instance.
+	 */
 	GenericContainer<?> MOSQUITTO_CONTAINER = new GenericContainer<>("eclipse-mosquitto:2.0.13")
 		.withCommand("mosquitto -c /mosquitto-no-auth.conf")
 		.withExposedPorts(1883);
