@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import org.springframework.web.cors.CorsConfiguration;
  *
  * @author Artem Bilan
  */
-@ConfigurationProperties("http")
+@ConfigurationProperties("http.supplier")
 @Validated
 public class HttpSupplierProperties {
 
@@ -109,7 +109,7 @@ public class HttpSupplierProperties {
 		}
 
 		public Boolean getAllowCredentials() {
-			return allowCredentials;
+			return this.allowCredentials;
 		}
 
 		public void setAllowCredentials(Boolean allowCredentials) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -112,7 +112,7 @@ public class HttpSupplierApplicationTests {
 			.trustManager(InsecureTrustManagerFactory.INSTANCE)
 			.build();
 
-		HttpClient httpClient = HttpClient.create().secure(sslSpec -> sslSpec.sslContext(sslContext));
+		HttpClient httpClient = HttpClient.create().secure((sslSpec) -> sslSpec.sslContext(sslContext));
 
 		WebClient webClient = WebClient.builder()
 			.clientConnector(new ReactorClientHttpConnector(httpClient))
@@ -140,24 +140,7 @@ public class HttpSupplierApplicationTests {
 		stepVerifier.verify();
 	}
 
-	private static class TestPojo {
-
-		private String name;
-
-		TestPojo() {
-		}
-
-		TestPojo(String name) {
-			this.name = name;
-		}
-
-		public String getName() {
-			return this.name;
-		}
-
-		public void setName(String name) {
-			this.name = name;
-		}
+	private record TestPojo(String name) {
 
 	}
 

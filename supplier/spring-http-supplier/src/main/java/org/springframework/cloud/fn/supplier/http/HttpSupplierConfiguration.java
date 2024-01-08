@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2023 the original author or authors.
+ * Copyright 2011-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,11 @@ import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,12 +40,12 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 
 /**
- * Configuration for the HTTP Supplier.
+ * The auto-configuration for the HTTP Supplier.
  *
  * @author Artem Bilan
  */
 @EnableConfigurationProperties(HttpSupplierProperties.class)
-@Configuration
+@AutoConfiguration(after = WebFluxAutoConfiguration.class)
 public class HttpSupplierConfiguration {
 
 	@Bean
@@ -65,7 +66,7 @@ public class HttpSupplierConfiguration {
 				.statusCodeExpression(new ValueExpression<>(HttpStatus.ACCEPTED))
 				.headerMapper(httpHeaderMapper)
 				.codecConfigurer(serverCodecConfigurer)
-				.crossOrigin(crossOrigin -> crossOrigin.origin(httpSupplierProperties.getCors().getAllowedOrigins())
+				.crossOrigin((crossOrigin) -> crossOrigin.origin(httpSupplierProperties.getCors().getAllowedOrigins())
 					.allowedHeaders(httpSupplierProperties.getCors().getAllowedHeaders())
 					.allowCredentials(httpSupplierProperties.getCors().getAllowCredentials()))
 				.autoStartup(false))

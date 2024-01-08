@@ -7,7 +7,7 @@ Users have to subscribe to the returned `Flux` to receive the data.
 
 ## Beans for injection
 
-You can import the `HttpRequestFunction` configuration in a Spring Boot application and then inject the following bean.
+The `HttpRequestFunction` auto-configuration provides the following bean:
 
 `httpRequestFunction`
 
@@ -25,7 +25,7 @@ For more information on the various options available, please see link:src/main/
 
 ## Examples
 
-See this link:src/test/java/org/springframework/cloud/fn/http/request/HttpRequestFunctionApplicationTests.java[test suite] for examples of how this function is used.
+See this link:src/test/java/org/springframework/cloud/fn/http/request/HttpRequestFunctionTests.java[test suite] for examples of how this function is used.
 
 ## Other usage
 

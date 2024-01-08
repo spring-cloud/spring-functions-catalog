@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,34 +20,37 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.expression.Expression;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.integration.config.IntegrationConverter;
 import org.springframework.messaging.Message;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilderFactory;
 
 /**
- * Configuration for a {@link Function} that makes HTTP requests to a resource and for
- * each request, returns a {@link ResponseEntity}.
+ * Auto-configuration for a {@link Function} that makes HTTP requests to a resource and
+ * for each request, returns a {@link ResponseEntity}.
  *
  * @author David Turanski
  * @author Sunny Hemdev
  * @author Corneil du Plessis
  **/
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(HttpRequestFunctionProperties.class)
 public class HttpRequestFunctionConfiguration {
 
 	@Bean
 	public HttpRequestFunction httpRequestFunction(WebClient.Builder webClientBuilder,
 			HttpRequestFunctionProperties properties) {
+
 		return new HttpRequestFunction(webClientBuilder.build(), properties);
 	}
 
@@ -77,37 +80,39 @@ public class HttpRequestFunctionConfiguration {
 		@Override
 		public Object apply(Message<?> message) {
 			return this.webClient.method(resolveHttpMethod(message))
-				.uri(uriBuilderFactory.uriString(resolveUrl(message)).build())
+				.uri(this.uriBuilderFactory.uriString(resolveUrl(message)).build())
 				.bodyValue(resolveBody(message))
-				.headers(httpHeaders -> httpHeaders.addAll(resolveHeaders(message)))
+				.headers((httpHeaders) -> httpHeaders.addAll(resolveHeaders(message)))
 				.retrieve()
-				.toEntity(properties.getExpectedResponseType())
-				.map(responseEntity -> properties.getReplyExpression().getValue(responseEntity))
-				.timeout(Duration.ofMillis(properties.getTimeout()))
+				.toEntity(this.properties.getExpectedResponseType())
+				.map((responseEntity) -> this.properties.getReplyExpression().getValue(responseEntity))
+				.timeout(Duration.ofMillis(this.properties.getTimeout()))
 				.block();
 		}
 
 		private String resolveUrl(Message<?> message) {
-			return properties.getUrlExpression().getValue(message, String.class);
+			return this.properties.getUrlExpression().getValue(message, String.class);
 		}
 
 		private HttpMethod resolveHttpMethod(Message<?> message) {
-			return properties.getHttpMethodExpression().getValue(message, HttpMethod.class);
+			return this.properties.getHttpMethodExpression().getValue(message, HttpMethod.class);
 		}
 
 		private Object resolveBody(Message<?> message) {
-			return properties.getBodyExpression() != null ? properties.getBodyExpression().getValue(message)
+			return (this.properties.getBodyExpression() != null) ? this.properties.getBodyExpression().getValue(message)
 					: message.getPayload();
 		}
 
 		private HttpHeaders resolveHeaders(Message<?> message) {
 			HttpHeaders headers = new HttpHeaders();
-			if (properties.getHeadersExpression() != null) {
-				Map<?, ?> headersMap = properties.getHeadersExpression().getValue(message, Map.class);
-				for (Map.Entry<?, ?> header : headersMap.entrySet()) {
-					if (header.getKey() != null && header.getValue() != null) {
-						headers.add(header.getKey().toString(), header.getValue().toString());
-					}
+			Expression headersExpression = this.properties.getHeadersExpression();
+			if (headersExpression != null) {
+				Map<?, ?> headersMap = headersExpression.getValue(message, Map.class);
+				if (!CollectionUtils.isEmpty(headersMap)) {
+					headersMap.entrySet()
+						.stream()
+						.filter((entry) -> entry.getKey() != null && entry.getValue() != null)
+						.forEach((entry) -> headers.add(entry.getKey().toString(), entry.getValue().toString()));
 				}
 			}
 			return headers;

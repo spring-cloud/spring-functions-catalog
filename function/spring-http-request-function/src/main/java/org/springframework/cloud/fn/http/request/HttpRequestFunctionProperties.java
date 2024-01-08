@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2022 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ public class HttpRequestFunctionProperties {
 	/**
 	 * A SpEL expression to derive the request method from the incoming message.
 	 */
-	private Expression httpMethodExpression = new ValueExpression(HttpMethod.GET);
+	private Expression httpMethodExpression = new ValueExpression<>(HttpMethod.GET);
 
 	/**
 	 * A SpEL expression to derive the request body from the incoming message.
@@ -74,13 +74,13 @@ public class HttpRequestFunctionProperties {
 
 	/**
 	 * A SpEL expression used to compute the final result, applied against the whole http
-	 * {@link org.springframework.http.ResponseEntity}.
+	 * {@link ResponseEntity}.
 	 */
-	private Expression replyExpression = new FunctionExpression<ResponseEntity>(ResponseEntity::getBody);
+	private Expression replyExpression = new FunctionExpression<ResponseEntity<?>>(ResponseEntity::getBody);
 
 	@NotNull
 	public Expression getUrlExpression() {
-		return urlExpression;
+		return this.urlExpression;
 	}
 
 	public void setUrlExpression(Expression urlExpression) {
@@ -88,7 +88,7 @@ public class HttpRequestFunctionProperties {
 	}
 
 	public Expression getHttpMethodExpression() {
-		return httpMethodExpression;
+		return this.httpMethodExpression;
 	}
 
 	public void setHttpMethodExpression(Expression httpMethodExpression) {
@@ -97,7 +97,7 @@ public class HttpRequestFunctionProperties {
 
 	@NotNull
 	public Class<?> getExpectedResponseType() {
-		return expectedResponseType;
+		return this.expectedResponseType;
 	}
 
 	public void setExpectedResponseType(Class<?> expectedResponseType) {
@@ -113,7 +113,7 @@ public class HttpRequestFunctionProperties {
 	}
 
 	public Expression getBodyExpression() {
-		return bodyExpression;
+		return this.bodyExpression;
 	}
 
 	public void setBodyExpression(Expression bodyExpression) {
@@ -121,7 +121,7 @@ public class HttpRequestFunctionProperties {
 	}
 
 	public Expression getHeadersExpression() {
-		return headersExpression;
+		return this.headersExpression;
 	}
 
 	public void setHeadersExpression(Expression headersExpression) {
@@ -130,7 +130,7 @@ public class HttpRequestFunctionProperties {
 
 	@NotNull
 	public Expression getReplyExpression() {
-		return replyExpression;
+		return this.replyExpression;
 	}
 
 	public void setReplyExpression(Expression replyExpression) {
