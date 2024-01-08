@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,21 +25,21 @@ import org.zeromq.ZMQ;
 import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.channel.FluxMessageChannel;
 import org.springframework.integration.zeromq.inbound.ZeroMqMessageProducer;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
 
 /**
- * A source module that receives data from ZeroMQ.
+ * A supplier auto-configuration that receives data from ZeroMQ.
  *
  * @author Daniel Frey
  * @since 3.1.0
  */
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties(ZeroMqSupplierProperties.class)
 public class ZeroMqSupplierConfiguration {
 
@@ -70,7 +70,7 @@ public class ZeroMqSupplierConfiguration {
 		if (socketConfigurer != null) {
 			zeroMqMessageProducer.setSocketConfigurer(socketConfigurer);
 		}
-		zeroMqMessageProducer.setOutputChannel(output);
+		zeroMqMessageProducer.setOutputChannel(this.output);
 		zeroMqMessageProducer.setAutoStartup(false);
 
 		return zeroMqMessageProducer;
@@ -78,7 +78,7 @@ public class ZeroMqSupplierConfiguration {
 
 	@Bean
 	public Supplier<Flux<Message<?>>> zeromqSupplier(ZeroMqMessageProducer adapter) {
-		return () -> Flux.from(output).doOnSubscribe(subscription -> adapter.start());
+		return () -> Flux.from(this.output).doOnSubscribe((subscription) -> adapter.start());
 	}
 
 }

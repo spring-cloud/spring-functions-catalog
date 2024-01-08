@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -51,16 +53,21 @@ public class ZeroMqConsumerConfigurationTests {
 
 	private static ZMQ.Socket socket;
 
+	private static int bindPort;
+
 	@Autowired
 	Function<Flux<Message<?>>, Mono<Void>> subject;
 
 	@BeforeAll
 	static void setup() {
-
 		socket = CONTEXT.createSocket(SocketType.SUB);
 		socket.setReceiveTimeOut(10_000);
-		int bindPort = socket.bindToRandomPort("tcp://*");
-		System.setProperty("zeromq.consumer.connectUrl", "tcp://localhost:" + bindPort);
+		bindPort = socket.bindToRandomPort("tcp://*");
+	}
+
+	@DynamicPropertySource
+	static void zeromqConnectUrl(DynamicPropertyRegistry dynamicPropertyRegistry) {
+		dynamicPropertyRegistry.add("zeromq.consumer.connectUrl", () -> "tcp://localhost:" + bindPort);
 	}
 
 	@AfterAll

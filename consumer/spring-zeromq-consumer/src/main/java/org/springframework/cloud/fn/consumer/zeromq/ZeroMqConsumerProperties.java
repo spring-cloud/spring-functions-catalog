@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import org.springframework.expression.Expression;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The configuration properties for ZeroMQ consumer.
+ *
  * @author Daniel Frey
  * @since 3.1.0
  */
@@ -49,35 +51,26 @@ public class ZeroMqConsumerProperties {
 
 	@NotNull(message = "'socketType' is required")
 	public SocketType getSocketType() {
-		return socketType;
+		return this.socketType;
 	}
 
-	/**
-	 * @param socketType the {@link SocketType} to establish.
-	 */
 	public void setSocketType(SocketType socketType) {
 		this.socketType = socketType;
 	}
 
 	@NotEmpty(message = "connectUrl is required like protocol://server:port")
 	public String getConnectUrl() {
-		return connectUrl;
+		return this.connectUrl;
 	}
 
-	/**
-	 * @param connectUrl The ZeroMQ socket to expose
-	 */
 	public void setConnectUrl(String connectUrl) {
 		this.connectUrl = connectUrl;
 	}
 
 	public Expression getTopic() {
-		return topic;
+		return this.topic;
 	}
 
-	/**
-	 * @param topic The 'topic' SpEL expression to set
-	 */
 	public void setTopic(Expression topic) {
 		this.topic = topic;
 	}

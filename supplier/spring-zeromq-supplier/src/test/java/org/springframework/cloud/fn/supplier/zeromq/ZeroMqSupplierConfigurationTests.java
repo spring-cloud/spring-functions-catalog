@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,11 +36,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * @author Daniel Frey since 3.1.0
+ * @author Daniel Frey
+ * @since 3.1.0
  */
 @SpringBootTest(properties = { "zeromq.supplier.topics=test-topic" })
 @DirtiesContext
@@ -50,6 +53,8 @@ public class ZeroMqSupplierConfigurationTests {
 
 	private static ZMQ.Socket socket;
 
+	private static int bindPort;
+
 	@Autowired
 	Supplier<Flux<Message<?>>> subject;
 
@@ -58,10 +63,12 @@ public class ZeroMqSupplierConfigurationTests {
 
 		String socketAddress = "tcp://*";
 		socket = CONTEXT.createSocket(SocketType.PUB);
-		int bindPort = socket.bindToRandomPort(socketAddress);
+		bindPort = socket.bindToRandomPort(socketAddress);
+	}
 
-		System.setProperty("zeromq.supplier.connectUrl", "tcp://localhost:" + bindPort);
-
+	@DynamicPropertySource
+	static void zeromqConnectUrl(DynamicPropertyRegistry dynamicPropertyRegistry) {
+		dynamicPropertyRegistry.add("zeromq.supplier.connectUrl", () -> "tcp://localhost:" + bindPort);
 	}
 
 	@AfterAll
@@ -72,7 +79,6 @@ public class ZeroMqSupplierConfigurationTests {
 
 	@Test
 	void testSubscriptionConfiguration() throws InterruptedException {
-
 		StepVerifier stepVerifier = StepVerifier.create(subject.get())
 			.assertNext((message) -> assertThat(message.getPayload())
 				.asInstanceOf(InstanceOfAssertFactories.type(byte[].class))

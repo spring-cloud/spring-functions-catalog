@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The ZeroMQ supplier configuration properties.
+ *
  * @author Daniel Frey
  * @since 3.1.0
  */
@@ -59,68 +61,46 @@ public class ZeroMqSupplierProperties {
 	 */
 	private String[] topics = { "" };
 
-	/**
-	 * @param socketType the {@link SocketType} to establish.
-	 */
 	public void setSocketType(SocketType socketType) {
 		this.socketType = socketType;
 	}
 
 	@NotNull(message = "'socketType' is required")
 	public SocketType getSocketType() {
-		return socketType;
+		return this.socketType;
 	}
 
 	@NotEmpty(message = "connectUrl is required like tcp://server:port")
 	public String getConnectUrl() {
-		return connectUrl;
+		return this.connectUrl;
 	}
 
-	/**
-	 * @param connectUrl The ZeroMQ server connect url
-	 *
-	 * @see org.springframework.integration.zeromq.inbound.ZeroMqMessageProducer#setConnectUrl(String)
-	 */
 	public void setConnectUrl(String connectUrl) {
 		this.connectUrl = connectUrl;
 	}
 
 	@Range(min = 0, message = "'bindPort' must not be negative")
 	public int getBindPort() {
-		return bindPort;
+		return this.bindPort;
 	}
 
-	/**
-	 * @param bindPort The Port to bind to on all interfaces
-	 *
-	 * @see org.springframework.integration.zeromq.inbound.ZeroMqMessageProducer#setBindPort(int)
-	 */
 	public void setBindPort(int bindPort) {
 		this.bindPort = bindPort;
 	}
 
 	@NotNull(message = "'consumeDelay' is required")
 	public Duration getConsumeDelay() {
-		return consumeDelay;
+		return this.consumeDelay;
 	}
 
-	/**
-	 * Specify a {@link Duration} to delay consumption when no data received.
-	 * @param consumeDelay the {@link Duration} to delay consumption when empty.
-	 */
 	public void setConsumeDelay(Duration consumeDelay) {
 		this.consumeDelay = consumeDelay;
 	}
 
 	public String[] getTopics() {
-		return topics;
+		return this.topics;
 	}
 
-	/**
-	 * @param topics The ZeroMQ Topics to subscribe to
-	 *
-	 * @see org.springframework.integration.zeromq.inbound.ZeroMqMessageProducer#setTopics(String...)
-	 */
 	public void setTopics(String... topics) {
 		this.topics = topics;
 	}

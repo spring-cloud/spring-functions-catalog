@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,18 +25,20 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.mapping.OutboundMessageMapper;
 import org.springframework.integration.zeromq.outbound.ZeroMqMessageHandler;
 import org.springframework.messaging.Message;
 
 /**
+ * The auto-configuration for ZeroMQ consumer.
+ *
  * @author Daniel Frey
  * @since 3.1.0
  */
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties(ZeroMqConsumerProperties.class)
 public class ZeroMqConsumerConfiguration {
 
@@ -49,6 +51,7 @@ public class ZeroMqConsumerConfiguration {
 	public ZeroMqMessageHandler zeromqMessageHandler(ZeroMqConsumerProperties properties, ZContext zContext,
 			@Autowired(required = false) Consumer<ZMQ.Socket> socketConfigurer,
 			@Autowired(required = false) OutboundMessageMapper<byte[]> messageMapper) {
+
 		ZeroMqMessageHandler zeroMqMessageHandler = new ZeroMqMessageHandler(zContext, properties.getConnectUrl(),
 				properties.getSocketType());
 
@@ -69,7 +72,7 @@ public class ZeroMqConsumerConfiguration {
 
 	@Bean
 	public Function<Flux<Message<?>>, Mono<Void>> zeromqConsumer(ZeroMqMessageHandler zeromqMessageHandler) {
-		return input -> input.flatMap(zeromqMessageHandler::handleMessage).ignoreElements();
+		return (input) -> input.flatMap(zeromqMessageHandler::handleMessage).ignoreElements();
 	}
 
 }
