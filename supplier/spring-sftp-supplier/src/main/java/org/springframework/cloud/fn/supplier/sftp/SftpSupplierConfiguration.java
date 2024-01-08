@@ -100,7 +100,8 @@ public class SftpSupplierConfiguration {
 	private static final String FILE_MODIFIED_TIME_HEADER = "FILE_MODIFIED_TIME";
 
 	@Bean
-	public Supplier<Flux<? extends Message<?>>> sftpSupplier(MessageSource<?> sftpMessageSource,
+	public Supplier<Flux<? extends Message<?>>> sftpSupplier(
+			@Qualifier("sftpMessageSource") MessageSource<?> sftpMessageSource,
 			@Nullable Publisher<Message<Object>> sftpReadingFlow, SftpSupplierProperties sftpSupplierProperties) {
 
 		Flux<? extends Message<?>> flux = (sftpReadingFlow != null) ? Flux.from(sftpReadingFlow)
@@ -115,8 +116,8 @@ public class SftpSupplierConfiguration {
 
 	@Bean
 	@Primary
-	public MessageSource<?> sftpMessageSource(MessageSource<?> messageSource, BeanFactory beanFactory,
-			@Nullable List<ReceiveMessageAdvice> receiveMessageAdvice) {
+	public MessageSource<?> sftpMessageSource(@Qualifier("targetMessageSource") MessageSource<?> messageSource,
+			BeanFactory beanFactory, @Nullable List<ReceiveMessageAdvice> receiveMessageAdvice) {
 
 		if (CollectionUtils.isEmpty(receiveMessageAdvice)) {
 			return messageSource;
@@ -157,7 +158,8 @@ public class SftpSupplierConfiguration {
 	/*
 	 * Create a Flux from a MessageSource that will be used by the supplier.
 	 */
-	private Flux<? extends Message<?>> sftpMessageFlux(MessageSource<?> sftpMessageSource,
+	private Flux<? extends Message<?>> sftpMessageFlux(
+			@Qualifier("sftpMessageSource") MessageSource<?> sftpMessageSource,
 			SftpSupplierProperties sftpSupplierProperties) {
 
 		return IntegrationReactiveUtils.messageSourceToFlux(sftpMessageSource)
@@ -201,7 +203,7 @@ public class SftpSupplierConfiguration {
 		}
 
 		@Bean
-		Publisher<Message<Object>> sftpReadingFlow(MessageSource<?> sftpMessageSource,
+		Publisher<Message<Object>> sftpReadingFlow(@Qualifier("sftpMessageSource") MessageSource<?> sftpMessageSource,
 				SftpSupplierProperties sftpSupplierProperties, FileConsumerProperties fileConsumerProperties) {
 
 			return FileUtils
@@ -247,7 +249,7 @@ public class SftpSupplierConfiguration {
 		 */
 		@Bean
 		@ConditionalOnExpression("environment['file.consumer.mode']!='ref' && environment['sftp.supplier.list-only']!='true'")
-		Publisher<Message<Object>> sftpReadingFlow(MessageSource<?> sftpMessageSource,
+		Publisher<Message<Object>> sftpReadingFlow(@Qualifier("sftpMessageSource") MessageSource<?> sftpMessageSource,
 				SftpSupplierProperties sftpSupplierProperties, FileConsumerProperties fileConsumerProperties,
 				@Nullable @Qualifier("renameRemoteFileHandler") MessageHandler renameRemoteFileHandler) {
 
