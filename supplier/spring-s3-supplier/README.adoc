@@ -8,7 +8,7 @@ Users have to subscribe to this `Flux` and receive the data.
 
 == Beans for injection
 
-You can import the `AwsS3SupplierConfiguration` in the application and then inject the following bean.
+The `AwsS3SupplierConfiguration` auto-configuration provides the following bean:
 
 `s3Supplier`
 

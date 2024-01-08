@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,9 +41,10 @@ public class AmazonS3LinesTransferredTests extends AbstractAwsS3SupplierMockTest
 			assertThat(message.getHeaders()).containsKey(FileHeaders.ORIGINAL_FILE);
 			assertThat(message.getHeaders())
 				.containsValue(new File(this.awsS3SupplierProperties.getLocalDir(), "subdir/otherFile"));
-		}).assertNext((message) -> {
-			assertThat(message.getPayload().toString()).isEqualTo("Other2");
-		}).thenCancel().verifyLater();
+		})
+			.assertNext((message) -> assertThat(message.getPayload().toString()).isEqualTo("Other2"))
+			.thenCancel()
+			.verifyLater();
 		standardIntegrationFlow.start();
 		stepVerifier.verify(Duration.ofSeconds(10));
 

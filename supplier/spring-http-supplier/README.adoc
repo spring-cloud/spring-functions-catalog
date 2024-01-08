@@ -20,7 +20,7 @@ Once injected, you can use the `get` method of the `Supplier` to invoke it and t
 
 ## Configuration Options
 
-All configuration properties are prefixed with `http`.
+All configuration properties are prefixed with `http.supplier`.
 
 For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/supplier/http/HttpSupplierProperties.java[HttpSupplierProperties].
 

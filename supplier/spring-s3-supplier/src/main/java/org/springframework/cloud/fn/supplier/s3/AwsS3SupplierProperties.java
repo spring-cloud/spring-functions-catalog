@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The configuration properties for S3 supplier.
+ *
  * @author Artem Bilan
  */
 @ConfigurationProperties("s3.supplier")
@@ -95,7 +97,7 @@ public class AwsS3SupplierProperties {
 
 	@NotBlank
 	public String getTmpFileSuffix() {
-		return tmpFileSuffix;
+		return this.tmpFileSuffix;
 	}
 
 	public void setTmpFileSuffix(String tmpFileSuffix) {
@@ -104,7 +106,7 @@ public class AwsS3SupplierProperties {
 
 	@NotBlank
 	public String getRemoteFileSeparator() {
-		return remoteFileSeparator;
+		return this.remoteFileSeparator;
 	}
 
 	public void setRemoteFileSeparator(String remoteFileSeparator) {
@@ -112,7 +114,7 @@ public class AwsS3SupplierProperties {
 	}
 
 	public boolean isAutoCreateLocalDir() {
-		return autoCreateLocalDir;
+		return this.autoCreateLocalDir;
 	}
 
 	public void setAutoCreateLocalDir(boolean autoCreateLocalDir) {
@@ -120,7 +122,7 @@ public class AwsS3SupplierProperties {
 	}
 
 	public boolean isDeleteRemoteFiles() {
-		return deleteRemoteFiles;
+		return this.deleteRemoteFiles;
 	}
 
 	public void setDeleteRemoteFiles(boolean deleteRemoteFiles) {
@@ -129,7 +131,7 @@ public class AwsS3SupplierProperties {
 
 	@NotNull
 	public File getLocalDir() {
-		return localDir;
+		return this.localDir;
 	}
 
 	public final void setLocalDir(File localDir) {
@@ -137,7 +139,7 @@ public class AwsS3SupplierProperties {
 	}
 
 	public String getFilenamePattern() {
-		return filenamePattern;
+		return this.filenamePattern;
 	}
 
 	public void setFilenamePattern(String filenamePattern) {
@@ -145,7 +147,7 @@ public class AwsS3SupplierProperties {
 	}
 
 	public Pattern getFilenameRegex() {
-		return filenameRegex;
+		return this.filenameRegex;
 	}
 
 	public void setFilenameRegex(Pattern filenameRegex) {
@@ -153,7 +155,7 @@ public class AwsS3SupplierProperties {
 	}
 
 	public boolean isPreserveTimestamp() {
-		return preserveTimestamp;
+		return this.preserveTimestamp;
 	}
 
 	public void setPreserveTimestamp(boolean preserveTimestamp) {
@@ -166,7 +168,7 @@ public class AwsS3SupplierProperties {
 	}
 
 	public boolean isListOnly() {
-		return listOnly;
+		return this.listOnly;
 	}
 
 	public void setListOnly(boolean listOnly) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,15 +34,15 @@ public class AmazonS3FilesTransferredTests extends AbstractAwsS3SupplierMockTest
 	@Test
 	public void test() {
 		final Flux<Message<?>> messageFlux = s3Supplier.get();
-		StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
-			assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
+		StepVerifier stepVerifier = StepVerifier.create(messageFlux)
+			.assertNext((message) -> assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
 				.isEqualTo(new File(this.awsS3SupplierProperties.getLocalDir() + File.separator + "subdir"
-						+ File.separator + "1.test"));
-		}).assertNext((message) -> {
-			assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
+						+ File.separator + "1.test")))
+			.assertNext((message) -> assertThat(new File(message.getPayload().toString().replaceAll("\"", "")))
 				.isEqualTo(new File(this.awsS3SupplierProperties.getLocalDir() + File.separator + "subdir"
-						+ File.separator + "2.test"));
-		}).thenCancel().verifyLater();
+						+ File.separator + "2.test")))
+			.thenCancel()
+			.verifyLater();
 		standardIntegrationFlow.start();
 		stepVerifier.verify(Duration.ofSeconds(10));
 	}

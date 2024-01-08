@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,14 +19,16 @@ package org.springframework.cloud.fn.consumer.s3;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import io.awspring.cloud.autoconfigure.s3.S3TransferManagerAutoConfiguration;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.progress.TransferListener;
 
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
 import org.springframework.integration.aws.outbound.S3MessageHandler;
@@ -39,7 +41,12 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.util.Assert;
 
-@Configuration(proxyBeanMethods = false)
+/**
+ * Auto-configuration for S3 consumer.
+ *
+ * @author Artem Bilan
+ */
+@AutoConfiguration(after = S3TransferManagerAutoConfiguration.class)
 @EnableConfigurationProperties(AwsS3ConsumerProperties.class)
 public class AwsS3ConsumerConfiguration {
 
@@ -52,7 +59,7 @@ public class AwsS3ConsumerConfiguration {
 	public IntegrationFlow s3ConsumerFlow(@Nullable TransferListener transferListener,
 			MessageHandler amazonS3MessageHandler) {
 
-		return flow -> flow.enrichHeaders(headers -> headers.header(AwsHeaders.TRANSFER_LISTENER, transferListener))
+		return (flow) -> flow.enrichHeaders((headers) -> headers.header(AwsHeaders.TRANSFER_LISTENER, transferListener))
 			.handle(amazonS3MessageHandler);
 	}
 
@@ -62,8 +69,9 @@ public class AwsS3ConsumerConfiguration {
 			@Nullable BiConsumer<PutObjectRequest.Builder, Message<?>> uploadMetadataProvider) {
 
 		Expression bucketExpression = s3ConsumerProperties.getBucketExpression();
-		if (s3ConsumerProperties.getBucket() != null) {
-			bucketExpression = new ValueExpression<>(s3ConsumerProperties.getBucket());
+		String bucket = s3ConsumerProperties.getBucket();
+		if (bucket != null) {
+			bucketExpression = new ValueExpression<>(bucket);
 		}
 
 		S3MessageHandler s3MessageHandler = new S3MessageHandler(s3TransferManager, bucketExpression);
@@ -71,8 +79,9 @@ public class AwsS3ConsumerConfiguration {
 
 		Expression aclExpression;
 
-		if (s3ConsumerProperties.getAcl() != null) {
-			aclExpression = new ValueExpression<>(s3ConsumerProperties.getAcl());
+		ObjectCannedACL acl = s3ConsumerProperties.getAcl();
+		if (acl != null) {
+			aclExpression = new ValueExpression<>(acl);
 		}
 		else {
 			aclExpression = s3ConsumerProperties.getAclExpression();

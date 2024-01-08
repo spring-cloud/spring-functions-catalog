@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,17 +41,17 @@ public class AmazonS3ListOnlyTests extends AbstractAwsS3SupplierMockTests {
 		keys.add("subdir/1.test");
 		keys.add("subdir/2.test");
 		keys.add("subdir/otherFile");
-		StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext(message -> {
+		StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
 			String s3Object = (String) message.getPayload();
 			String key = jsonPathKey(s3Object);
 			assertThat(keys).contains(key);
 			keys.remove(key);
-		}).assertNext(message -> {
+		}).assertNext((message) -> {
 			String s3Object = (String) message.getPayload();
 			String key = jsonPathKey(s3Object);
 			assertThat(keys).contains(key);
 			keys.remove(key);
-		}).assertNext(message -> {
+		}).assertNext((message) -> {
 			String s3Object = (String) message.getPayload();
 			String key = jsonPathKey(s3Object);
 			assertThat(keys).contains(key);

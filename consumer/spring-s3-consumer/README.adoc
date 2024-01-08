@@ -5,7 +5,7 @@ The consumer uses the AWS S3 support from Spring Integration and Spring Cloud AW
 
 == Beans for injection
 
-You can import `AwsS3ConsumerConfiguration` in the application and then inject the following bean.
+The `AwsS3ConsumerConfiguration` auto-configuration provides the following bean:
 
 `Consumer<Message<?>> s3Consumer`
 

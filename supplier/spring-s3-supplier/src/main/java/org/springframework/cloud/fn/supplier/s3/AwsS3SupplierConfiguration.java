@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +30,10 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.cloud.fn.common.aws.s3.AmazonS3Configuration;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.cloud.fn.common.file.FileConsumerProperties;
 import org.springframework.cloud.fn.common.file.FileUtils;
@@ -55,10 +57,12 @@ import org.springframework.messaging.support.GenericMessage;
 import org.springframework.util.StringUtils;
 
 /**
+ * Auto-configuration for S3 supplier.
+ *
  * @author Artem Bilan
  * @author David Turanski
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration(after = AmazonS3Configuration.class)
 @EnableConfigurationProperties({ AwsS3SupplierProperties.class, FileConsumerProperties.class })
 public class AwsS3SupplierConfiguration {
 
@@ -87,12 +91,12 @@ public class AwsS3SupplierConfiguration {
 	static class SynchronizingConfiguration extends AwsS3SupplierConfiguration {
 
 		@Bean
-		public Supplier<Flux<Message<?>>> s3Supplier(Publisher<Message<?>> s3SupplierFlow) {
+		Supplier<Flux<Message<?>>> s3Supplier(Publisher<Message<?>> s3SupplierFlow) {
 			return () -> Flux.from(s3SupplierFlow);
 		}
 
 		@Bean
-		public ChainFileListFilter<S3Object> filter(ConcurrentMetadataStore metadataStore) {
+		ChainFileListFilter<S3Object> filter(ConcurrentMetadataStore metadataStore) {
 			ChainFileListFilter<S3Object> chainFilter = new ChainFileListFilter<>();
 			if (StringUtils.hasText(this.awsS3SupplierProperties.getFilenamePattern())) {
 				chainFilter
@@ -115,19 +119,19 @@ public class AwsS3SupplierConfiguration {
 		}
 
 		@Bean
-		public Publisher<Message<Object>> s3SupplierFlow(S3InboundFileSynchronizingMessageSource s3MessageSource) {
+		Publisher<Message<Object>> s3SupplierFlow(S3InboundFileSynchronizingMessageSource s3MessageSource) {
 			return FileUtils
 				.enhanceFlowForReadingMode(
 						IntegrationFlow.from(IntegrationReactiveUtils.messageSourceToFlux(s3MessageSource)
 							.doOnSubscribe((s) -> s3MessageSource.start())),
-						fileConsumerProperties)
+						this.fileConsumerProperties)
 				.toReactivePublisher(true);
 		}
 
 		@Bean
-		public S3InboundFileSynchronizer s3InboundFileSynchronizer(ChainFileListFilter<S3Object> filter) {
+		S3InboundFileSynchronizer s3InboundFileSynchronizer(ChainFileListFilter<S3Object> filter) {
 
-			S3InboundFileSynchronizer synchronizer = new S3InboundFileSynchronizer(s3SessionFactory);
+			S3InboundFileSynchronizer synchronizer = new S3InboundFileSynchronizer(this.s3SessionFactory);
 			synchronizer.setDeleteRemoteFiles(this.awsS3SupplierProperties.isDeleteRemoteFiles());
 			synchronizer.setPreserveTimestamp(this.awsS3SupplierProperties.isPreserveTimestamp());
 			String remoteDir = this.awsS3SupplierProperties.getRemoteDir();
@@ -140,8 +144,7 @@ public class AwsS3SupplierConfiguration {
 		}
 
 		@Bean
-		public S3InboundFileSynchronizingMessageSource s3MessageSource(
-				S3InboundFileSynchronizer s3InboundFileSynchronizer,
+		S3InboundFileSynchronizingMessageSource s3MessageSource(S3InboundFileSynchronizer s3InboundFileSynchronizer,
 				@Nullable ComponentCustomizer<S3InboundFileSynchronizingMessageSource> s3MessageSourceCustomizer) {
 
 			S3InboundFileSynchronizingMessageSource s3MessageSource = new S3InboundFileSynchronizingMessageSource(
@@ -170,18 +173,18 @@ public class AwsS3SupplierConfiguration {
 		}
 
 		@Bean
-		public Supplier<Flux<Message<Object>>> s3Supplier(Publisher<Message<Object>> s3SupplierFlow) {
+		Supplier<Flux<Message<Object>>> s3Supplier(Publisher<Message<Object>> s3SupplierFlow) {
 			return () -> Flux.from(s3SupplierFlow);
 		}
 
 		@Bean
-		public Publisher<Message<Object>> s3SupplierFlow(ReactiveMessageSourceProducer s3ListingProducer) {
+		Publisher<Message<Object>> s3SupplierFlow(ReactiveMessageSourceProducer s3ListingProducer) {
 			return IntegrationFlow.from(s3ListingProducer).split().toReactivePublisher(true);
 		}
 
 		@Bean
 		Predicate<S3Object> listOnlyFilter(AwsS3SupplierProperties awsS3SupplierProperties) {
-			Predicate<S3Object> predicate = s -> true;
+			Predicate<S3Object> predicate = (s) -> true;
 			if (StringUtils.hasText(this.awsS3SupplierProperties.getFilenamePattern())) {
 				Pattern pattern = Pattern.compile(this.awsS3SupplierProperties.getFilenamePattern());
 				predicate = (S3Object summary) -> pattern.matcher(summary.key()).matches();
@@ -197,7 +200,7 @@ public class AwsS3SupplierConfiguration {
 				final String storedLastModified = this.metadataStore.get(key);
 				boolean result = !lastModified.equals(storedLastModified);
 				if (result) {
-					metadataStore.put(key, lastModified);
+					this.metadataStore.put(key, lastModified);
 				}
 				return result;
 			});
@@ -214,7 +217,7 @@ public class AwsS3SupplierConfiguration {
 					.contents()
 					.stream()
 					.filter(filter)
-					.map(s3Object -> {
+					.map((s3Object) -> {
 						try {
 							return objectMapper.writeValueAsString(s3Object.toBuilder());
 						}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,10 +51,8 @@ public class AmazonS3UploadFileTests extends AbstractAwsS3ConsumerMockTests {
 
 		this.s3Consumer.accept(message);
 
-		ArgumentCaptor<PutObjectRequest> putObjectRequestArgumentCaptor = ArgumentCaptor
-			.forClass(PutObjectRequest.class);
-		ArgumentCaptor<AsyncRequestBody> asyncRequestBodyArgumentCaptor = ArgumentCaptor
-			.forClass(AsyncRequestBody.class);
+		ArgumentCaptor<PutObjectRequest> putObjectRequestArgumentCaptor = ArgumentCaptor.captor();
+		ArgumentCaptor<AsyncRequestBody> asyncRequestBodyArgumentCaptor = ArgumentCaptor.captor();
 		verify(amazonS3Client, atLeastOnce()).putObject(putObjectRequestArgumentCaptor.capture(),
 				asyncRequestBodyArgumentCaptor.capture());
 
@@ -68,7 +66,7 @@ public class AmazonS3UploadFileTests extends AbstractAwsS3ConsumerMockTests {
 
 		AsyncRequestBody asyncRequestBody = asyncRequestBodyArgumentCaptor.getValue();
 		StepVerifier.create(asyncRequestBody)
-			.assertNext(buffer -> assertThat(TestUtils.getPropertyValue(buffer, "hb", byte[].class)).isEmpty())
+			.assertNext((buffer) -> assertThat(TestUtils.getPropertyValue(buffer, "hb", byte[].class)).isEmpty())
 			.expectComplete()
 			.verify();
 

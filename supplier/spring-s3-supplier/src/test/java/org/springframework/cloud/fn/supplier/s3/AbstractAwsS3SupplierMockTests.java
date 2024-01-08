@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -117,11 +117,11 @@ public abstract class AbstractAwsS3SupplierMockTests {
 	@AfterAll
 	public static void tearDown() {
 		System.clearProperty("s3.supplier.localDir");
-		S3_OBJECTS.values().forEach(stream -> {
+		S3_OBJECTS.values().forEach((stream) -> {
 			try {
 				stream.close();
 			}
-			catch (IOException e) {
+			catch (IOException ex) {
 				// Ignore
 			}
 		});
@@ -140,10 +140,10 @@ public abstract class AbstractAwsS3SupplierMockTests {
 				.isTruncated(false)
 				.build();
 
-			willAnswer(invocation -> listObjectsResponse).given(amazonS3).listObjects(any(ListObjectsRequest.class));
+			willAnswer((invocation) -> listObjectsResponse).given(amazonS3).listObjects(any(ListObjectsRequest.class));
 
 			for (Map.Entry<S3Object, InputStream> s3Object : S3_OBJECTS.entrySet()) {
-				willAnswer(invocation -> new ResponseInputStream<>(GetObjectResponse.builder().build(),
+				willAnswer((invocation) -> new ResponseInputStream<>(GetObjectResponse.builder().build(),
 						s3Object.getValue()))
 					.given(amazonS3)
 					.getObject(GetObjectRequest.builder().bucket(S3_BUCKET).key(s3Object.getKey().key()).build());
