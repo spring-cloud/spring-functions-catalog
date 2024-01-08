@@ -6,7 +6,7 @@ The `Supplier` uses the `FastDateFormat` from Apache Commons library.
 
 ## Beans for injection
 
-You can import the `TimeSupplierConfiguration` in the application and then inject the following bean.
+The `TimeSupplierConfiguration` auto-configuration provides the following bean:
 
 `timeSupplier`
 

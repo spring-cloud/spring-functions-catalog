@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,15 +17,14 @@
 package org.springframework.cloud.fn.supplier.time;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 /**
  * @author Soby Chacko
@@ -38,10 +37,7 @@ public class VariationToSimpleTests extends TimeSupplierApplicationTests {
 	public void testTimeSupplier() {
 		final String time = timeSupplier.get();
 		SimpleDateFormat dateFormat = new SimpleDateFormat(timeSupplierProperties.getDateFormat());
-		assertThatCode(() -> {
-			Date date = dateFormat.parse(time);
-			assertThat(date).isNotNull();
-		}).doesNotThrowAnyException();
+		assertThatNoException().isThrownBy(() -> assertThat(dateFormat.parse(time)).isNotNull());
 	}
 
 	@Test

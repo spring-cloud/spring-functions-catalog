@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,6 @@ package org.springframework.cloud.fn.consumer.websocket.trace;
 import java.util.Date;
 import java.util.Map;
 
-import org.springframework.util.Assert;
-
 /**
  * A value object representing a trace event: at a particular time with a simple (map)
  * information. Can be used for analyzing contextual information such as HTTP headers.
@@ -29,29 +27,12 @@ import org.springframework.util.Assert;
  * It is a copy of {@code InMemoryTraceRepository} from Spring Boot 1.5.x. Since Spring
  * Boot 2.0 traces are only available for HTTP.
  *
+ * @param timestamp the time for trace.
+ * @param info the map of that tags for trace.
  * @author Dave Syer
  * @author Artem Bilan
  * @since 2.0
  */
-public class Trace {
-
-	private final Date timestamp;
-
-	private final Map<String, Object> info;
-
-	public Trace(Date timestamp, Map<String, Object> info) {
-		Assert.notNull(timestamp, "Timestamp must not be null");
-		Assert.notNull(info, "Info must not be null");
-		this.timestamp = timestamp;
-		this.info = info;
-	}
-
-	public Date getTimestamp() {
-		return this.timestamp;
-	}
-
-	public Map<String, Object> getInfo() {
-		return this.info;
-	}
+public record Trace(Date timestamp, Map<String, Object> info) {
 
 }

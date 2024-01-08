@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -83,7 +83,7 @@ public class WebsocketConsumerTests {
 		handler.await();
 
 		assertThat(handler.getReceivedMessages().size()).isEqualTo(MESSAGE_COUNT);
-		messagesToSend.forEach(s -> assertThat(handler.getReceivedMessages().contains(s)).isTrue());
+		messagesToSend.forEach((s) -> assertThat(handler.getReceivedMessages().contains(s)).isTrue());
 	}
 
 	@Test
@@ -112,7 +112,7 @@ public class WebsocketConsumerTests {
 		// create multiple handlers
 		List<WebsocketConsumerClientHandler> handlers = createHandlerList(CLIENT_COUNT, MESSAGE_COUNT);
 
-		// submit mulitple message
+		// submit multiple message
 		List<String> messagesReceived = submitMultipleMessages(MESSAGE_COUNT);
 
 		// wait on each handle
@@ -126,12 +126,12 @@ public class WebsocketConsumerTests {
 	private WebSocketSession doHandshake(WebsocketConsumerClientHandler handler)
 			throws InterruptedException, ExecutionException {
 		String wsEndpoint = "ws://localhost:" + this.consumerServer.getPort() + this.properties.getPath();
-		return new StandardWebSocketClient().doHandshake(handler, wsEndpoint).get();
+		return new StandardWebSocketClient().execute(handler, wsEndpoint).get();
 	}
 
 	private List<String> submitMultipleMessages(int messageCount) {
 		List<String> messagesToSend = new ArrayList<>(messageCount);
-		synchronized (websocketConsumer) {
+		synchronized (this) {
 			for (int i = 0; i < messageCount; i++) {
 				String message = "message_" + i;
 				messagesToSend.add(message);

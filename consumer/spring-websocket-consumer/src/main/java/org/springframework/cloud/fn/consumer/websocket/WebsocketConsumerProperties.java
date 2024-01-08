@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2020 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,8 @@ import io.netty.handler.logging.LogLevel;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 /**
+ * Configuration properties for WebSocket consumer.
+ *
  * @author Oliver Moser
  * @author Gary Russell
  */
@@ -48,34 +50,34 @@ public class WebsocketConsumerProperties {
 	public static final int DEFAULT_PORT = 9292;
 
 	/**
-	 * whether or not to create a {@link io.netty.handler.ssl.SslContext}.
+	 * Whether to create a {@link io.netty.handler.ssl.SslContext}.
 	 */
 	boolean ssl;
 
 	/**
-	 * the port on which the Netty server listens. Default is <tt>9292</tt>
+	 * The port on which the Netty server listens. Default is <tt>9292</tt>
 	 */
 	int port = DEFAULT_PORT;
 
 	/**
-	 * the number of threads for the Netty {@link io.netty.channel.EventLoopGroup}.
+	 * The number of threads for the Netty {@link io.netty.channel.EventLoopGroup}.
 	 * Default is <tt>1</tt>
 	 */
 	int threads = DEFAULT_THREADS;
 
 	/**
-	 * the logLevel for netty channels. Default is <tt>WARN</tt>
+	 * The logLevel for netty channels. Default is <tt>WARN</tt>
 	 */
 	String logLevel = DEFAULT_LOGLEVEL;
 
 	/**
-	 * the path on which a WebsocketSink consumer needs to connect. Default is
+	 * The path on which a WebsocketSink consumer needs to connect. Default is
 	 * <tt>/websocket</tt>
 	 */
 	String path = DEFAULT_PATH;
 
 	public boolean isSsl() {
-		return ssl;
+		return this.ssl;
 	}
 
 	public void setSsl(boolean ssl) {
@@ -83,7 +85,7 @@ public class WebsocketConsumerProperties {
 	}
 
 	public int getPort() {
-		return port;
+		return this.port;
 	}
 
 	public void setPort(int port) {
@@ -91,7 +93,7 @@ public class WebsocketConsumerProperties {
 	}
 
 	public int getThreads() {
-		return threads;
+		return this.threads;
 	}
 
 	public void setThreads(int threads) {
@@ -99,7 +101,7 @@ public class WebsocketConsumerProperties {
 	}
 
 	public String getLogLevel() {
-		return logLevel;
+		return this.logLevel;
 	}
 
 	public void setLogLevel(String logLevel) {
@@ -107,7 +109,7 @@ public class WebsocketConsumerProperties {
 	}
 
 	public String getPath() {
-		return path;
+		return this.path;
 	}
 
 	public void setPath(String path) {

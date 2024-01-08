@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,13 +43,13 @@ import org.apache.commons.logging.LogFactory;
  */
 public class WebsocketConsumerServer {
 
-	private static final Log logger = LogFactory.getLog(WebsocketConsumerServer.class);
+	private static final Log LOGGER = LogFactory.getLog(WebsocketConsumerServer.class);
 
-	static final List<Channel> channels = Collections.synchronizedList(new ArrayList<Channel>());
+	static final List<Channel> CHANNELS = Collections.synchronizedList(new ArrayList<>());
 
-	private WebsocketConsumerProperties properties;
+	private final WebsocketConsumerProperties properties;
 
-	private WebsocketConsumerServerInitializer initializer;
+	private final WebsocketConsumerServerInitializer initializer;
 
 	private EventLoopGroup bossGroup;
 
@@ -59,6 +59,7 @@ public class WebsocketConsumerServer {
 
 	public WebsocketConsumerServer(WebsocketConsumerProperties properties,
 			WebsocketConsumerServerInitializer initializer) {
+
 		this.properties = properties;
 		this.initializer = initializer;
 	}
@@ -69,22 +70,23 @@ public class WebsocketConsumerServer {
 
 	@PostConstruct
 	public void init() {
-		bossGroup = new NioEventLoopGroup(properties.getThreads());
-		workerGroup = new NioEventLoopGroup();
+		this.bossGroup = new NioEventLoopGroup(this.properties.getThreads());
+		this.workerGroup = new NioEventLoopGroup();
 	}
 
 	@PreDestroy
 	public void shutdown() {
-		bossGroup.shutdownGracefully();
-		workerGroup.shutdownGracefully();
+		this.bossGroup.shutdownGracefully();
+		this.workerGroup.shutdownGracefully();
 	}
 
 	public void run() throws InterruptedException {
-		NioServerSocketChannel channel = (NioServerSocketChannel) new ServerBootstrap().group(bossGroup, workerGroup)
+		NioServerSocketChannel channel = (NioServerSocketChannel) new ServerBootstrap()
+			.group(this.bossGroup, this.workerGroup)
 			.channel(NioServerSocketChannel.class)
 			.handler(new LoggingHandler(nettyLogLevel()))
-			.childHandler(initializer)
-			.bind(properties.getPort())
+			.childHandler(this.initializer)
+			.bind(this.properties.getPort())
 			.sync()
 			.channel();
 		this.port = channel.localAddress().getPort();
@@ -92,23 +94,23 @@ public class WebsocketConsumerServer {
 	}
 
 	private void dumpProperties() {
-		logger.info("███████████████████████████████████████████████████████████");
-		logger.info("                >> websocket-sink config <<                ");
-		logger.info("");
-		logger.info(String.format("port:     %s", this.port));
-		logger.info(String.format("ssl:               %s", this.properties.isSsl()));
-		logger.info(String.format("path:     %s", this.properties.getPath()));
-		logger.info(String.format("logLevel: %s", this.properties.getLogLevel()));
-		logger.info(String.format("threads:           %s", this.properties.getThreads()));
-		logger.info("");
-		logger.info("████████████████████████████████████████████████████████████");
+		LOGGER.info("███████████████████████████████████████████████████████████");
+		LOGGER.info("                >> websocket-sink config <<                ");
+		LOGGER.info("");
+		LOGGER.info(String.format("port:     %s", this.port));
+		LOGGER.info(String.format("ssl:               %s", this.properties.isSsl()));
+		LOGGER.info(String.format("path:     %s", this.properties.getPath()));
+		LOGGER.info(String.format("logLevel: %s", this.properties.getLogLevel()));
+		LOGGER.info(String.format("threads:           %s", this.properties.getThreads()));
+		LOGGER.info("");
+		LOGGER.info("████████████████████████████████████████████████████████████");
 	}
 
 	//
 	// HELPERS
 	//
 	private LogLevel nettyLogLevel() {
-		return LogLevel.valueOf(properties.getLogLevel().toUpperCase());
+		return LogLevel.valueOf(this.properties.getLogLevel().toUpperCase());
 	}
 
 }

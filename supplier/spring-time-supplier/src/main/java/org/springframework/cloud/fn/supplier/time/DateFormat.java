@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,12 +41,7 @@ import jakarta.validation.Payload;
 @Constraint(validatedBy = { DateFormat.DateFormatValidator.class })
 public @interface DateFormat {
 
-	/**
-	 * Default message for validation.
-	 */
-	String DEFAULT_MESSAGE = "";
-
-	String message() default DEFAULT_MESSAGE;
+	String message() default "";
 
 	Class<?>[] groups() default {};
 
@@ -69,10 +64,10 @@ public @interface DateFormat {
 			try {
 				new SimpleDateFormat(value.toString());
 			}
-			catch (IllegalArgumentException e) {
-				if (DEFAULT_MESSAGE.equals(this.message)) {
+			catch (IllegalArgumentException ex) {
+				if ("".equals(this.message)) {
 					context.disableDefaultConstraintViolation();
-					context.buildConstraintViolationWithTemplate(e.getMessage()).addConstraintViolation();
+					context.buildConstraintViolationWithTemplate(ex.getMessage()).addConstraintViolation();
 				}
 				return false;
 			}

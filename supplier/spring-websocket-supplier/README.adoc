@@ -7,7 +7,7 @@ Users have to subscribe to this `Flux` and receive the data.
 
 ## Beans for injection
 
-You can import the `WebsocketSupplierConfiguration` in the application and then inject the following bean.
+The `WebsocketSupplierConfiguration` auto-configuration provides the following bean:
 
 `websocketSupplier`
 

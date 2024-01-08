@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,13 @@ import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.websocket.IntegrationWebSocketContainer;
 import org.springframework.integration.websocket.ServerWebSocketContainer;
@@ -35,13 +37,13 @@ import org.springframework.integration.websocket.inbound.WebSocketInboundChannel
 import org.springframework.messaging.Message;
 
 /**
- * A supplier that receives data over WebSocket.
+ * Auto-configuration for supplier that receives data over WebSocket.
  *
  * @author Krishnaprasad A S
  * @author Artem Bilan
  *
  */
-@Configuration
+@AutoConfiguration(before = { WebSocketServletAutoConfiguration.class, SecurityAutoConfiguration.class })
 @EnableConfigurationProperties(WebsocketSupplierProperties.class)
 public class WebsocketSupplierConfiguration {
 
@@ -51,8 +53,9 @@ public class WebsocketSupplierConfiguration {
 	@Bean
 	public Supplier<Flux<Message<?>>> websocketSupplier(Publisher<Message<?>> websocketPublisher,
 			WebSocketInboundChannelAdapter webSocketInboundChannelAdapter) {
+
 		return () -> Flux.from(websocketPublisher)
-			.doOnSubscribe(subscription -> webSocketInboundChannelAdapter.start())
+			.doOnSubscribe((subscription) -> webSocketInboundChannelAdapter.start())
 			.doOnTerminate(webSocketInboundChannelAdapter::stop);
 	}
 
@@ -63,6 +66,7 @@ public class WebsocketSupplierConfiguration {
 
 	private WebSocketInboundChannelAdapter webSocketInboundChannelAdapter(
 			IntegrationWebSocketContainer serverWebSocketContainer) {
+
 		WebSocketInboundChannelAdapter webSocketInboundChannelAdapter = new WebSocketInboundChannelAdapter(
 				serverWebSocketContainer);
 		webSocketInboundChannelAdapter.setAutoStartup(false);
@@ -80,7 +84,9 @@ public class WebsocketSupplierConfiguration {
 	@Bean
 	public IntegrationWebSocketContainer serverWebSocketContainer(
 			ObjectProvider<ServerWebSocketContainer.SockJsServiceOptions> sockJsServiceOptions) {
-		return new ServerWebSocketContainer(properties.getPath()).setAllowedOrigins(properties.getAllowedOrigins())
+
+		return new ServerWebSocketContainer(this.properties.getPath())
+			.setAllowedOrigins(this.properties.getAllowedOrigins())
 			.withSockJs(sockJsServiceOptions.getIfAvailable());
 	}
 

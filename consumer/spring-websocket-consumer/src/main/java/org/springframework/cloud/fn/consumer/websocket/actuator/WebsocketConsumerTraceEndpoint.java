@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2020 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import org.springframework.cloud.fn.consumer.websocket.trace.Trace;
 @Endpoint(id = "websocketconsumertrace")
 public class WebsocketConsumerTraceEndpoint {
 
-	private static final Log logger = LogFactory.getLog(WebsocketConsumerTraceEndpoint.class);
+	private static final Log LOGGER = LogFactory.getLog(WebsocketConsumerTraceEndpoint.class);
 
 	private boolean enabled;
 
@@ -47,7 +47,7 @@ public class WebsocketConsumerTraceEndpoint {
 
 	public WebsocketConsumerTraceEndpoint(InMemoryTraceRepository repository) {
 		this.repository = repository;
-		logger.info(String.format("/websocketsinktrace enabled: %b", this.enabled));
+		LOGGER.info(String.format("/websocketsinktrace enabled: %b", this.enabled));
 	}
 
 	@PostConstruct

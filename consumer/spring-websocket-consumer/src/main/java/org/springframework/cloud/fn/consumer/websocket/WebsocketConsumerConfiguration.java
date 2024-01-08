@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2022 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.consumer.websocket.actuator.WebsocketConsumerTraceEndpoint;
@@ -39,12 +40,14 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
 
 /**
+ * Auto-configuration for WebSocket consumer.
+ *
  * @author Oliver Moser
  * @author Gary Russell
  * @author Artem Bilan
  * @author Chris Bono
  */
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties(WebsocketConsumerProperties.class)
 public class WebsocketConsumerConfiguration {
 
@@ -58,7 +61,7 @@ public class WebsocketConsumerConfiguration {
 
 	@PostConstruct
 	public void init() throws InterruptedException {
-		websocketConsumerServer.run();
+		this.websocketConsumerServer.run();
 	}
 
 	@Bean
@@ -69,14 +72,14 @@ public class WebsocketConsumerConfiguration {
 
 	@Bean
 	public Consumer<Message<?>> websocketConsumer(InMemoryTraceRepository websocketTraceRepository) {
-		return message -> {
+		return (message) -> {
 			if (logger.isTraceEnabled()) {
 				logger.trace("Handling message: " + message);
 			}
 			SimpMessageHeaderAccessor headers = SimpMessageHeaderAccessor.wrap(message);
 			headers.setMessageTypeIfNotSet(SimpMessageType.MESSAGE);
 			String messagePayload = message.getPayload().toString();
-			for (Channel channel : WebsocketConsumerServer.channels) {
+			for (Channel channel : WebsocketConsumerServer.CHANNELS) {
 				if (logger.isTraceEnabled()) {
 					logger.trace(
 							String.format("Writing message %s to channel %s", messagePayload, channel.localAddress()));
@@ -101,22 +104,23 @@ public class WebsocketConsumerConfiguration {
 		websocketTraceRepository.add(trace);
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	static class WebsocketConsumerServerConfiguration {
 
 		@Bean
-		public InMemoryTraceRepository websocketTraceRepository() {
+		InMemoryTraceRepository websocketTraceRepository() {
 			return new InMemoryTraceRepository();
 		}
 
 		@Bean
-		public WebsocketConsumerServer server(WebsocketConsumerProperties properties,
+		WebsocketConsumerServer server(WebsocketConsumerProperties properties,
 				WebsocketConsumerServerInitializer initializer) {
+
 			return new WebsocketConsumerServer(properties, initializer);
 		}
 
 		@Bean
-		public WebsocketConsumerServerInitializer initializer(InMemoryTraceRepository websocketTraceRepository) {
+		WebsocketConsumerServerInitializer initializer(InMemoryTraceRepository websocketTraceRepository) {
 			return new WebsocketConsumerServerInitializer(websocketTraceRepository);
 		}
 

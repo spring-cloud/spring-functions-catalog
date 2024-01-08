@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2021 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.springframework.cloud.fn.supplier.websocket;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.integration.websocket.ClientWebSocketContainer;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.util.Base64Utils;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
@@ -77,9 +77,10 @@ public class WebsocketSupplierTests {
 				"ws://localhost:{port}/{path}", this.port, this.properties.getPath());
 
 		HttpHeaders httpHeaders = new HttpHeaders();
-		String token = Base64Utils.encodeToString(
-				(this.securityProperties.getUser().getName() + ":" + this.securityProperties.getUser().getPassword())
-					.getBytes(StandardCharsets.UTF_8));
+		String token = Base64.getEncoder()
+			.encodeToString((this.securityProperties.getUser().getName() + ":"
+					+ this.securityProperties.getUser().getPassword())
+				.getBytes(StandardCharsets.UTF_8));
 		httpHeaders.set(HttpHeaders.AUTHORIZATION, "Basic " + token);
 		clientWebSocketContainer.setHeaders(httpHeaders);
 		clientWebSocketContainer.start();

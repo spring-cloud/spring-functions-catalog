@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2020 the original author or authors.
+ * Copyright 2014-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,11 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpUtil;
+import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.codec.http.websocketx.CloseWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PingWebSocketFrame;
 import io.netty.handler.codec.http.websocketx.PongWebSocketFrame;
@@ -42,12 +46,6 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.cloud.fn.consumer.websocket.trace.InMemoryTraceRepository;
 
-import static io.netty.handler.codec.http.HttpHeaderNames.HOST;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpResponseStatus.BAD_REQUEST;
-import static io.netty.handler.codec.http.HttpResponseStatus.FORBIDDEN;
-import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
-
 /**
  * Handles handshakes and messages. Based on the Netty
  * <a href="https://bit.ly/1jVBj5T">websocket examples</a>.
@@ -59,7 +57,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  */
 public class WebsocketConsumerServerHandler extends SimpleChannelInboundHandler<Object> {
 
-	private static final Log logger = LogFactory.getLog(WebsocketConsumerServerHandler.class);
+	private static final Log LOGGER = LogFactory.getLog(WebsocketConsumerServerHandler.class);
 
 	private final boolean traceEnabled;
 
@@ -95,15 +93,16 @@ public class WebsocketConsumerServerHandler extends SimpleChannelInboundHandler<
 	private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest req) {
 		// Handle a bad request.
 		if (!req.decoderResult().isSuccess()) {
-			logger.warn(String.format("Bad request: %s", req.uri()));
-			sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, BAD_REQUEST));
+			LOGGER.warn(String.format("Bad request: %s", req.uri()));
+			sendHttpResponse(ctx, req,
+					new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.BAD_REQUEST));
 			return;
 		}
 
 		// Allow only GET methods.
-		if (req.method() != GET) {
-			logger.warn(String.format("Unsupported HTTP method: %s", req.method()));
-			sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HTTP_1_1, FORBIDDEN));
+		if (req.method() != HttpMethod.GET) {
+			LOGGER.warn(String.format("Unsupported HTTP method: %s", req.method()));
+			sendHttpResponse(ctx, req, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FORBIDDEN));
 			return;
 		}
 
@@ -122,7 +121,7 @@ public class WebsocketConsumerServerHandler extends SimpleChannelInboundHandler<
 		}
 		else {
 			this.handshaker.handshake(ctx.channel(), req);
-			WebsocketConsumerServer.channels.add(ctx.channel());
+			WebsocketConsumerServer.CHANNELS.add(ctx.channel());
 		}
 	}
 
@@ -155,8 +154,8 @@ public class WebsocketConsumerServerHandler extends SimpleChannelInboundHandler<
 
 	// simple echo implementation
 	private void handleTextWebSocketFrameInternal(TextWebSocketFrame frame, ChannelHandlerContext ctx) {
-		if (logger.isTraceEnabled()) {
-			logger.trace(String.format("%s received %s", ctx.channel(), frame.text()));
+		if (LOGGER.isTraceEnabled()) {
+			LOGGER.trace(String.format("%s received %s", ctx.channel(), frame.text()));
 		}
 
 		addTraceForFrame(frame, "text");
@@ -195,13 +194,12 @@ public class WebsocketConsumerServerHandler extends SimpleChannelInboundHandler<
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
-		logger.error("Websocket error", cause);
-		cause.printStackTrace();
+		LOGGER.error("Websocket error", cause);
 		ctx.close();
 	}
 
 	private String getWebSocketLocation(FullHttpRequest req) {
-		String location = req.headers().get(HOST) + this.properties.getPath();
+		String location = req.headers().get(HttpHeaderNames.HOST) + this.properties.getPath();
 		if (this.properties.isSsl()) {
 			return "wss://" + location;
 		}
