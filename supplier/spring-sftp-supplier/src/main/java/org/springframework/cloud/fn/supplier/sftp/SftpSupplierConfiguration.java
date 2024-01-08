@@ -107,11 +107,10 @@ public class SftpSupplierConfiguration {
 		Flux<? extends Message<?>> flux = (sftpReadingFlow != null) ? Flux.from(sftpReadingFlow)
 				: sftpMessageFlux(sftpMessageSource, sftpSupplierProperties);
 
-		return () -> flux.doOnSubscribe((sub) -> {
-			if (sftpMessageSource instanceof Lifecycle lifecycle) {
-				lifecycle.start();
-			}
-		});
+		if (sftpMessageSource instanceof Lifecycle lifecycle) {
+			lifecycle.start();
+		}
+		return () -> flux;
 	}
 
 	@Bean
