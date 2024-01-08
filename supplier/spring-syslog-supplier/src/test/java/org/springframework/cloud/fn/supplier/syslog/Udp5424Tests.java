@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,9 +33,11 @@ public class Udp5424Tests extends AbstractSyslogSupplierTests {
 	@Test
 	public void test() throws Exception {
 		final Flux<Message<?>> messageFlux = syslogSupplier.get();
-		final StepVerifier stepVerifier = StepVerifier.create(messageFlux).assertNext((message) -> {
-			assertThat(((Map) message.getPayload()).get("syslog_HOST")).isEqualTo("loggregator");
-		}).thenCancel().verifyLater();
+		final StepVerifier stepVerifier = StepVerifier.create(messageFlux)
+			.assertNext((message) -> assertThat(((Map<?, ?>) message.getPayload()).get("syslog_HOST"))
+				.isEqualTo("loggregator"))
+			.thenCancel()
+			.verifyLater();
 
 		sendUdp(RFC5424_PACKET);
 		stepVerifier.verify();

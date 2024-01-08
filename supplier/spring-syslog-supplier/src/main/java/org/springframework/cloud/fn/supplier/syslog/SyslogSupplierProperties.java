@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,11 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+/**
+ * The configuration properties for Syslog supplier.
+ *
+ * @author Soby Chacko
+ */
 @ConfigurationProperties("syslog.supplier")
 @Validated
 public class SyslogSupplierProperties {
@@ -42,28 +47,28 @@ public class SyslogSupplierProperties {
 	private int port = 1514;
 
 	/**
-	 * whether or not to use NIO (when supporting a large number of connections).
+	 * Whether to use NIO (when supporting a large number of connections).
 	 */
 	private boolean nio = false;
 
 	/**
-	 * whether or not to perform a reverse lookup on the incoming socket.
+	 * Whether to perform a reverse lookup on the incoming socket.
 	 */
 	private boolean reverseLookup;
 
 	/**
-	 * the socket timeout.
+	 * The socket timeout.
 	 */
 	private int socketTimeout;
 
 	/**
-	 * '5424' or '3164' - the syslog format according to the RFC; 3164 is aka 'BSD'
+	 * The '5424' or '3164' - the syslog format according to the RFC; 3164 is aka 'BSD'
 	 * format.
 	 */
 	private String rfc = "3164";
 
 	public int getBufferSize() {
-		return bufferSize;
+		return this.bufferSize;
 	}
 
 	public void setBufferSize(int bufferSize) {
@@ -71,7 +76,7 @@ public class SyslogSupplierProperties {
 	}
 
 	public Protocol getProtocol() {
-		return protocol;
+		return this.protocol;
 	}
 
 	public void setProtocol(Protocol protocol) {
@@ -79,7 +84,7 @@ public class SyslogSupplierProperties {
 	}
 
 	public int getPort() {
-		return port;
+		return this.port;
 	}
 
 	public void setPort(int port) {
@@ -87,7 +92,7 @@ public class SyslogSupplierProperties {
 	}
 
 	public boolean isNio() {
-		return nio;
+		return this.nio;
 	}
 
 	public void setNio(boolean nio) {
@@ -95,7 +100,7 @@ public class SyslogSupplierProperties {
 	}
 
 	public boolean isReverseLookup() {
-		return reverseLookup;
+		return this.reverseLookup;
 	}
 
 	public void setReverseLookup(boolean reverseLookup) {
@@ -103,7 +108,7 @@ public class SyslogSupplierProperties {
 	}
 
 	public int getSocketTimeout() {
-		return socketTimeout;
+		return this.socketTimeout;
 	}
 
 	public void setSocketTimeout(int socketTimeout) {
@@ -112,7 +117,7 @@ public class SyslogSupplierProperties {
 
 	@NotNull
 	public String getRfc() {
-		return rfc;
+		return this.rfc;
 	}
 
 	public void setRfc(String rfc) {

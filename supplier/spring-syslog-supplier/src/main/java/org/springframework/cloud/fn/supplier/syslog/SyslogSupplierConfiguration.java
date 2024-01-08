@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import reactor.core.publisher.Flux;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -43,11 +44,11 @@ import org.springframework.integration.syslog.inbound.UdpSyslogReceivingChannelA
 import org.springframework.messaging.Message;
 
 /**
- * Configuration class for SYSLOG Supplier.
+ * Auto-configuration class for SYSLOG Supplier.
  *
  * @author Soby Chacko
  */
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties(SyslogSupplierProperties.class)
 public class SyslogSupplierConfiguration {
 
@@ -60,12 +61,13 @@ public class SyslogSupplierConfiguration {
 	}
 
 	@Bean
-	public Supplier<Flux<Message<?>>> syslogSupplier(
+	public Supplier<Flux<Message<?>>> syslogSupplier(FluxMessageChannel syslogInputChannel,
 			ObjectProvider<UdpSyslogReceivingChannelAdapter> udpAdapterProvider,
 			ObjectProvider<TcpSyslogReceivingChannelAdapter> tcpAdapterProvider) {
-		return () -> Flux.from(syslogInputChannel()).doOnSubscribe(subscription -> {
-			final UdpSyslogReceivingChannelAdapter udpAdapter = udpAdapterProvider.getIfAvailable();
-			final TcpSyslogReceivingChannelAdapter tcpAdapter = tcpAdapterProvider.getIfAvailable();
+
+		return () -> Flux.from(syslogInputChannel).doOnSubscribe((subscription) -> {
+			UdpSyslogReceivingChannelAdapter udpAdapter = udpAdapterProvider.getIfAvailable();
+			TcpSyslogReceivingChannelAdapter tcpAdapter = tcpAdapterProvider.getIfAvailable();
 			if (udpAdapter != null) {
 				udpAdapter.start();
 			}
@@ -77,34 +79,44 @@ public class SyslogSupplierConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "udp")
-	public UdpSyslogReceivingChannelAdapter udpAdapter() {
-		return createUdpAdapter();
+	public UdpSyslogReceivingChannelAdapter udpAdapter(MessageConverter syslogConverter,
+			FluxMessageChannel syslogInputChannel) {
+
+		return createUdpAdapter(syslogConverter, syslogInputChannel);
 	}
 
 	@Bean
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "both")
-	public UdpSyslogReceivingChannelAdapter udpBothAdapter() {
-		return createUdpAdapter();
+	public UdpSyslogReceivingChannelAdapter udpBothAdapter(MessageConverter syslogConverter,
+			FluxMessageChannel syslogInputChannel) {
+
+		return createUdpAdapter(syslogConverter, syslogInputChannel);
 	}
 
-	private UdpSyslogReceivingChannelAdapter createUdpAdapter() {
+	private UdpSyslogReceivingChannelAdapter createUdpAdapter(MessageConverter syslogConverter,
+			FluxMessageChannel syslogInputChannel) {
+
 		UdpSyslogReceivingChannelAdapter adapter = new UdpSyslogReceivingChannelAdapter();
-		setAdapterProperties(adapter);
+		setAdapterProperties(adapter, syslogConverter, syslogInputChannel);
 		return adapter;
 	}
 
 	@Bean
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "tcp", matchIfMissing = true)
 	public TcpSyslogReceivingChannelAdapter tcpAdapter(
-			@Qualifier("syslogSupplierConnectionFactory") AbstractServerConnectionFactory connectionFactory) {
-		return createTcpAdapter(connectionFactory);
+			@Qualifier("syslogSupplierConnectionFactory") AbstractServerConnectionFactory connectionFactory,
+			MessageConverter syslogConverter, FluxMessageChannel syslogInputChannel) {
+
+		return createTcpAdapter(connectionFactory, syslogConverter, syslogInputChannel);
 	}
 
 	@Bean
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "both")
 	public TcpSyslogReceivingChannelAdapter tcpBothAdapter(
-			@Qualifier("syslogSupplierConnectionFactory") AbstractServerConnectionFactory connectionFactory) {
-		return createTcpAdapter(connectionFactory);
+			@Qualifier("syslogSupplierConnectionFactory") AbstractServerConnectionFactory connectionFactory,
+			MessageConverter syslogConverter, FluxMessageChannel syslogInputChannel) {
+
+		return createTcpAdapter(connectionFactory, syslogConverter, syslogInputChannel);
 	}
 
 	@Bean
@@ -117,21 +129,25 @@ public class SyslogSupplierConfiguration {
 		}
 	}
 
-	private TcpSyslogReceivingChannelAdapter createTcpAdapter(AbstractServerConnectionFactory connectionFactory) {
+	private TcpSyslogReceivingChannelAdapter createTcpAdapter(AbstractServerConnectionFactory connectionFactory,
+			MessageConverter syslogConverter, FluxMessageChannel syslogInputChannel) {
+
 		TcpSyslogReceivingChannelAdapter adapter = new TcpSyslogReceivingChannelAdapter();
 		adapter.setConnectionFactory(connectionFactory);
-		setAdapterProperties(adapter);
+		setAdapterProperties(adapter, syslogConverter, syslogInputChannel);
 		return adapter;
 	}
 
-	private void setAdapterProperties(SyslogReceivingChannelAdapterSupport adapter) {
+	private void setAdapterProperties(SyslogReceivingChannelAdapterSupport adapter, MessageConverter syslogConverter,
+			FluxMessageChannel syslogInputChannel) {
+
 		adapter.setPort(this.properties.getPort());
-		adapter.setConverter(syslogConverter());
-		adapter.setOutputChannel(syslogInputChannel());
+		adapter.setConverter(syslogConverter);
+		adapter.setOutputChannel(syslogInputChannel);
 		adapter.setAutoStartup(false);
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "tcp", matchIfMissing = true)
 	protected static class TcpBits {
 
@@ -140,7 +156,8 @@ public class SyslogSupplierConfiguration {
 
 		@Bean
 		public AbstractServerConnectionFactory syslogSupplierConnectionFactory(
-				@Qualifier("syslogSupplierDecoder") Deserializer<?> decoder) throws Exception {
+				@Qualifier("syslogSupplierDecoder") Deserializer<?> decoder) {
+
 			AbstractServerConnectionFactory factory;
 			if (this.properties.isNio()) {
 				factory = new TcpNioServerConnectionFactory(this.properties.getPort());
@@ -168,7 +185,7 @@ public class SyslogSupplierConfiguration {
 
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "both")
 	protected static class BothBits extends TcpBits {
 
