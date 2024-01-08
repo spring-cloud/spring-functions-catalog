@@ -25,7 +25,7 @@ When configuring the `sftp.factory.known-hosts-expression` option, the root obje
 
 ## Idempotency
 
-By default the supplier uses a https://docs.spring.io/spring-integration/api/org/springframework/integration/metadata/SimpleMetadataStore.html[SimpleMetadataStore], storing the last modified time to track files that have already been processed in memory.
+By default, the supplier uses a https://docs.spring.io/spring-integration/api/org/springframework/integration/metadata/SimpleMetadataStore.html[SimpleMetadataStore], storing the last modified time to track files that have already been processed in memory.
 If an application using this supplier is restarted, any existing files will be reprocessed. You can inject on of the persistent https://docs.spring.io/spring-integration/reference/html/meta-data-store.html[MetadataStore implementations] provided by Spring Integration, or your own of course, to maintain this state permanently.
 See also link:../../common/metadata-store-common/README.adoc[`MetadataStore`] options for possible shared persistent store configuration for the `SftpPersistentAcceptOnceFileListFilter` used in the SFTP Source.
 
@@ -60,7 +60,7 @@ Users have to subscribe to this `Flux` and receive the data.
 
 ## Beans for injection
 
-You can import the `SftpSupplierConfiguration` in the application and then inject the following bean.
+The `SftpSupplierConfiguration` auto-configuration provides the following bean:
 
 `sftpSupplier`
 
@@ -76,7 +76,7 @@ All configuration properties are prefixed with `sftp.supplier`.
 There are also properties that need to be used with the prefix `file.consumer`.
 
 For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/supplier/sftp/SftpSupplierProperties.java[SftpSupplierProperties].
-Also see link:src/main/java/org/springframework/cloud/fn/supplier/file/FileConsumerProperties.java[FileConsumerProperties].
+Also see `FileConsumerProperties`.
 
 ## Examples
 

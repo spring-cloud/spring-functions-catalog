@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2023 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,13 +20,13 @@ import java.util.function.Consumer;
 
 import org.apache.sshd.sftp.client.SftpClient;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlowBuilder;
 import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.sftp.dsl.Sftp;
 import org.springframework.integration.sftp.dsl.SftpMessageHandlerSpec;
@@ -35,12 +35,12 @@ import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**
- * Configuration for SFTP Consumer.
+ * Auto-configuration for SFTP Consumer.
  *
  * @author Soby Chacko
  * @author Corneil du Plessis
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(SftpConsumerProperties.class)
 @Import(SftpConsumerSessionFactoryConfiguration.class)
 public class SftpConsumerConfiguration {
@@ -49,9 +49,6 @@ public class SftpConsumerConfiguration {
 	public IntegrationFlow ftpOutboundFlow(SftpConsumerProperties properties,
 			SessionFactory<SftpClient.DirEntry> ftpSessionFactory,
 			@Nullable ComponentCustomizer<SftpMessageHandlerSpec> sftpMessageHandlerSpecCustomizer) {
-
-		IntegrationFlowBuilder integrationFlowBuilder = IntegrationFlow.from(MessageConsumer.class,
-				(gateway) -> gateway.beanName("sftpConsumer"));
 
 		SftpMessageHandlerSpec handlerSpec = Sftp
 			.outboundAdapter(new SftpRemoteFileTemplate(ftpSessionFactory), properties.getMode())
@@ -69,10 +66,11 @@ public class SftpConsumerConfiguration {
 			sftpMessageHandlerSpecCustomizer.customize(handlerSpec);
 		}
 
-		return integrationFlowBuilder.handle(handlerSpec).get();
+		return (flow) -> flow.handle(handlerSpec);
 	}
 
-	private interface MessageConsumer extends Consumer<Message<?>> {
+	@MessagingGateway(name = "sftpConsumer", defaultRequestChannel = "ftpOutboundFlow.input")
+	public interface MessageConsumer extends Consumer<Message<?>> {
 
 	}
 

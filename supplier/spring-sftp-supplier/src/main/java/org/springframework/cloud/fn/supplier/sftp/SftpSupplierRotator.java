@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,15 +31,12 @@ import org.springframework.messaging.support.MessageBuilder;
  */
 public class SftpSupplierRotator extends RotatingServerAdvice {
 
-	private static String SFTP_SELECTED_SERVER_PROPERTY_KEY = "sftp_selectedServer";
-
-	private final SftpSupplierProperties properties;
+	private static final String SFTP_SELECTED_SERVER_PROPERTY_KEY = "sftp_selectedServer";
 
 	private final StandardRotationPolicy rotationPolicy;
 
-	public SftpSupplierRotator(SftpSupplierProperties properties, StandardRotationPolicy rotationPolicy) {
+	public SftpSupplierRotator(StandardRotationPolicy rotationPolicy) {
 		super(rotationPolicy);
-		this.properties = properties;
 		this.rotationPolicy = rotationPolicy;
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,26 +20,14 @@ import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.context.properties.ConfigurationPropertiesBinding;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.util.TestPropertyValues;
+import org.springframework.cloud.fn.common.config.SpelExpressionConverterConfiguration;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.expression.EvaluationContext;
-import org.springframework.expression.Expression;
-import org.springframework.expression.ParseException;
-import org.springframework.expression.spel.standard.SpelExpression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.config.EnableIntegration;
-import org.springframework.integration.config.IntegrationConverter;
-import org.springframework.integration.context.IntegrationContextUtils;
 import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.file.support.FileExistsMode;
 import org.springframework.integration.test.util.TestUtils;
@@ -160,49 +148,8 @@ public class SftpConsumerPropertiesTests {
 	@Configuration
 	@EnableConfigurationProperties(SftpConsumerProperties.class)
 	@EnableIntegration
-	@Import(SftpConsumerSessionFactoryConfiguration.class)
+	@Import({ SpelExpressionConverterConfiguration.class, SftpConsumerSessionFactoryConfiguration.class })
 	static class Factory {
-
-		@Bean
-		@ConfigurationPropertiesBinding
-		@IntegrationConverter
-		public Converter<String, Expression> spelConverter() {
-			return new SpelConverter();
-		}
-
-		/**
-		 * TODO: This needs to be refactored into a generic place for any functions to
-		 * use.
-		 *
-		 * A simple converter from String to Expression.
-		 *
-		 * @author Eric Bottard
-		 */
-		public static class SpelConverter implements Converter<String, Expression> {
-
-			private SpelExpressionParser parser = new SpelExpressionParser();
-
-			@Autowired
-			@Qualifier(IntegrationContextUtils.INTEGRATION_EVALUATION_CONTEXT_BEAN_NAME)
-			@Lazy
-			private EvaluationContext evaluationContext;
-
-			@Override
-			public Expression convert(String source) {
-				try {
-					Expression expression = this.parser.parseExpression(source);
-					if (expression instanceof SpelExpression) {
-						((SpelExpression) expression).setEvaluationContext(this.evaluationContext);
-					}
-					return expression;
-				}
-				catch (ParseException e) {
-					throw new IllegalArgumentException(
-							String.format("Could not convert '%s' into a SpEL expression", source), e);
-				}
-			}
-
-		}
 
 	}
 

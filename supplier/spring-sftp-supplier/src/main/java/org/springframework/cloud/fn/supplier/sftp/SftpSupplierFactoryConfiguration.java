@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2022 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
-import org.springframework.integration.context.IntegrationContextUtils;
+import org.springframework.expression.Expression;
 import org.springframework.integration.file.remote.aop.StandardRotationPolicy;
 import org.springframework.integration.file.remote.session.CachingSessionFactory;
 import org.springframework.integration.file.remote.session.DelegatingSessionFactory;
@@ -63,14 +63,15 @@ public class SftpSupplierFactoryConfiguration {
 	@Bean
 	StandardRotationPolicy rotationPolicy(SftpSupplierProperties properties, DelegatingFactoryWrapper factory) {
 
-		return properties.isMultiSource() ? new StandardRotationPolicy(factory.getFactory(),
+		return (properties.isMultiSource()) ? new StandardRotationPolicy(factory.getFactory(),
 				SftpSupplierProperties.keyDirectories(properties), properties.isFair()) : null;
 	}
 
 	@Bean
 	public SftpSupplierRotator rotatingAdvice(SftpSupplierProperties properties,
 			@Nullable StandardRotationPolicy rotationPolicy) {
-		return properties.isMultiSource() ? new SftpSupplierRotator(properties, rotationPolicy) : null;
+
+		return (properties.isMultiSource()) ? new SftpSupplierRotator(rotationPolicy) : null;
 	}
 
 	static SessionFactory<SftpClient.DirEntry> buildFactory(ApplicationContext applicationContext,
@@ -84,9 +85,9 @@ public class SftpSupplierFactoryConfiguration {
 		sftpSessionFactory.setPrivateKey(factory.getPrivateKey());
 		sftpSessionFactory.setPrivateKeyPassphrase(factory.getPassPhrase());
 		sftpSessionFactory.setAllowUnknownKeys(factory.isAllowUnknownKeys());
-		if (factory.getKnownHostsExpression() != null) {
-			String knownHostsLocation = factory.getKnownHostsExpression()
-				.getValue(IntegrationContextUtils.getEvaluationContext(applicationContext), String.class);
+		Expression knownHostsExpression = factory.getKnownHostsExpression();
+		if (knownHostsExpression != null) {
+			String knownHostsLocation = knownHostsExpression.getValue(String.class);
 			Resource knownHostsResource = applicationContext.getResource(knownHostsLocation);
 			sftpSessionFactory.setKnownHostsResource(knownHostsResource);
 		}
@@ -94,7 +95,7 @@ public class SftpSupplierFactoryConfiguration {
 		return new CachingSessionFactory<>(sftpSessionFactory);
 	}
 
-	public final static class DelegatingFactoryWrapper implements DisposableBean {
+	public static final class DelegatingFactoryWrapper implements DisposableBean {
 
 		private final DelegatingSessionFactory<SftpClient.DirEntry> delegatingSessionFactory;
 
@@ -115,12 +116,12 @@ public class SftpSupplierFactoryConfiguration {
 
 		@Override
 		public void destroy() {
-			this.factories.values().forEach(f -> {
-				if (f instanceof DisposableBean) {
+			this.factories.values().forEach((f) -> {
+				if (f instanceof DisposableBean disposableBean) {
 					try {
-						((DisposableBean) f).destroy();
+						disposableBean.destroy();
 					}
-					catch (Exception e) {
+					catch (Exception ex) {
 						// empty
 					}
 				}

@@ -4,7 +4,7 @@ A consumer that allows you to SFTP files.
 
 ## Beans for injection
 
-You can import `SftpConsumerConfiguration` in the application and then inject the following bean.
+The `SftpConsumerConfiguration` auto-configuration provides the following bean:
 
 `Consumer<Message<?>> sftpConsumer`
 

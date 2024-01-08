@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2020 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,6 +40,8 @@ import org.springframework.util.Assert;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The configuration properties for SFTP supplier.
+ *
  * @author Gary Russell
  * @author Artem Bilan
  * @author Chris Schaefer
@@ -153,7 +155,7 @@ public class SftpSupplierProperties {
 
 	@NotBlank
 	public String getRemoteDir() {
-		return remoteDir;
+		return this.remoteDir;
 	}
 
 	public void setRemoteDir(String remoteDir) {
@@ -162,7 +164,7 @@ public class SftpSupplierProperties {
 
 	@NotBlank
 	public String getTmpFileSuffix() {
-		return tmpFileSuffix;
+		return this.tmpFileSuffix;
 	}
 
 	public void setTmpFileSuffix(String tmpFileSuffix) {
@@ -171,7 +173,7 @@ public class SftpSupplierProperties {
 
 	@NotBlank
 	public String getRemoteFileSeparator() {
-		return remoteFileSeparator;
+		return this.remoteFileSeparator;
 	}
 
 	public void setRemoteFileSeparator(String remoteFileSeparator) {
@@ -179,7 +181,7 @@ public class SftpSupplierProperties {
 	}
 
 	public boolean isAutoCreateLocalDir() {
-		return autoCreateLocalDir;
+		return this.autoCreateLocalDir;
 	}
 
 	public void setAutoCreateLocalDir(boolean autoCreateLocalDir) {
@@ -187,7 +189,7 @@ public class SftpSupplierProperties {
 	}
 
 	public boolean isDeleteRemoteFiles() {
-		return deleteRemoteFiles;
+		return this.deleteRemoteFiles;
 	}
 
 	public void setDeleteRemoteFiles(boolean deleteRemoteFiles) {
@@ -195,7 +197,7 @@ public class SftpSupplierProperties {
 	}
 
 	public Expression getRenameRemoteFilesTo() {
-		return renameRemoteFilesTo;
+		return this.renameRemoteFilesTo;
 	}
 
 	public void setRenameRemoteFilesTo(Expression renameRemoteFilesTo) {
@@ -204,7 +206,7 @@ public class SftpSupplierProperties {
 
 	@NotNull
 	public File getLocalDir() {
-		return localDir;
+		return this.localDir;
 	}
 
 	public final void setLocalDir(File localDir) {
@@ -212,7 +214,7 @@ public class SftpSupplierProperties {
 	}
 
 	public String getFilenamePattern() {
-		return filenamePattern;
+		return this.filenamePattern;
 	}
 
 	public void setFilenamePattern(String filenamePattern) {
@@ -220,7 +222,7 @@ public class SftpSupplierProperties {
 	}
 
 	public Pattern getFilenameRegex() {
-		return filenameRegex;
+		return this.filenameRegex;
 	}
 
 	public void setFilenameRegex(Pattern filenameRegex) {
@@ -228,7 +230,7 @@ public class SftpSupplierProperties {
 	}
 
 	public boolean isPreserveTimestamp() {
-		return preserveTimestamp;
+		return this.preserveTimestamp;
 	}
 
 	public void setPreserveTimestamp(boolean preserveTimestamp) {
@@ -241,7 +243,7 @@ public class SftpSupplierProperties {
 	}
 
 	public boolean isListOnly() {
-		return listOnly;
+		return this.listOnly;
 	}
 
 	public void setListOnly(boolean listOnly) {
@@ -253,7 +255,7 @@ public class SftpSupplierProperties {
 	}
 
 	public int getMaxFetch() {
-		return maxFetch;
+		return this.maxFetch;
 	}
 
 	public void setMaxFetch(int maxFetch) {
@@ -285,7 +287,7 @@ public class SftpSupplierProperties {
 	}
 
 	public boolean isStream() {
-		return stream;
+		return this.stream;
 	}
 
 	public void setStream(boolean stream) {
@@ -293,11 +295,11 @@ public class SftpSupplierProperties {
 	}
 
 	public Factory getFactory() {
-		return factory;
+		return this.factory;
 	}
 
 	public Duration getDelayWhenEmpty() {
-		return delayWhenEmpty;
+		return this.delayWhenEmpty;
 	}
 
 	public void setDelayWhenEmpty(Duration delayWhenEmpty) {
@@ -317,7 +319,7 @@ public class SftpSupplierProperties {
 
 	@Valid
 	public SftpSupplierProperties.SortSpec getSortBy() {
-		return sortBy;
+		return this.sortBy;
 	}
 
 	public void setSortBy(SortSpec sortBy) {
@@ -326,7 +328,7 @@ public class SftpSupplierProperties {
 
 	@AssertTrue(message = "deleteRemoteFiles must be 'false' when renameRemoteFilesTo is set")
 	public boolean isRenameRemoteFilesValid() {
-		return renameRemoteFilesTo == null || !deleteRemoteFiles;
+		return this.renameRemoteFilesTo == null || !this.deleteRemoteFiles;
 	}
 
 	public static class Factory {
@@ -456,7 +458,7 @@ public class SftpSupplierProperties {
 
 		@NotNull
 		public Attribute getAttribute() {
-			return attribute;
+			return this.attribute;
 		}
 
 		public void setAttribute(Attribute attribute) {
@@ -465,7 +467,7 @@ public class SftpSupplierProperties {
 
 		@NotNull
 		public Dir getDir() {
-			return dir;
+			return this.dir;
 		}
 
 		public void setDir(Dir dir) {
@@ -506,21 +508,17 @@ public class SftpSupplierProperties {
 		}
 
 		private Comparator<SftpClient.DirEntry> getAttributeComparator() {
-			switch (attribute) {
-				case FILENAME:
-					return Comparator.comparing(SftpClient.DirEntry::getFilename);
-				case ATIME:
-					return Comparator.comparing(x -> x.getAttributes().getAccessTime());
-				case MTIME:
-					return Comparator.comparing(x -> x.getAttributes().getModifyTime());
-			}
+			return switch (this.attribute) {
+				case FILENAME -> Comparator.comparing(SftpClient.DirEntry::getFilename);
+				case ATIME -> Comparator.comparing((x) -> x.getAttributes().getAccessTime());
+				case MTIME -> Comparator.comparing((x) -> x.getAttributes().getModifyTime());
+			};
 
-			throw new UnsupportedOperationException("Unsupported sortBy attribute: " + attribute);
 		}
 
 		public Comparator<SftpClient.DirEntry> comparator() {
 			Comparator<SftpClient.DirEntry> comparator = getAttributeComparator();
-			return dir == Dir.ASC ? comparator : comparator.reversed();
+			return (this.dir == Dir.ASC) ? comparator : comparator.reversed();
 		}
 
 	}

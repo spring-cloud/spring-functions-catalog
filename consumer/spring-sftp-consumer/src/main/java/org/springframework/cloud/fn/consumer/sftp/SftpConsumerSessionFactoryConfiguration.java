@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2022 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.io.Resource;
-import org.springframework.integration.context.IntegrationContextUtils;
+import org.springframework.expression.Expression;
 import org.springframework.integration.file.remote.session.CachingSessionFactory;
 import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.sftp.session.DefaultSftpSessionFactory;
@@ -51,9 +51,9 @@ public class SftpConsumerSessionFactoryConfiguration {
 		sftpSessionFactory.setPrivateKey(factory.getPrivateKey());
 		sftpSessionFactory.setPrivateKeyPassphrase(factory.getPassPhrase());
 		sftpSessionFactory.setAllowUnknownKeys(factory.isAllowUnknownKeys());
-		if (factory.getKnownHostsExpression() != null) {
-			String knownHostsLocation = factory.getKnownHostsExpression()
-				.getValue(IntegrationContextUtils.getEvaluationContext(applicationContext), String.class);
+		Expression knownHostsExpression = factory.getKnownHostsExpression();
+		if (knownHostsExpression != null) {
+			String knownHostsLocation = knownHostsExpression.getValue(String.class);
 			Resource knownHostsResource = applicationContext.getResource(knownHostsLocation);
 			sftpSessionFactory.setKnownHostsResource(knownHostsResource);
 		}

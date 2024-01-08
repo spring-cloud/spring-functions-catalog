@@ -1,5 +1,5 @@
 /*
- * Copyright 2018-2023 the original author or authors.
+ * Copyright 2018-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@ import java.util.stream.Stream;
 import org.apache.sshd.sftp.client.SftpClient;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.MonoProcessor;
 import reactor.util.context.Context;
 
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.aop.support.NameMatchMethodPointcutAdvisor;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -40,6 +40,7 @@ import org.springframework.cloud.fn.common.file.FileConsumerProperties;
 import org.springframework.cloud.fn.common.file.FileUtils;
 import org.springframework.cloud.fn.common.file.remote.RemoteFileDeletingAdvice;
 import org.springframework.cloud.fn.common.file.remote.RemoteFileRenamingAdvice;
+import org.springframework.context.Lifecycle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -61,8 +62,8 @@ import org.springframework.integration.handler.MessageProcessor;
 import org.springframework.integration.metadata.ConcurrentMetadataStore;
 import org.springframework.integration.sftp.dsl.Sftp;
 import org.springframework.integration.sftp.dsl.SftpInboundChannelAdapterSpec;
-import org.springframework.integration.sftp.dsl.SftpStreamingInboundChannelAdapterSpec;
 import org.springframework.integration.sftp.dsl.SftpOutboundGatewaySpec;
+import org.springframework.integration.sftp.dsl.SftpStreamingInboundChannelAdapterSpec;
 import org.springframework.integration.sftp.filters.SftpPersistentAcceptOnceFileListFilter;
 import org.springframework.integration.sftp.filters.SftpRegexPatternFileListFilter;
 import org.springframework.integration.sftp.filters.SftpSimplePatternFileListFilter;
@@ -70,7 +71,6 @@ import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.integration.util.IntegrationReactiveUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.MessagingException;
@@ -80,6 +80,8 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
+ * The auto-configuration for SFTP supplier.
+ *
  * @author Gary Russell
  * @author Artem Bilan
  * @author Chris Schaefer
@@ -88,7 +90,7 @@ import org.springframework.util.StringUtils;
  * @author Corneil du Plessis
  */
 
-@Configuration
+@AutoConfiguration
 @EnableConfigurationProperties({ SftpSupplierProperties.class, FileConsumerProperties.class })
 @Import({ SftpSupplierFactoryConfiguration.class })
 public class SftpSupplierConfiguration {
@@ -98,20 +100,17 @@ public class SftpSupplierConfiguration {
 	private static final String FILE_MODIFIED_TIME_HEADER = "FILE_MODIFIED_TIME";
 
 	@Bean
-	public MonoProcessor<Boolean> subscriptionBarrier() {
-		return MonoProcessor.create();
-	}
-
-	@Bean
 	public Supplier<Flux<? extends Message<?>>> sftpSupplier(MessageSource<?> sftpMessageSource,
-			@Nullable Publisher<Message<Object>> sftpReadingFlow, MonoProcessor<Boolean> subscriptionBarrier,
-			SftpSupplierProperties sftpSupplierProperties) {
+			@Nullable Publisher<Message<Object>> sftpReadingFlow, SftpSupplierProperties sftpSupplierProperties) {
 
-		Flux<? extends Message<?>> flux = sftpReadingFlow == null
-				? sftpMessageFlux(sftpMessageSource, sftpSupplierProperties, subscriptionBarrier)
-				: Flux.from(sftpReadingFlow);
+		Flux<? extends Message<?>> flux = (sftpReadingFlow != null) ? Flux.from(sftpReadingFlow)
+				: sftpMessageFlux(sftpMessageSource, sftpSupplierProperties);
 
-		return () -> flux.doOnRequest(l -> subscriptionBarrier.onNext(true));
+		return () -> flux.doOnSubscribe((sub) -> {
+			if (sftpMessageSource instanceof Lifecycle lifecycle) {
+				lifecycle.start();
+			}
+		});
 	}
 
 	@Bean
@@ -126,7 +125,7 @@ public class SftpSupplierConfiguration {
 		ProxyFactoryBean proxyFactoryBean = new ProxyFactoryBean();
 		proxyFactoryBean.setTarget(messageSource);
 		proxyFactoryBean.setBeanFactory(beanFactory);
-		receiveMessageAdvice.stream().map(advice -> {
+		receiveMessageAdvice.stream().map((advice) -> {
 			NameMatchMethodPointcutAdvisor advisor = new NameMatchMethodPointcutAdvisor(advice);
 			advisor.addMethodName("receive");
 			return advisor;
@@ -159,37 +158,39 @@ public class SftpSupplierConfiguration {
 	 * Create a Flux from a MessageSource that will be used by the supplier.
 	 */
 	private Flux<? extends Message<?>> sftpMessageFlux(MessageSource<?> sftpMessageSource,
-			SftpSupplierProperties sftpSupplierProperties, MonoProcessor<?> subscriptionBarrier) {
+			SftpSupplierProperties sftpSupplierProperties) {
 
 		return IntegrationReactiveUtils.messageSourceToFlux(sftpMessageSource)
-			.delaySubscription(subscriptionBarrier)
 			.contextWrite(Context.of(IntegrationReactiveUtils.DELAY_WHEN_EMPTY_KEY,
 					sftpSupplierProperties.getDelayWhenEmpty()));
 
 	}
 
 	private static String remoteDirectory(SftpSupplierProperties sftpSupplierProperties) {
-		return sftpSupplierProperties.isMultiSource()
+		return (sftpSupplierProperties.isMultiSource())
 				? SftpSupplierProperties.keyDirectories(sftpSupplierProperties).get(0).getDirectory()
 				: sftpSupplierProperties.getRemoteDir();
 	}
 
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnProperty(prefix = "sftp.supplier", name = "stream")
 	static class StreamingConfiguration {
 
 		@Bean
-		public SftpRemoteFileTemplate sftpTemplate(SftpSupplierFactoryConfiguration.DelegatingFactoryWrapper wrapper) {
+		SftpRemoteFileTemplate sftpTemplate(SftpSupplierFactoryConfiguration.DelegatingFactoryWrapper wrapper) {
 			return new SftpRemoteFileTemplate(wrapper.getFactory());
 		}
 
 		/**
 		 * Streaming {@link MessageSource} that provides an InputStream for each remote
 		 * file. It does not synchronize files to a local directory.
+		 * @param sftpTemplate the {@link SftpRemoteFileTemplate} to use.
+		 * @param sftpSupplierProperties the {@link SftpSupplierProperties} to use.
+		 * @param fileListFilter the {@link FileListFilter} to use.
 		 * @return a {@link MessageSource}.
 		 */
 		@Bean
-		public SftpStreamingInboundChannelAdapterSpec targetMessageSource(SftpRemoteFileTemplate sftpTemplate,
+		SftpStreamingInboundChannelAdapterSpec targetMessageSource(SftpRemoteFileTemplate sftpTemplate,
 				SftpSupplierProperties sftpSupplierProperties, FileListFilter<SftpClient.DirEntry> fileListFilter) {
 
 			return Sftp.inboundStreamingAdapter(sftpTemplate)
@@ -200,23 +201,21 @@ public class SftpSupplierConfiguration {
 		}
 
 		@Bean
-		public Publisher<Message<Object>> sftpReadingFlow(MessageSource<?> sftpMessageSource,
-				MonoProcessor<?> subscriptionBarrier, SftpSupplierProperties sftpSupplierProperties,
-				FileConsumerProperties fileConsumerProperties) {
+		Publisher<Message<Object>> sftpReadingFlow(MessageSource<?> sftpMessageSource,
+				SftpSupplierProperties sftpSupplierProperties, FileConsumerProperties fileConsumerProperties) {
 
 			return FileUtils
 				.enhanceStreamFlowForReadingMode(
 						IntegrationFlow.from(IntegrationReactiveUtils.messageSourceToFlux(sftpMessageSource)
-							.delaySubscription(subscriptionBarrier)
 							.contextWrite(Context.of(IntegrationReactiveUtils.DELAY_WHEN_EMPTY_KEY,
 									sftpSupplierProperties.getDelayWhenEmpty()))),
 						fileConsumerProperties)
-				.toReactivePublisher();
+				.toReactivePublisher(true);
 		}
 
 		@Bean
 		@ConditionalOnProperty(prefix = "sftp.supplier", value = "delete-remote-files")
-		public RemoteFileDeletingAdvice remoteFileDeletingAdvice(SftpRemoteFileTemplate sftpTemplate,
+		RemoteFileDeletingAdvice remoteFileDeletingAdvice(SftpRemoteFileTemplate sftpTemplate,
 				SftpSupplierProperties sftpSupplierProperties) {
 
 			return new RemoteFileDeletingAdvice(sftpTemplate, sftpSupplierProperties.getRemoteFileSeparator());
@@ -224,7 +223,7 @@ public class SftpSupplierConfiguration {
 
 		@Bean
 		@ConditionalOnProperty(prefix = "sftp.supplier", value = "rename-remote-files-to")
-		public RemoteFileRenamingAdvice remoteFileRenamingAdvice(SftpRemoteFileTemplate sftpTemplate,
+		RemoteFileRenamingAdvice remoteFileRenamingAdvice(SftpRemoteFileTemplate sftpTemplate,
 				SftpSupplierProperties sftpSupplierProperties) {
 
 			return new RemoteFileRenamingAdvice(sftpTemplate, sftpSupplierProperties.getRemoteFileSeparator(),
@@ -233,46 +232,50 @@ public class SftpSupplierConfiguration {
 
 	}
 
-	@Configuration
-	@ConditionalOnExpression("environment['sftp.supplier.stream']!='true'")
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnExpression("environment['sftp.supplier.stream'] != 'true'")
 	static class NonStreamingConfiguration {
 
 		/**
 		 * Enrich the flow to provide some standard headers, depending on
 		 * {@link FileConsumerProperties}, when consuming file contents.
 		 * @param sftpMessageSource the {@link MessageSource}.
-		 * @param fileConsumerProperties the {@code FileConsumerProperties}.
+		 * @param sftpSupplierProperties the {@link SftpSupplierProperties} to use.
+		 * @param fileConsumerProperties the {@link FileConsumerProperties}.
+		 * @param renameRemoteFileHandler the {@link MessageHandler} for SFTP protocol.
 		 * @return a {@code Publisher<Message>}.
 		 */
 		@Bean
 		@ConditionalOnExpression("environment['file.consumer.mode']!='ref' && environment['sftp.supplier.list-only']!='true'")
-		public Publisher<Message<Object>> sftpReadingFlow(MessageSource<?> sftpMessageSource,
-				MonoProcessor<?> subscriptionBarrier, SftpSupplierProperties sftpSupplierProperties,
-				FileConsumerProperties fileConsumerProperties,
+		Publisher<Message<Object>> sftpReadingFlow(MessageSource<?> sftpMessageSource,
+				SftpSupplierProperties sftpSupplierProperties, FileConsumerProperties fileConsumerProperties,
 				@Nullable @Qualifier("renameRemoteFileHandler") MessageHandler renameRemoteFileHandler) {
 
 			IntegrationFlowBuilder flowBuilder = FileUtils.enhanceFlowForReadingMode(
 					IntegrationFlow.from(IntegrationReactiveUtils.messageSourceToFlux(sftpMessageSource)
-						.delaySubscription(subscriptionBarrier)
 						.contextWrite(Context.of(IntegrationReactiveUtils.DELAY_WHEN_EMPTY_KEY,
 								sftpSupplierProperties.getDelayWhenEmpty()))),
 					fileConsumerProperties);
 
 			if (renameRemoteFileHandler != null) {
-				flowBuilder.publishSubscribeChannel(
-						pubsub -> pubsub.subscribe(subFlow -> subFlow.handle(renameRemoteFileHandler).nullChannel()));
+				flowBuilder.publishSubscribeChannel((pubsub) -> pubsub
+					.subscribe((subFlow) -> subFlow.handle(renameRemoteFileHandler).nullChannel()));
 			}
 
-			return flowBuilder.toReactivePublisher();
+			return flowBuilder.toReactivePublisher(true);
 		}
 
 		/**
 		 * A {@link MessageSource} that synchronizes files to a local directory.
+		 * @param sftpSupplierProperties the properties.
+		 * @param delegatingFactoryWrapper the
+		 * {@link SftpSupplierFactoryConfiguration.DelegatingFactoryWrapper} to use.
+		 * @param fileListFilter the {@link FileListFilter} to use.
 		 * @return the {code MessageSource}.
 		 */
 		@ConditionalOnExpression("environment['sftp.supplier.list-only'] != 'true'")
 		@Bean
-		public SftpInboundChannelAdapterSpec targetMessageSource(SftpSupplierProperties sftpSupplierProperties,
+		SftpInboundChannelAdapterSpec targetMessageSource(SftpSupplierProperties sftpSupplierProperties,
 				SftpSupplierFactoryConfiguration.DelegatingFactoryWrapper delegatingFactoryWrapper,
 				FileListFilter<SftpClient.DirEntry> fileListFilter) {
 
@@ -291,7 +294,7 @@ public class SftpSupplierConfiguration {
 
 		@Bean
 		@ConditionalOnProperty(prefix = "sftp.supplier", value = "rename-remote-files-to")
-		public SftpOutboundGatewaySpec renameRemoteFileHandler(
+		SftpOutboundGatewaySpec renameRemoteFileHandler(
 				SftpSupplierFactoryConfiguration.DelegatingFactoryWrapper delegatingFactoryWrapper,
 				SftpSupplierProperties sftpSupplierProperties) {
 
@@ -308,28 +311,24 @@ public class SftpSupplierConfiguration {
 	/*
 	 * List only configuration
 	 */
-	@Configuration
+	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnProperty(prefix = "sftp.supplier", name = "list-only")
 	static class ListingOnlyConfiguration {
 
-		@Bean
-		PollableChannel listingChannel() {
-			return new QueueChannel();
-		}
+		private final PollableChannel listingChannel = new QueueChannel();
 
 		@Bean
 		@SuppressWarnings("unchecked")
-		public MessageSource<?> targetMessageSource(PollableChannel listingChannel,
-				SftpListingMessageProducer sftpListingMessageProducer) {
+		MessageSource<?> targetMessageSource(SftpListingMessageProducer sftpListingMessageProducer) {
 			return () -> {
 				sftpListingMessageProducer.listNames();
-				return (Message<Object>) listingChannel.receive();
+				return (Message<Object>) this.listingChannel.receive();
 			};
 
 		}
 
 		@Bean
-		public SftpListingMessageProducer sftpListingMessageProducer(SftpSupplierProperties sftpSupplierProperties,
+		SftpListingMessageProducer sftpListingMessageProducer(SftpSupplierProperties sftpSupplierProperties,
 				SftpSupplierFactoryConfiguration.DelegatingFactoryWrapper delegatingFactoryWrapper) {
 
 			return new SftpListingMessageProducer(delegatingFactoryWrapper.getFactory(),
@@ -339,7 +338,7 @@ public class SftpSupplierConfiguration {
 
 		@Bean
 		GenericSelector<String> listOnlyFilter(SftpSupplierProperties sftpSupplierProperties) {
-			Predicate<String> predicate = s -> true;
+			Predicate<String> predicate = (s) -> true;
 			if (StringUtils.hasText(sftpSupplierProperties.getFilenamePattern())) {
 				predicate = Pattern.compile(sftpSupplierProperties.getFilenamePattern()).asPredicate();
 			}
@@ -351,7 +350,7 @@ public class SftpSupplierConfiguration {
 		}
 
 		@Bean
-		public IntegrationFlow listingFlow(MessageProducerSupport listingMessageProducer, MessageChannel listingChannel,
+		IntegrationFlow listingFlow(MessageProducerSupport listingMessageProducer,
 				MessageProcessor<?> lsEntryToStringTransformer, GenericSelector<Message<?>> duplicateFilter,
 				GenericSelector<String> listOnlyFilter) {
 
@@ -360,14 +359,13 @@ public class SftpSupplierConfiguration {
 				.transform(lsEntryToStringTransformer)
 				.filter(duplicateFilter)
 				.filter(listOnlyFilter)
-				.channel(listingChannel)
+				.channel(this.listingChannel)
 				.get();
 		}
 
 		@Bean
-		public MessageProcessor<Message<?>> lsEntryToStringTransformer() {
+		MessageProcessor<Message<?>> lsEntryToStringTransformer() {
 			return (Message<?> message) -> {
-
 				SftpClient.DirEntry dirEntry = (SftpClient.DirEntry) message.getPayload();
 
 				String fileName = message.getHeaders().get(FileHeaders.REMOTE_DIRECTORY) + dirEntry.getFilename();
@@ -383,6 +381,7 @@ public class SftpSupplierConfiguration {
 
 		@Bean
 		GenericSelector<Message<?>> duplicateFilter(ConcurrentMetadataStore metadataStore) {
+			// Must be a specific type
 			return new GenericSelector<Message<?>>() {
 				@Override
 				public boolean accept(Message<?> message) {
@@ -420,18 +419,18 @@ public class SftpSupplierConfiguration {
 				this.sort = sort;
 			}
 
-			public void listNames() {
+			void listNames() {
 				Stream<SftpClient.DirEntry> stream;
 				try {
 					stream = Stream.of(this.sessionFactory.getSession().list(this.remoteDirectory))
-						.filter(x -> !(x.getAttributes().isDirectory() || x.getAttributes().isSymbolicLink()));
+						.filter((x) -> !(x.getAttributes().isDirectory() || x.getAttributes().isSymbolicLink()));
 
-					if (sort != null) {
-						stream = stream.sorted(sort.comparator());
+					if (this.sort != null) {
+						stream = stream.sorted(this.sort.comparator());
 					}
 				}
-				catch (IOException e) {
-					throw new MessagingException(e.getMessage(), e);
+				catch (IOException ex) {
+					throw new MessagingException(ex.getMessage(), ex);
 				}
 				sendMessage(MessageBuilder.withPayload(stream)
 					.setHeader(FileHeaders.REMOTE_DIRECTORY, this.remoteDirectory + this.remoteFileSeparator)

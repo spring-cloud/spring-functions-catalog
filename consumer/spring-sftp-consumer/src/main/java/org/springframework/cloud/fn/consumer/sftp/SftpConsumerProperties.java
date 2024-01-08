@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,6 +27,8 @@ import org.springframework.integration.file.support.FileExistsMode;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The configuration properties for SFTP consumer.
+ *
  * @author Gary Russell
  * @author Artem Bilan
  * @author Corneil du Plessis
@@ -122,7 +124,7 @@ public class SftpConsumerProperties {
 
 	@NotBlank
 	public String getRemoteDir() {
-		return remoteDir;
+		return this.remoteDir;
 	}
 
 	public final void setRemoteDir(String remoteDir) {
@@ -131,7 +133,7 @@ public class SftpConsumerProperties {
 
 	@NotBlank
 	public String getTmpFileSuffix() {
-		return tmpFileSuffix;
+		return this.tmpFileSuffix;
 	}
 
 	public void setTmpFileSuffix(String tmpFileSuffix) {
@@ -140,7 +142,7 @@ public class SftpConsumerProperties {
 
 	@NotBlank
 	public String getRemoteFileSeparator() {
-		return remoteFileSeparator;
+		return this.remoteFileSeparator;
 	}
 
 	public void setRemoteFileSeparator(String remoteFileSeparator) {
