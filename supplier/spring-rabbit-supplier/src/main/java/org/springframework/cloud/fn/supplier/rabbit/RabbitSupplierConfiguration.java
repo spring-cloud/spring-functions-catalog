@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,14 +38,15 @@ import org.springframework.amqp.rabbit.support.MessagePropertiesConverter;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.CachingConnectionFactoryConfigurer;
 import org.springframework.boot.autoconfigure.amqp.ConnectionFactoryCustomizer;
+import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.RabbitConnectionFactoryBeanConfigurer;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.integration.amqp.dsl.Amqp;
 import org.springframework.integration.amqp.dsl.AmqpInboundChannelAdapterSMLCSpec;
@@ -56,7 +57,7 @@ import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.util.Assert;
 
 /**
- * A source module that receives data from RabbitMQ.
+ * Auto-configuration for supplier that receives data from RabbitMQ.
  *
  * @author Gary Russell
  * @author Chris Schaefer
@@ -64,11 +65,11 @@ import org.springframework.util.Assert;
  * @author Chris Bono
  * @author Artem Bilan
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration(after = RabbitAutoConfiguration.class)
 @EnableConfigurationProperties(RabbitSupplierProperties.class)
 public class RabbitSupplierConfiguration implements DisposableBean {
 
-	private static final MessagePropertiesConverter inboundMessagePropertiesConverter = new DefaultMessagePropertiesConverter() {
+	private static final MessagePropertiesConverter INBOUND_MESSAGE_PROPERTIES_CONVERTER = new DefaultMessagePropertiesConverter() {
 
 		@Override
 		public MessageProperties toMessageProperties(AMQP.BasicProperties source, Envelope envelope, String charset) {
@@ -105,7 +106,7 @@ public class RabbitSupplierConfiguration implements DisposableBean {
 
 	@Bean
 	public SimpleMessageListenerContainer container(RetryOperationsInterceptor rabbitSourceRetryInterceptor) {
-		ConnectionFactory connectionFactory = this.properties.isOwnConnection() ? buildLocalConnectionFactory()
+		ConnectionFactory connectionFactory = (this.properties.isOwnConnection()) ? buildLocalConnectionFactory()
 				: this.rabbitConnectionFactory;
 		SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(connectionFactory);
 		container.setAutoStartup(false);
@@ -140,7 +141,7 @@ public class RabbitSupplierConfiguration implements DisposableBean {
 		if (this.properties.isEnableRetry()) {
 			container.setAdviceChain(rabbitSourceRetryInterceptor);
 		}
-		container.setMessagePropertiesConverter(inboundMessagePropertiesConverter);
+		container.setMessagePropertiesConverter(INBOUND_MESSAGE_PROPERTIES_CONVERTER);
 		return container;
 	}
 
@@ -149,7 +150,7 @@ public class RabbitSupplierConfiguration implements DisposableBean {
 			@Nullable ComponentCustomizer<AmqpInboundChannelAdapterSMLCSpec> amqpMessageProducerCustomizer) {
 
 		AmqpInboundChannelAdapterSMLCSpec messageProducerSpec = Amqp.inboundAdapter(container)
-			.mappedRequestHeaders(properties.getMappedRequestHeaders());
+			.mappedRequestHeaders(this.properties.getMappedRequestHeaders());
 
 		if (amqpMessageProducerCustomizer != null) {
 			amqpMessageProducerCustomizer.customize(messageProducerSpec);
@@ -220,7 +221,7 @@ public class RabbitSupplierConfiguration implements DisposableBean {
 		CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(connectionFactory);
 		CachingConnectionFactoryConfigurer cachingConnectionFactoryConfigurer = new CachingConnectionFactoryConfigurer(
 				properties);
-		cachingConnectionFactoryConfigurer.setConnectionNameStrategy(cf -> "rabbit.supplier.own.connection");
+		cachingConnectionFactoryConfigurer.setConnectionNameStrategy((cf) -> "rabbit.supplier.own.connection");
 		cachingConnectionFactoryConfigurer.configure(cachingConnectionFactory);
 		cachingConnectionFactory.afterPropertiesSet();
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package org.springframework.cloud.fn.consumer.rabbit;
 
-import java.util.function.Function;
+import java.util.function.Consumer;
 
 import com.rabbitmq.client.impl.CredentialsProvider;
 import com.rabbitmq.client.impl.CredentialsRefreshService;
@@ -33,15 +33,16 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.CachingConnectionFactoryConfigurer;
 import org.springframework.boot.autoconfigure.amqp.ConnectionFactoryCustomizer;
+import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.RabbitConnectionFactoryBeanConfigurer;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.expression.Expression;
 import org.springframework.integration.amqp.dsl.Amqp;
@@ -51,7 +52,7 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 
 /**
- * A configuration for RabbitMQ Consumer function. Uses a
+ * Auto-configuration for RabbitMQ Consumer function. Uses a
  * {@link AmqpOutboundChannelAdapterSpec} to save payload contents to RabbitMQ.
  *
  * @author Soby Chako
@@ -59,7 +60,7 @@ import org.springframework.messaging.MessageHandler;
  * @author Chris Bono
  */
 @EnableConfigurationProperties(RabbitConsumerProperties.class)
-@Configuration
+@AutoConfiguration(after = RabbitAutoConfiguration.class)
 public class RabbitConsumerConfiguration implements DisposableBean {
 
 	@Autowired
@@ -86,11 +87,8 @@ public class RabbitConsumerConfiguration implements DisposableBean {
 	private CachingConnectionFactory ownConnectionFactory;
 
 	@Bean
-	public Function<Message<?>, Object> rabbitConsumer(@Qualifier("amqpChannelAdapter") MessageHandler messageHandler) {
-		return o -> {
-			messageHandler.handleMessage(o);
-			return "";
-		};
+	public Consumer<Message<?>> rabbitConsumer(@Qualifier("amqpChannelAdapter") MessageHandler messageHandler) {
+		return messageHandler::handleMessage;
 	}
 
 	@Bean
@@ -100,9 +98,9 @@ public class RabbitConsumerConfiguration implements DisposableBean {
 
 		AmqpOutboundChannelAdapterSpec handler = Amqp
 			.outboundAdapter(rabbitTemplate(
-					this.properties.isOwnConnection() ? buildLocalConnectionFactory() : rabbitConnectionFactory))
-			.mappedRequestHeaders(properties.getMappedRequestHeaders())
-			.defaultDeliveryMode(properties.getPersistentDeliveryMode() ? MessageDeliveryMode.PERSISTENT
+					(this.properties.isOwnConnection()) ? buildLocalConnectionFactory() : rabbitConnectionFactory))
+			.mappedRequestHeaders(this.properties.getMappedRequestHeaders())
+			.defaultDeliveryMode((this.properties.getPersistentDeliveryMode()) ? MessageDeliveryMode.PERSISTENT
 					: MessageDeliveryMode.NON_PERSISTENT)
 			.headersMappedLast(this.properties.isHeadersMappedLast());
 
@@ -129,8 +127,7 @@ public class RabbitConsumerConfiguration implements DisposableBean {
 		return handler;
 	}
 
-	@Bean
-	public RabbitTemplate rabbitTemplate(ConnectionFactory rabbitConnectionFactory) {
+	private RabbitTemplate rabbitTemplate(ConnectionFactory rabbitConnectionFactory) {
 		RabbitTemplate rabbitTemplate = new RabbitTemplate(rabbitConnectionFactory);
 		if (this.messageConverter != null) {
 			rabbitTemplate.setMessageConverter(this.messageConverter);
@@ -184,7 +181,7 @@ public class RabbitConsumerConfiguration implements DisposableBean {
 		CachingConnectionFactory cachingConnectionFactory = new CachingConnectionFactory(connectionFactory);
 		CachingConnectionFactoryConfigurer cachingConnectionFactoryConfigurer = new CachingConnectionFactoryConfigurer(
 				properties);
-		cachingConnectionFactoryConfigurer.setConnectionNameStrategy(cf -> "rabbit.sink.own.connection");
+		cachingConnectionFactoryConfigurer.setConnectionNameStrategy((cf) -> "rabbit.sink.own.connection");
 		cachingConnectionFactoryConfigurer.configure(cachingConnectionFactory);
 		cachingConnectionFactory.afterPropertiesSet();
 

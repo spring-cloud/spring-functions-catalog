@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,11 @@ import jakarta.validation.constraints.Size;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
+/**
+ * The RabbitMQ supplier configuration properties.
+ *
+ * @author Gary Russell
+ */
 @ConfigurationProperties("rabbit.supplier")
 @Validated
 public class RabbitSupplierProperties {
@@ -77,7 +82,7 @@ public class RabbitSupplierProperties {
 	private boolean ownConnection;
 
 	public boolean getRequeue() {
-		return requeue;
+		return this.requeue;
 	}
 
 	public void setRequeue(boolean requeue) {
@@ -85,7 +90,7 @@ public class RabbitSupplierProperties {
 	}
 
 	public boolean getTransacted() {
-		return transacted;
+		return this.transacted;
 	}
 
 	public void setTransacted(boolean transacted) {
@@ -95,7 +100,7 @@ public class RabbitSupplierProperties {
 	@NotNull(message = "queue(s) are required")
 	@Size(min = 1, message = "At least one queue is required")
 	public String[] getQueues() {
-		return queues;
+		return this.queues;
 	}
 
 	public void setQueues(String[] queues) {
@@ -104,7 +109,7 @@ public class RabbitSupplierProperties {
 
 	@NotNull
 	public String[] getMappedRequestHeaders() {
-		return mappedRequestHeaders;
+		return this.mappedRequestHeaders;
 	}
 
 	public void setMappedRequestHeaders(String[] mappedRequestHeaders) {
@@ -112,7 +117,7 @@ public class RabbitSupplierProperties {
 	}
 
 	public int getInitialRetryInterval() {
-		return initialRetryInterval;
+		return this.initialRetryInterval;
 	}
 
 	public void setInitialRetryInterval(int initialRetryInterval) {
@@ -120,7 +125,7 @@ public class RabbitSupplierProperties {
 	}
 
 	public int getMaxRetryInterval() {
-		return maxRetryInterval;
+		return this.maxRetryInterval;
 	}
 
 	public void setMaxRetryInterval(int maxRetryInterval) {
@@ -128,7 +133,7 @@ public class RabbitSupplierProperties {
 	}
 
 	public double getRetryMultiplier() {
-		return retryMultiplier;
+		return this.retryMultiplier;
 	}
 
 	public void setRetryMultiplier(double retryMultiplier) {
@@ -136,7 +141,7 @@ public class RabbitSupplierProperties {
 	}
 
 	public int getMaxAttempts() {
-		return maxAttempts;
+		return this.maxAttempts;
 	}
 
 	public void setMaxAttempts(int maxAttempts) {
@@ -144,7 +149,7 @@ public class RabbitSupplierProperties {
 	}
 
 	public boolean isEnableRetry() {
-		return enableRetry;
+		return this.enableRetry;
 	}
 
 	public void setEnableRetry(boolean enableRetry) {

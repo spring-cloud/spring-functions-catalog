@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
 import org.springframework.validation.annotation.Validated;
 
-@ConfigurationProperties("rabbit")
+/**
+ * Configuration properties for RabbitMQ consumer.
+ *
+ * @author Soby Chacko
+ */
+@ConfigurationProperties("rabbit.consumer")
 @Validated
 public class RabbitConsumerProperties {
 
@@ -76,7 +81,7 @@ public class RabbitConsumerProperties {
 
 	/**
 	 * When mapping headers for the outbound message, determine whether the headers are
-	 * mapped before the message is converted, or afterwards.
+	 * mapped before the message is converted, or afterward.
 	 */
 	private boolean headersMappedLast = true;
 
