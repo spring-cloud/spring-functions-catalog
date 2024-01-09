@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,8 +33,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -43,14 +42,9 @@ import static org.awaitility.Awaitility.await;
  * @author David Turanski
  * @author Chris Bono
  */
-@SpringBootTest(properties = { "mongodb.consumer.collection=testing" })
+@SpringBootTest(properties = "mongodb.consumer.collection=testing")
+@DirtiesContext
 class MongoDbConsumerApplicationTests implements MongoDbTestContainerSupport {
-
-	@DynamicPropertySource
-	static void mongoDbProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.data.mongodb.port", MONGO_CONTAINER::getFirstMappedPort);
-		registry.add("spring.data.mongodb.database", () -> "test");
-	}
 
 	@Autowired
 	private MongoDbConsumerProperties properties;
@@ -73,28 +67,26 @@ class MongoDbConsumerApplicationTests implements MongoDbTestContainerSupport {
 		Flux<Message<?>> messages = Flux.just(new GenericMessage<>(data1), new GenericMessage<>(data2),
 				new GenericMessage<>("{\"my_data\": \"THE DATA\"}"));
 
-		messages.map(message -> {
+		messages.map((message) -> {
 			mongodbConsumer.accept(message);
 			return message;
 
 		}).subscribe();
 
 		await().timeout(Duration.ofSeconds(10))
-			.until(() -> mongoTemplate.findAll(Document.class, properties.getCollection()).count().block() == 3L);
+			.untilAsserted(
+					() -> assertThat(mongoTemplate.findAll(Document.class, properties.getCollection()).count().block())
+						.isEqualTo(3L));
 
 		StepVerifier
 			.create(this.mongoTemplate.findAll(Document.class, properties.getCollection())
-				.sort(Comparator.comparing(d -> d.get("_id").toString())))
-			.assertNext(document -> {
-				assertThat(document.get("foo")).isEqualTo("bar");
-			})
-			.assertNext(document -> {
+				.sort(Comparator.comparing((d) -> d.get("_id").toString())))
+			.assertNext((document) -> assertThat(document.get("foo")).isEqualTo("bar"))
+			.assertNext((document) -> {
 				assertThat(document.get("firstName")).isEqualTo("Foo");
 				assertThat(document.get("lastName")).isEqualTo("Bar");
 			})
-			.assertNext(document -> {
-				assertThat(document.get("my_data")).isEqualTo("THE DATA");
-			})
+			.assertNext((document) -> assertThat(document.get("my_data")).isEqualTo("THE DATA"))
 			.verifyComplete();
 	}
 

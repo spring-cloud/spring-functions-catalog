@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,26 +24,27 @@ import javax.sql.DataSource;
 
 import reactor.core.publisher.Flux;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.cloud.fn.splitter.SplitterFunctionConfiguration;
 import org.springframework.cloud.function.context.PollableBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.jdbc.JdbcPollingChannelAdapter;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**
+ * JDBC supplier auto-configuration.
+ *
  * @author Soby Chacko
  * @author Artem Bilan
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration(after = { DataSourceAutoConfiguration.class, SplitterFunctionConfiguration.class })
 @EnableConfigurationProperties(JdbcSupplierProperties.class)
-@Import(SplitterFunctionConfiguration.class)
 public class JdbcSupplierConfiguration {
 
 	private final JdbcSupplierProperties properties;
@@ -74,12 +75,12 @@ public class JdbcSupplierConfiguration {
 	@ConditionalOnProperty(prefix = "jdbc.supplier", name = "split", matchIfMissing = true)
 	public Supplier<Flux<Message<?>>> splittedSupplier(MessageSource<Object> jdbcMessageSource,
 			Function<Message<?>, List<Message<?>>> splitterFunction) {
+
 		return () -> {
 			Message<?> received = jdbcMessageSource.receive();
 			if (received != null) {
-				return Flux.fromIterable(splitterFunction.apply(received)); // multiple
-																			// Message<Map<String,
-																			// Object>>
+				// multiple Message<Map<String, Object>>
+				return Flux.fromIterable(splitterFunction.apply(received));
 			}
 			else {
 				return Flux.empty();

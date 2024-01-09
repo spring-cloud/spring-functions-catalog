@@ -1,5 +1,5 @@
 /*
- * Copyright 2022-2022 the original author or authors.
+ * Copyright 2022-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,12 @@
 
 package org.springframework.cloud.fn.consumer.mongo;
 
-import java.time.Duration;
-
 import org.junit.jupiter.api.BeforeAll;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
+
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 
 /**
  * Provides a static {@link MongoDBContainer} that can be shared across test classes.
@@ -30,12 +31,17 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers(disabledWithoutDocker = true)
 public interface MongoDbTestContainerSupport {
 
-	MongoDBContainer MONGO_CONTAINER = new MongoDBContainer("mongo:6.0.6").withStartupTimeout(Duration.ofSeconds(120))
-		.withStartupAttempts(3);
+	MongoDBContainer MONGO_CONTAINER = new MongoDBContainer("mongo");
 
 	@BeforeAll
 	static void startContainer() {
 		MONGO_CONTAINER.start();
+	}
+
+	@DynamicPropertySource
+	static void mongoDbProperties(DynamicPropertyRegistry registry) {
+		registry.add("spring.data.mongodb.port", MONGO_CONTAINER::getFirstMappedPort);
+		registry.add("spring.data.mongodb.database", () -> "test");
 	}
 
 	static String mongoDbUri() {

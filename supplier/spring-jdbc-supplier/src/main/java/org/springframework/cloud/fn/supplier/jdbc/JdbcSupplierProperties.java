@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +22,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * JDBC supplier configuration properties.
+ *
  * @author Soby Chacko
  * @author Artem Bilan
  */
@@ -51,7 +53,7 @@ public class JdbcSupplierProperties {
 
 	@NotNull
 	public String getQuery() {
-		return query;
+		return this.query;
 	}
 
 	public void setQuery(String query) {
@@ -59,7 +61,7 @@ public class JdbcSupplierProperties {
 	}
 
 	public String getUpdate() {
-		return update;
+		return this.update;
 	}
 
 	public void setUpdate(String update) {
@@ -67,7 +69,7 @@ public class JdbcSupplierProperties {
 	}
 
 	public boolean isSplit() {
-		return split;
+		return this.split;
 	}
 
 	public void setSplit(boolean split) {
@@ -75,7 +77,7 @@ public class JdbcSupplierProperties {
 	}
 
 	public int getMaxRows() {
-		return maxRows;
+		return this.maxRows;
 	}
 
 	public void setMaxRows(int maxRows) {

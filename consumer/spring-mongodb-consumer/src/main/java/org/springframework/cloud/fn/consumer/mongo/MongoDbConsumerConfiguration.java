@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2022 the original author or authors.
+ * Copyright 2017-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,11 @@ import java.util.function.Function;
 
 import reactor.core.publisher.Mono;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.expression.Expression;
 import org.springframework.expression.common.LiteralExpression;
@@ -41,8 +42,8 @@ import org.springframework.messaging.ReactiveMessageHandler;
  * @author David Turanski
  *
  */
-@Configuration(proxyBeanMethods = false)
-@EnableConfigurationProperties({ MongoDbConsumerProperties.class })
+@AutoConfiguration(after = MongoReactiveAutoConfiguration.class)
+@EnableConfigurationProperties(MongoDbConsumerProperties.class)
 public class MongoDbConsumerConfiguration {
 
 	private final MongoDbConsumerProperties properties;
@@ -56,7 +57,7 @@ public class MongoDbConsumerConfiguration {
 
 	@Bean
 	public Consumer<Message<?>> mongodbConsumer(Function<Message<?>, Mono<Void>> mongodbConsumerFunction) {
-		return message -> mongodbConsumerFunction.apply(message).subscribe();
+		return (message) -> mongodbConsumerFunction.apply(message).subscribe();
 	}
 
 	@Bean

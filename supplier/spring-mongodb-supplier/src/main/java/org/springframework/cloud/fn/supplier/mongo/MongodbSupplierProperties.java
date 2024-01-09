@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2021 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,6 +24,8 @@ import org.springframework.expression.Expression;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * The MongoDB supplier configuration properties.
+ *
  * @author Adam Zwickey
  * @author Artem Bilan
  * @author Chris Schaefer
@@ -60,7 +62,7 @@ public class MongodbSupplierProperties {
 
 	@NotEmpty(message = "Query is required")
 	public String getQuery() {
-		return query;
+		return this.query;
 	}
 
 	public void setQuery(String query) {
@@ -68,7 +70,7 @@ public class MongodbSupplierProperties {
 	}
 
 	public Expression getQueryExpression() {
-		return queryExpression;
+		return this.queryExpression;
 	}
 
 	public void setQueryExpression(Expression queryExpression) {
@@ -77,7 +79,7 @@ public class MongodbSupplierProperties {
 
 	@NotBlank(message = "Collection name is required")
 	public String getCollection() {
-		return collection;
+		return this.collection;
 	}
 
 	public void setCollection(String collection) {
@@ -85,7 +87,7 @@ public class MongodbSupplierProperties {
 	}
 
 	public boolean isSplit() {
-		return split;
+		return this.split;
 	}
 
 	public void setSplit(boolean split) {

@@ -7,7 +7,7 @@ When you have use-cases such as periodical execution of querying MongoDB, based 
 
 ## Beans for injection
 
-You can import the `MongoDBSupplierConfiguration` in the application and then inject the following bean.
+The `MongoDBSupplierConfiguration` auto-configuration provides the following bean:
 
 `mongoDBSupplier`
 

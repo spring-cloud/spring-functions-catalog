@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ public class ShorthandMapConverter implements Converter<String, Map<String, Stri
 		for (String mapping : mappings) {
 			// Turn backslash-comma back to comma
 			String unescaped = mapping.trim().replace("\\,", ",");
-			if (unescaped.length() == 0) {
+			if (unescaped.isEmpty()) {
 				continue;
 			}
 			// Split on colon, if not preceded by backslash
@@ -54,7 +54,7 @@ public class ShorthandMapConverter implements Converter<String, Map<String, Stri
 			Assert.isTrue(keyValuePair.length <= 2, "'" + unescaped
 					+ "' could not be parsed to a 'key:value' pair or simple 'key' with implicit value");
 			String key = keyValuePair[0].trim().replace("\\:", ":");
-			String value = keyValuePair.length == 2 ? keyValuePair[1].trim().replace("\\:", ":") : key;
+			String value = (keyValuePair.length == 2) ? keyValuePair[1].trim().replace("\\:", ":") : key;
 			result.put(key, value);
 		}
 		return result;

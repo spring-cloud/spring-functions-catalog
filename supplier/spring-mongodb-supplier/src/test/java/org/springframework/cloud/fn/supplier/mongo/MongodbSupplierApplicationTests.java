@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2023 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.fn.consumer.mongo.MongoDbTestContainerSupport;
 import org.springframework.messaging.Message;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.util.ReflectionUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
@@ -43,13 +43,8 @@ import static org.assertj.core.api.Assertions.entry;
 @SpringBootTest(
 		properties = { "mongodb.supplier.collection=testing", "mongodb.supplier.query={ name: { $exists: true }}",
 				"mongodb.supplier.update-expression='{ $unset: { name: 0 } }'" })
+@DirtiesContext
 class MongodbSupplierApplicationTests implements MongoDbTestContainerSupport {
-
-	@DynamicPropertySource
-	static void mongoDbProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.data.mongodb.port", MONGO_CONTAINER::getFirstMappedPort);
-		registry.add("spring.data.mongodb.database", () -> "test");
-	}
 
 	private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -60,7 +55,7 @@ class MongodbSupplierApplicationTests implements MongoDbTestContainerSupport {
 	private MongoClient mongo;
 
 	@BeforeEach
-	public void setUp() {
+	void setUp() {
 		MongoDatabase database = this.mongo.getDatabase("test");
 		database.createCollection("testing");
 		MongoCollection<Document> collection = database.getCollection("testing");
@@ -91,8 +86,8 @@ class MongodbSupplierApplicationTests implements MongoDbTestContainerSupport {
 		try {
 			map = objectMapper.readValue(message.getPayload().toString(), Map.class);
 		}
-		catch (Exception e) {
-			e.printStackTrace();
+		catch (Exception ex) {
+			ReflectionUtils.rethrowRuntimeException(ex);
 		}
 		return map;
 	}

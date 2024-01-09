@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2020 the original author or authors.
+ * Copyright 2011-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,14 +23,13 @@ import java.util.function.Function;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.channel.ReactiveStreamsSubscribableChannel;
 import org.springframework.integration.file.splitter.FileSplitter;
 import org.springframework.integration.splitter.AbstractMessageSplitter;
@@ -39,7 +38,13 @@ import org.springframework.integration.splitter.ExpressionEvaluatingSplitter;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 
-@Configuration
+/**
+ * Auto-configuration for Splitter function.
+ *
+ * @author Artem Bilan
+ * @author Soby Chacko
+ */
+@AutoConfiguration
 @EnableConfigurationProperties(SplitterFunctionProperties.class)
 public class SplitterFunctionConfiguration {
 
@@ -50,7 +55,7 @@ public class SplitterFunctionConfiguration {
 		messageSplitter.setApplySequence(splitterFunctionProperties.isApplySequence());
 		ThreadLocalFluxSinkMessageChannel outputChannel = new ThreadLocalFluxSinkMessageChannel();
 		messageSplitter.setOutputChannel(outputChannel);
-		return message -> {
+		return (message) -> {
 			messageSplitter.handleMessage(message);
 			return outputChannel.publisherThreadLocal.get();
 		};
@@ -59,8 +64,7 @@ public class SplitterFunctionConfiguration {
 	@Bean
 	@ConditionalOnProperty(prefix = "splitter", name = "expression")
 	public AbstractMessageSplitter expressionSplitter(SplitterFunctionProperties splitterFunctionProperties) {
-		return new ExpressionEvaluatingSplitter(
-				new SpelExpressionParser().parseExpression(splitterFunctionProperties.getExpression()));
+		return new ExpressionEvaluatingSplitter(splitterFunctionProperties.getExpression());
 	}
 
 	@Bean

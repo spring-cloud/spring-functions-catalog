@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,14 +22,14 @@ import java.util.function.Supplier;
 
 import reactor.core.publisher.Flux;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.cloud.fn.splitter.SplitterFunctionConfiguration;
 import org.springframework.cloud.function.context.PollableBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.expression.Expression;
 import org.springframework.expression.common.LiteralExpression;
@@ -38,17 +38,15 @@ import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**
- * A configuration for MongoDB Source applications. Produces {@link MongoDbMessageSource}
- * which polls collection with the query after startup according to the polling
- * properties.
+ * Auto-configuration for MongoDB supplier. Produces {@link MongoDbMessageSource} which
+ * polls collection with the query after startup according to the polling properties.
  *
  * @author Adam Zwickey
  * @author Artem Bilan
  * @author David Turanski
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration(after = { MongoAutoConfiguration.class, SplitterFunctionConfiguration.class })
 @EnableConfigurationProperties({ MongodbSupplierProperties.class })
-@Import(SplitterFunctionConfiguration.class)
 public class MongodbSupplierConfiguration {
 
 	private final MongodbSupplierProperties properties;
@@ -69,9 +67,8 @@ public class MongodbSupplierConfiguration {
 		return () -> {
 			Message<?> received = mongoDbSource.receive();
 			if (received != null) {
-				return Flux.fromIterable(splitterFunction.apply(received)); // multiple
-																			// Message<Map<String,
-																			// Object>>
+				// multiple Message<Map<String, Object>>
+				return Flux.fromIterable(splitterFunction.apply(received));
 			}
 			else {
 				return Flux.empty();
@@ -89,8 +86,8 @@ public class MongodbSupplierConfiguration {
 	public MongoDbMessageSource mongoDbSource(
 			@Nullable ComponentCustomizer<MongoDbMessageSource> mongoDbMessageSourceCustomizer) {
 
-		Expression queryExpression = (this.properties.getQueryExpression() != null
-				? this.properties.getQueryExpression() : new LiteralExpression(this.properties.getQuery()));
+		Expression queryExpression = (this.properties.getQueryExpression() != null)
+				? this.properties.getQueryExpression() : new LiteralExpression(this.properties.getQuery());
 		MongoDbMessageSource mongoDbMessageSource = new MongoDbMessageSource(this.mongoTemplate, queryExpression);
 		mongoDbMessageSource.setCollectionNameExpression(new LiteralExpression(this.properties.getCollection()));
 		mongoDbMessageSource.setEntityClass(String.class);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,30 +29,28 @@ import javax.sql.DataSource;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.EvaluationException;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.SpelParseException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.integration.aggregator.DefaultAggregatingMessageGroupProcessor;
 import org.springframework.integration.aggregator.MessageCountReleaseStrategy;
+import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.config.AggregatorFactoryBean;
+import org.springframework.integration.context.IntegrationContextUtils;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlowBuilder;
-import org.springframework.integration.expression.ExpressionUtils;
 import org.springframework.integration.expression.ValueExpression;
 import org.springframework.integration.jdbc.JdbcMessageHandler;
 import org.springframework.integration.jdbc.SqlParameterSourceFactory;
-import org.springframework.integration.json.JsonPropertyAccessor;
 import org.springframework.integration.store.MessageGroupStore;
 import org.springframework.integration.store.SimpleMessageStore;
 import org.springframework.integration.support.MutableMessage;
@@ -68,6 +66,8 @@ import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.MultiValueMap;
 
 /**
+ * Auto-configuration for JDBC consumer.
+ *
  * @author Eric Bottard
  * @author Thomas Risberg
  * @author Robert St. John
@@ -76,25 +76,20 @@ import org.springframework.util.MultiValueMap;
  * @author Soby Chacko
  * @author Szabolcs Stremler
  */
-@Configuration
+@AutoConfiguration(after = DataSourceAutoConfiguration.class)
 @EnableConfigurationProperties(JdbcConsumerProperties.class)
 public class JdbcConsumerConfiguration {
 
-	private static final Log logger = LogFactory.getLog(JdbcConsumerConfiguration.class);
+	private static final Log LOGGER = LogFactory.getLog(JdbcConsumerConfiguration.class);
 
 	private static final Object NOT_SET = new Object();
 
+	private static final SpelExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
+
 	private final JdbcConsumerProperties properties;
 
-	private SpelExpressionParser spelExpressionParser = new SpelExpressionParser();
-
-	private EvaluationContext evaluationContext;
-
-	public JdbcConsumerConfiguration(JdbcConsumerProperties properties, BeanFactory beanFactory) {
+	public JdbcConsumerConfiguration(JdbcConsumerProperties properties) {
 		this.properties = properties;
-		this.evaluationContext = ExpressionUtils.createStandardEvaluationContext(beanFactory);
-		StandardEvaluationContext standardEvaluationContext = (StandardEvaluationContext) this.evaluationContext;
-		standardEvaluationContext.addPropertyAccessor(new JsonPropertyAccessor());
 	}
 
 	@Bean
@@ -128,18 +123,18 @@ public class JdbcConsumerConfiguration {
 	IntegrationFlow jdbcConsumerFlow(@Qualifier("aggregator") MessageHandler aggregator,
 			JdbcMessageHandler jdbcMessageHandler) {
 
-		final IntegrationFlowBuilder builder = IntegrationFlow.from(Consumer.class,
-				gateway -> gateway.beanName("jdbcConsumer"));
-		if (properties.getBatchSize() > 1 || properties.getIdleTimeout() > 0) {
-			builder.handle(aggregator);
-		}
-		return builder.handle(jdbcMessageHandler).get();
+		return (flow) -> {
+			if (this.properties.getBatchSize() > 1 || this.properties.getIdleTimeout() > 0) {
+				flow.handle(aggregator);
+			}
+			flow.handle(jdbcMessageHandler);
+		};
 	}
 
 	@Bean
 	FactoryBean<MessageHandler> aggregator(MessageGroupStore messageGroupStore) {
 		AggregatorFactoryBean aggregatorFactoryBean = new AggregatorFactoryBean();
-		aggregatorFactoryBean.setCorrelationStrategy(message -> message.getPayload().getClass().getName());
+		aggregatorFactoryBean.setCorrelationStrategy((message) -> message.getPayload().getClass().getName());
 		aggregatorFactoryBean.setReleaseStrategy(new MessageCountReleaseStrategy(this.properties.getBatchSize()));
 		if (this.properties.getIdleTimeout() >= 0) {
 			aggregatorFactoryBean.setGroupTimeoutExpression(new ValueExpression<>(this.properties.getIdleTimeout()));
@@ -160,19 +155,20 @@ public class JdbcConsumerConfiguration {
 	}
 
 	@Bean
-	public JdbcMessageHandler jdbcMessageHandler(DataSource dataSource) {
+	public JdbcMessageHandler jdbcMessageHandler(DataSource dataSource,
+			@Qualifier(IntegrationContextUtils.INTEGRATION_EVALUATION_CONTEXT_BEAN_NAME) EvaluationContext evaluationContext) {
+
 		final MultiValueMap<String, Expression> columnExpressionVariations = new LinkedMultiValueMap<>();
 		for (Map.Entry<String, String> entry : this.properties.getColumnsMap().entrySet()) {
 			String value = entry.getValue();
-			columnExpressionVariations.add(entry.getKey(), this.spelExpressionParser.parseExpression(value));
+			columnExpressionVariations.add(entry.getKey(), EXPRESSION_PARSER.parseExpression(value));
 			if (!value.startsWith("payload")) {
 				String qualified = "payload." + value;
 				try {
-					columnExpressionVariations.add(entry.getKey(),
-							this.spelExpressionParser.parseExpression(qualified));
+					columnExpressionVariations.add(entry.getKey(), EXPRESSION_PARSER.parseExpression(qualified));
 				}
-				catch (SpelParseException e) {
-					logger.info("failed to parse qualified fallback expression " + qualified
+				catch (SpelParseException ex) {
+					LOGGER.info("failed to parse qualified fallback expression " + qualified
 							+ "; be sure your expression uses the 'payload.' prefix where necessary");
 				}
 			}
@@ -191,10 +187,9 @@ public class JdbcConsumerConfiguration {
 					if (message.getPayload() instanceof Iterable) {
 						Stream<Object> messageStream = StreamSupport
 							.stream(((Iterable<?>) message.getPayload()).spliterator(), false)
-							.map(payload -> {
-								if (payload instanceof byte[]) {
-									return convertibleContentType(contentType) ? new String(((byte[]) payload))
-											: payload;
+							.map((payload) -> {
+								if (payload instanceof byte[] bytes) {
+									return (convertibleContentType(contentType)) ? new String(bytes) : bytes;
 								}
 								else {
 									return payload;
@@ -205,7 +200,7 @@ public class JdbcConsumerConfiguration {
 					}
 					else {
 						if (convertibleContentType(contentType)) {
-							convertedMessage = new MutableMessage<>(new String(((byte[]) message.getPayload())),
+							convertedMessage = new MutableMessage<>(new String((byte[]) message.getPayload()),
 									message.getHeaders());
 						}
 					}
@@ -214,7 +209,7 @@ public class JdbcConsumerConfiguration {
 			}
 		};
 		SqlParameterSourceFactory parameterSourceFactory = new ParameterFactory(columnExpressionVariations,
-				this.evaluationContext);
+				evaluationContext);
 		jdbcMessageHandler.setSqlParameterSourceFactory(parameterSourceFactory);
 		return jdbcMessageHandler;
 	}
@@ -227,7 +222,7 @@ public class JdbcConsumerConfiguration {
 		ResourceDatabasePopulator databasePopulator = new ResourceDatabasePopulator();
 		databasePopulator.setIgnoreFailedDrops(true);
 		dataSourceInitializer.setDatabasePopulator(databasePopulator);
-		if ("true".equals(properties.getInitialize())) {
+		if ("true".equals(this.properties.getInitialize())) {
 			databasePopulator.addScript(new DefaultInitializationScriptResource(this.properties.getTableName(),
 					this.properties.getColumnsMap().keySet()));
 		}
@@ -237,23 +232,19 @@ public class JdbcConsumerConfiguration {
 		return dataSourceInitializer;
 	}
 
-	private static final class ParameterFactory implements SqlParameterSourceFactory {
+	@MessagingGateway(name = "jdbcConsumer", defaultRequestChannel = "jdbcConsumerFlow.input")
+	public interface MessageConsumer extends Consumer<Message<?>> {
 
-		private final MultiValueMap<String, Expression> columnExpressions;
+	}
 
-		private final EvaluationContext context;
-
-		ParameterFactory(MultiValueMap<String, Expression> columnExpressions, EvaluationContext context) {
-			this.columnExpressions = columnExpressions;
-			this.context = context;
-		}
+	private record ParameterFactory(MultiValueMap<String, Expression> columnExpressions,
+			EvaluationContext context) implements SqlParameterSourceFactory {
 
 		@Override
 		public SqlParameterSource createParameterSource(Object o) {
-			if (!(o instanceof Message)) {
+			if (!(o instanceof Message<?> message)) {
 				throw new IllegalArgumentException("Unable to handle type " + o.getClass().getName());
 			}
-			Message<?> message = (Message<?>) o;
 			MapSqlParameterSource parameterSource = new MapSqlParameterSource();
 			for (Map.Entry<String, List<Expression>> entry : this.columnExpressions.entrySet()) {
 				String key = entry.getKey();
@@ -262,16 +253,16 @@ public class JdbcConsumerConfiguration {
 				EvaluationException lastException = null;
 				for (Expression spel : spels) {
 					try {
-						value = spel.getValue(context, message);
+						value = spel.getValue(this.context, message);
 						break;
 					}
-					catch (EvaluationException e) {
-						lastException = e;
+					catch (EvaluationException ex) {
+						lastException = ex;
 					}
 				}
 				if (value == NOT_SET) {
 					if (lastException != null) {
-						logger.info("Could not find value for column '" + key + "': " + lastException.getMessage());
+						LOGGER.info("Could not find value for column '" + key + "': " + lastException.getMessage());
 					}
 					parameterSource.addValue(key, null);
 				}

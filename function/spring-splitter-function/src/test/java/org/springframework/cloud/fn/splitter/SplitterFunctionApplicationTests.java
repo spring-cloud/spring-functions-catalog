@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2020 the original author or authors.
+ * Copyright 2011-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +40,7 @@ public class SplitterFunctionApplicationTests {
 	@Test
 	public void testExpressionSplitter() {
 		List<Message<?>> messageList = this.splitter.apply(new GenericMessage<>("hello,world"));
-		assertThat(messageList).extracting(m -> m.getPayload().toString()).contains("hello", "world");
+		assertThat(messageList).extracting((m) -> m.getPayload().toString()).contains("hello", "world");
 	}
 
 	@SpringBootApplication

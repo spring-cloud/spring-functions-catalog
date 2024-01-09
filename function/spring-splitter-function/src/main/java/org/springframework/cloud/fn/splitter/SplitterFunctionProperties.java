@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,10 +19,11 @@ package org.springframework.cloud.fn.splitter;
 import jakarta.validation.constraints.AssertTrue;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.expression.Expression;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Configuration properties for the Splitter Processor app.
+ * Configuration properties for the Splitter function.
  *
  * @author Gary Russell
  * @author Artem Bilan
@@ -34,7 +35,7 @@ public class SplitterFunctionProperties {
 	/**
 	 * A SpEL expression for splitting payloads.
 	 */
-	private String expression;
+	private Expression expression;
 
 	/**
 	 * When expression is null, delimiters to use when tokenizing {@link String} payloads.
@@ -63,11 +64,11 @@ public class SplitterFunctionProperties {
 	 */
 	private boolean applySequence = true;
 
-	public String getExpression() {
+	public Expression getExpression() {
 		return this.expression;
 	}
 
-	public void setExpression(String expression) {
+	public void setExpression(Expression expression) {
 		this.expression = expression;
 	}
 
