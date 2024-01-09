@@ -23,16 +23,19 @@ import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.junit.RabbitAvailable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.fn.consumer.rabbit.RabbitTestContainer;
+import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
+import org.springframework.test.annotation.DirtiesContext;
 
-@RabbitAvailable(RabbitSupplierTests.TEST_QUEUE)
 @SpringBootTest(properties = "rabbit.supplier.queues=" + RabbitSupplierTests.TEST_QUEUE)
-public class RabbitSupplierTests {
+@DirtiesContext
+public class RabbitSupplierTests implements RabbitTestContainer {
 
 	static final String TEST_QUEUE = "test-supplier-queue";
 
@@ -51,6 +54,11 @@ public class RabbitSupplierTests {
 
 	@SpringBootApplication
 	public static class TestConfiguration {
+
+		@Bean
+		Queue testQueue() {
+			return new Queue(TEST_QUEUE);
+		}
 
 	}
 

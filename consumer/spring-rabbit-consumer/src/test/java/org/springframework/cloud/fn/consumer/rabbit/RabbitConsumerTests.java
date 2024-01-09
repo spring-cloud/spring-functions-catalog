@@ -20,20 +20,21 @@ import java.util.function.Consumer;
 
 import org.junit.jupiter.api.Test;
 
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.junit.RabbitAvailable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
+import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@RabbitAvailable(RabbitConsumerTests.TEST_QUEUE)
-@SpringBootTest(properties = { "rabbit.consumer.routingKey=" + RabbitConsumerTests.TEST_QUEUE,
-		"rabbit.consumer.own-connection=true" })
-public class RabbitConsumerTests {
+@SpringBootTest(properties = "rabbit.consumer.routingKey=" + RabbitConsumerTests.TEST_QUEUE)
+@DirtiesContext
+public class RabbitConsumerTests implements RabbitTestContainer {
 
 	static final String TEST_QUEUE = "test-consumer-queue";
 
@@ -52,6 +53,11 @@ public class RabbitConsumerTests {
 
 	@SpringBootApplication
 	public static class TestConfiguration {
+
+		@Bean
+		Queue testQueue() {
+			return new Queue(TEST_QUEUE);
+		}
 
 	}
 

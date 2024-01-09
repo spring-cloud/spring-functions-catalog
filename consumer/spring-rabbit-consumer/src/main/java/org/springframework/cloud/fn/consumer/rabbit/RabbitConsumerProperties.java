@@ -75,11 +75,6 @@ public class RabbitConsumerProperties {
 	private String converterBeanName;
 
 	/**
-	 * When true, use a separate connection based on the boot properties.
-	 */
-	private boolean ownConnection;
-
-	/**
 	 * When mapping headers for the outbound message, determine whether the headers are
 	 * mapped before the message is converted, or afterward.
 	 */
@@ -144,14 +139,6 @@ public class RabbitConsumerProperties {
 	@AssertTrue(message = "routingKey or routingKeyExpression is required")
 	public boolean isRoutingKeyProvided() {
 		return this.routingKey != null || this.routingKeyExpression != null;
-	}
-
-	public boolean isOwnConnection() {
-		return this.ownConnection;
-	}
-
-	public void setOwnConnection(boolean ownConnection) {
-		this.ownConnection = ownConnection;
 	}
 
 	public boolean isHeadersMappedLast() {
