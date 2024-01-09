@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 the original author or authors.
+ * Copyright 2023-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -41,11 +41,11 @@ import org.springframework.kafka.KafkaException;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandlingException;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.support.GenericMessage;
-import org.springframework.kafka.test.context.EmbeddedKafka;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -123,7 +123,7 @@ public class KafkaPublisherConfigurationTests {
 
 				Message<?> successMessage = successSend.asMono().block(Duration.ofSeconds(10));
 
-				assertThat(successMessage).satisfies(message -> {
+				assertThat(successMessage).satisfies((message) -> {
 					assertThat(message.getPayload()).isEqualTo(testData);
 					MessageHeaders messageHeaders = message.getHeaders();
 					assertThat(messageHeaders).containsKeys("topic", "mapped", "not mapped",

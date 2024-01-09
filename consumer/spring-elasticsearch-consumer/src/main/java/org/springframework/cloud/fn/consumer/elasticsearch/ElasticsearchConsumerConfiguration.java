@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,14 +39,15 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.elasticsearch.ElasticsearchClientAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.aggregator.AbstractAggregatingMessageGroupProcessor;
 import org.springframework.integration.aggregator.MessageCountReleaseStrategy;
+import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.config.AggregatorFactoryBean;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlowBuilder;
 import org.springframework.integration.expression.ValueExpression;
 import org.springframework.integration.store.MessageGroup;
 import org.springframework.integration.store.MessageGroupStore;
@@ -57,13 +58,17 @@ import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
 /**
+ * Auto-configuration for Elasticsearch.
+ *
  * @author Soby Chacko
  * @author Andrea Montemaggio
  * @author Corneil du Plessis
  */
-@Configuration
+@AutoConfiguration(after = ElasticsearchClientAutoConfiguration.class)
 @EnableConfigurationProperties(ElasticsearchConsumerProperties.class)
 public class ElasticsearchConsumerConfiguration {
+
+	private static final Log LOGGER = LogFactory.getLog(ElasticsearchConsumerConfiguration.class);
 
 	/**
 	 * Message header for the Index id.
@@ -75,13 +80,12 @@ public class ElasticsearchConsumerConfiguration {
 	 */
 	public static final String INDEX_NAME_HEADER = "INDEX_NAME";
 
-	private static final Log logger = LogFactory.getLog(ElasticsearchConsumerConfiguration.class);
-
 	@Bean
 	FactoryBean<MessageHandler> aggregator(MessageGroupStore messageGroupStore,
 			ElasticsearchConsumerProperties consumerProperties) {
+
 		AggregatorFactoryBean aggregatorFactoryBean = new AggregatorFactoryBean();
-		aggregatorFactoryBean.setCorrelationStrategy(message -> "");
+		aggregatorFactoryBean.setCorrelationStrategy((message) -> "");
 		aggregatorFactoryBean.setReleaseStrategy(new MessageCountReleaseStrategy(consumerProperties.getBatchSize()));
 		if (consumerProperties.getGroupTimeout() >= 0) {
 			aggregatorFactoryBean
@@ -126,40 +130,43 @@ public class ElasticsearchConsumerConfiguration {
 	IntegrationFlow elasticsearchConsumerFlow(@Qualifier("aggregator") MessageHandler aggregator,
 			ElasticsearchConsumerProperties properties, @Qualifier("indexingHandler") MessageHandler indexingHandler) {
 
-		final IntegrationFlowBuilder builder = IntegrationFlow.from(MessageConsumer.class,
-				gateway -> gateway.beanName("elasticsearchConsumer"));
-		if (properties.getBatchSize() > 1) {
-			builder.handle(aggregator);
-		}
-		return builder.handle(indexingHandler).get();
+		return (flow) -> {
+			if (properties.getBatchSize() > 1) {
+				flow.handle(aggregator);
+			}
+			flow.handle(indexingHandler);
+		};
 	}
 
 	@Bean
 	public MessageHandler indexingHandler(ElasticsearchClient elasticsearchClient,
 			ElasticsearchConsumerProperties consumerProperties) {
-		return message -> {
-			if (message.getPayload() instanceof Iterable) {
+
+		return (message) -> {
+			if (message.getPayload() instanceof Iterable<?> iterable) {
 				BulkRequest.Builder builder = new BulkRequest.Builder();
-				StreamSupport.stream(((Iterable<?>) message.getPayload()).spliterator(), false)
+				StreamSupport.stream(iterable.spliterator(), false)
 					.filter(MessageWrapper.class::isInstance)
-					.map(itemPayload -> ((MessageWrapper) itemPayload).getMessage())
-					.map(m -> buildIndexRequest(m, consumerProperties))
-					.forEach(indexRequest -> builder
-						.operations(builder1 -> builder1.index(idx -> idx.index(indexRequest.index())
+					.map((itemPayload) -> ((MessageWrapper) itemPayload).message())
+					.map((m) -> buildIndexRequest(m, consumerProperties))
+					.forEach((indexRequest) -> builder
+						.operations((builder1) -> builder1.index((idx) -> idx.index(indexRequest.index())
 							.id(indexRequest.id())
 							.document(indexRequest.document()))));
 
 				index(elasticsearchClient, builder.build(), consumerProperties.isAsync());
 			}
 			else {
-				IndexRequest request = buildIndexRequest(message, consumerProperties);
+				IndexRequest<?> request = buildIndexRequest(message, consumerProperties);
 				index(elasticsearchClient, request, consumerProperties.isAsync());
 			}
 		};
 	}
 
-	private IndexRequest buildIndexRequest(Message<?> message, ElasticsearchConsumerProperties consumerProperties) {
-		IndexRequest.Builder requestBuilder = new IndexRequest.Builder();
+	private IndexRequest<Object> buildIndexRequest(Message<?> message,
+			ElasticsearchConsumerProperties consumerProperties) {
+
+		IndexRequest.Builder<Object> requestBuilder = new IndexRequest.Builder<>();
 
 		String index = consumerProperties.getIndex();
 		if (message.getHeaders().containsKey(INDEX_NAME_HEADER)) {
@@ -214,14 +221,14 @@ public class ElasticsearchConsumerConfiguration {
 				BulkResponse bulkResponse = elasticsearchClient.bulk(request);
 				handleBulkResponse(bulkResponse);
 			}
-			catch (IOException e) {
+			catch (IOException ex) {
 				throw new IllegalStateException(
-						"Error occurred while performing bulk index operation: " + e.getMessage(), e);
+						"Error occurred while performing bulk index operation: " + ex.getMessage(), ex);
 			}
 		}
 	}
 
-	private void index(ElasticsearchClient elasticsearchClient, IndexRequest request, boolean isAsync) {
+	private void index(ElasticsearchClient elasticsearchClient, IndexRequest<?> request, boolean isAsync) {
 		if (isAsync) {
 			ElasticsearchAsyncClient elasticsearchAsyncClient = new ElasticsearchAsyncClient(
 					elasticsearchClient._transport());
@@ -240,35 +247,35 @@ public class ElasticsearchConsumerConfiguration {
 				IndexResponse response = elasticsearchClient.index(request);
 				handleResponse(response);
 			}
-			catch (IOException e) {
-				throw new IllegalStateException("Error occurred while indexing document: " + e.getMessage(), e);
+			catch (IOException ex) {
+				throw new IllegalStateException("Error occurred while indexing document: " + ex.getMessage(), ex);
 			}
 		}
 	}
 
 	private void handleBulkResponse(BulkResponse response) {
-		if (logger.isDebugEnabled() || response.errors()) {
+		if (LOGGER.isDebugEnabled() || response.errors()) {
 			for (BulkResponseItem itemResponse : response.items()) {
 				if (itemResponse.error() != null) {
-					if (logger.isDebugEnabled()) {
-						logger.debug("itemResponse.error=" + itemResponse.error());
+					if (LOGGER.isDebugEnabled()) {
+						LOGGER.debug("itemResponse.error=" + itemResponse.error());
 					}
-					logger.error(String.format("Index operation [id=%s, index=%s] failed: %s", itemResponse.id(),
+					LOGGER.error(String.format("Index operation [id=%s, index=%s] failed: %s", itemResponse.id(),
 							itemResponse.index(), itemResponse.error().toString()));
 				}
 				else {
 					var r = itemResponse.get();
 					if (r != null) {
-						if (logger.isDebugEnabled()) {
-							logger.debug("itemResponse:" + r);
+						if (LOGGER.isDebugEnabled()) {
+							LOGGER.debug("itemResponse:" + r);
 						}
-						logger.debug(String.format(
+						LOGGER.debug(String.format(
 								"Index operation [id=%s, index=%s] succeeded: document [id=%s, version=%s] was written on shard %s.",
 								itemResponse.id(), itemResponse.index(), r.source().get("id"),
 								r.source().get("version"), r.source().get("shardId")));
 					}
 					else {
-						logger.debug(String.format("Index operation [id=%s, index=%s] succeeded", itemResponse.id(),
+						LOGGER.debug(String.format("Index operation [id=%s, index=%s] succeeded", itemResponse.id(),
 								itemResponse.index()));
 					}
 				}
@@ -278,34 +285,25 @@ public class ElasticsearchConsumerConfiguration {
 		if (response.errors()) {
 			String error = response.items()
 				.stream()
-				.map(bulkResponseItem -> bulkResponseItem.error() != null ? bulkResponseItem.error().toString() : "")
-				.reduce((errorCause, errorCause2) -> errorCause != null ? errorCause + " : " + errorCause2
-						: errorCause2)
+				.map((bulkResponseItem) -> (bulkResponseItem.error() != null) ? bulkResponseItem.error().toString()
+						: "")
+				.reduce((errorCause, errorCause2) -> errorCause + " : " + errorCause2)
 				.orElseGet(response::toString);
 			throw new IllegalStateException("Bulk indexing operation completed with failures: " + error);
 		}
 	}
 
 	private void handleResponse(IndexResponse response) {
-		logger.debug(String.format(
+		LOGGER.debug(String.format(
 				"Index operation [index=%s] succeeded: document [id=%s, version=%d] was written on shard %s.",
 				response.index(), response.id(), response.version(), response.shards().toString()));
 	}
 
-	static class MessageWrapper {
-
-		private final Message<?> message;
-
-		MessageWrapper(Message<?> message) {
-			this.message = message;
-		}
-
-		public Message<?> getMessage() {
-			return message;
-		}
+	record MessageWrapper(Message<?> message) {
 
 	}
 
+	@MessagingGateway(name = "elasticsearchConsumer", defaultRequestChannel = "elasticsearchConsumerFlow.input")
 	private interface MessageConsumer extends Consumer<Message<?>> {
 
 	}

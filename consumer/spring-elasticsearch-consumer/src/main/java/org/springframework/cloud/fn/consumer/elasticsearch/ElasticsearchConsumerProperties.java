@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
 
 /**
+ * The Elasticsearch consumer configuration properties.
+ *
  * @author Soby Chacko
  * @author Andrea Montemaggio
  */
@@ -28,13 +30,13 @@ public class ElasticsearchConsumerProperties {
 
 	/**
 	 * The id of the document to index. If set, the INDEX_ID header value overrides this
-	 * property on a per message basis.
+	 * property on a per-message basis.
 	 */
 	Expression id;
 
 	/**
 	 * Name of the index. If set, the INDEX_NAME header value overrides this property on a
-	 * per message basis.
+	 * per-message basis.
 	 */
 	String index;
 
@@ -51,7 +53,7 @@ public class ElasticsearchConsumerProperties {
 	long timeoutSeconds;
 
 	/**
-	 * Indicates whether the indexing operation is async or not. By default indexing is
+	 * Indicates whether the indexing operation is async or not. By default, indexing is
 	 * done synchronously.
 	 */
 	boolean async;
@@ -70,7 +72,7 @@ public class ElasticsearchConsumerProperties {
 	long groupTimeout = -1L;
 
 	public Expression getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(Expression id) {
@@ -78,7 +80,7 @@ public class ElasticsearchConsumerProperties {
 	}
 
 	public String getIndex() {
-		return index;
+		return this.index;
 	}
 
 	public void setIndex(String index) {
@@ -86,7 +88,7 @@ public class ElasticsearchConsumerProperties {
 	}
 
 	public String getRouting() {
-		return routing;
+		return this.routing;
 	}
 
 	public void setRouting(String routing) {
@@ -94,7 +96,7 @@ public class ElasticsearchConsumerProperties {
 	}
 
 	public long getTimeoutSeconds() {
-		return timeoutSeconds;
+		return this.timeoutSeconds;
 	}
 
 	public void setTimeoutSeconds(long timeoutSeconds) {
@@ -102,7 +104,7 @@ public class ElasticsearchConsumerProperties {
 	}
 
 	public boolean isAsync() {
-		return async;
+		return this.async;
 	}
 
 	public void setAsync(boolean async) {
@@ -110,7 +112,7 @@ public class ElasticsearchConsumerProperties {
 	}
 
 	public int getBatchSize() {
-		return batchSize;
+		return this.batchSize;
 	}
 
 	public void setBatchSize(int batchSize) {
@@ -118,7 +120,7 @@ public class ElasticsearchConsumerProperties {
 	}
 
 	public long getGroupTimeout() {
-		return groupTimeout;
+		return this.groupTimeout;
 	}
 
 	public void setGroupTimeout(long groupTimeout) {
