@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2020 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,8 +28,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @TestPropertySource(properties = { "jms.supplier.sessionTransacted = false", "jms.supplier.destination = topic",
 		"jms.supplier.messageSelector = JMSCorrelationId=foo", "jms.supplier.subscriptionDurable = false",
-		"jms.supplier.subscriptionShared = false", "spring.jms.listener.acknowledgeMode = DUPS_OK",
-		"spring.jms.listener.concurrency = 3", "spring.jms.listener.maxConcurrency = 4",
+		"jms.supplier.subscriptionShared = false", "spring.jms.listener.session.acknowledge-mode = dups_ok",
+		"spring.jms.listener.min-concurrency = 3", "spring.jms.listener.maxConcurrency = 4",
 		"spring.jms.pubSubDomain = true" })
 public class PropertiesPopulated1Tests extends AbstractJmsSupplierTests {
 

@@ -8,7 +8,7 @@ Users have to subscribe to this `Flux` and then receive the data.
 
 ## Beans for injection
 
-You can import the `JmsSupplierConfiguration` in the application and then inject the following bean.
+The `JmsSupplierConfiguration` auto-configuration provides the following bean:
 
 `jmsSupplier`
 

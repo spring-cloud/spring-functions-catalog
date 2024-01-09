@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2023 the original author or authors.
+ * Copyright 2016-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,14 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.jms.AcknowledgeMode;
+import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.JmsProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.JavaUtils;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.jms.dsl.Jms;
 import org.springframework.integration.jms.dsl.JmsMessageDrivenChannelAdapterSpec;
@@ -37,7 +40,14 @@ import org.springframework.jms.listener.SimpleMessageListenerContainer;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
-@Configuration(proxyBeanMethods = false)
+/**
+ * Auto-configuration for JMS supplier.
+ *
+ * @author Gary Russell
+ * @author Soby Chako
+ * @author Artem Bilan
+ */
+@AutoConfiguration(after = JmsAutoConfiguration.class)
 @EnableConfigurationProperties(JmsSupplierProperties.class)
 public class JmsSupplierConfiguration {
 
@@ -71,47 +81,46 @@ public class JmsSupplierConfiguration {
 	@Bean
 	public AbstractMessageListenerContainer container() {
 		AbstractMessageListenerContainer container;
+
 		JmsProperties.Listener listenerProperties = this.jmsProperties.getListener();
+		Integer concurrency = listenerProperties.getMinConcurrency();
 		if (this.properties.isSessionTransacted()) {
 			DefaultMessageListenerContainer dmlc = new DefaultMessageListenerContainer();
 			dmlc.setSessionTransacted(true);
-			if (listenerProperties.getConcurrency() != null) {
-				dmlc.setConcurrentConsumers(listenerProperties.getConcurrency());
+			if (concurrency != null) {
+				dmlc.setConcurrentConsumers(concurrency);
 			}
-			if (listenerProperties.getMaxConcurrency() != null) {
-				dmlc.setMaxConcurrentConsumers(listenerProperties.getMaxConcurrency());
+			Integer maxConcurrency = listenerProperties.getMaxConcurrency();
+			if (maxConcurrency != null) {
+				dmlc.setMaxConcurrentConsumers(maxConcurrency);
 			}
 			container = dmlc;
 		}
 		else {
 			SimpleMessageListenerContainer smlc = new SimpleMessageListenerContainer();
 			smlc.setSessionTransacted(false);
-			if (listenerProperties != null && listenerProperties.getConcurrency() != null) {
-				smlc.setConcurrentConsumers(listenerProperties.getConcurrency());
+			if (concurrency != null) {
+				smlc.setConcurrentConsumers(concurrency);
 			}
 			container = smlc;
 		}
+
 		container.setConnectionFactory(this.connectionFactory);
-		if (this.properties.getClientId() != null) {
-			container.setClientId(this.properties.getClientId());
-		}
 		container.setDestinationName(this.properties.getDestination());
-		if (this.properties.getMessageSelector() != null) {
-			container.setMessageSelector(this.properties.getMessageSelector());
-		}
 		container.setPubSubDomain(this.jmsProperties.isPubSubDomain());
-		if (this.properties.getMessageSelector() != null && listenerProperties.getAcknowledgeMode() != null) {
-			container.setSessionAcknowledgeMode(listenerProperties.getAcknowledgeMode().getMode());
+
+		String messageSelector = this.properties.getMessageSelector();
+		AcknowledgeMode acknowledgeMode = listenerProperties.getSession().getAcknowledgeMode();
+		if (messageSelector != null && acknowledgeMode != null) {
+			container.setSessionAcknowledgeMode(acknowledgeMode.getMode());
 		}
-		if (this.properties.getSubscriptionDurable() != null) {
-			container.setSubscriptionDurable(this.properties.getSubscriptionDurable());
-		}
-		if (this.properties.getSubscriptionName() != null) {
-			container.setSubscriptionName(this.properties.getSubscriptionName());
-		}
-		if (this.properties.getSubscriptionShared() != null) {
-			container.setSubscriptionShared(this.properties.getSubscriptionShared());
-		}
+
+		JavaUtils.INSTANCE.acceptIfNotNull(this.properties.getClientId(), container::setClientId)
+			.acceptIfNotNull(messageSelector, container::setMessageSelector)
+			.acceptIfNotNull(this.properties.getSubscriptionDurable(), container::setSubscriptionDurable)
+			.acceptIfNotNull(this.properties.getSubscriptionName(), container::setSubscriptionName)
+			.acceptIfNotNull(this.properties.getSubscriptionShared(), container::setSubscriptionShared);
+
 		return container;
 	}
 
