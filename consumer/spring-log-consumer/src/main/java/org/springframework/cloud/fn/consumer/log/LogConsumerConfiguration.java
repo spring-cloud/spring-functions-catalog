@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2023 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,33 +18,35 @@ package org.springframework.cloud.fn.consumer.log;
 
 import java.util.function.Consumer;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.messaging.Message;
 
 /**
- * The Configuration class for {@link Consumer} which logs incoming data. For the logging
- * logic a Spring Integration
+ * The Auto-configuration class for {@link Consumer} which logs incoming data. For the
+ * logging logic a Spring Integration
  * {@link org.springframework.integration.handler.LoggingHandler} is used. If incoming
  * payload is a {@code byte[]} and incoming message {@code contentType} header is
  * text-compatible (e.g. {@code application/json}), it is converted into a {@link String}.
- * Otherwise the payload is passed to logger as is.
+ * Otherwise, the payload is passed to logger as is.
  *
  * @author Artem Bilan
  */
-@Configuration(proxyBeanMethods = false)
+@AutoConfiguration
 @EnableConfigurationProperties(LogConsumerProperties.class)
 public class LogConsumerConfiguration {
 
 	@Bean
 	IntegrationFlow logConsumerFlow(LogConsumerProperties logSinkProperties) {
-		return IntegrationFlow.from(MessageConsumer.class, (gateway) -> gateway.beanName("logConsumer"))
+		return (flow) -> flow
 			.log(logSinkProperties.getLevel(), logSinkProperties.getName(), logSinkProperties.getExpression())
 			.nullChannel();
 	}
 
+	@MessagingGateway(name = "logConsumer", defaultRequestChannel = "logConsumerFlow.input")
 	private interface MessageConsumer extends Consumer<Message<?>> {
 
 	}

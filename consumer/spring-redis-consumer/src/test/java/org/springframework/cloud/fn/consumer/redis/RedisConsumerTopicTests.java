@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -70,13 +70,7 @@ public class RedisConsumerTopicTests extends AbstractRedisConsumerTests {
 		container.stop();
 	}
 
-	private static class Listener {
-
-		private final CountDownLatch latch;
-
-		Listener(CountDownLatch latch) {
-			this.latch = latch;
-		}
+	record Listener(CountDownLatch latch) {
 
 		@SuppressWarnings("unused")
 		public void handleMessage(String s) {

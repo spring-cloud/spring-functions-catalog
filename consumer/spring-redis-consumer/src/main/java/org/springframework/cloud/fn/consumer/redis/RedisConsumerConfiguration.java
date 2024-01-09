@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,9 +18,10 @@ package org.springframework.cloud.fn.consumer.redis;
 
 import java.util.function.Consumer;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.integration.redis.outbound.RedisPublishingMessageHandler;
 import org.springframework.integration.redis.outbound.RedisQueueOutboundChannelAdapter;
@@ -29,13 +30,15 @@ import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 
 /**
+ * Auto-configuration for Redis consumer.
+ *
  * @author Eric Bottard
  * @author Mark Pollack
  * @author Gary Russell
  * @author Soby Chacko
  * @author Artem Bilan
  */
-@Configuration
+@AutoConfiguration(after = RedisAutoConfiguration.class)
 @EnableConfigurationProperties(RedisConsumerProperties.class)
 public class RedisConsumerConfiguration {
 
@@ -47,6 +50,7 @@ public class RedisConsumerConfiguration {
 	@Bean
 	public MessageHandler redisConsumerMessageHandler(RedisConnectionFactory redisConnectionFactory,
 			RedisConsumerProperties redisConsumerProperties) {
+
 		if (redisConsumerProperties.isKeyPresent()) {
 			RedisStoreWritingMessageHandler redisStoreWritingMessageHandler = new RedisStoreWritingMessageHandler(
 					redisConnectionFactory);

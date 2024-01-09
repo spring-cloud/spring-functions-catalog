@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2021 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ import static org.mockito.Mockito.verify;
  * @author Artem Bilan
  */
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@SpringBootTest({ "log.name=foo", "log.level=warn", "log.expression=payload.toUpperCase()" })
+@SpringBootTest({ "log.consumer.name=foo", "log.consumer.level=warn", "log.consumer.expression=payload.toUpperCase()" })
 class LogConsumerApplicationTests {
 
 	@Autowired
@@ -55,7 +55,7 @@ class LogConsumerApplicationTests {
 	private LoggingHandler loggingHandler;
 
 	@Test
-	public void testJsonContentType() {
+	void testJsonContentType() {
 		Message<String> message = MessageBuilder.withPayload("{\"foo\":\"bar\"}")
 			.setHeader("contentType", new MimeType("json"))
 			.build();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,17 +24,15 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.integration.handler.LoggingHandler;
 import org.springframework.validation.annotation.Validated;
 
-import static org.springframework.integration.handler.LoggingHandler.Level.INFO;
-
 /**
- * Configuration properties for the Log Sink app.
+ * Configuration properties for the Log consumer.
  *
  * @author Gary Russell
  * @author Eric Bottard
  * @author Chris Schaefer
  * @author Artem Bilan
  */
-@ConfigurationProperties("log")
+@ConfigurationProperties("log.consumer")
 @Validated
 public class LogConsumerProperties {
 
@@ -52,11 +50,11 @@ public class LogConsumerProperties {
 	/**
 	 * The level at which to log messages.
 	 */
-	private LoggingHandler.Level level = INFO;
+	private LoggingHandler.Level level = LoggingHandler.Level.INFO;
 
 	@NotBlank
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -65,7 +63,7 @@ public class LogConsumerProperties {
 
 	@NotBlank
 	public String getExpression() {
-		return expression;
+		return this.expression;
 	}
 
 	public void setExpression(String expression) {
@@ -74,7 +72,7 @@ public class LogConsumerProperties {
 
 	@NotNull
 	public LoggingHandler.Level getLevel() {
-		return level;
+		return this.level;
 	}
 
 	public void setLevel(LoggingHandler.Level level) {

@@ -5,7 +5,7 @@ The consumer uses the `LoggingMessageHandler` from Spring Integration.
 
 ## Beans for injection
 
-You can import `LogConsumerConfiguration` in the application and then inject the following bean.
+The `LogConsumerConfiguration` auto-configuration provides the following bean:
 
 `Consumer<Message<?>> logConsumer`
 
@@ -13,7 +13,7 @@ You can use `logConsumer` as a qualifier when injecting.
 
 ## Configuration Options
 
-All configuration properties are prefixed with `log`.
+All configuration properties are prefixed with `log.consumer`.
 
 For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/consumer/log/LogConsumerProperties.java[LogConsumerProperties].
 

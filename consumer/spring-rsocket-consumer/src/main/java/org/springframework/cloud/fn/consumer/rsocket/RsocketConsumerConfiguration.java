@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,31 +16,47 @@
 
 package org.springframework.cloud.fn.consumer.rsocket;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.rsocket.RSocketRequesterAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.rsocket.RSocketRequester;
 
-@Configuration(proxyBeanMethods = false)
+/**
+ * Auto-configuration for RSocket consumer.
+ *
+ * @author Artem Bilan
+ */
+@AutoConfiguration(after = RSocketRequesterAutoConfiguration.class)
 @EnableConfigurationProperties(RsocketConsumerProperties.class)
 public class RsocketConsumerConfiguration {
 
 	@Bean
-	public Function<Flux<Message<?>>, Mono<Void>> rsocketConsumer(RSocketRequester.Builder builder,
+	public Consumer<Flux<Message<?>>> rsocketConsumer(
+			@Qualifier("rsocketFunctionConsumer") Function<Flux<Message<?>>, Mono<Void>> rsocketFunctionConsumer) {
+
+		return (data) -> rsocketFunctionConsumer.apply(data).block();
+	}
+
+	@Bean
+	public Function<Flux<Message<?>>, Mono<Void>> rsocketFunctionConsumer(RSocketRequester.Builder builder,
 			RsocketConsumerProperties rsocketConsumerProperties) {
-		RSocketRequester rSocketRequester = rsocketConsumerProperties.getUri() != null
+
+		RSocketRequester rSocketRequester = (rsocketConsumerProperties.getUri() != null)
 				? builder.websocket(rsocketConsumerProperties.getUri())
 				: builder.tcp(rsocketConsumerProperties.getHost(), rsocketConsumerProperties.getPort());
 
 		String route = rsocketConsumerProperties.getRoute();
 
-		return input -> input.flatMap(message -> rSocketRequester.route(route).data(message.getPayload()).send())
+		return (input) -> input.flatMap((message) -> rSocketRequester.route(route).data(message.getPayload()).send())
 			.ignoreElements();
 	}
 

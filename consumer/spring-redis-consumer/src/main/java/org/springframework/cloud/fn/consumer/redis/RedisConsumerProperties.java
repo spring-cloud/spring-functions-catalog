@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2020 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,15 +23,12 @@ import jakarta.validation.constraints.AssertTrue;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
-import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.common.LiteralExpression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Used to configure those Redis Sink module options that are not related to connecting to
- * Redis.
+ * The configuration properties for Redis consumer.
  *
  * @author Eric Bottard
  * @author Mark Pollack
@@ -42,22 +39,20 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class RedisConsumerProperties {
 
-	private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
-
 	/**
 	 * A SpEL expression to use for topic.
 	 */
-	private String topicExpression;
+	private Expression topicExpression;
 
 	/**
 	 * A SpEL expression to use for queue.
 	 */
-	private String queueExpression;
+	private Expression queueExpression;
 
 	/**
 	 * A SpEL expression to use for storing to a key.
 	 */
-	private String keyExpression;
+	private Expression keyExpression;
 
 	/**
 	 * A literal key name to use when storing to a key.
@@ -75,55 +70,55 @@ public class RedisConsumerProperties {
 	private String topic;
 
 	public Expression keyExpression() {
-		return key != null ? new LiteralExpression(key) : EXPRESSION_PARSER.parseExpression(keyExpression);
+		return (this.key != null) ? new LiteralExpression(this.key) : this.keyExpression;
 	}
 
 	public Expression queueExpression() {
-		return queue != null ? new LiteralExpression(queue) : EXPRESSION_PARSER.parseExpression(queueExpression);
+		return (this.queue != null) ? new LiteralExpression(this.queue) : this.queueExpression;
 	}
 
 	public Expression topicExpression() {
-		return topic != null ? new LiteralExpression(topic) : EXPRESSION_PARSER.parseExpression(topicExpression);
+		return (this.topic != null) ? new LiteralExpression(this.topic) : this.topicExpression;
 	}
 
 	boolean isKeyPresent() {
-		return StringUtils.hasText(key) || keyExpression != null;
+		return StringUtils.hasText(this.key) || this.keyExpression != null;
 	}
 
 	boolean isQueuePresent() {
-		return StringUtils.hasText(queue) || queueExpression != null;
+		return StringUtils.hasText(this.queue) || this.queueExpression != null;
 	}
 
 	boolean isTopicPresent() {
-		return StringUtils.hasText(topic) || topicExpression != null;
+		return StringUtils.hasText(this.topic) || this.topicExpression != null;
 	}
 
-	public String getTopicExpression() {
-		return topicExpression;
+	public Expression getTopicExpression() {
+		return this.topicExpression;
 	}
 
-	public void setTopicExpression(String topicExpression) {
+	public void setTopicExpression(Expression topicExpression) {
 		this.topicExpression = topicExpression;
 	}
 
-	public String getQueueExpression() {
-		return queueExpression;
+	public Expression getQueueExpression() {
+		return this.queueExpression;
 	}
 
-	public void setQueueExpression(String queueExpression) {
+	public void setQueueExpression(Expression queueExpression) {
 		this.queueExpression = queueExpression;
 	}
 
-	public String getKeyExpression() {
-		return keyExpression;
+	public Expression getKeyExpression() {
+		return this.keyExpression;
 	}
 
-	public void setKeyExpression(String keyExpression) {
+	public void setKeyExpression(Expression keyExpression) {
 		this.keyExpression = keyExpression;
 	}
 
 	public String getKey() {
-		return key;
+		return this.key;
 	}
 
 	public void setKey(String key) {
@@ -131,7 +126,7 @@ public class RedisConsumerProperties {
 	}
 
 	public String getQueue() {
-		return queue;
+		return this.queue;
 	}
 
 	public void setQueue(String queue) {
@@ -139,7 +134,7 @@ public class RedisConsumerProperties {
 	}
 
 	public String getTopic() {
-		return topic;
+		return this.topic;
 	}
 
 	public void setTopic(String topic) {
@@ -151,7 +146,8 @@ public class RedisConsumerProperties {
 	@AssertTrue(message = "Exactly one of 'queue', 'queueExpression', 'key', 'keyExpression', "
 			+ "'topic' and 'topicExpression' must be set")
 	public boolean isMutuallyExclusive() {
-		Object[] props = new Object[] { queue, queueExpression, key, keyExpression, topic, topicExpression };
+		Object[] props = { this.queue, this.queueExpression, this.key, this.keyExpression, this.topic,
+				this.topicExpression };
 		return (props.length - 1) == Collections.frequency(Arrays.asList(props), null);
 	}
 
