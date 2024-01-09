@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,6 +29,8 @@ import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.BeanInitializationException;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration;
 import org.springframework.boot.autoconfigure.cassandra.CassandraProperties;
 import org.springframework.boot.autoconfigure.cassandra.CqlSessionBuilderCustomizer;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -38,11 +40,11 @@ import org.springframework.boot.context.properties.PropertyMapper;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.data.cassandra.config.CqlSessionFactoryBean;
@@ -53,11 +55,13 @@ import org.springframework.data.cassandra.core.cql.keyspace.CreateKeyspaceSpecif
 import org.springframework.util.StringUtils;
 
 /**
+ * The auto-configuration for Apache Cassandra cluster initialization.
+ *
  * @author Artem Bilan
  * @author Thomas Risberg
  * @author Rob Hardt
  */
-@Configuration
+@AutoConfiguration(before = CassandraAutoConfiguration.class)
 @EnableConfigurationProperties(CassandraClusterProperties.class)
 @Import(CassandraAppClusterConfiguration.CassandraPackageRegistrar.class)
 public class CassandraAppClusterConfiguration {
@@ -66,7 +70,7 @@ public class CassandraAppClusterConfiguration {
 	public CqlSessionBuilderCustomizer clusterBuilderCustomizer(CassandraClusterProperties cassandraClusterProperties) {
 
 		PropertyMapper map = PropertyMapper.get();
-		return builder -> map.from(cassandraClusterProperties::isSkipSslValidation).whenTrue().toCall(() -> {
+		return (builder) -> map.from(cassandraClusterProperties::isSkipSslValidation).whenTrue().toCall(() -> {
 			try {
 				builder.withSslContext(TrustAllSSLContextFactory.getSslContext());
 			}
@@ -96,6 +100,7 @@ public class CassandraAppClusterConfiguration {
 
 	@Bean
 	@Lazy
+	@Primary
 	@DependsOn("keyspaceCreator")
 	public CqlSession cassandraSession(CqlSessionBuilder cqlSessionBuilder) {
 		return cqlSessionBuilder.build();
@@ -115,7 +120,7 @@ public class CassandraAppClusterConfiguration {
 
 		Flux.fromArray(StringUtils.delimitedListToStringArray(scripts, ";", "\r\n\f"))
 			.filter(StringUtils::hasText) // an empty String after the last ';'
-			.concatMap(script -> reactiveCqlOperations.execute(script + ";"))
+			.concatMap((script) -> reactiveCqlOperations.execute(script + ";"))
 			.blockLast();
 
 		return null;
@@ -138,7 +143,7 @@ public class CassandraAppClusterConfiguration {
 			Binder.get(this.environment)
 				.bind("cassandra.cluster.entity-base-packages", String[].class)
 				.map(Arrays::asList)
-				.ifBound(packagesToScan -> EntityScanPackages.register(registry, packagesToScan));
+				.ifBound((packagesToScan) -> EntityScanPackages.register(registry, packagesToScan));
 		}
 
 	}

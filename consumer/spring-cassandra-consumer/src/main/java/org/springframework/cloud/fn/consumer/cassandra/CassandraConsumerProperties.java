@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2020 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,12 @@ import org.springframework.expression.Expression;
 import org.springframework.integration.cassandra.outbound.CassandraMessageHandler;
 
 /**
+ * Apache Cassandra consumer configuration properties.
+ *
  * @author Artem Bilan
  * @author Thomas Risberg
  */
-@ConfigurationProperties("cassandra")
+@ConfigurationProperties("cassandra.consumer")
 public class CassandraConsumerProperties {
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,9 @@ import org.junit.jupiter.api.AfterEach;
 import reactor.core.publisher.Mono;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.fn.consumer.cassandra.domain.Book;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.cassandra.core.CassandraOperations;
 import org.springframework.data.cassandra.core.WriteResult;
 import org.springframework.test.annotation.DirtiesContext;
@@ -41,11 +39,10 @@ import org.springframework.test.context.DynamicPropertySource;
 /**
  * @author Artem Bilan
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = { "spring.cassandra.keyspace-name=" + CassandraConsumerApplicationTests.CASSANDRA_KEYSPACE,
-				"cassandra.cluster.createKeyspace=true" })
+@SpringBootTest(properties = { "spring.cassandra.keyspace-name=" + CassandraConsumerApplicationTests.CASSANDRA_KEYSPACE,
+		"cassandra.cluster.createKeyspace=true" })
 @DirtiesContext
-abstract class CassandraConsumerApplicationTests implements CassandraContainerTest {
+abstract class CassandraConsumerApplicationTests implements CassandraTestContainer {
 
 	static final String CASSANDRA_KEYSPACE = "test";
 
@@ -57,10 +54,10 @@ abstract class CassandraConsumerApplicationTests implements CassandraContainerTe
 
 	@DynamicPropertySource
 	static void registerConfigurationProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.cassandra.localDatacenter", () -> CASSANDRA_CONTAINER.getLocalDatacenter());
+		registry.add("spring.cassandra.localDatacenter", CASSANDRA_CONTAINER::getLocalDatacenter);
 		registry.add("spring.cassandra.contactPoints",
 				() -> Optional.of(CASSANDRA_CONTAINER.getContactPoint())
-					.map(contactPoint -> contactPoint.getAddress().getHostAddress() + ':' + contactPoint.getPort())
+					.map((contactPoint) -> contactPoint.getAddress().getHostAddress() + ':' + contactPoint.getPort())
 					.get());
 	}
 
@@ -80,9 +77,7 @@ abstract class CassandraConsumerApplicationTests implements CassandraContainerTe
 		return books;
 	}
 
-	@SpringBootConfiguration
-	@EnableAutoConfiguration
-	@Import(CassandraConsumerConfiguration.class)
+	@SpringBootApplication
 	static class CassandraConsumerTestApplication {
 
 	}

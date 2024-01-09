@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2022 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Artem Bilan
  */
 @TestPropertySource(properties = { "cassandra.cluster.init-script=init-db.cql",
-		"cassandra.ingest-query=" + "update book set inStock = :inStock, author = :author, pages = :pages, "
+		"cassandra.consumer.ingest-query=" + "update book set inStock = :inStock, author = :author, pages = :pages, "
 				+ "saleDate = :saleDate, title = :title where isbn = :isbn",
-		"cassandra.queryType=UPDATE" })
+		"cassandra.consumer.queryType=UPDATE" })
 class CassandraIngestUpdateTests extends CassandraConsumerApplicationTests {
 
 	@Test

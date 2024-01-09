@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2022 the original author or authors.
+ * Copyright 2015-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.datastax.oss.driver.api.core.ConsistencyLevel;
@@ -32,58 +33,65 @@ import com.fasterxml.jackson.databind.util.StdDateFormat;
 import reactor.core.publisher.Mono;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.data.cassandra.CassandraReactiveDataAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.cloud.fn.consumer.cassandra.cluster.CassandraAppClusterConfiguration;
 import org.springframework.cloud.fn.consumer.cassandra.query.ColumnNameExtractor;
 import org.springframework.cloud.fn.consumer.cassandra.query.InsertQueryColumnNameExtractor;
 import org.springframework.cloud.fn.consumer.cassandra.query.UpdateQueryColumnNameExtractor;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.cassandra.core.InsertOptions;
 import org.springframework.data.cassandra.core.ReactiveCassandraOperations;
 import org.springframework.data.cassandra.core.UpdateOptions;
 import org.springframework.data.cassandra.core.WriteResult;
 import org.springframework.data.cassandra.core.cql.WriteOptions;
 import org.springframework.integration.JavaUtils;
+import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.cassandra.outbound.CassandraMessageHandler;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.integration.dsl.IntegrationFlowBuilder;
 import org.springframework.integration.support.json.Jackson2JsonObjectMapper;
 import org.springframework.integration.transformer.AbstractPayloadTransformer;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.util.StringUtils;
 
 /**
+ * Apache Cassandra consumer auto-configuration.
+ *
  * @author Artem Bilan
  * @author Thomas Risberg
  * @author Ashu Gairola
  * @author Akos Ratku
  */
-@AutoConfiguration
+@AutoConfiguration(after = CassandraReactiveDataAutoConfiguration.class)
 @EnableConfigurationProperties(CassandraConsumerProperties.class)
-@Import(CassandraAppClusterConfiguration.class)
 public class CassandraConsumerConfiguration {
 
 	@Autowired
 	private CassandraConsumerProperties cassandraSinkProperties;
 
 	@Bean
-	public IntegrationFlow cassandraConsumerFlow(MessageHandler cassandraSinkMessageHandler,
-			ObjectMapper objectMapper) {
-
-		IntegrationFlowBuilder integrationFlowBuilder = IntegrationFlow.from(CassandraConsumerFunction.class);
-		String ingestQuery = this.cassandraSinkProperties.getIngestQuery();
-		if (StringUtils.hasText(ingestQuery)) {
-			integrationFlowBuilder.transform(new PayloadToMatrixTransformer(objectMapper, ingestQuery,
-					CassandraMessageHandler.Type.UPDATE == this.cassandraSinkProperties.getQueryType()
-							? new UpdateQueryColumnNameExtractor() : new InsertQueryColumnNameExtractor()));
-		}
-		return integrationFlowBuilder.handle(cassandraSinkMessageHandler).get();
+	public Consumer<Object> cassandraConsumer(CassandraConsumerFunction cassandraConsumerFunction) {
+		return (payload) -> cassandraConsumerFunction.apply(payload).block();
 	}
 
 	@Bean
-	public MessageHandler cassandraSinkMessageHandler(ReactiveCassandraOperations cassandraOperations) {
+	public IntegrationFlow cassandraConsumerFlow(
+			@Qualifier("cassandraMessageHandler") MessageHandler cassandraMessageHandler, ObjectMapper objectMapper) {
+
+		return (flow) -> {
+			String ingestQuery = this.cassandraSinkProperties.getIngestQuery();
+			if (StringUtils.hasText(ingestQuery)) {
+				flow.transform(new PayloadToMatrixTransformer(objectMapper, ingestQuery,
+						(CassandraMessageHandler.Type.UPDATE == this.cassandraSinkProperties.getQueryType())
+								? new UpdateQueryColumnNameExtractor() : new InsertQueryColumnNameExtractor()));
+			}
+			flow.handle(cassandraMessageHandler);
+		};
+	}
+
+	@Bean
+	public MessageHandler cassandraMessageHandler(ReactiveCassandraOperations cassandraOperations) {
 		CassandraMessageHandler.Type queryType = Optional.ofNullable(this.cassandraSinkProperties.getQueryType())
 			.orElse(CassandraMessageHandler.Type.INSERT);
 
@@ -190,6 +198,7 @@ public class CassandraConsumerConfiguration {
 
 	}
 
+	@MessagingGateway(name = "cassandraConsumerFunction", defaultRequestChannel = "cassandraConsumerFlow.input")
 	interface CassandraConsumerFunction extends Function<Object, Mono<? extends WriteResult>> {
 
 	}

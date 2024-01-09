@@ -1,0 +1,2 @@
+org.springframework.cloud.fn.consumer.cassandra.CassandraConsumerConfiguration
+org.springframework.cloud.fn.consumer.cassandra.cluster.CassandraAppClusterConfiguration

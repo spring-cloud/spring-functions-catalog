@@ -6,7 +6,7 @@ Internally it uses the `CassandraMessageHandler` from Spring Integration.
 
 ## Beans for injection
 
-You can import the `CassnadraConsumerConfiguration` in the application and then inject the following bean.
+The `CassnadraConsumerConfiguration` auto-configuration provides the following beans:
 
 `cassandraConsumerFunction`
 
@@ -14,11 +14,12 @@ You can use `cassandraConsumerFunction` as a qualifier when injecting.
 
 Type for injection: `Function<Object, Mono<? extends WriteResult>>`
 
-You can ignore the return value from the function as this is a consumer and simply will send the data to Cassandra.
+You have to subscribe to the returned `Mono` to trigger a communication with Cassandra.
+Or use `Consumer<Object> cassandraConsumer` instead which ignores the result and performs just `Mono.block()` before returning.
 
 ## Configuration Options
 
-All configuration properties are prefixed with either `cassandra` or `cassandra.cluster`.
+All configuration properties are prefixed with either `cassandra.consumer` or `cassandra.cluster`.
 
 For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/consumer/cassandra/CassandraConsumerProperties.java[CassandraConsumerProperties].
 See link:src/main/java/org/springframework/cloud/fn/consumer/cassandra/cluster/CassandraClusterProperties.java[this] also.
