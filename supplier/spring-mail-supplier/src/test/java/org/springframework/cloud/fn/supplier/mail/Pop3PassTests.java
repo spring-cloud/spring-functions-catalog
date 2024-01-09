@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,10 +34,10 @@ public class Pop3PassTests extends AbstractMailSupplierTests {
 		sendMessage("test", "foo");
 		final Flux<Message<?>> messageFlux = mailSupplier.get();
 
-		StepVerifier.create(messageFlux).assertNext((message) -> {
-			assertThat(((String) message.getPayload())).contains("foo");
-		}).thenCancel().verify();
-
+		StepVerifier.create(messageFlux)
+			.assertNext((message) -> assertThat(((String) message.getPayload())).contains("foo"))
+			.thenCancel()
+			.verify();
 	}
 
 }

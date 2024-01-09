@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,11 +25,11 @@ import jakarta.mail.URLName;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.MessageProducerSpec;
@@ -38,27 +38,28 @@ import org.springframework.integration.endpoint.MessageProducerSupport;
 import org.springframework.integration.endpoint.ReactiveMessageSourceProducer;
 import org.springframework.integration.mail.MailHeaders;
 import org.springframework.integration.mail.dsl.ImapIdleChannelAdapterSpec;
+import org.springframework.integration.mail.dsl.ImapMailInboundChannelAdapterSpec;
 import org.springframework.integration.mail.dsl.Mail;
 import org.springframework.integration.mail.dsl.MailInboundChannelAdapterSpec;
+import org.springframework.integration.mail.dsl.Pop3MailInboundChannelAdapterSpec;
 import org.springframework.integration.transformer.support.AbstractHeaderValueMessageProcessor;
 import org.springframework.integration.transformer.support.HeaderValueMessageProcessor;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**
- * Mail supplier components.
+ * Mail supplier auto-configuration.
  *
- * @author Amol
  * @author Artem Bilan
  * @author Chris Schaefer
- * @author Soby Chacko
  * @author Corneil du Plessis
+ * @author Soby Chacko
  */
-@Configuration(proxyBeanMethods = false)
 @EnableConfigurationProperties(MailSupplierProperties.class)
+@AutoConfiguration
 public class MailSupplierConfiguration {
 
-	final private MailSupplierProperties properties;
+	private final MailSupplierProperties properties;
 
 	public MailSupplierConfiguration(MailSupplierProperties properties) {
 		this.properties = properties;
@@ -66,10 +67,9 @@ public class MailSupplierConfiguration {
 
 	@Bean
 	public Publisher<Message<Object>> mailInboundFlow(MessageProducerSupport messageProducer) {
-
 		return IntegrationFlow.from(messageProducer)
 			.transform(Mail.toStringTransformer(this.properties.getCharset()))
-			.enrichHeaders(h -> h.defaultOverwrite(true)
+			.enrichHeaders((h) -> h.defaultOverwrite(true)
 				.header(MailHeaders.TO, arrayToListProcessor(MailHeaders.TO))
 				.header(MailHeaders.CC, arrayToListProcessor(MailHeaders.CC))
 				.header(MailHeaders.BCC, arrayToListProcessor(MailHeaders.BCC)))
@@ -81,7 +81,7 @@ public class MailSupplierConfiguration {
 		return () -> Flux.from(messagePublisher);
 	}
 
-	private HeaderValueMessageProcessor<?> arrayToListProcessor(final String header) {
+	private HeaderValueMessageProcessor<?> arrayToListProcessor(String header) {
 		return new AbstractHeaderValueMessageProcessor<List<String>>() {
 
 			@Override
@@ -103,7 +103,8 @@ public class MailSupplierConfiguration {
 			.userFlag(this.properties.getUserFlag())
 			.javaMailProperties(getJavaMailProperties(urlName))
 			.selectorExpression(this.properties.getExpression())
-			.shouldMarkMessagesAsRead(this.properties.isMarkAsRead());
+			.shouldMarkMessagesAsRead(this.properties.isMarkAsRead())
+			.autoStartup(false);
 
 		if (imapIdleChannelAdapterSpecCustomizer != null) {
 			imapIdleChannelAdapterSpecCustomizer.customize(imapIdleChannelAdapterSpec);
@@ -118,18 +119,11 @@ public class MailSupplierConfiguration {
 
 		MailInboundChannelAdapterSpec<?, ?> adapterSpec;
 		URLName urlName = this.properties.getUrl();
-		switch (urlName.getProtocol().toUpperCase()) {
-			case "IMAP":
-			case "IMAPS":
-				adapterSpec = getImapChannelAdapterSpec(urlName);
-				break;
-			case "POP3":
-			case "POP3S":
-				adapterSpec = getPop3ChannelAdapterSpec(urlName);
-				break;
-			default:
-				throw new IllegalArgumentException("Unsupported mail protocol: " + urlName.getProtocol());
-		}
+		adapterSpec = switch (urlName.getProtocol().toUpperCase()) {
+			case "IMAP", "IMAPS" -> getImapChannelAdapterSpec(urlName);
+			case "POP3", "POP3S" -> getPop3ChannelAdapterSpec(urlName);
+			default -> throw new IllegalArgumentException("Unsupported mail protocol: " + urlName.getProtocol());
+		};
 		adapterSpec.javaMailProperties(getJavaMailProperties(urlName))
 			.userFlag(this.properties.getUserFlag())
 			.selectorExpression(this.properties.getExpression())
@@ -145,26 +139,17 @@ public class MailSupplierConfiguration {
 	@Bean("mailChannelAdapter")
 	@ConditionalOnProperty(value = "mail.supplier.idle-imap", matchIfMissing = true, havingValue = "false")
 	MessageProducerSupport mailMessageProducer(MessageSource<?> mailMessageSource) {
-		return new ReactiveMessageSourceProducer(mailMessageSource);
+		ReactiveMessageSourceProducer reactiveMessageSourceProducer = new ReactiveMessageSourceProducer(
+				mailMessageSource);
+		reactiveMessageSourceProducer.setAutoStartup(false);
+		return reactiveMessageSourceProducer;
 	}
 
-	/**
-	 * Method to build Mail Channel Adapter for POP3.
-	 * @param urlName Mail source URL.
-	 * @return Mail Channel for POP3
-	 */
-	@SuppressWarnings("rawtypes")
-	private MailInboundChannelAdapterSpec getPop3ChannelAdapterSpec(URLName urlName) {
+	private Pop3MailInboundChannelAdapterSpec getPop3ChannelAdapterSpec(URLName urlName) {
 		return Mail.pop3InboundAdapter(urlName.toString());
 	}
 
-	/**
-	 * Method to build Mail Channel Adapter for IMAP.
-	 * @param urlName Mail source URL.
-	 * @return Mail Channel for IMAP
-	 */
-	@SuppressWarnings("rawtypes")
-	private MailInboundChannelAdapterSpec getImapChannelAdapterSpec(URLName urlName) {
+	private ImapMailInboundChannelAdapterSpec getImapChannelAdapterSpec(URLName urlName) {
 		return Mail.imapInboundAdapter(urlName.toString()).shouldMarkMessagesAsRead(this.properties.isMarkAsRead());
 	}
 
@@ -172,29 +157,26 @@ public class MailSupplierConfiguration {
 		Properties javaMailProperties = new Properties();
 
 		switch (urlName.getProtocol().toUpperCase()) {
-			case "IMAP":
+			case "IMAP" -> {
 				javaMailProperties.setProperty("mail.imap.socketFactory.class", "javax.net.SocketFactory");
 				javaMailProperties.setProperty("mail.imap.socketFactory.fallback", "false");
 				javaMailProperties.setProperty("mail.store.protocol", "imap");
-				break;
-
-			case "IMAPS":
+			}
+			case "IMAPS" -> {
 				javaMailProperties.setProperty("mail.imap.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 				javaMailProperties.setProperty("mail.imap.socketFactory.fallback", "false");
 				javaMailProperties.setProperty("mail.store.protocol", "imaps");
-				break;
-
-			case "POP3":
+			}
+			case "POP3" -> {
 				javaMailProperties.setProperty("mail.pop3.socketFactory.class", "javax.net.SocketFactory");
 				javaMailProperties.setProperty("mail.pop3.socketFactory.fallback", "false");
 				javaMailProperties.setProperty("mail.store.protocol", "pop3");
-				break;
-
-			case "POP3S":
+			}
+			case "POP3S" -> {
 				javaMailProperties.setProperty("mail.pop3.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
 				javaMailProperties.setProperty("mail.pop3.socketFactory.fallback", "false");
 				javaMailProperties.setProperty("mail.store.protocol", "pop3s");
-				break;
+			}
 		}
 
 		javaMailProperties.putAll(this.properties.getJavaMailProperties());

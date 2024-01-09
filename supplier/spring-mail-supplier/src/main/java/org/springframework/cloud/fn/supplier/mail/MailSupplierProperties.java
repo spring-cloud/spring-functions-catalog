@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import org.springframework.integration.mail.AbstractMailReceiver;
 import org.springframework.validation.annotation.Validated;
 
 /**
- * Properties for the file supplier.
+ * Configuration properties for Mail supplier.
  *
  * @author Gary Russell
  * @author Artem Bilan
@@ -58,7 +58,7 @@ public class MailSupplierProperties {
 	private boolean idleImap = false;
 
 	/**
-	 * JavaMail properties as a new line delimited string of name-value pairs, e.g.
+	 * Java Mail properties as a new line delimited string of name-value pairs, e.g.
 	 * 'foo=bar\n baz=car'.
 	 */
 	private Properties javaMailProperties = new Properties();
@@ -78,89 +78,53 @@ public class MailSupplierProperties {
 	 */
 	private String userFlag = AbstractMailReceiver.DEFAULT_SI_USER_FLAG;
 
-	/**
-	 * @return the markAsRead
-	 */
 	public boolean isMarkAsRead() {
 		return this.markAsRead;
 	}
 
-	/**
-	 * @param markAsRead the markAsRead to set
-	 */
 	public void setMarkAsRead(boolean markAsRead) {
 		this.markAsRead = markAsRead;
 	}
 
-	/**
-	 * @return the delete
-	 */
 	public boolean isDelete() {
 		return this.delete;
 	}
 
-	/**
-	 * @param delete the delete to set
-	 */
 	public void setDelete(boolean delete) {
 		this.delete = delete;
 	}
 
-	/**
-	 * @return the idleImap
-	 */
 	public boolean isIdleImap() {
 		return this.idleImap;
 	}
 
-	/**
-	 * @param idleImap the idleImap to set
-	 */
 	public void setIdleImap(boolean idleImap) {
 		this.idleImap = idleImap;
 	}
 
-	/**
-	 * @return the javaMailProperties
-	 */
 	@NotNull
 	public Properties getJavaMailProperties() {
 		return this.javaMailProperties;
 	}
 
-	/**
-	 * @param javaMailProperties the javaMailProperties to set
-	 */
 	public void setJavaMailProperties(Properties javaMailProperties) {
 		this.javaMailProperties = javaMailProperties;
 	}
 
-	/**
-	 * @return the url
-	 */
 	@NotNull
 	public URLName getUrl() {
 		return this.url;
 	}
 
-	/**
-	 * @param url the url to set
-	 */
 	public void setUrl(URLName url) {
 		this.url = url;
 	}
 
-	/**
-	 * @return the expression
-	 */
 	@NotNull
 	public String getExpression() {
 		return this.expression;
 	}
 
-	/**
-	 * @param expression the expression to set
-	 */
 	public void setExpression(String expression) {
 		this.expression = expression;
 	}

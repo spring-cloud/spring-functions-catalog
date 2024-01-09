@@ -9,7 +9,7 @@ Users have to subscribe to this `Flux` and receive the data.
 
 ## Beans for injection
 
-You can import the `MailSupplierConfiguration` in the application and then inject the following bean.
+The `MailSupplierConfiguration` auto-configuration provides the following bean:
 
 `mailSupplier`
 

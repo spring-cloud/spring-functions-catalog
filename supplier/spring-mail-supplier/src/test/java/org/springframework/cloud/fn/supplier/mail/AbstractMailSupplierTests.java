@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import com.icegreen.greenmail.util.GreenMail;
 import com.icegreen.greenmail.util.GreenMailUtil;
 import com.icegreen.greenmail.util.ServerSetup;
 import com.icegreen.greenmail.util.ServerSetupTest;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import reactor.core.publisher.Flux;
 
@@ -35,8 +36,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, properties = { "mail.supplier.mark-as-read=true",
-		"mail.supplier.delete=false", "mail.supplier.user-flag=testSIUserFlag",
+@SpringBootTest(properties = { "mail.supplier.mark-as-read=true", "mail.supplier.delete=false",
+		"mail.supplier.user-flag=testSIUserFlag",
 		"mail.supplier.java-mail-properties=mail.imap.socketFactory.fallback=true\\n mail.store.protocol=imap\\n mail.debug=true" })
 @DirtiesContext
 public abstract class AbstractMailSupplierTests {
@@ -68,6 +69,11 @@ public abstract class AbstractMailSupplierTests {
 		mailServer = new GreenMail(new ServerSetup[] { imap, pop3, smtp });
 		mailUser = mailServer.setUser("user", "pw");
 		mailServer.start();
+	}
+
+	@AfterAll
+	static void tearDown() {
+		mailServer.stop();
 	}
 
 	@DynamicPropertySource

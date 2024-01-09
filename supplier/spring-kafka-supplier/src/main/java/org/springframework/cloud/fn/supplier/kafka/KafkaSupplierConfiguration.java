@@ -126,7 +126,7 @@ public class KafkaSupplierConfiguration {
 
 		StandardEvaluationContext evaluationContext = IntegrationContextUtils.getEvaluationContext(beanFactory);
 
-		return consumerRecord -> Boolean.TRUE.equals(
+		return (consumerRecord) -> Boolean.TRUE.equals(
 				kafkaSupplierProperties.getRecordFilter().getValue(evaluationContext, consumerRecord, Boolean.class));
 	}
 
