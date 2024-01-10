@@ -1,6 +1,6 @@
 # Splitter Function
 
-This module provides a header enricher function that can be reused and composed in other applications.
+This module provides a splitter function that can be reused and composed in other applications.
 
 ## Beans for injection
 
