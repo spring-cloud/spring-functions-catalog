@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package org.springframework.cloud.fn.filter;
 
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -47,9 +46,8 @@ public class FilterFunctionApplicationTests {
 
 	@Test
 	public void testFilter() {
-		Stream<Message<?>> messages = List.of("hello", "hello world").stream().map(GenericMessage::new);
-		List<Message<?>> result = messages.filter(message -> this.filter.apply(message) != null)
-			.collect(Collectors.toList());
+		Stream<Message<?>> messages = Stream.of("hello", "hello world").map(GenericMessage::new);
+		List<Message<?>> result = messages.filter((message) -> this.filter.apply(message) != null).toList();
 		assertThat(result.size()).isEqualTo(1);
 		assertThat(result.get(0).getPayload()).isNotNull();
 		assertThat(result.get(0).getPayload()).isEqualTo("hello world");

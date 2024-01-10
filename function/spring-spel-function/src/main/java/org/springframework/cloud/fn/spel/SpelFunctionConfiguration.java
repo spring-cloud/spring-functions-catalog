@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,18 @@ package org.springframework.cloud.fn.spel;
 
 import java.util.function.Function;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.transformer.ExpressionEvaluatingTransformer;
 import org.springframework.messaging.Message;
 
-@Configuration
+/**
+ * Auto-configuration for SpEL function.
+ *
+ * @author Soby Chacko
+ */
+@AutoConfiguration
 @EnableConfigurationProperties(SpelFunctionProperties.class)
 public class SpelFunctionConfiguration {
 
@@ -33,15 +37,14 @@ public class SpelFunctionConfiguration {
 	public Function<Message<?>, Message<?>> spelFunction(
 			ExpressionEvaluatingTransformer expressionEvaluatingTransformer) {
 
-		return message -> expressionEvaluatingTransformer.transform(message);
+		return expressionEvaluatingTransformer::transform;
 	}
 
 	@Bean
 	public ExpressionEvaluatingTransformer expressionEvaluatingTransformer(
 			SpelFunctionProperties spelFunctionProperties) {
 
-		return new ExpressionEvaluatingTransformer(
-				new SpelExpressionParser().parseExpression(spelFunctionProperties.getExpression()));
+		return new ExpressionEvaluatingTransformer(spelFunctionProperties.getExpression());
 	}
 
 }

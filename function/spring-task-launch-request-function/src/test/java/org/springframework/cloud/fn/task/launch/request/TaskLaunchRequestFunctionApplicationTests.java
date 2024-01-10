@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,13 +194,13 @@ public class TaskLaunchRequestFunctionApplicationTests {
 		@Bean
 		@ConditionalOnProperty("customTaskNameExtractor")
 		TaskNameMessageMapper taskNameExtractor() {
-			return message -> ((String) (message.getPayload())).equalsIgnoreCase("foo") ? "fooTask" : "defaultTask";
+			return (message) -> ((String) (message.getPayload())).equalsIgnoreCase("foo") ? "fooTask" : "defaultTask";
 		}
 
 		@Bean
 		@ConditionalOnProperty("enhanceTLRArgs")
 		CommandLineArgumentsMessageMapper commandLineArgumentsProvider() {
-			return message -> Collections.singletonList("runtimeArg");
+			return (message) -> Collections.singletonList("runtimeArg");
 		}
 
 	}

@@ -5,7 +5,7 @@ The function can be used to apply SpEL transformations on data based on a SpEL e
 
 ## Beans for injection
 
-You can import the `SpelFunctionConfiguration` in a Spring Boot application and then inject the following bean.
+The `SpelFunctionConfiguration` auto-configuration provides the following bean:
 
 `spelFunction`
 

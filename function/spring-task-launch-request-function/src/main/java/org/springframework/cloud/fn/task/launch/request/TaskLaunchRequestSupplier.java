@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,18 +30,18 @@ class TaskLaunchRequestSupplier implements Supplier<TaskLaunchRequest> {
 
 	private Supplier<Map<String, String>> deploymentPropertiesSupplier;
 
-	public TaskLaunchRequestSupplier taskNameSupplier(Supplier<String> taskNameSupplier) {
+	TaskLaunchRequestSupplier taskNameSupplier(Supplier<String> taskNameSupplier) {
 		this.taskNameSupplier = taskNameSupplier;
 		return this;
 	}
 
-	public TaskLaunchRequestSupplier commandLineArgumentSupplier(Supplier<List<String>> commandLineArgumentsSupplier) {
+	TaskLaunchRequestSupplier commandLineArgumentSupplier(Supplier<List<String>> commandLineArgumentsSupplier) {
 		this.commandLineArgumentsSupplier = commandLineArgumentsSupplier;
 		return this;
 	}
 
-	public TaskLaunchRequestSupplier deploymentPropertiesSupplier(
-			Supplier<Map<String, String>> deploymentPropertiesSupplier) {
+	TaskLaunchRequestSupplier deploymentPropertiesSupplier(Supplier<Map<String, String>> deploymentPropertiesSupplier) {
+
 		this.deploymentPropertiesSupplier = deploymentPropertiesSupplier;
 		return this;
 	}

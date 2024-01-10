@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,22 +46,22 @@ class TaskLaunchRequestMessageProcessor implements MessagePostProcessor {
 
 	@Override
 	public Message<TaskLaunchRequest> postProcessMessage(Message<?> message) {
-		TaskLaunchRequest taskLaunchRequest = taskLaunchRequestInitializer.get();
+		TaskLaunchRequest taskLaunchRequest = this.taskLaunchRequestInitializer.get();
 
 		if (!StringUtils.hasText(taskLaunchRequest.getTaskName())) {
-			taskLaunchRequest.setTaskName(taskNameMessageMapper.processMessage(message));
+			taskLaunchRequest.setTaskName(this.taskNameMessageMapper.processMessage(message));
 			Assert.hasText(taskLaunchRequest.getTaskName(),
 					() -> "'taskName' is required in " + TaskLaunchRequest.class.getName());
 		}
 
-		taskLaunchRequest.addCommmandLineArguments(commandLineArgumentsMessageMapper.processMessage(message));
+		taskLaunchRequest.addCommmandLineArguments(this.commandLineArgumentsMessageMapper.processMessage(message));
 
 		MessageBuilder<TaskLaunchRequest> builder = MessageBuilder.withPayload(taskLaunchRequest)
 			.copyHeaders(message.getHeaders());
 		return adjustHeaders(builder).build();
 	}
 
-	private MessageBuilder<TaskLaunchRequest> adjustHeaders(MessageBuilder<TaskLaunchRequest> builder) {
+	private static MessageBuilder<TaskLaunchRequest> adjustHeaders(MessageBuilder<TaskLaunchRequest> builder) {
 		builder.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON);
 		return builder;
 	}

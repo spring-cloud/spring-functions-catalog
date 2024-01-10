@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,7 +82,7 @@ public class TaskLaunchRequestFunctionProperties {
 	}
 
 	public String getTaskName() {
-		return taskName;
+		return this.taskName;
 	}
 
 	public void setTaskName(String taskName) {
@@ -90,7 +90,7 @@ public class TaskLaunchRequestFunctionProperties {
 	}
 
 	public String getTaskNameExpression() {
-		return taskNameExpression;
+		return this.taskNameExpression;
 	}
 
 	public void setTaskNameExpression(String taskNameExpression) {
@@ -98,7 +98,7 @@ public class TaskLaunchRequestFunctionProperties {
 	}
 
 	public String getArgExpressions() {
-		return argExpressions;
+		return this.argExpressions;
 	}
 
 	public void setArgExpressions(String argExpressions) {

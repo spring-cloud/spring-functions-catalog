@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,8 @@ import org.springframework.integration.transformer.ExpressionEvaluatingTransform
 import org.springframework.messaging.Message;
 
 /**
+ * Auto-configuration for Filter function.
+ *
  * @author Artem Bilan
  * @author David Turanski
  */
@@ -36,7 +38,7 @@ public class FilterFunctionConfiguration {
 	public Function<Message<?>, Message<?>> filterFunction(
 			ExpressionEvaluatingTransformer filterExpressionEvaluatingTransformer) {
 
-		return message -> {
+		return (message) -> {
 			if ((Boolean) filterExpressionEvaluatingTransformer.transform(message).getPayload()) {
 				return message;
 			}

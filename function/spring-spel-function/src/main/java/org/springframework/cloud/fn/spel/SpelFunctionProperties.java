@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ package org.springframework.cloud.fn.spel;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.integration.expression.FunctionExpression;
+import org.springframework.messaging.Message;
 
 /**
  * Configuration properties for the SpEL function.
@@ -29,18 +30,18 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 @ConfigurationProperties("spel.function")
 public class SpelFunctionProperties {
 
-	private static final Expression DEFAULT_EXPRESSION = new SpelExpressionParser().parseExpression("payload");
+	private static final Expression DEFAULT_EXPRESSION = new FunctionExpression<Message<?>>(Message::getPayload);
 
 	/**
 	 * A SpEL expression to apply.
 	 */
-	private String expression = DEFAULT_EXPRESSION.getExpressionString();
+	private Expression expression = DEFAULT_EXPRESSION;
 
-	public String getExpression() {
+	public Expression getExpression() {
 		return this.expression;
 	}
 
-	public void setExpression(String expression) {
+	public void setExpression(Expression expression) {
 		this.expression = expression;
 	}
 

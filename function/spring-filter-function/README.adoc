@@ -4,7 +4,7 @@ This module provides a filter function that can be reused and composed in other 
 
 ## Beans for injection
 
-You can import the `FilterFunctionConfiguration` in a Spring Boot application and then inject the following bean.
+The `FilterFunctionConfiguration` auto-configuration provides following bean:
 
 `filterFunction`
 
