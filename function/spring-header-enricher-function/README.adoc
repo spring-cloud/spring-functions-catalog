@@ -4,7 +4,7 @@ This module provides a header enricher function that can be reused and composed 
 
 ## Beans for injection
 
-You can import the `HeaderEnricherFunctionConfiguration` in a Spring Boot application and then inject the following bean.
+The `HeaderEnricherFunctionConfiguration` auto-configuration provides the following bean:
 
 `headerEnricherFunction`
 

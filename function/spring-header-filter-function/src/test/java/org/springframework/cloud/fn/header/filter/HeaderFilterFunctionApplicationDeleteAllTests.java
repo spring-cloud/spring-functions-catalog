@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 the original author or authors.
+ * Copyright 2023-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import java.util.function.Function;
 import org.junit.jupiter.api.Test;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.messaging.Message;
@@ -51,10 +50,6 @@ public class HeaderFilterFunctionApplicationDeleteAllTests {
 
 	@SpringBootApplication
 	static class HeaderFilterFunctionTestApplication {
-
-		public static void main(String[] args) throws Exception {
-			SpringApplication.main(args);
-		}
 
 	}
 

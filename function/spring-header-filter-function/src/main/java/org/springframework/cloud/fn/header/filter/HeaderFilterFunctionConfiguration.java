@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 the original author or authors.
+ * Copyright 2023-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ import org.springframework.messaging.Message;
 import org.springframework.util.StringUtils;
 
 /**
- * Configure a function using {@link HeaderFilter}.
+ * Auto-configure a function using {@link HeaderFilter}.
  *
  * @author Corneil du Plessis
  */
@@ -38,14 +38,9 @@ import org.springframework.util.StringUtils;
 @ConditionalOnExpression("'${header.filter.remove}'!='' or '${header.filter.delete-all}' != ''")
 public class HeaderFilterFunctionConfiguration {
 
-	private final HeaderFilterFunctionProperties properties;
-
-	public HeaderFilterFunctionConfiguration(HeaderFilterFunctionProperties properties) {
-		this.properties = properties;
-	}
-
 	@Bean
-	public Function<Message<?>, Message<?>> headerFilterFunction() {
+	public Function<Message<?>, Message<?>> headerFilterFunction(HeaderFilterFunctionProperties properties,
+			HeaderFilter headerFilter) {
 		if (properties.isDeleteAll()) {
 			return (message) -> {
 				var accessor = new IntegrationMessageHeaderAccessor(message);
@@ -56,12 +51,12 @@ public class HeaderFilterFunctionConfiguration {
 			};
 		}
 		else {
-			return headerFilter()::transform;
+			return headerFilter::transform;
 		}
 	}
 
 	@Bean
-	public HeaderFilter headerFilter() {
+	public HeaderFilter headerFilter(HeaderFilterFunctionProperties properties) {
 		if (properties.getRemove() != null) {
 			String[] remove = StringUtils.tokenizeToStringArray(properties.getRemove(), ", ", true, true);
 			HeaderFilter filter = new HeaderFilter(remove);

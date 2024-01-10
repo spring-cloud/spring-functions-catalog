@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,7 +23,6 @@ import java.util.Properties;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.BeanFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -33,6 +32,8 @@ import org.springframework.integration.transformer.support.ExpressionEvaluatingH
 import org.springframework.messaging.Message;
 
 /**
+ * Auto-configuration for Header Enricher function.
+ *
  * @author Gary Russell
  * @author Christian Tzolov
  * @author Soby Chacko
@@ -43,18 +44,15 @@ import org.springframework.messaging.Message;
 @ConditionalOnProperty(prefix = "header.enricher", value = "headers")
 public class HeaderEnricherFunctionConfiguration {
 
-	@Autowired
-	private HeaderEnricherFunctionProperties properties;
-
 	@Bean
 	public Function<Message<?>, Message<?>> headerEnricherFunction(HeaderEnricher headerEnricher) {
 		return headerEnricher::transform;
 	}
 
 	@Bean
-	public HeaderEnricher headerEnricher(BeanFactory beanFactory) {
+	public HeaderEnricher headerEnricher(HeaderEnricherFunctionProperties properties, BeanFactory beanFactory) {
 		Map<String, ExpressionEvaluatingHeaderValueMessageProcessor<?>> headersToAdd = new HashMap<>();
-		Properties props = this.properties.getHeaders();
+		Properties props = properties.getHeaders();
 		Enumeration<?> enumeration = props.propertyNames();
 		while (enumeration.hasMoreElements()) {
 			String propertyName = (String) enumeration.nextElement();
@@ -64,7 +62,7 @@ public class HeaderEnricherFunctionConfiguration {
 			headersToAdd.put(propertyName, headerValueMessageProcessor);
 		}
 		HeaderEnricher headerEnricher = new HeaderEnricher(headersToAdd);
-		headerEnricher.setDefaultOverwrite(this.properties.isOverwrite());
+		headerEnricher.setDefaultOverwrite(properties.isOverwrite());
 		return headerEnricher;
 	}
 
