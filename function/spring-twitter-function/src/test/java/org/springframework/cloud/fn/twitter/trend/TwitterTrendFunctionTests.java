@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,13 +35,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionProperties;
 import org.springframework.cloud.fn.common.twitter.util.TwitterTestUtils;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.util.TestSocketUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockserver.matchers.Times.exactly;
@@ -61,8 +59,6 @@ public abstract class TwitterTrendFunctionTests {
 
 	private static final String MOCK_SERVER_IP = "127.0.0.1";
 
-	private static final Integer MOCK_SERVER_PORT = TestSocketUtils.findAvailableTcpPort();
-
 	private static ClientAndServer mockServer;
 
 	private static MockServerClient mockClient;
@@ -74,8 +70,8 @@ public abstract class TwitterTrendFunctionTests {
 
 	@BeforeAll
 	public static void startServer() {
-		mockServer = ClientAndServer.startClientAndServer(MOCK_SERVER_PORT);
-		mockClient = new MockServerClient(MOCK_SERVER_IP, MOCK_SERVER_PORT);
+		mockServer = ClientAndServer.startClientAndServer();
+		mockClient = new MockServerClient(MOCK_SERVER_IP, mockServer.getPort());
 
 		trendsRequest = setExpectation(
 				request().withMethod("GET").withPath("/trends/place.json").withQueryStringParameter("id", "2972"));
@@ -96,7 +92,8 @@ public abstract class TwitterTrendFunctionTests {
 		return request;
 	}
 
-	@TestPropertySource(properties = { "twitter.trend.locationId='2972'", "twitter.connection.rawJson=true" })
+	@TestPropertySource(properties = { "twitter.trend.trendQueryType=trend", "twitter.trend.locationId='2972'",
+			"twitter.connection.rawJson=true" })
 	public static class TwitterTrendPayloadTests extends TwitterTrendFunctionTests {
 
 		@Test
@@ -110,7 +107,6 @@ public abstract class TwitterTrendFunctionTests {
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
-	@Import(TwitterTrendFunctionConfiguration.class)
 	public static class TwitterTrendFunctionTestApplication {
 
 		@Bean
@@ -120,7 +116,7 @@ public abstract class TwitterTrendFunctionTests {
 
 			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration = toConfigurationBuilder
 				.andThen(new TwitterTestUtils()
-					.mockTwitterUrls(String.format("http://%s:%s", MOCK_SERVER_IP, MOCK_SERVER_PORT)));
+					.mockTwitterUrls(String.format("http://%s:%s", MOCK_SERVER_IP, mockServer.getPort())));
 
 			return mockedConfiguration.apply(properties).build();
 		}

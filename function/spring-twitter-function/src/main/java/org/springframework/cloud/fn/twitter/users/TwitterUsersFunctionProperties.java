@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,21 +17,23 @@
 package org.springframework.cloud.fn.twitter.users;
 
 import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.integration.expression.FunctionExpression;
+import org.springframework.messaging.Message;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * Configuration properties for Twitter Users function.
+ *
  * @author Christian Tzolov
  */
 @ConfigurationProperties("twitter.users")
 @Validated
 public class TwitterUsersFunctionProperties {
 
-	private static final Expression DEFAULT_EXPRESSION = new SpelExpressionParser().parseExpression("payload");
+	private static final Expression DEFAULT_EXPRESSION = new FunctionExpression<Message<?>>(Message::getPayload);
 
 	public enum UserQueryType {
 
@@ -43,8 +45,7 @@ public class TwitterUsersFunctionProperties {
 	/**
 	 * Perform search or lookup type of search.
 	 */
-	@NotNull
-	private UserQueryType type = UserQueryType.search;
+	private UserQueryType type;
 
 	/**
 	 * Returns fully-hydrated user objects for specified by comma-separated values passed
@@ -53,13 +54,13 @@ public class TwitterUsersFunctionProperties {
 	private final Lookup lookup = new Lookup();
 
 	/**
-	 * relevance-based search interface for querying by topical interest, full name,
+	 * Relevance-based search interface for querying by topical interest, full name,
 	 * company name, location, or other criteria.
 	 */
 	private final Search search = new Search();
 
 	public UserQueryType getType() {
-		return type;
+		return this.type;
 	}
 
 	public void setType(UserQueryType type) {
@@ -67,20 +68,20 @@ public class TwitterUsersFunctionProperties {
 	}
 
 	public Lookup getLookup() {
-		return lookup;
+		return this.lookup;
 	}
 
 	public Search getSearch() {
-		return search;
+		return this.search;
 	}
 
 	@AssertTrue(message = "Per query type validate the required parameters")
 	public boolean checkParametersPerType() {
-		if (this.getType() == UserQueryType.lookup) {
-			return (this.getLookup().getScreenName() != null) || (this.getLookup().getUserId() != null);
+		if (getType() == UserQueryType.lookup) {
+			return (getLookup().getScreenName() != null) || (getLookup().getUserId() != null);
 		}
-		else if (this.getType() == UserQueryType.search) {
-			return (this.getSearch().getQuery() != null);
+		else if (getType() == UserQueryType.search) {
+			return (getSearch().getQuery() != null);
 		}
 
 		return false;
@@ -102,7 +103,7 @@ public class TwitterUsersFunctionProperties {
 		private Expression screenName;
 
 		public Expression getUserId() {
-			return userId;
+			return this.userId;
 		}
 
 		public void setUserId(Expression userId) {
@@ -110,7 +111,7 @@ public class TwitterUsersFunctionProperties {
 		}
 
 		public Expression getScreenName() {
-			return screenName;
+			return this.screenName;
 		}
 
 		public void setScreenName(Expression screenName) {
@@ -132,7 +133,7 @@ public class TwitterUsersFunctionProperties {
 		private int page = 3;
 
 		public Expression getQuery() {
-			return query;
+			return this.query;
 		}
 
 		public void setQuery(Expression query) {
@@ -140,7 +141,7 @@ public class TwitterUsersFunctionProperties {
 		}
 
 		public int getPage() {
-			return page;
+			return this.page;
 		}
 
 		public void setPage(int page) {

@@ -2,33 +2,30 @@
 
 This module provides couple of twitter functions that can be reused and composed in other applications.
 
-To use those functions add the following dependency to your POM:
+This module exposes auto-configurations for the following beans:
 
-[source,XML]
-----
- <dependency>
-   <groupId>org.springframework.cloud.fn</groupId>
-   <artifactId>twitter-function</artifactId>
-   <version>${java-functions.version}</version>
- </dependency>
-----
+* `twitterTrendFunction`
+* `twitterUsersFunction`
+* `twitterGeoFunction`
+
+Each of them are conditional by specific configuration properties.
 
 ## 1. Twitter Trend Function
 
-Functions can return either Trends topics or the Locations of the trending topics. The `twitter.trend.trend-query-type` property allows choosing between both types.
+Function can return either Trends topics or the Locations of the trending topics.
+The `twitter.trend.trend-query-type` property allows choosing between both types.
+This property is required to enable the function auto-configuration.
 
-* Trends - `twitter.trend.trend-query-type` is set to `trend`. Leverages the https://developer.twitter.com/en/docs/trends/trends-for-location/api-reference/get-trends-place[Trends API] to return the https://help.twitter.com/en/using-twitter/twitter-trending-faqs[trending topics] near a specific latitude, longitude location.
+* Trends - `twitter.trend.trend-query-type` is set to `trend`.
+Leverages the https://developer.twitter.com/en/docs/trends/trends-for-location/api-reference/get-trends-place[Trends API] to return the https://help.twitter.com/en/using-twitter/twitter-trending-faqs[trending topics] near a specific latitude, longitude location.
 
-* Trend Locations - the `twitter.trend.trend-query-type` is set `trendLocation`. Retrieve a full or nearby locations list of trending topics by location. If the `latitude`, `longitude` parameters are NOT provided the processor performs the https://developer.twitter.com/en/docs/trends/locations-with-trending-topics/api-reference/get-trends-available[Trends Available API] and returns the locations that Twitter has trending topic information for.
+* Trend Locations - the `twitter.trend.trend-query-type` is set `trendLocation`.
+Retrieve a full or nearby locations list of trending topics by location. If the `latitude`, `longitude` parameters are NOT provided the processor performs the https://developer.twitter.com/en/docs/trends/locations-with-trending-topics/api-reference/get-trends-available[Trends Available API] and returns the locations that Twitter has trending topic information for.
 If the `latitude`, `longitude` parameters are provided the processor performs the https://developer.twitter.com/en/docs/trends/locations-with-trending-topics/api-reference/get-trends-closest[Trends Closest API] and returns the locations that Twitter has trending topic information for, closest to a specified location.
 
 Response is an array of `locations` that encode the location's WOEID and some other human-readable information such as a canonical name and country the location belongs in.
 
 ### 1.1 Beans for injection
-
-You can import the `TwitterTrendFunctionConfiguration` in a Spring Boot application and then inject the following bean.
-
-`filterFunction`
 
 You can use `Function<Message<?>, Message<byte[]>> twitterTrendFunction` as a qualifier when injecting.
 
@@ -45,12 +42,11 @@ See this link:src/test/java/org/springframework/cloud/fn/twitter/trend/TwitterTr
 
 ### 1.4 Other usage
 
-Leveraging the Spring Cloud Function composability, you can compose the Trend function in your boot app like this:
+Leveraging the Spring Cloud Function "composability", you can compose the Trend function in your boot app like this:
 
 [source,Java]
 ----
 @SpringBootApplication
-@Import(TwitterTrendFunctionConfiguration.class )
 public class MyTwitterTrendBootApp {
 
 	public static void main(String[] args) {
@@ -79,11 +75,9 @@ Some parameters in this method are only required based on the existence of other
 
 NOTE: Limits: 15 requests / 15-min window (user auth).
 
+This function auto-configuration is conditional on `twitter.geo.search.ip != null || (twitter.geo.location.lat != null && twitter.geo.location.lon != null)`
+
 ### 2.1 Beans for injection
-
-You can import the `TwitterGeoFunctionConfiguration` in a Spring Boot application and then inject the following bean.
-
-`filterFunction`
 
 You can use `Function<Message<?>, Message<byte[]>> twitterGeoFunction` as a qualifier when injecting.
 Once injected, you can use the `apply` method of the `Function` to invoke it and get the result.
@@ -96,7 +90,7 @@ For more information on the various options available, please see link:../twitte
 
 ### 2.3 Tests
 
-See this link:src/test/java/org/springframework/cloud/fn/twitter/geo/TwitterGeoFunctionTest.java[test suite] for examples of how this function is used.
+See this link:src/test/java/org/springframework/cloud/fn/twitter/geo/TwitterGeoFunctionTests.java[test suite] for examples of how this function is used.
 
 ### 2.4 Other usage
 
@@ -105,7 +99,6 @@ Leveraging the Spring Cloud Function composability, you can compose the Geo func
 [source,Java]
 ----
 @SpringBootApplication
-@Import(TwitterGeoFunctionConfiguration.class )
 public class MyTwitterGeoProcessorBootApp {
 
 	public static void main(String[] args) {
@@ -122,16 +115,13 @@ Uses SpEL expressions to compute the query parameters from the input message.
 Use the single quoted literals to set static values (e.g. user-id: '6666, 9999, 10000').
 
 Use `twitter.users.type` property allow to select the query approaches.
+This property is required to trigger the `twitterUsersFunction` auto-configuration.
 
 * https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-lookup[Users Lookup API] - Returns fully-hydrated user objects for up to 100 users per request, as specified by comma-separated values passed to the `userId` and/or `screenName` parameters. Rate limits: (300 requests / 15-min window)
 * https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-search[Users Search API] - Relevance-based search interface to public user accounts on Twitter.
 Querying by topical interest, full name, company name, location, or other criteria. Exact match searches are not supported. Only the first 1,000 matching results are available. Rate limits:(900 requests / 15-min window)
 
 ### 3.1 Beans for injection
-
-You can import the `TwitterUsersFunctionConfiguration` in a Spring Boot application and then inject the following bean.
-
-`filterFunction`
 
 You can use `Function<Message<?>, Message<byte[]>> twitterUsersFunction` as a qualifier when injecting.
 Once injected, you can use the `apply` method of the `Function` to invoke it and get the result.

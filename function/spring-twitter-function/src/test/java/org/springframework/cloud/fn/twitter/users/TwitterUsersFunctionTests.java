@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,13 +38,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionProperties;
 import org.springframework.cloud.fn.common.twitter.util.TwitterTestUtils;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.util.TestSocketUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockserver.matchers.Times.exactly;
@@ -63,8 +61,6 @@ import static org.mockserver.verify.VerificationTimes.once;
 public abstract class TwitterUsersFunctionTests {
 
 	private static final String MOCK_SERVER_IP = "127.0.0.1";
-
-	private static final Integer MOCK_SERVER_PORT = TestSocketUtils.findAvailableTcpPort();
 
 	private static ClientAndServer mockServer;
 
@@ -94,8 +90,8 @@ public abstract class TwitterUsersFunctionTests {
 
 	@BeforeAll
 	public static void startServer() {
-		mockServer = ClientAndServer.startClientAndServer(MOCK_SERVER_PORT);
-		mockClient = new MockServerClient(MOCK_SERVER_IP, MOCK_SERVER_PORT);
+		mockServer = ClientAndServer.startClientAndServer();
+		mockClient = new MockServerClient(MOCK_SERVER_IP, mockServer.getPort());
 
 		searchUsersRequest = setExpectation(request().withMethod("GET")
 			.withPath("/users/search.json")
@@ -127,7 +123,7 @@ public abstract class TwitterUsersFunctionTests {
 			Message<?> received = twitterUsersFunction.apply(MessageBuilder.withPayload("tzolov").build());
 			mockClient.verify(searchUsersRequest, once());
 			assertThat(received).isNotNull();
-			List list = mapper.readValue(new String((byte[]) received.getPayload()), List.class);
+			List<?> list = mapper.readValue(new String((byte[]) received.getPayload()), List.class);
 			assertThat(list).hasSize(20);
 		}
 
@@ -144,7 +140,7 @@ public abstract class TwitterUsersFunctionTests {
 
 			mockClient.verify(lookupUsersRequest, once());
 			assertThat(received).isNotNull();
-			List list = mapper.readValue(new String((byte[]) received.getPayload()), List.class);
+			List<?> list = mapper.readValue(new String((byte[]) received.getPayload()), List.class);
 			assertThat(list).hasSize(5);
 		}
 
@@ -164,7 +160,7 @@ public abstract class TwitterUsersFunctionTests {
 
 			mockClient.verify(lookupUsersRequest2, once());
 			assertThat(received).isNotNull();
-			List list = mapper.readValue(new String((byte[]) received.getPayload()), List.class);
+			List<?> list = mapper.readValue(new String((byte[]) received.getPayload()), List.class);
 			assertThat(list).hasSize(5);
 		}
 
@@ -172,17 +168,16 @@ public abstract class TwitterUsersFunctionTests {
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
-	@Import(TwitterUsersFunctionConfiguration.class)
 	static class TwitterUsersFunctionTestApplication {
 
 		@Bean
 		@Primary
-		public twitter4j.conf.Configuration twitterConfiguration2(TwitterConnectionProperties properties,
+		twitter4j.conf.Configuration twitterConfiguration2(TwitterConnectionProperties properties,
 				Function<TwitterConnectionProperties, ConfigurationBuilder> toConfigurationBuilder) {
 
 			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration = toConfigurationBuilder
 				.andThen(new TwitterTestUtils()
-					.mockTwitterUrls(String.format("http://%s:%s", MOCK_SERVER_IP, MOCK_SERVER_PORT)));
+					.mockTwitterUrls(String.format("http://%s:%s", MOCK_SERVER_IP, mockServer.getPort())));
 
 			return mockedConfiguration.apply(properties).build();
 		}

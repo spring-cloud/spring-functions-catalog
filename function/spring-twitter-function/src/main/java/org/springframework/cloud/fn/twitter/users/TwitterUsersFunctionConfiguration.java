@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,41 +21,40 @@ import java.util.function.Function;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import twitter4j.ResponseList;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.User;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 
 /**
+ * Auto-configuration for Twitter Users function.
+ *
  * @author Christian Tzolov
  */
-@Configuration
+@ConditionalOnProperty(prefix = "twitter.users", name = "type")
+@AutoConfiguration(after = TwitterConnectionConfiguration.class)
 @EnableConfigurationProperties(TwitterUsersFunctionProperties.class)
-@Import(TwitterConnectionConfiguration.class)
 public class TwitterUsersFunctionConfiguration {
 
-	private static final Log logger = LogFactory.getLog(TwitterUsersFunctionConfiguration.class);
+	private static final Log LOGGER = LogFactory.getLog(TwitterUsersFunctionConfiguration.class);
 
 	@Bean
 	@ConditionalOnProperty(name = "twitter.users.type", havingValue = "search")
 	public Function<Message<?>, List<User>> userSearch(Twitter twitter, TwitterUsersFunctionProperties properties) {
 
-		return message -> {
+		return (message) -> {
 			String query = properties.getSearch().getQuery().getValue(message, String.class);
 			try {
-				ResponseList<User> users = twitter.searchUsers(query, properties.getSearch().getPage());
-				return users;
+				return twitter.searchUsers(query, properties.getSearch().getPage());
 			}
-			catch (TwitterException e) {
-				logger.error("Twitter API error!", e);
+			catch (TwitterException ex) {
+				LOGGER.error("Twitter API error!", ex);
 			}
 			return null;
 		};
@@ -65,7 +64,7 @@ public class TwitterUsersFunctionConfiguration {
 	@ConditionalOnProperty(name = "twitter.users.type", havingValue = "lookup")
 	public Function<Message<?>, List<User>> userLookup(Twitter twitter, TwitterUsersFunctionProperties properties) {
 
-		return message -> {
+		return (message) -> {
 
 			try {
 				TwitterUsersFunctionProperties.Lookup lookup = properties.getLookup();
@@ -78,20 +77,17 @@ public class TwitterUsersFunctionConfiguration {
 					return twitter.lookupUsers(ids);
 				}
 			}
-			catch (TwitterException e) {
-				logger.error("Twitter API error!", e);
+			catch (TwitterException ex) {
+				LOGGER.error("Twitter API error!", ex);
 			}
 			return null;
 		};
 	}
 
 	@Bean
-	/**
-	 * queryUsers - depends on the `twitter.users.type` property is either userSearch or
-	 * userLookup. managedJson - converts Users into JSON message payload.
-	 */
 	public Function<Message<?>, Message<byte[]>> twitterUsersFunction(Function<Message<?>, List<User>> queryUsers,
 			Function<Object, Message<byte[]>> managedJson) {
+
 		return queryUsers.andThen(managedJson);
 	}
 

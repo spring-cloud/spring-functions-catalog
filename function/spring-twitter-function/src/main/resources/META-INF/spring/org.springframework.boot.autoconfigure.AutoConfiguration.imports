@@ -1,0 +1,3 @@
+org.springframework.cloud.fn.twitter.geo.TwitterGeoFunctionConfiguration
+org.springframework.cloud.fn.twitter.trend.TwitterTrendFunctionConfiguration
+org.springframework.cloud.fn.twitter.users.TwitterUsersFunctionConfiguration

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,17 +21,16 @@ import jakarta.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * Configuration properties for Twitter Geo function.
+ *
  * @author Christian Tzolov
  */
 @ConfigurationProperties("twitter.geo")
 @Validated
 public class TwitterGeoFunctionProperties {
-
-	private static final Expression DEFAULT_EXPRESSION = new SpelExpressionParser().parseExpression("payload");
 
 	public enum GeoType {
 
@@ -51,9 +50,6 @@ public class TwitterGeoFunctionProperties {
 	 */
 	private Search search = new Search();
 
-	/**
-	 *
-	 */
 	private Location location = new Location();
 
 	/**
@@ -68,7 +64,7 @@ public class TwitterGeoFunctionProperties {
 	 * in meters, but it can also take a string that is suffixed with ft to specify feet.
 	 * If this is not passed in, then it is assumed to be 0m. If coming from a device, in
 	 * practice, this value is whatever accuracy the device has measuring its location
-	 * (whether it be coming from a GPS, WiFi triangulation, etc.).
+	 * (whether it be coming from a GPS, Wi-Fi triangulation, etc.).
 	 */
 	private String accuracy = null;
 
@@ -79,7 +75,7 @@ public class TwitterGeoFunctionProperties {
 	private String granularity = null;
 
 	public Search getSearch() {
-		return search;
+		return this.search;
 	}
 
 	public void setSearch(Search search) {
@@ -87,7 +83,7 @@ public class TwitterGeoFunctionProperties {
 	}
 
 	public GeoType getType() {
-		return type;
+		return this.type;
 	}
 
 	public void setType(GeoType type) {
@@ -95,7 +91,7 @@ public class TwitterGeoFunctionProperties {
 	}
 
 	public Location getLocation() {
-		return location;
+		return this.location;
 	}
 
 	public void setLocation(Location location) {
@@ -103,7 +99,7 @@ public class TwitterGeoFunctionProperties {
 	}
 
 	public int getMaxResults() {
-		return maxResults;
+		return this.maxResults;
 	}
 
 	public void setMaxResults(int maxResults) {
@@ -111,7 +107,7 @@ public class TwitterGeoFunctionProperties {
 	}
 
 	public String getAccuracy() {
-		return accuracy;
+		return this.accuracy;
 	}
 
 	public void setAccuracy(String accuracy) {
@@ -119,7 +115,7 @@ public class TwitterGeoFunctionProperties {
 	}
 
 	public String getGranularity() {
-		return granularity;
+		return this.granularity;
 	}
 
 	public void setGranularity(String granularity) {
@@ -128,13 +124,12 @@ public class TwitterGeoFunctionProperties {
 
 	@AssertTrue(message = "Either the IP or the Location must be set")
 	public boolean isAtLeastOne() {
-		return this.getSearch().getIp() == null
-				^ (this.getLocation().getLat() == null && this.getLocation().getLon() == null);
+		return getSearch().getIp() == null ^ (getLocation().getLat() == null && getLocation().getLon() == null);
 	}
 
 	@AssertTrue(message = "The IP parameter is applicable only for 'Search' GeoType")
 	public boolean isIpUsedWithSearchGeoType() {
-		if (this.getSearch().getIp() != null) {
+		if (getSearch().getIp() != null) {
 			return this.type == GeoType.search;
 		}
 		return true;
@@ -154,7 +149,7 @@ public class TwitterGeoFunctionProperties {
 		private Expression query = null;
 
 		public Expression getIp() {
-			return ip;
+			return this.ip;
 		}
 
 		public void setIp(Expression ip) {
@@ -162,7 +157,7 @@ public class TwitterGeoFunctionProperties {
 		}
 
 		public Expression getQuery() {
-			return query;
+			return this.query;
 		}
 
 		public void setQuery(Expression query) {
@@ -184,7 +179,7 @@ public class TwitterGeoFunctionProperties {
 		private Expression lon;
 
 		public Expression getLat() {
-			return lat;
+			return this.lat;
 		}
 
 		public void setLat(Expression lat) {
@@ -192,7 +187,7 @@ public class TwitterGeoFunctionProperties {
 		}
 
 		public Expression getLon() {
-			return lon;
+			return this.lon;
 		}
 
 		public void setLon(Expression lon) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,27 +27,29 @@ import twitter4j.Place;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 
 /**
+ * Auto-configuration for Twitter Geo function.
+ *
  * @author Christian Tzolov
  */
-@Configuration
+@ConditionalOnExpression("environment['twitter.geo.search.ip'] != null || (environment['twitter.geo.location.lat'] != null && environment['twitter.geo.location.lon'] != null)")
+@AutoConfiguration(after = TwitterConnectionConfiguration.class)
 @EnableConfigurationProperties(TwitterGeoFunctionProperties.class)
-@Import(TwitterConnectionConfiguration.class)
 public class TwitterGeoFunctionConfiguration {
 
-	private static final Log logger = LogFactory.getLog(TwitterGeoFunctionConfiguration.class);
+	private static final Log LOGGER = LogFactory.getLog(TwitterGeoFunctionConfiguration.class);
 
 	@Bean
 	public Function<Message<?>, GeoQuery> messageToGeoQueryFunction(TwitterGeoFunctionProperties geoProperties) {
-		return message -> {
+		return (message) -> {
 			String ip = null;
 			if (geoProperties.getSearch().getIp() != null) {
 				ip = geoProperties.getSearch().getIp().getValue(message, String.class);
@@ -76,12 +78,12 @@ public class TwitterGeoFunctionConfiguration {
 	@Bean
 	@ConditionalOnProperty(name = "twitter.geo.search.type", havingValue = "search", matchIfMissing = true)
 	public Function<GeoQuery, List<Place>> twitterSearchPlacesFunction(Twitter twitter) {
-		return geoQuery -> {
+		return (geoQuery) -> {
 			try {
 				return twitter.searchPlaces(geoQuery);
 			}
-			catch (TwitterException e) {
-				logger.error("Places Search failed!", e);
+			catch (TwitterException ex) {
+				LOGGER.error("Places Search failed!", ex);
 			}
 			return null;
 		};
@@ -90,12 +92,12 @@ public class TwitterGeoFunctionConfiguration {
 	@Bean
 	@ConditionalOnProperty(name = "twitter.geo.search.type", havingValue = "reverse")
 	public Function<GeoQuery, List<Place>> twitterReverseGeocodeFunction(Twitter twitter) {
-		return geoQuery -> {
+		return (geoQuery) -> {
 			try {
 				return twitter.reverseGeoCode(geoQuery);
 			}
-			catch (TwitterException e) {
-				logger.error("Reverse Geocode failed!", e);
+			catch (TwitterException ex) {
+				LOGGER.error("Reverse Geocode failed!", ex);
 			}
 			return null;
 		};
@@ -105,7 +107,7 @@ public class TwitterGeoFunctionConfiguration {
 	public Function<Message<?>, Message<byte[]>> twitterGeoFunction(Function<Message<?>, GeoQuery> toGeoQuery,
 			Function<GeoQuery, List<Place>> places, Function<Object, Message<byte[]>> managedJson) {
 
-		return toGeoQuery.andThen(places).andThen(managedJson)::apply;
+		return toGeoQuery.andThen(places).andThen(managedJson);
 	}
 
 }

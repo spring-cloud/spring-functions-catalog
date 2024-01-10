@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,32 +27,34 @@ import twitter4j.Trends;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
+import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.messaging.Message;
 
 /**
+ * Auto-configuration for Twitter Trend function.
+ *
  * @author Christian Tzolov
  */
-@Configuration
+@ConditionalOnProperty(prefix = "twitter.trend", name = "trend-query-type")
+@AutoConfiguration(after = TwitterConnectionConfiguration.class)
 @EnableConfigurationProperties(TwitterTrendFunctionProperties.class)
-@Import(TwitterConnectionConfiguration.class)
 public class TwitterTrendFunctionConfiguration {
 
-	private static final Log logger = LogFactory.getLog(TwitterTrendFunctionConfiguration.class);
+	private static final Log LOGGER = LogFactory.getLog(TwitterTrendFunctionConfiguration.class);
 
 	@Bean
 	public Function<Message<?>, Trends> trend(TwitterTrendFunctionProperties properties, Twitter twitter) {
-		return message -> {
+		return (message) -> {
 			try {
 				int woeid = properties.getLocationId().getValue(message, int.class);
 				return twitter.getPlaceTrends(woeid);
 			}
-			catch (TwitterException e) {
-				logger.error("Twitter API error!", e);
+			catch (TwitterException ex) {
+				LOGGER.error("Twitter API error!", ex);
 			}
 			return null;
 		};
@@ -61,7 +63,8 @@ public class TwitterTrendFunctionConfiguration {
 	@Bean
 	public Function<Message<?>, List<Location>> closestOrAvailableTrends(TwitterTrendFunctionProperties properties,
 			Twitter twitter) {
-		return message -> {
+
+		return (message) -> {
 			try {
 				if (properties.getClosest().getLat() != null && properties.getClosest().getLon() != null) {
 					double lat = properties.getClosest().getLat().getValue(message, double.class);
@@ -72,8 +75,8 @@ public class TwitterTrendFunctionConfiguration {
 					return twitter.getAvailableTrends();
 				}
 			}
-			catch (TwitterException e) {
-				logger.error("Twitter API error!", e);
+			catch (TwitterException ex) {
+				LOGGER.error("Twitter API error!", ex);
 			}
 			return null;
 		};

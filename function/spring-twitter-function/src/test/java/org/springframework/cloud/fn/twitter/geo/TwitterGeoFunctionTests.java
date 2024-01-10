@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,13 +40,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionProperties;
 import org.springframework.cloud.fn.common.twitter.util.TwitterTestUtils;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.util.TestSocketUtils;
 import org.springframework.util.MimeTypeUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -58,16 +56,13 @@ import static org.mockserver.verify.VerificationTimes.once;
 /**
  * @author Christian Tzolov
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = { "twitter.connection.consumerKey=consumerKey666",
-				"twitter.connection.consumerSecret=consumerSecret666", "twitter.connection.accessToken=accessToken666",
-				"twitter.connection.accessTokenSecret=accessTokenSecret666" })
+@SpringBootTest(properties = { "twitter.connection.consumerKey=consumerKey666",
+		"twitter.connection.consumerSecret=consumerSecret666", "twitter.connection.accessToken=accessToken666",
+		"twitter.connection.accessTokenSecret=accessTokenSecret666" })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
-public abstract class TwitterGeoFunctionTest {
+public abstract class TwitterGeoFunctionTests {
 
 	private static final String MOCK_SERVER_IP = "127.0.0.1";
-
-	private static final Integer MOCK_SERVER_PORT = TestSocketUtils.findAvailableTcpPort();
 
 	private static ClientAndServer mockServer;
 
@@ -90,8 +85,8 @@ public abstract class TwitterGeoFunctionTest {
 
 	@BeforeAll
 	public static void startMockServer() {
-		mockServer = ClientAndServer.startClientAndServer(MOCK_SERVER_PORT);
-		mockClient = new MockServerClient(MOCK_SERVER_IP, MOCK_SERVER_PORT);
+		mockServer = ClientAndServer.startClientAndServer();
+		mockClient = new MockServerClient(MOCK_SERVER_IP, mockServer.getPort());
 	}
 
 	@AfterAll
@@ -101,7 +96,7 @@ public abstract class TwitterGeoFunctionTest {
 
 	@TestPropertySource(
 			properties = { "twitter.geo.search.ip='127.0.0.1'", "twitter.geo.search.query=payload.toUpperCase()" })
-	public static class TwitterGeoSearchByIPAndQueryTests extends TwitterGeoFunctionTest {
+	public static class TwitterGeoSearchByIPAndQueryTests extends TwitterGeoFunctionTests {
 
 		@Test
 		public void testOne() throws IOException {
@@ -125,7 +120,7 @@ public abstract class TwitterGeoFunctionTest {
 
 			assertThat(outPayload).isNotNull();
 
-			List places = new ObjectMapper().readValue(outPayload, List.class);
+			List<?> places = new ObjectMapper().readValue(outPayload, List.class);
 			assertThat(places).hasSize(12);
 		}
 
@@ -133,7 +128,7 @@ public abstract class TwitterGeoFunctionTest {
 
 	@TestPropertySource(properties = { "twitter.geo.location.lat='52.378'", "twitter.geo.location.lon='4.9'",
 			"twitter.geo.search.query=payload.toUpperCase()" })
-	public static class TwitterGeoSearchByLocationTests extends TwitterGeoFunctionTest {
+	public static class TwitterGeoSearchByLocationTests extends TwitterGeoFunctionTests {
 
 		@Test
 		public void testOne() throws IOException {
@@ -159,7 +154,7 @@ public abstract class TwitterGeoFunctionTest {
 
 			assertThat(outPayload).isNotNull();
 
-			List places = new ObjectMapper().readValue(outPayload, List.class);
+			List<?> places = new ObjectMapper().readValue(outPayload, List.class);
 			assertThat(places).hasSize(12);
 		}
 
@@ -167,7 +162,7 @@ public abstract class TwitterGeoFunctionTest {
 
 	@TestPropertySource(properties = { "twitter.geo.type=reverse", "twitter.geo.location.lat='52.378'",
 			"twitter.geo.location.lon='4.9'" })
-	public static class TwitterGeoSearchByLocation2Tests extends TwitterGeoFunctionTest {
+	public static class TwitterGeoSearchByLocation2Tests extends TwitterGeoFunctionTests {
 
 		@Test
 		public void testOne() throws IOException {
@@ -191,7 +186,7 @@ public abstract class TwitterGeoFunctionTest {
 
 			assertThat(outPayload).isNotNull();
 
-			List places = new ObjectMapper().readValue(outPayload, List.class);
+			List<?> places = new ObjectMapper().readValue(outPayload, List.class);
 			assertThat(places).hasSize(12);
 		}
 
@@ -200,7 +195,7 @@ public abstract class TwitterGeoFunctionTest {
 	@TestPropertySource(properties = { "twitter.geo.location.lat=#jsonPath(new String(payload),'$.location.lat')",
 			"twitter.geo.location.lon=#jsonPath(new String(payload),'$.location.lon')",
 			"twitter.geo.search.query=#jsonPath(new String(payload),'$.country')" })
-	public static class TwitterGeoSearchJsonPathTests extends TwitterGeoFunctionTest {
+	public static class TwitterGeoSearchJsonPathTests extends TwitterGeoFunctionTests {
 
 		@Test
 		public void testOne() throws IOException {
@@ -228,7 +223,7 @@ public abstract class TwitterGeoFunctionTest {
 
 			assertThat(outPayload).isNotNull();
 
-			List places = new ObjectMapper().readValue(outPayload, List.class);
+			List<?> places = new ObjectMapper().readValue(outPayload, List.class);
 			assertThat(places).hasSize(12);
 		}
 
@@ -236,7 +231,6 @@ public abstract class TwitterGeoFunctionTest {
 
 	@SpringBootConfiguration
 	@EnableAutoConfiguration
-	@Import(TwitterGeoFunctionConfiguration.class)
 	public static class TwitterGeoFunctionTestApplication {
 
 		@Bean
@@ -246,7 +240,7 @@ public abstract class TwitterGeoFunctionTest {
 
 			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration = toConfigurationBuilder
 				.andThen(new TwitterTestUtils()
-					.mockTwitterUrls(String.format("http://%s:%s", MOCK_SERVER_IP, MOCK_SERVER_PORT)));
+					.mockTwitterUrls(String.format("http://%s:%s", MOCK_SERVER_IP, mockServer.getPort())));
 
 			return mockedConfiguration.apply(properties).build();
 		}

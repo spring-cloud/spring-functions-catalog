@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2020 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,19 +20,22 @@ import jakarta.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
-import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.integration.expression.FunctionExpression;
+import org.springframework.messaging.Message;
 import org.springframework.validation.annotation.Validated;
 
 /**
+ * Configuration properties for Twitter Trend function.
+ *
  * @author Christian Tzolov
  */
 @ConfigurationProperties("twitter.trend")
 @Validated
 public class TwitterTrendFunctionProperties {
 
-	private static final Expression DEFAULT_EXPRESSION = new SpelExpressionParser().parseExpression("payload");
+	private static final Expression DEFAULT_EXPRESSION = new FunctionExpression<Message<?>>(Message::getPayload);
 
-	enum TrendQueryType {
+	public enum TrendQueryType {
 
 		/** Retrieve trending places. */
 		trend,
@@ -41,10 +44,10 @@ public class TwitterTrendFunctionProperties {
 
 	}
 
-	private TrendQueryType trendQueryType = TrendQueryType.trend;
+	private TrendQueryType trendQueryType;
 
 	public TrendQueryType getTrendQueryType() {
-		return trendQueryType;
+		return this.trendQueryType;
 	}
 
 	public void setTrendQueryType(TrendQueryType trendQueryType) {
@@ -59,40 +62,39 @@ public class TwitterTrendFunctionProperties {
 	private Expression locationId = DEFAULT_EXPRESSION;
 
 	public Expression getLocationId() {
-		return locationId;
+		return this.locationId;
 	}
 
 	public void setLocationId(Expression locationId) {
 		this.locationId = locationId;
 	}
 
-	/**
-	 *
-	 */
-	private Closest closest = new Closest();
+	private final Closest closest = new Closest();
 
 	public Closest getClosest() {
-		return closest;
+		return this.closest;
 	}
 
 	public static class Closest {
 
 		/**
 		 * If provided with a long parameter the available trend locations will be sorted
-		 * by distance, nearest to furthest, to the co-ordinate pair. The valid ranges for
-		 * longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.
+		 * by distance, nearest to the furthest, to the co-ordinate pair. The valid ranges
+		 * for longitude is -180.0 to +180.0 (West is negative, East is positive)
+		 * inclusive.
 		 */
 		private Expression lat;
 
 		/**
 		 * If provided with a lat parameter the available trend locations will be sorted
-		 * by distance, nearest to furthest, to the co-ordinate pair. The valid ranges for
-		 * longitude is -180.0 to +180.0 (West is negative, East is positive) inclusive.
+		 * by distance, nearest to the furthest, to the co-ordinate pair. The valid ranges
+		 * for longitude is -180.0 to +180.0 (West is negative, East is positive)
+		 * inclusive.
 		 */
 		private Expression lon;
 
 		public Expression getLat() {
-			return lat;
+			return this.lat;
 		}
 
 		public void setLat(Expression lat) {
@@ -100,7 +102,7 @@ public class TwitterTrendFunctionProperties {
 		}
 
 		public Expression getLon() {
-			return lon;
+			return this.lon;
 		}
 
 		public void setLon(Expression lon) {
