@@ -1,0 +1,11 @@
+spring:
+  cloud:
+    function:
+      definition: timeSupplier|spelFunction|logConsumer
+
+time:
+  date-format: ss
+
+spel:
+  function:
+    expression: "'Current seconds: ' + payload"

@@ -1,0 +1,37 @@
+= Simple Function Composition from Catalog
+
+This sample demonstrates a composition of functions from the catalog based on https://spring.io/projects/spring-cloud-function[Spring Cloud Function] framework.
+The goal and configuration of the sample is very simple and straightforward.
+
+It uses these dependencies:
+
+[source,groovy]
+----
+implementation 'org.springframework.cloud:spring-cloud-function-context'
+implementation 'org.springframework.cloud.fn:spring-time-supplier'
+implementation 'org.springframework.cloud.fn:spring-spel-function'
+implementation 'org.springframework.cloud.fn:spring-log-consumer'
+----
+
+The first one is for `FunctionCatalog` and functions composition configuration.
+The rest are artifacts from Spring Functions Catalog with auto-configuration for respective function.
+
+These functions are composed via standard property: `spring.cloud.function.definition = timeSupplier|spelFunction|logConsumer`.
+Then we provide some customization for specific function using its configuration properties:
+
+[source,properties]
+----
+#Emit only seconds from time supplier
+time.date-format = ss
+#Suffix seconds emitted by the time supplier with some text
+spel.function.expression = "'Current seconds: ' + payload"
+----
+
+The Log Consumer is left without any customization deliberately to demonstrate that there is some default auto-configuration applied.
+
+Since we deal in this sample with pure Spring Cloud Function framework, there is no any out-of-the-box triggers to initiate data flow from our function composition.
+Therefore, we use `@Scheduled` API in the sample application to call `Runnable.run()` every second which was provided by the default `FunctionCatalog.lookup(null)`.
+
+You can see this function composition in action running the application from the IDE or using Spring Boot Gradle plugin via `./gradlew bootRun`.
+
+The `@SpringBootTest` in this sample ensures that log output contains `Current seconds:` text.
