@@ -21,8 +21,8 @@ import java.util.function.Consumer;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.gateway.AnnotationGatewayProxyFactoryBean;
 import org.springframework.messaging.Message;
 
 /**
@@ -46,9 +46,12 @@ public class LogConsumerConfiguration {
 			.nullChannel();
 	}
 
-	@MessagingGateway(name = "logConsumer", defaultRequestChannel = "logConsumerFlow.input")
-	private interface MessageConsumer extends Consumer<Message<?>> {
-
+	@Bean
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	AnnotationGatewayProxyFactoryBean<Consumer<Message<?>>> logConsumer() {
+		var gatewayProxyFactoryBean = new AnnotationGatewayProxyFactoryBean<>(Consumer.class);
+		gatewayProxyFactoryBean.setDefaultRequestChannelName("logConsumerFlow.input");
+		return (AnnotationGatewayProxyFactoryBean) gatewayProxyFactoryBean;
 	}
 
 }

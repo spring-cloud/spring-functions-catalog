@@ -44,11 +44,11 @@ import org.springframework.expression.spel.SpelParseException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.aggregator.DefaultAggregatingMessageGroupProcessor;
 import org.springframework.integration.aggregator.MessageCountReleaseStrategy;
-import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.config.AggregatorFactoryBean;
 import org.springframework.integration.context.IntegrationContextUtils;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.expression.ValueExpression;
+import org.springframework.integration.gateway.AnnotationGatewayProxyFactoryBean;
 import org.springframework.integration.jdbc.JdbcMessageHandler;
 import org.springframework.integration.jdbc.SqlParameterSourceFactory;
 import org.springframework.integration.store.MessageGroupStore;
@@ -129,6 +129,14 @@ public class JdbcConsumerConfiguration {
 			}
 			flow.handle(jdbcMessageHandler);
 		};
+	}
+
+	@Bean
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	AnnotationGatewayProxyFactoryBean<Consumer<Message<?>>> jdbcConsumer() {
+		var gatewayProxyFactoryBean = new AnnotationGatewayProxyFactoryBean<>(Consumer.class);
+		gatewayProxyFactoryBean.setDefaultRequestChannelName("jdbcConsumerFlow.input");
+		return (AnnotationGatewayProxyFactoryBean) gatewayProxyFactoryBean;
 	}
 
 	@Bean
@@ -230,11 +238,6 @@ public class JdbcConsumerConfiguration {
 			databasePopulator.addScript(resourceLoader.getResource(this.properties.getInitialize()));
 		}
 		return dataSourceInitializer;
-	}
-
-	@MessagingGateway(name = "jdbcConsumer", defaultRequestChannel = "jdbcConsumerFlow.input")
-	public interface MessageConsumer extends Consumer<Message<?>> {
-
 	}
 
 	private record ParameterFactory(MultiValueMap<String, Expression> columnExpressions,

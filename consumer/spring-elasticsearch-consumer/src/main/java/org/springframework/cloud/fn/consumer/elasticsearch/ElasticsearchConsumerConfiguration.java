@@ -45,10 +45,10 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.aggregator.AbstractAggregatingMessageGroupProcessor;
 import org.springframework.integration.aggregator.MessageCountReleaseStrategy;
-import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.config.AggregatorFactoryBean;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.expression.ValueExpression;
+import org.springframework.integration.gateway.AnnotationGatewayProxyFactoryBean;
 import org.springframework.integration.store.MessageGroup;
 import org.springframework.integration.store.MessageGroupStore;
 import org.springframework.integration.store.SimpleMessageStore;
@@ -136,6 +136,14 @@ public class ElasticsearchConsumerConfiguration {
 			}
 			flow.handle(indexingHandler);
 		};
+	}
+
+	@Bean
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	AnnotationGatewayProxyFactoryBean<Consumer<Message<?>>> elasticsearchConsumer() {
+		var gatewayProxyFactoryBean = new AnnotationGatewayProxyFactoryBean<>(Consumer.class);
+		gatewayProxyFactoryBean.setDefaultRequestChannelName("elasticsearchConsumerFlow.input");
+		return (AnnotationGatewayProxyFactoryBean) gatewayProxyFactoryBean;
 	}
 
 	@Bean
@@ -300,11 +308,6 @@ public class ElasticsearchConsumerConfiguration {
 	}
 
 	record MessageWrapper(Message<?> message) {
-
-	}
-
-	@MessagingGateway(name = "elasticsearchConsumer", defaultRequestChannel = "elasticsearchConsumerFlow.input")
-	private interface MessageConsumer extends Consumer<Message<?>> {
 
 	}
 

@@ -25,9 +25,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.file.remote.session.SessionFactory;
+import org.springframework.integration.gateway.AnnotationGatewayProxyFactoryBean;
 import org.springframework.integration.sftp.dsl.Sftp;
 import org.springframework.integration.sftp.dsl.SftpMessageHandlerSpec;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
@@ -69,9 +69,12 @@ public class SftpConsumerConfiguration {
 		return (flow) -> flow.handle(handlerSpec);
 	}
 
-	@MessagingGateway(name = "sftpConsumer", defaultRequestChannel = "ftpOutboundFlow.input")
-	public interface MessageConsumer extends Consumer<Message<?>> {
-
+	@Bean
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	AnnotationGatewayProxyFactoryBean<Consumer<Message<?>>> sftpConsumer() {
+		var gatewayProxyFactoryBean = new AnnotationGatewayProxyFactoryBean<>(Consumer.class);
+		gatewayProxyFactoryBean.setDefaultRequestChannelName("ftpOutboundFlow.input");
+		return (AnnotationGatewayProxyFactoryBean) gatewayProxyFactoryBean;
 	}
 
 }

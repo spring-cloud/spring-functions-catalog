@@ -47,9 +47,9 @@ import org.springframework.data.cassandra.core.UpdateOptions;
 import org.springframework.data.cassandra.core.WriteResult;
 import org.springframework.data.cassandra.core.cql.WriteOptions;
 import org.springframework.integration.JavaUtils;
-import org.springframework.integration.annotation.MessagingGateway;
 import org.springframework.integration.cassandra.outbound.CassandraMessageHandler;
 import org.springframework.integration.dsl.IntegrationFlow;
+import org.springframework.integration.gateway.AnnotationGatewayProxyFactoryBean;
 import org.springframework.integration.support.json.Jackson2JsonObjectMapper;
 import org.springframework.integration.transformer.AbstractPayloadTransformer;
 import org.springframework.messaging.MessageHandler;
@@ -71,7 +71,7 @@ public class CassandraConsumerConfiguration {
 	private CassandraConsumerProperties cassandraSinkProperties;
 
 	@Bean
-	public Consumer<Object> cassandraConsumer(CassandraConsumerFunction cassandraConsumerFunction) {
+	Consumer<Object> cassandraConsumer(CassandraConsumerFunction cassandraConsumerFunction) {
 		return (payload) -> cassandraConsumerFunction.apply(payload).block();
 	}
 
@@ -119,6 +119,13 @@ public class CassandraConsumerConfiguration {
 					cassandraMessageHandler::setStatementExpression);
 
 		return cassandraMessageHandler;
+	}
+
+	@Bean
+	AnnotationGatewayProxyFactoryBean<CassandraConsumerFunction> cassandraConsumerFunction() {
+		var gatewayProxyFactoryBean = new AnnotationGatewayProxyFactoryBean<>(CassandraConsumerFunction.class);
+		gatewayProxyFactoryBean.setDefaultRequestChannelName("cassandraConsumerFlow.input");
+		return gatewayProxyFactoryBean;
 	}
 
 	private static boolean isUuid(String uuid) {
@@ -198,7 +205,6 @@ public class CassandraConsumerConfiguration {
 
 	}
 
-	@MessagingGateway(name = "cassandraConsumerFunction", defaultRequestChannel = "cassandraConsumerFlow.input")
 	interface CassandraConsumerFunction extends Function<Object, Mono<? extends WriteResult>> {
 
 	}
