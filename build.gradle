@@ -114,7 +114,6 @@ configure(javaProjects) { subproject ->
 	checkstyle {
 		toolVersion = '10.3'
 		configDirectory = rootProject.file('etc/checkstyle')
-		ignoreFailures = true
 	}
 
 	// dependencies that are common across all java projects
