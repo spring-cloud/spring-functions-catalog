@@ -6,4 +6,4 @@ bin/
 .gradle/
 .idea/
 out/
-
+.vscode/
