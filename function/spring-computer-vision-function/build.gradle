@@ -1,0 +1,7 @@
+dependencies {
+    api djlSpringAutoconfigure
+    api "ai.djl.spring:djl-spring-boot-starter-tensorflow-auto:$djlSpringVersion"
+    api "ai.djl.spring:djl-spring-boot-starter-pytorch-auto:$djlSpringVersion"
+    api "ai.djl.spring:djl-spring-boot-starter-mxnet-auto:$djlSpringVersion"
+    runtimeOnly 'ai.djl.onnxruntime:onnxruntime-engine'
+}
