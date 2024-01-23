@@ -1,7 +1,3 @@
-repositories {
-    mavenLocal()
-}
-
 dependencies {
     api "ai.djl.spring:djl-spring-boot-starter-autoconfigure:$djlSpringVersion"
     api "ai.djl.spring:djl-spring-boot-starter-tensorflow-auto:$djlSpringVersion"

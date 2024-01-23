@@ -5,7 +5,7 @@ ext {
 
     debeziumVersion = '2.5.0.Final'
     djlVersion = '0.26.0'
-    djlSpringVersion = '0.26-SNAPSHOT'
+    djlSpringVersion = '0.26'
 
     springIntegrationAws = 'org.springframework.integration:spring-integration-aws:3.0.5'
     ftpserverCore = 'org.apache.ftpserver:ftpserver-core:1.2.0'
