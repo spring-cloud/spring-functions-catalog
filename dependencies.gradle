@@ -3,7 +3,7 @@ ext {
     springCloudVersion = '2023.0.0'
     springCloudAwsVersion = '3.0.4'
 
-    debeziumVersion = '2.5.0.Final'
+    debeziumVersion = '2.5.1.Final'
 
     springIntegrationAws = 'org.springframework.integration:spring-integration-aws:3.0.5'
     ftpserverCore = 'org.apache.ftpserver:ftpserver-core:1.2.0'
