@@ -18,6 +18,7 @@ package org.springframework.cloud.fn.aggregator;
 
 import java.time.Duration;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
@@ -57,9 +58,8 @@ public class DefaultAggregatorTests extends AbstractAggregatorFunctionTests {
 		output.log("DefaultAggregatorTests:output")
 			.as(StepVerifier::create)
 			.assertNext((message) -> assertThat(message).extracting(Message::getPayload)
-				.asList()
-				.hasSize(2)
-				.contains("1", "2"))
+				.asInstanceOf(InstanceOfAssertFactories.LIST)
+				.containsExactlyInAnyOrder("1", "2"))
 			.thenCancel()
 			.verify(Duration.ofSeconds(30));
 

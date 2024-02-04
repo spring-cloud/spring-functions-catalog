@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 package org.springframework.cloud.fn.aggregator;
 
 import java.time.Duration;
-import java.util.List;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -60,11 +60,8 @@ public class CustomPropsAndMongoMessageStoreAggregatorTests extends AbstractAggr
 
 		output.as(StepVerifier::create)
 			.assertNext((message) -> assertThat(message).extracting(Message::getPayload)
-				.isInstanceOf(List.class)
-				.asList()
-				.hasSize(1)
-				.element(0)
-				.isEqualTo("foo"))
+				.asInstanceOf(InstanceOfAssertFactories.LIST)
+				.containsExactly("foo"))
 			.thenCancel()
 			.verify(Duration.ofSeconds(10));
 
