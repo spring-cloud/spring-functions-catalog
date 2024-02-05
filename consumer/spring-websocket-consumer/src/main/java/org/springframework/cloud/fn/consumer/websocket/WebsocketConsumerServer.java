@@ -16,9 +16,8 @@
 
 package org.springframework.cloud.fn.consumer.websocket;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -40,12 +39,13 @@ import org.apache.commons.logging.LogFactory;
  * @author Oliver Moser
  * @author Gary Russell
  * @author Chris Bono
+ * @author Artem Bilan
  */
 public class WebsocketConsumerServer {
 
 	private static final Log LOGGER = LogFactory.getLog(WebsocketConsumerServer.class);
 
-	static final List<Channel> CHANNELS = Collections.synchronizedList(new ArrayList<>());
+	static final List<Channel> CHANNELS = new CopyOnWriteArrayList<>();
 
 	private final WebsocketConsumerProperties properties;
 
