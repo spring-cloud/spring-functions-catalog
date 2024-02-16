@@ -120,12 +120,13 @@ public class ComputerVisionFunctionConfigurationTests {
 
 				assertThat(JsonHelper.toDetectedObjects(json)).isNotNull();
 
-				save(outputMessage.getPayload(), "tf2-sm-object-detection-augmented.jpg");
+				// save(outputMessage.getPayload(),
+				// "tf2-sm-object-detection-augmented.jpg");
 			});
 	}
 
 	@Test
-	public void Yolov8Detection() {
+	public void yolov8Detection() {
 		applicationContextRunner.withPropertyValues(
 		// @formatter:off
 					"computer.vision.function.augment-enabled=true",
@@ -176,7 +177,8 @@ public class ComputerVisionFunctionConfigurationTests {
 
 				assertThat(detectionObjects).isNotNull();
 
-				save(outputMessage.getPayload(), "yolo-v8-object-detection-augmented.jpg");
+				// save(outputMessage.getPayload(),
+				// "yolo-v8-object-detection-augmented.jpg");
 			});
 
 	}
@@ -221,7 +223,8 @@ public class ComputerVisionFunctionConfigurationTests {
 				assertThat(outputMessage.getHeaders()).containsKey("cvjson");
 				String json = outputMessage.getHeaders().get("cvjson", String.class);
 				log.info(json);
-				save(outputMessage.getPayload(), "instance-segmentation-augmented.jpg");
+				// save(outputMessage.getPayload(),
+				// "instance-segmentation-augmented.jpg");
 
 				assertThat(JsonHelper.toDetectedObjects(json)).isNotNull();
 			});
@@ -268,7 +271,8 @@ public class ComputerVisionFunctionConfigurationTests {
 
 				// log.info(ssJson);
 
-				save(outputMessage.getPayload(), "semantic-segmentation-augmented.jpg");
+				// save(outputMessage.getPayload(),
+				// "semantic-segmentation-augmented.jpg");
 
 				assertThat(JsonHelper.toCategoryMask(ssJson)).isNotNull();
 			});
@@ -356,22 +360,15 @@ public class ComputerVisionFunctionConfigurationTests {
 
 				log.info(ssJson);
 
-				save(outputMessage.getPayload(), "pose-estimation.jpg");
-
 				assertThat(JsonHelper.toJoints(ssJson)).isNotNull();
 			});
 	}
 
 	private static void save(byte[] imageBytes, String outputFileName) {
-
 		BufferedImage image = createImageFromBytes(imageBytes);
-
-		// Specify the file path and format to save the image
-		File outputFile = new File("build" + File.separator + outputFileName);
-
 		try {
 			// Use ImageIO.write() to save the RenderedImage to the specified file
-			ImageIO.write(image, "png", outputFile);
+			ImageIO.write(image, "png", new File("build" + File.separator + outputFileName));
 		}
 		catch (IOException ex) {
 			throw new RuntimeException(ex);

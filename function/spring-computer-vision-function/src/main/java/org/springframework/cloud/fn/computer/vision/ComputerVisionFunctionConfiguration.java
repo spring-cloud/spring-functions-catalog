@@ -20,6 +20,7 @@ import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -46,7 +47,8 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.messaging.Message;
 
 /**
- * Auto-configuration for TensorFlow Object Detection Function.
+ * A configuration class that provides the necessary beans for the Computer Vision
+ * Function.
  *
  * @author Christian Tzolov
  */
@@ -56,17 +58,13 @@ public class ComputerVisionFunctionConfiguration {
 
 	private static final Logger log = LoggerFactory.getLogger(ComputerVisionFunctionConfiguration.class);
 
-	@Bean
-	public ImageFactory imageFactory() {
-		return ImageFactory.getInstance();
-	}
+	private ImageFactory imageFactory = ImageFactory.getInstance();
 
 	@Bean
 	@ConditionalOnProperty(prefix = "djl", name = "output-class",
 			havingValue = "ai.djl.modality.cv.output.DetectedObjects")
 	public Function<Message<byte[]>, Message<byte[]>> objectDetection(Supplier<Predictor<?, ?>> predictorProvider,
-			ImageFactory imageFactory, ComputerVisionFunctionProperties cvProperties,
-			DjlConfigurationProperties djlProperties) {
+			ComputerVisionFunctionProperties cvProperties, DjlConfigurationProperties djlProperties) {
 
 		Function<DetectedObjects, String> toJson = (detectedObjects) -> JsonHelper.toJson(detectedObjects);
 
@@ -76,16 +74,14 @@ public class ComputerVisionFunctionConfiguration {
 			return getByteArray((RenderedImage) newImage.getWrappedImage(), cvProperties.getOutputImageFormatName());
 		};
 
-		return predictor(predictorProvider, imageFactory, cvProperties, djlProperties, DetectedObjects.class, toJson,
-				augmentImage);
+		return predictor(predictorProvider, cvProperties, djlProperties, DetectedObjects.class, toJson, augmentImage);
 	}
 
 	@Bean
 	@ConditionalOnProperty(prefix = "djl", name = "output-class",
 			havingValue = "ai.djl.modality.cv.output.CategoryMask")
 	public Function<Message<byte[]>, Message<byte[]>> semanticSegmentation(Supplier<Predictor<?, ?>> predictorProvider,
-			ImageFactory imageFactory, ComputerVisionFunctionProperties cvProperties,
-			DjlConfigurationProperties djlProperties) {
+			ComputerVisionFunctionProperties cvProperties, DjlConfigurationProperties djlProperties) {
 
 		Function<CategoryMask, String> toJson = (mask) -> JsonHelper.toJson(mask);
 
@@ -95,15 +91,13 @@ public class ComputerVisionFunctionConfiguration {
 			return getByteArray((RenderedImage) newImage.getWrappedImage(), cvProperties.getOutputImageFormatName());
 		};
 
-		return predictor(predictorProvider, imageFactory, cvProperties, djlProperties, CategoryMask.class, toJson,
-				augmentImage);
+		return predictor(predictorProvider, cvProperties, djlProperties, CategoryMask.class, toJson, augmentImage);
 	}
 
 	@Bean
 	@ConditionalOnProperty(prefix = "djl", name = "output-class", havingValue = "ai.djl.modality.Classifications")
 	public Function<Message<byte[]>, Message<byte[]>> imageClassifications(Supplier<Predictor<?, ?>> predictorProvider,
-			ImageFactory imageFactory, ComputerVisionFunctionProperties cvProperties,
-			DjlConfigurationProperties djlProperties) {
+			ComputerVisionFunctionProperties cvProperties, DjlConfigurationProperties djlProperties) {
 
 		Function<Classifications, String> toJson = (classifications) -> JsonHelper.toJson(classifications);
 
@@ -112,15 +106,13 @@ public class ComputerVisionFunctionConfiguration {
 			return getByteArray((RenderedImage) newImage.getWrappedImage(), cvProperties.getOutputImageFormatName());
 		};
 
-		return predictor(predictorProvider, imageFactory, cvProperties, djlProperties, Classifications.class, toJson,
-				augmentImage);
+		return predictor(predictorProvider, cvProperties, djlProperties, Classifications.class, toJson, augmentImage);
 	}
 
 	@Bean
 	@ConditionalOnProperty(prefix = "djl", name = "output-class", havingValue = "ai.djl.modality.cv.output.Joints")
 	public Function<Message<byte[]>, Message<byte[]>> poseEstimation(Supplier<Predictor<?, ?>> predictorProvider,
-			ImageFactory imageFactory, ComputerVisionFunctionProperties cvProperties,
-			DjlConfigurationProperties djlProperties) {
+			ComputerVisionFunctionProperties cvProperties, DjlConfigurationProperties djlProperties) {
 
 		Function<Joints, String> toJson = (joins) -> JsonHelper.toJson(joins);
 
@@ -130,13 +122,12 @@ public class ComputerVisionFunctionConfiguration {
 			return getByteArray((RenderedImage) newImage.getWrappedImage(), cvProperties.getOutputImageFormatName());
 		};
 
-		return predictor(predictorProvider, imageFactory, cvProperties, djlProperties, Joints.class, toJson,
-				augmentImage);
+		return predictor(predictorProvider, cvProperties, djlProperties, Joints.class, toJson, augmentImage);
 	}
 
 	private <T> Function<Message<byte[]>, Message<byte[]>> predictor(Supplier<Predictor<?, ?>> predictorProvider,
-			ImageFactory imageFactory, ComputerVisionFunctionProperties cvProperties,
-			DjlConfigurationProperties djlProperties, Class<T> outputClass, Function<T, String> toJsonFunction,
+			ComputerVisionFunctionProperties cvProperties, DjlConfigurationProperties djlProperties,
+			Class<T> outputClass, Function<T, String> toJsonFunction,
 			BiFunction<T, Image, byte[]> augmentImageFunction) {
 
 		return (input) -> {
@@ -145,7 +136,7 @@ public class ComputerVisionFunctionConfiguration {
 
 			try {
 
-				Image image = imageFactory.fromInputStream(new ByteArrayInputStream(input.getPayload()));
+				Image image = this.imageFactory.fromInputStream(new ByteArrayInputStream(input.getPayload()));
 
 				T output = predictor.predict(image);
 
@@ -180,7 +171,7 @@ public class ComputerVisionFunctionConfiguration {
 			return byteArrayOutputStream.toByteArray();
 		}
 		catch (IOException ex) {
-			throw new RuntimeException(ex);
+			throw new UncheckedIOException(ex);
 		}
 	}
 

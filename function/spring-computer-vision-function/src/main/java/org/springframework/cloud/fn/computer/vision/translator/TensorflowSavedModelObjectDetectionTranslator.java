@@ -41,6 +41,12 @@ import ai.djl.translate.TranslatorContext;
 import ai.djl.util.JsonUtils;
 import com.google.gson.annotations.SerializedName;
 
+/**
+ * A {@link NoBatchifyTranslator} that post-processes the output of a TensorFlow
+ * SavedModel Object Detection model.
+ *
+ * @author Christian Tzolov
+ */
 public final class TensorflowSavedModelObjectDetectionTranslator
 		implements NoBatchifyTranslator<Image, DetectedObjects> {
 
