@@ -51,7 +51,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 				"debezium.properties.schema.history.internal=io.debezium.relational.history.MemorySchemaHistory",
 				"debezium.properties.offset.storage=org.apache.kafka.connect.storage.MemoryOffsetBackingStore",
 
-				// Drop schema from the payload payload.
+				// Drop schema from the message payload.
 				"debezium.properties.key.converter.schemas.enable=false",
 				"debezium.properties.value.converter.schemas.enable=false",
 
