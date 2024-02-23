@@ -22,21 +22,35 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * Debezium supplier configuration properties.
  *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
 @ConfigurationProperties("debezium.supplier")
 public class DebeziumSupplierProperties {
 
 	/**
-	 * Copy Change Event headers into Message headers.
+	 * Enable support for tombstone (aka delete) messages.
 	 */
-	private boolean copyHeaders = true;
+	private boolean enableEmptyPayload = true;
 
-	public boolean isCopyHeaders() {
-		return this.copyHeaders;
+	/**
+	 * Patterns for {@code ChangeEvent.headers()} to map.
+	 */
+	private String[] headerNamesToMap = { "*" };
+
+	public boolean isEnableEmptyPayload() {
+		return this.enableEmptyPayload;
 	}
 
-	public void setCopyHeaders(boolean copyHeaders) {
-		this.copyHeaders = copyHeaders;
+	public void setEnableEmptyPayload(boolean enableEmptyPayload) {
+		this.enableEmptyPayload = enableEmptyPayload;
+	}
+
+	public String[] getHeaderNamesToMap() {
+		return this.headerNamesToMap;
+	}
+
+	public void setHeaderNamesToMap(String[] headerNamesToMap) {
+		this.headerNamesToMap = headerNamesToMap;
 	}
 
 }

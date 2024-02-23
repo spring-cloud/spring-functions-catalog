@@ -4,6 +4,7 @@ repositories {
 
 dependencies {
     api project(':spring-debezium-autoconfigure')
+    api 'org.springframework.integration:spring-integration-debezium'
     api 'io.debezium:debezium-connector-mysql'
     api 'io.debezium:debezium-connector-mongodb'
     api 'io.debezium:debezium-connector-postgres'

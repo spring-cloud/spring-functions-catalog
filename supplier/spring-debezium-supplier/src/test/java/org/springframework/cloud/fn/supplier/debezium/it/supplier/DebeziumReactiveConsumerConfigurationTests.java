@@ -16,7 +16,8 @@
 
 package org.springframework.cloud.fn.supplier.debezium.it.supplier;
 
-import io.debezium.engine.DebeziumEngine;
+import java.util.function.Supplier;
+
 import org.junit.jupiter.api.Test;
 
 import org.springframework.boot.autoconfigure.AutoConfigurations;
@@ -30,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests for {@link DebeziumReactiveConsumerConfiguration}.
  *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
 public class DebeziumReactiveConsumerConfigurationTests {
 
@@ -41,13 +43,13 @@ public class DebeziumReactiveConsumerConfigurationTests {
 
 	@Test
 	void noConnectorNoProperty() {
-		this.contextRunner.run((context) -> assertThat(context).doesNotHaveBean(DebeziumEngine.class));
+		this.contextRunner.run((context) -> assertThat(context).doesNotHaveBean(Supplier.class));
 	}
 
 	@Test
 	void withConnectorWithProperty() {
 		this.contextRunner.withPropertyValues("debezium.properties.connector.class=Dummy")
-			.run((context) -> assertThat(context).hasSingleBean(DebeziumEngine.class));
+			.run((context) -> assertThat(context).hasSingleBean(Supplier.class));
 	}
 
 }

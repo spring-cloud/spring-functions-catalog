@@ -21,10 +21,11 @@
 		</encoder>
 	</appender>
 
-	<root level="info">
+	<root level="warn">
 		<appender-ref ref="STDOUT"/>
 	</root>
 
-	<logger name="org.testcontainers" level="INFO"/>
+	<logger name="org.testcontainers" level="WARN"/>
 	<logger name="com.github.dockerjava" level="WARN"/>
+	<logger name="io.debezium" level="INFO"/>
 </configuration>
