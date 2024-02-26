@@ -1,5 +1,5 @@
 /*
- * Copyright 2023-2023 the original author or authors.
+ * Copyright 2023-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,7 +35,6 @@ public class DebeziumPropertiesTests {
 	@Test
 	public void defaultPropertiesTest() {
 		assertThat(this.properties.getPayloadFormat()).isEqualTo(DebeziumFormat.JSON);
-		assertThat(this.properties.getHeaderFormat()).isEqualTo(DebeziumFormat.JSON);
 		assertThat(this.properties.getOffsetCommitPolicy()).isEqualTo(DebeziumOffsetCommitPolicy.DEFAULT);
 		assertThat(this.properties.getProperties()).isNotNull();
 		assertThat(this.properties.getProperties()).isEmpty();

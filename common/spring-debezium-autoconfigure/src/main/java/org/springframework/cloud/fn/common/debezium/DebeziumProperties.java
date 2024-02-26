@@ -70,11 +70,6 @@ public class DebeziumProperties {
 	private DebeziumFormat payloadFormat = DebeziumFormat.JSON;
 
 	/**
-	 * {@code io.debezium.engine.ChangeEvent} header format. Defaults to 'JSON'.
-	 */
-	private DebeziumFormat headerFormat = DebeziumFormat.JSON;
-
-	/**
 	 * The policy that defines when the offsets should be committed to offset storage.
 	 */
 	private DebeziumOffsetCommitPolicy offsetCommitPolicy = DebeziumOffsetCommitPolicy.DEFAULT;
@@ -89,14 +84,6 @@ public class DebeziumProperties {
 
 	public void setPayloadFormat(DebeziumFormat format) {
 		this.payloadFormat = format;
-	}
-
-	public DebeziumFormat getHeaderFormat() {
-		return this.headerFormat;
-	}
-
-	public void setHeaderFormat(DebeziumFormat headerFormat) {
-		this.headerFormat = headerFormat;
 	}
 
 	public enum DebeziumOffsetCommitPolicy {

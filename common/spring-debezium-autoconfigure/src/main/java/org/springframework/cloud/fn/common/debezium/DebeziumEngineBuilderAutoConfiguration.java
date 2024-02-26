@@ -23,6 +23,7 @@ import io.debezium.engine.ChangeEvent;
 import io.debezium.engine.DebeziumEngine;
 import io.debezium.engine.DebeziumEngine.CompletionCallback;
 import io.debezium.engine.DebeziumEngine.ConnectorCallback;
+import io.debezium.engine.format.Json;
 import io.debezium.engine.format.KeyValueHeaderChangeEventFormat;
 import io.debezium.engine.format.SerializationFormat;
 import io.debezium.engine.spi.OffsetCommitPolicy;
@@ -140,11 +141,7 @@ public class DebeziumEngineBuilderAutoConfiguration {
 				serializationFormatClass(properties.getPayloadFormat()),
 				"Cannot find payload format for " + properties.getProperties());
 
-		Class<? extends SerializationFormat<byte[]>> headerFormat = Objects.requireNonNull(
-				serializationFormatClass(properties.getHeaderFormat()),
-				"Cannot find header format for " + properties.getProperties());
-
-		return DebeziumEngine.create(KeyValueHeaderChangeEventFormat.of(payloadFormat, payloadFormat, headerFormat))
+		return DebeziumEngine.create(KeyValueHeaderChangeEventFormat.of(payloadFormat, payloadFormat, Json.class))
 			.using(properties.getDebeziumNativeConfiguration())
 			.using(debeziumClock)
 			.using(completionCallback)
