@@ -1,0 +1,38 @@
+= Debezium Supplier
+
+This module provides a Debezium supplier that can be reused and composed in other applications.
+The `Supplier` uses the `DebeziumMessageProducer` from Spring Integration.
+The `debeziumSupplier` is implemented as a `java.util.function.Supplier`.
+This supplier gives you a reactive stream from the Debezium engine callback.
+The supplier has a signature of `Supplier<Flux<Message<byte[]>>>`.
+Users have to subscribe to this `Flux` and then receive the data.
+
+== Beans for injection
+
+The `DebeziumReactiveConsumerConfiguration` auto-configuration provides the following bean:
+
+`debeziumSupplier`
+
+You need to inject this as `Supplier<Flux<Message<byte[]>>>`.
+
+You can use `debeziumSupplier` as a qualifier when injecting.
+
+Once injected, you can use the `get` method of the `Supplier` to invoke it and then subscribe to the returned `Flux`.
+
+== Configuration Options
+
+All configuration properties are prefixed with `debezium.supplier`.
+
+For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/supplier/debezium/DebeziumSupplierProperties.java[DebeziumSupplierProperties].
+
+The `ComponentCustomizer<DebeziumMessageProducerSpec>` bean can be provided in the target configuration to provide any customization to this supplier configuration.
+
+Also see the `DebeziumEngine` link:../../common/spring-debezium-autoconfigure/README.adoc[auto-configuration] for more information.
+
+== Tests
+
+See this link:src/test/java/org/springframework/cloud/fn/supplier/debezium/it/supplier/DebeziumSupplierIntegrationTests.java[test suite] for the way this supplier can be used.
+
+== Other usage
+
+See this https://github.com/spring-cloud/stream-applications/blob/main/applications/source/debezium-source/README.adoc[README] where this supplier is used to create a Spring Cloud Stream application where it makes a Debezium Source.
