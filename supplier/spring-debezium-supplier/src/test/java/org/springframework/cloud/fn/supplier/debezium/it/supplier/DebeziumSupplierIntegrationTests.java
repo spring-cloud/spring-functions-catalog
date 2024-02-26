@@ -16,6 +16,7 @@
 
 package org.springframework.cloud.fn.supplier.debezium.it.supplier;
 
+import java.time.Duration;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
@@ -41,10 +42,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 		properties = { "spring.cloud.function.definition=debeziumSupplier",
 
 				// https://debezium.io/documentation/reference/transformations/event-flattening.html
+				"debezium.properties.debezium.embedded.shutdown.pause.before.interrupt.ms=500",
 				"debezium.properties.transforms=unwrap",
 				"debezium.properties.transforms.unwrap.type=io.debezium.transforms.ExtractNewRecordState",
-				"debezium.properties.transforms.unwrap.drop.tombstones=true",
-				"debezium.properties.transforms.unwrap.delete.handling.mode=rewrite",
+				"debezium.properties.transforms.unwrap.delete.tombstone.handling.mode=rewrite",
 				"debezium.properties.transforms.unwrap.add.fields=name,db,op,table",
 
 				"debezium.properties.schema.history.internal=io.debezium.relational.history.MemorySchemaHistory",
@@ -101,50 +102,49 @@ public class DebeziumSupplierIntegrationTests {
 		jdbcTemplate.update(
 				"INSERT INTO `customers`(`first_name`,`last_name`,`email`) VALUES('Test666', 'Test666', 'Test666@spring.org')");
 
-		Flux<Message<?>> messageFlux = this.debeziumSupplier.get();
+		Flux<String> payloadFlux = this.debeziumSupplier.get()
+			.map(Message::getPayload)
+			.cast(byte[].class)
+			.map(String::new);
 
-		// Message size should correspond to the number of insert statements in:
+		// payload size should correspond to the number of insert statements in:
 		// https://github.com/debezium/container-images/blob/main/examples/mysql/2.3/inventory.sql
 		// filtered by Customers and Addresses table.
-		StepVerifier.create(messageFlux)
+		StepVerifier.create(payloadFlux)
 			.expectNextCount(16) // Skip the DDL transaction logs.
 
 			// Customers table
-			.assertNext((message) -> assertThat(payloadString(message)).isEqualTo(
+			.assertNext((payload) -> assertThat(payload).isEqualTo(
 					"{\"id\":1001,\"first_name\":\"Sally\",\"last_name\":\"Thomas\",\"email\":\"sally.thomas@acme.com\",\"__deleted\":\"false\",\"__name\":\"my-topic\",\"__db\":\"inventory\",\"__op\":\"r\",\"__table\":\"customers\"}"))
-			.assertNext((message) -> assertThat(payloadString(message)).isEqualTo(
+			.assertNext((payload) -> assertThat(payload).isEqualTo(
 					"{\"id\":1002,\"first_name\":\"George\",\"last_name\":\"Bailey\",\"email\":\"gbailey@foobar.com\",\"__deleted\":\"false\",\"__name\":\"my-topic\",\"__db\":\"inventory\",\"__op\":\"r\",\"__table\":\"customers\"}"))
-			.assertNext((message) -> assertThat(payloadString(message)).isEqualTo(
+			.assertNext((payload) -> assertThat(payload).isEqualTo(
 					"{\"id\":1003,\"first_name\":\"Edward\",\"last_name\":\"Walker\",\"email\":\"ed@walker.com\",\"__deleted\":\"false\",\"__name\":\"my-topic\",\"__db\":\"inventory\",\"__op\":\"r\",\"__table\":\"customers\"}"))
-			.assertNext((message) -> assertThat(payloadString(message)).isEqualTo(
+			.assertNext((payload) -> assertThat(payload).isEqualTo(
 					"{\"id\":1004,\"first_name\":\"Anne\",\"last_name\":\"Kretchmar\",\"email\":\"annek@noanswer.org\",\"__deleted\":\"false\",\"__name\":\"my-topic\",\"__db\":\"inventory\",\"__op\":\"r\",\"__table\":\"customers\"}"))
 
 			// NEW Customer Insert
-			.assertNext((message) -> assertThat(payloadString(message)).isEqualTo(
+			.assertNext((payload) -> assertThat(payload).isEqualTo(
 					"{\"id\":1005,\"first_name\":\"Test666\",\"last_name\":\"Test666\",\"email\":\"Test666@spring.org\",\"__deleted\":\"false\",\"__name\":\"my-topic\",\"__db\":\"inventory\",\"__op\":\"r\",\"__table\":\"customers\"}"))
 
 			// Addresses table
-			.assertNext((message) -> assertThat(payloadString(message)).isEqualTo(
+			.assertNext((payload) -> assertThat(payload).isEqualTo(
 					"{\"id\":10,\"customer_id\":1001,\"street\":\"3183 Moore Avenue\",\"city\":\"Euless\",\"state\":\"Texas\",\"zip\":\"76036\",\"type\":\"SHIPPING\",\"__deleted\":\"false\",\"__name\":\"my-topic\",\"__db\":\"inventory\",\"__op\":\"r\",\"__table\":\"addresses\"}"))
-			.assertNext((message) -> assertThat(payloadString(message)).isEqualTo(
+			.assertNext((payload) -> assertThat(payload).isEqualTo(
 					"{\"id\":11,\"customer_id\":1001,\"street\":\"2389 Hidden Valley Road\",\"city\":\"Harrisburg\",\"state\":\"Pennsylvania\",\"zip\":\"17116\",\"type\":\"BILLING\",\"__deleted\":\"false\",\"__name\":\"my-topic\",\"__db\":\"inventory\",\"__op\":\"r\",\"__table\":\"addresses\"}"))
-			.assertNext((message) -> assertThat(payloadString(message)).isEqualTo(
+			.assertNext((payload) -> assertThat(payload).isEqualTo(
 					"{\"id\":12,\"customer_id\":1002,\"street\":\"281 Riverside Drive\",\"city\":\"Augusta\",\"state\":\"Georgia\",\"zip\":\"30901\",\"type\":\"BILLING\",\"__deleted\":\"false\",\"__name\":\"my-topic\",\"__db\":\"inventory\",\"__op\":\"r\",\"__table\":\"addresses\"}"))
-			.assertNext((message) -> assertThat(payloadString(message)).isEqualTo(
+			.assertNext((payload) -> assertThat(payload).isEqualTo(
 					"{\"id\":13,\"customer_id\":1003,\"street\":\"3787 Brownton Road\",\"city\":\"Columbus\",\"state\":\"Mississippi\",\"zip\":\"39701\",\"type\":\"SHIPPING\",\"__deleted\":\"false\",\"__name\":\"my-topic\",\"__db\":\"inventory\",\"__op\":\"r\",\"__table\":\"addresses\"}"))
-			.assertNext((message) -> assertThat(payloadString(message)).isEqualTo(
+			.assertNext((payload) -> assertThat(payload).isEqualTo(
 					"{\"id\":14,\"customer_id\":1003,\"street\":\"2458 Lost Creek Road\",\"city\":\"Bethlehem\",\"state\":\"Pennsylvania\",\"zip\":\"18018\",\"type\":\"SHIPPING\",\"__deleted\":\"false\",\"__name\":\"my-topic\",\"__db\":\"inventory\",\"__op\":\"r\",\"__table\":\"addresses\"}"))
-			.assertNext((message) -> assertThat(payloadString(message)).isEqualTo(
+			.assertNext((payload) -> assertThat(payload).isEqualTo(
 					"{\"id\":15,\"customer_id\":1003,\"street\":\"4800 Simpson Square\",\"city\":\"Hillsdale\",\"state\":\"Oklahoma\",\"zip\":\"73743\",\"type\":\"BILLING\",\"__deleted\":\"false\",\"__name\":\"my-topic\",\"__db\":\"inventory\",\"__op\":\"r\",\"__table\":\"addresses\"}"))
-			.assertNext((message) -> assertThat(payloadString(message)).isEqualTo(
+			.assertNext((payload) -> assertThat(payload).isEqualTo(
 					"{\"id\":16,\"customer_id\":1004,\"street\":\"1289 University Hill Road\",\"city\":\"Canehill\",\"state\":\"Arkansas\",\"zip\":\"72717\",\"type\":\"LIVING\",\"__deleted\":\"false\",\"__name\":\"my-topic\",\"__db\":\"inventory\",\"__op\":\"r\",\"__table\":\"addresses\"}"))
 			.thenCancel()
-			.verify();
+			.verify(Duration.ofSeconds(30));
 
-	}
-
-	private String payloadString(Message<?> message) {
-		return new String((byte[]) message.getPayload());
 	}
 
 	@SpringBootApplication(exclude = { MongoAutoConfiguration.class })
