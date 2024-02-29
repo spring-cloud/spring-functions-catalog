@@ -8,21 +8,42 @@ on:
         required: true
         type: string
 
+env:
+  ARTIFACTORY_USERNAME: ${{ secrets.ARTIFACTORY_USERNAME }}
+  ARTIFACTORY_PASSWORD: ${{ secrets.ARTIFACTORY_PASSWORD }}
+
 jobs:
-  verify-staged-with-jfrog:
+  verify-staged-with-sample:
     runs-on: ubuntu-latest
     steps:
 
-      - uses: jfrog/setup-jfrog-cli@v3
-        env:
-          JF_ENV_SPRING: ${{ secrets.JF_ARTIFACTORY_SPRING }}
+      - name: Checkout Sample Directory
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          sparse-checkout: 'samples/time-spel-log'
+          sparse-checkout-cone-mode: false
+          show-progress: false
 
-      - name: Download Artifact from Staging Repo
+      - name: Set up Gradle
+        uses: spring-io/spring-gradle-build-action@v2
+
+      - name: Prepare Sample project against Staging
         run: |
-          fileToDownload=org/springframework/cloud/fn/spring-mail-supplier/${{ inputs.releaseVersion }}/spring-mail-supplier-${{ inputs.releaseVersion }}.jar
-          jfrog rt download libs-staging-local/$fileToDownload
-          if [ ! -f $fileToDownload ]
-          then
-            echo "::error title=No staged artifact::No spring-mail-supplier-${{ inputs.releaseVersion }}.jar in staging repository"
-            exit 1
-          fi
+          cd samples/time-spel-log
+          printf "allprojects {
+                  repositories {
+                    maven { 
+                      url 'https://repo.spring.io/libs-staging-local'
+                      credentials {
+                        username = '$ARTIFACTORY_USERNAME'
+                        password = '$ARTIFACTORY_PASSWORD'
+                      }
+                    }
+                  }
+                }" > staging-repo-init.gradle
+
+          sed -i "1,/springFunctionsCatalogVersion.*/s/springFunctionsCatalogVersion.*/springFunctionsCatalogVersion='${{ inputs.releaseVersion }}'/" build.gradle  
+
+      - name: Verify Spring Integration Samples against staged release
+        run: gradle check --init-script staging-repo-init.gradle
