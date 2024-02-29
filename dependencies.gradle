@@ -1,5 +1,5 @@
 ext {
-    springBootVersion = '3.3.0-SNAPSHOT'
+    springBootVersion = '3.2.3'
     springCloudVersion = '2023.0.0'
     springCloudAwsVersion = '3.0.4'
 
