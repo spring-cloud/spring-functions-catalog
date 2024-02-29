@@ -19,10 +19,10 @@ jobs:
 
       - name: Download Artifact from Staging Repo
         run: |
-          fileToDownload=org/springframework/cloud/fn/mail-supplier/${{ inputs.releaseVersion }}/mail-supplier-${{ inputs.releaseVersion }}.jar
+          fileToDownload=org/springframework/cloud/fn/spring-mail-supplier/${{ inputs.releaseVersion }}/spring-mail-supplier-${{ inputs.releaseVersion }}.jar
           jfrog rt download libs-staging-local/$fileToDownload
           if [ ! -f $fileToDownload ]
           then
-            echo "::error title=No staged artifact::No mail-supplier-${{ inputs.releaseVersion }}.jar in staging repository"
+            echo "::error title=No staged artifact::No spring-mail-supplier-${{ inputs.releaseVersion }}.jar in staging repository"
             exit 1
           fi
