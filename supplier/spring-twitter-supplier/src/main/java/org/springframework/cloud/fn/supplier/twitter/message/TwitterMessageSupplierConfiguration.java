@@ -17,16 +17,25 @@
 package org.springframework.cloud.fn.supplier.twitter.message;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import twitter4j.DirectMessage;
 import twitter4j.DirectMessageList;
+import twitter4j.HashtagEntity;
+import twitter4j.MediaEntity;
+import twitter4j.RateLimitStatus;
+import twitter4j.SymbolEntity;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
+import twitter4j.URLEntity;
+import twitter4j.User;
+import twitter4j.UserMentionEntity;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -64,7 +73,8 @@ public class TwitterMessageSupplierConfiguration {
 	}
 
 	@Bean
-	public Supplier<List<DirectMessage>> directMessagesSupplier(TwitterMessageSupplierProperties properties,
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public Supplier<List<DirectMessage>> twitterMessagesSupplier(TwitterMessageSupplierProperties properties,
 			Twitter twitter, MessageCursor cursorState) {
 
 		return () -> {
@@ -75,7 +85,7 @@ public class TwitterMessageSupplierConfiguration {
 
 				if (messages != null) {
 					cursorState.updateCursor(messages.getNextCursor());
-					return messages;
+					return (List<DirectMessage>) (List) messages.stream().map(DirectMessageAdapter::new).toList();
 				}
 
 				logger.error(String.format("NULL messages response for properties: %s and cursor: %s!", properties,
@@ -128,6 +138,105 @@ public class TwitterMessageSupplierConfiguration {
 		@Override
 		public String toString() {
 			return "Cursor{" + "cursor=" + this.cursor + '}';
+		}
+
+	}
+
+	@SuppressWarnings("serial")
+	private static class DirectMessageAdapter implements DirectMessage {
+
+		private final DirectMessage delegate;
+
+		private DirectMessageAdapter(DirectMessage delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public long getId() {
+			return this.delegate.getId();
+		}
+
+		@Override
+		public String getText() {
+			return this.delegate.getText();
+		}
+
+		@Override
+		public long getSenderId() {
+			return this.delegate.getSenderId();
+		}
+
+		@Override
+		public long getRecipientId() {
+			return this.delegate.getRecipientId();
+		}
+
+		@Override
+		public Date getCreatedAt() {
+			return this.delegate.getCreatedAt();
+		}
+
+		@Override
+		public RateLimitStatus getRateLimitStatus() {
+			return this.delegate.getRateLimitStatus();
+		}
+
+		@Override
+		public int getAccessLevel() {
+			return this.delegate.getAccessLevel();
+		}
+
+		@Override
+		public UserMentionEntity[] getUserMentionEntities() {
+			return this.delegate.getUserMentionEntities();
+		}
+
+		@Override
+		public URLEntity[] getURLEntities() {
+			return this.delegate.getURLEntities();
+		}
+
+		@Override
+		public HashtagEntity[] getHashtagEntities() {
+			return this.delegate.getHashtagEntities();
+		}
+
+		@Override
+		public MediaEntity[] getMediaEntities() {
+			return this.delegate.getMediaEntities();
+		}
+
+		@Override
+		public SymbolEntity[] getSymbolEntities() {
+			return this.delegate.getSymbolEntities();
+		}
+
+		@Deprecated
+		@JsonIgnore
+		@Override
+		public String getSenderScreenName() {
+			return this.delegate.getSenderScreenName();
+		}
+
+		@Deprecated
+		@JsonIgnore
+		@Override
+		public String getRecipientScreenName() {
+			return this.delegate.getRecipientScreenName();
+		}
+
+		@Deprecated
+		@JsonIgnore
+		@Override
+		public User getSender() {
+			return this.delegate.getSender();
+		}
+
+		@Deprecated
+		@JsonIgnore
+		@Override
+		public User getRecipient() {
+			return this.delegate.getRecipient();
 		}
 
 	}
