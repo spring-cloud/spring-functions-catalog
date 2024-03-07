@@ -23,7 +23,6 @@ import reactor.core.publisher.Flux;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -46,7 +45,6 @@ import org.springframework.integration.store.MessageGroupStore;
 import org.springframework.integration.support.MessageBuilder;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
-import org.springframework.messaging.MessageChannel;
 
 /**
  * The auto-configuration for aggregator function.
@@ -58,6 +56,8 @@ import org.springframework.messaging.MessageChannel;
 @EnableConfigurationProperties(AggregatorFunctionProperties.class)
 public class AggregatorFunctionConfiguration {
 
+	private final FluxMessageChannel outputChannel = new FluxMessageChannel();
+
 	@Autowired
 	private AggregatorFunctionProperties properties;
 
@@ -65,28 +65,22 @@ public class AggregatorFunctionConfiguration {
 	private BeanFactory beanFactory;
 
 	@Bean
-	public Function<Flux<Message<?>>, Flux<Message<?>>> aggregatorFunction(FluxMessageChannel inputChannel,
-			FluxMessageChannel outputChannel) {
-		return (input) -> Flux.from(outputChannel)
-			.doOnRequest((request) -> inputChannel.subscribeTo(input.map((
+	public Function<Flux<Message<?>>, Flux<Message<?>>> aggregatorFunction(FluxMessageChannel aggregatorInputChannel) {
+		return (input) -> Flux.from(this.outputChannel)
+			.doOnRequest((request) -> aggregatorInputChannel.subscribeTo(input.map((
 					inputMessage) -> MessageBuilder.fromMessage(inputMessage).removeHeader("kafka_consumer").build())));
 	}
 
 	@Bean
-	public FluxMessageChannel inputChannel() {
+	public FluxMessageChannel aggregatorInputChannel() {
 		return new FluxMessageChannel();
 	}
 
 	@Bean
-	public FluxMessageChannel outputChannel() {
-		return new FluxMessageChannel();
-	}
-
-	@Bean
-	@ServiceActivator(inputChannel = "inputChannel")
+	@ServiceActivator(inputChannel = "aggregatorInputChannel")
 	public AggregatorFactoryBean aggregator(@Nullable CorrelationStrategy correlationStrategy,
 			@Nullable ReleaseStrategy releaseStrategy, @Nullable MessageGroupProcessor messageGroupProcessor,
-			@Nullable MessageGroupStore messageStore, @Qualifier("outputChannel") MessageChannel outputChannel,
+			@Nullable MessageGroupStore messageStore,
 			@Nullable ComponentCustomizer<AggregatorFactoryBean> aggregatorCustomizer) {
 
 		AggregatorFactoryBean aggregator = new AggregatorFactoryBean();
@@ -112,7 +106,7 @@ public class AggregatorFunctionConfiguration {
 		if (messageStore != null) {
 			aggregator.setMessageStore(messageStore);
 		}
-		aggregator.setOutputChannel(outputChannel);
+		aggregator.setOutputChannel(this.outputChannel);
 
 		if (aggregatorCustomizer != null) {
 			aggregatorCustomizer.customize(aggregator);

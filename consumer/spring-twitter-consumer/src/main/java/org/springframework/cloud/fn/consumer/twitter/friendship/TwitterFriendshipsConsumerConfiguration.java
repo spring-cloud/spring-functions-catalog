@@ -22,6 +22,7 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -35,11 +36,13 @@ import org.springframework.messaging.Message;
  */
 @AutoConfiguration(after = TwitterConnectionConfiguration.class)
 @EnableConfigurationProperties(TwitterFriendshipsConsumerProperties.class)
+@ConditionalOnExpression("environment['twitter.friendships.update.user-id'] !='' or environment['twitter.friendships.update.screen-name'] != ''")
 public class TwitterFriendshipsConsumerConfiguration {
 
 	@Bean
 	@SuppressWarnings("Duplicates")
-	public Consumer<Message<?>> friendshipConsumer(TwitterFriendshipsConsumerProperties properties, Twitter twitter) {
+	public Consumer<Message<?>> twitterFriendshipConsumer(TwitterFriendshipsConsumerProperties properties,
+			Twitter twitter) {
 		return (message) -> {
 			try {
 				TwitterFriendshipsConsumerProperties.OperationType type = properties.getType()

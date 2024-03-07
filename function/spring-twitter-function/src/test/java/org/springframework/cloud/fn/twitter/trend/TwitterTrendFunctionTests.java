@@ -49,6 +49,7 @@ import static org.mockserver.verify.VerificationTimes.once;
 
 /**
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
 		properties = { "twitter.connection.consumerKey=consumerKey666",
@@ -56,8 +57,6 @@ import static org.mockserver.verify.VerificationTimes.once;
 				"twitter.connection.accessTokenSecret=accessTokenSecret666" })
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 public abstract class TwitterTrendFunctionTests {
-
-	private static final String MOCK_SERVER_IP = "127.0.0.1";
 
 	private static ClientAndServer mockServer;
 
@@ -71,7 +70,7 @@ public abstract class TwitterTrendFunctionTests {
 	@BeforeAll
 	public static void startServer() {
 		mockServer = ClientAndServer.startClientAndServer();
-		mockClient = new MockServerClient(MOCK_SERVER_IP, mockServer.getPort());
+		mockClient = new MockServerClient("localhost", mockServer.getPort());
 
 		trendsRequest = setExpectation(
 				request().withMethod("GET").withPath("/trends/place.json").withQueryStringParameter("id", "2972"));
@@ -116,7 +115,7 @@ public abstract class TwitterTrendFunctionTests {
 
 			Function<TwitterConnectionProperties, ConfigurationBuilder> mockedConfiguration = toConfigurationBuilder
 				.andThen(new TwitterTestUtils()
-					.mockTwitterUrls(String.format("http://%s:%s", MOCK_SERVER_IP, mockServer.getPort())));
+					.mockTwitterUrls(String.format("http://localhost:" + mockServer.getPort())));
 
 			return mockedConfiguration.apply(properties).build();
 		}

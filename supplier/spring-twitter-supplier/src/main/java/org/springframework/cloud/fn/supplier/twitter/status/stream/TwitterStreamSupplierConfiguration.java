@@ -53,14 +53,10 @@ public class TwitterStreamSupplierConfiguration {
 
 	private static final Log LOGGER = LogFactory.getLog(TwitterStreamSupplierConfiguration.class);
 
-	@Bean
-	public FluxMessageChannel twitterStatusInputChannel() {
-		return new FluxMessageChannel();
-	}
+	private final FluxMessageChannel twitterStatusInputChannel = new FluxMessageChannel();
 
 	@Bean
-	public StatusListener twitterStatusListener(FluxMessageChannel twitterStatusInputChannel,
-			TwitterStream twitterStream, ObjectMapper objectMapper) {
+	public StatusListener twitterStatusListener(TwitterStream twitterStream, ObjectMapper objectMapper) {
 
 		StatusListener statusListener = new StatusListener() {
 
@@ -94,7 +90,7 @@ public class TwitterStreamSupplierConfiguration {
 					Message<byte[]> message = MessageBuilder.withPayload(json.getBytes())
 						.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE)
 						.build();
-					twitterStatusInputChannel.send(message);
+					TwitterStreamSupplierConfiguration.this.twitterStatusInputChannel.send(message);
 				}
 				catch (JsonProcessingException ex) {
 					String errorMessage = "Status to JSON conversion error!";
@@ -116,23 +112,15 @@ public class TwitterStreamSupplierConfiguration {
 
 	@Bean
 	public Supplier<Flux<Message<?>>> twitterStreamSupplier(TwitterStream twitterStream,
-			FluxMessageChannel twitterStatusInputChannel, TwitterStreamSupplierProperties streamProperties) {
+			TwitterStreamSupplierProperties streamProperties) {
 
-		return () -> Flux.from(twitterStatusInputChannel).doOnSubscribe((subscription) -> {
+		return () -> Flux.from(this.twitterStatusInputChannel).doOnSubscribe((subscription) -> {
 			try {
 				switch (streamProperties.getType()) {
-					case filter -> {
-						twitterStream.filter(streamProperties.getFilter().toFilterQuery());
-					}
-					case sample -> {
-						twitterStream.sample();
-					}
-					case firehose -> {
-						twitterStream.firehose(streamProperties.getFilter().getCount());
-					}
-					case link -> {
-						twitterStream.links(streamProperties.getFilter().getCount());
-					}
+					case filter -> twitterStream.filter(streamProperties.getFilter().toFilterQuery());
+					case sample -> twitterStream.sample();
+					case firehose -> twitterStream.firehose(streamProperties.getFilter().getCount());
+					case link -> twitterStream.links(streamProperties.getFilter().getCount());
 					default -> throw new IllegalArgumentException("Unknown stream type:" + streamProperties.getType());
 				}
 			}

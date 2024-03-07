@@ -24,6 +24,7 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -37,12 +38,13 @@ import org.springframework.messaging.Message;
  */
 @AutoConfiguration(after = TwitterConnectionConfiguration.class)
 @EnableConfigurationProperties(TwitterMessageConsumerProperties.class)
+@ConditionalOnExpression("environment['twitter.message.update.user-id'] !='' or environment['twitter.message.update.screen-name'] != ''")
 public class TwitterMessageConsumerConfiguration {
 
 	private static final Log LOGGER = LogFactory.getLog(TwitterMessageConsumerConfiguration.class);
 
 	@Bean
-	public Consumer<Message<?>> sendDirectMessageConsumer(TwitterMessageConsumerProperties messageProperties,
+	public Consumer<Message<?>> twitterSendMessageConsumer(TwitterMessageConsumerProperties messageProperties,
 			Twitter twitter) {
 
 		return (message) -> {

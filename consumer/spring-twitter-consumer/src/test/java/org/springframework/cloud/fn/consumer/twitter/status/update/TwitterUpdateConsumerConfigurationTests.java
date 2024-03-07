@@ -39,7 +39,7 @@ import static org.mockito.Mockito.verify;
  * @author Christian Tzolov
  * @author Artem Bilan
  */
-public class TwitterUpdateSinkFunctionConfigurationTests {
+public class TwitterUpdateConsumerConfigurationTests {
 
 	private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
 
@@ -47,7 +47,8 @@ public class TwitterUpdateSinkFunctionConfigurationTests {
 	public void testStatusUpdateConsumer() throws TwitterException {
 		Twitter twitter = mock(Twitter.class);
 
-		Consumer<StatusUpdate> statusUpdateConsumer = new TwitterUpdateConsumerConfiguration().updateStatus(twitter);
+		Consumer<StatusUpdate> statusUpdateConsumer = new TwitterUpdateConsumerConfiguration()
+			.twitterUpdateStatusConsumer(twitter);
 
 		StatusUpdate statusUpdateQuery = new StatusUpdate("Hello World");
 		statusUpdateConsumer.accept(statusUpdateQuery);

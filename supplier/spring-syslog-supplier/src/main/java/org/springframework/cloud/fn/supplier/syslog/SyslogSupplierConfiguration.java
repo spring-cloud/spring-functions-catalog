@@ -55,17 +55,14 @@ public class SyslogSupplierConfiguration {
 	@Autowired
 	private SyslogSupplierProperties properties;
 
-	@Bean
-	public FluxMessageChannel syslogInputChannel() {
-		return new FluxMessageChannel();
-	}
+	private final FluxMessageChannel syslogInputChannel = new FluxMessageChannel();
 
 	@Bean
-	public Supplier<Flux<Message<?>>> syslogSupplier(FluxMessageChannel syslogInputChannel,
+	public Supplier<Flux<Message<?>>> syslogSupplier(
 			ObjectProvider<UdpSyslogReceivingChannelAdapter> udpAdapterProvider,
 			ObjectProvider<TcpSyslogReceivingChannelAdapter> tcpAdapterProvider) {
 
-		return () -> Flux.from(syslogInputChannel).doOnSubscribe((subscription) -> {
+		return () -> Flux.from(this.syslogInputChannel).doOnSubscribe((subscription) -> {
 			UdpSyslogReceivingChannelAdapter udpAdapter = udpAdapterProvider.getIfAvailable();
 			TcpSyslogReceivingChannelAdapter tcpAdapter = tcpAdapterProvider.getIfAvailable();
 			if (udpAdapter != null) {
@@ -79,25 +76,19 @@ public class SyslogSupplierConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "udp")
-	public UdpSyslogReceivingChannelAdapter udpAdapter(MessageConverter syslogConverter,
-			FluxMessageChannel syslogInputChannel) {
-
-		return createUdpAdapter(syslogConverter, syslogInputChannel);
+	public UdpSyslogReceivingChannelAdapter udpAdapter(MessageConverter syslogConverter) {
+		return createUdpAdapter(syslogConverter);
 	}
 
 	@Bean
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "both")
-	public UdpSyslogReceivingChannelAdapter udpBothAdapter(MessageConverter syslogConverter,
-			FluxMessageChannel syslogInputChannel) {
-
-		return createUdpAdapter(syslogConverter, syslogInputChannel);
+	public UdpSyslogReceivingChannelAdapter udpBothAdapter(MessageConverter syslogConverter) {
+		return createUdpAdapter(syslogConverter);
 	}
 
-	private UdpSyslogReceivingChannelAdapter createUdpAdapter(MessageConverter syslogConverter,
-			FluxMessageChannel syslogInputChannel) {
-
+	private UdpSyslogReceivingChannelAdapter createUdpAdapter(MessageConverter syslogConverter) {
 		UdpSyslogReceivingChannelAdapter adapter = new UdpSyslogReceivingChannelAdapter();
-		setAdapterProperties(adapter, syslogConverter, syslogInputChannel);
+		setAdapterProperties(adapter, syslogConverter);
 		return adapter;
 	}
 
@@ -105,18 +96,18 @@ public class SyslogSupplierConfiguration {
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "tcp", matchIfMissing = true)
 	public TcpSyslogReceivingChannelAdapter tcpAdapter(
 			@Qualifier("syslogSupplierConnectionFactory") AbstractServerConnectionFactory connectionFactory,
-			MessageConverter syslogConverter, FluxMessageChannel syslogInputChannel) {
+			MessageConverter syslogConverter) {
 
-		return createTcpAdapter(connectionFactory, syslogConverter, syslogInputChannel);
+		return createTcpAdapter(connectionFactory, syslogConverter);
 	}
 
 	@Bean
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "both")
 	public TcpSyslogReceivingChannelAdapter tcpBothAdapter(
 			@Qualifier("syslogSupplierConnectionFactory") AbstractServerConnectionFactory connectionFactory,
-			MessageConverter syslogConverter, FluxMessageChannel syslogInputChannel) {
+			MessageConverter syslogConverter) {
 
-		return createTcpAdapter(connectionFactory, syslogConverter, syslogInputChannel);
+		return createTcpAdapter(connectionFactory, syslogConverter);
 	}
 
 	@Bean
@@ -130,20 +121,19 @@ public class SyslogSupplierConfiguration {
 	}
 
 	private TcpSyslogReceivingChannelAdapter createTcpAdapter(AbstractServerConnectionFactory connectionFactory,
-			MessageConverter syslogConverter, FluxMessageChannel syslogInputChannel) {
+			MessageConverter syslogConverter) {
 
 		TcpSyslogReceivingChannelAdapter adapter = new TcpSyslogReceivingChannelAdapter();
 		adapter.setConnectionFactory(connectionFactory);
-		setAdapterProperties(adapter, syslogConverter, syslogInputChannel);
+		setAdapterProperties(adapter, syslogConverter);
 		return adapter;
 	}
 
-	private void setAdapterProperties(SyslogReceivingChannelAdapterSupport adapter, MessageConverter syslogConverter,
-			FluxMessageChannel syslogInputChannel) {
+	private void setAdapterProperties(SyslogReceivingChannelAdapterSupport adapter, MessageConverter syslogConverter) {
 
 		adapter.setPort(this.properties.getPort());
 		adapter.setConverter(syslogConverter);
-		adapter.setOutputChannel(syslogInputChannel);
+		adapter.setOutputChannel(this.syslogInputChannel);
 		adapter.setAutoStartup(false);
 	}
 

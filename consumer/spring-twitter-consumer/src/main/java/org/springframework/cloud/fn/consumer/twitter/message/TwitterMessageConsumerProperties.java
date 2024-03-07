@@ -19,7 +19,6 @@ package org.springframework.cloud.fn.consumer.twitter.message;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
-import org.springframework.validation.annotation.Validated;
 
 /**
  * The Twitter messages properties.
@@ -27,7 +26,6 @@ import org.springframework.validation.annotation.Validated;
  * @author Christian Tzolov
  */
 @ConfigurationProperties("twitter.message.update")
-@Validated
 public class TwitterMessageConsumerProperties {
 
 	private static final Expression DEFAULT_EXPRESSION = new SpelExpressionParser().parseExpression("payload");

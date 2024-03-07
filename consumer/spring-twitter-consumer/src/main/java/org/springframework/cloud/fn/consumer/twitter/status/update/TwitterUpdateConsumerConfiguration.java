@@ -45,7 +45,7 @@ public class TwitterUpdateConsumerConfiguration {
 	private static final Log LOGGER = LogFactory.getLog(TwitterUpdateConsumerConfiguration.class);
 
 	@Bean
-	public Consumer<StatusUpdate> updateStatus(Twitter twitter) {
+	public Consumer<StatusUpdate> twitterUpdateStatusConsumer(Twitter twitter) {
 		return (statusUpdate) -> {
 			try {
 				Status status = twitter.updateStatus(statusUpdate);

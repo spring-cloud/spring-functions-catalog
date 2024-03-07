@@ -20,15 +20,15 @@ You can find details for the Update API here: https://developer.twitter.com/en/d
 
 The `TwitterUpdateConsumerConfiguration` auto-configuration provides this beans:
 
-- `Consumer<StatusUpdate> updateStatus` - if you have an `StatusUpdate` instance you can use the `updateStatus` to apply it.
+- `Consumer<StatusUpdate> twitterUpdateStatusConsumer` - if you have an `StatusUpdate` instance you can use the `updateStatus` to apply it.
 
 - `Function<Message<?>, StatusUpdate> messageToStatusUpdateFunction` - function that converts a `Message<?>`  text into a `StatusUpdate` instance using the `TwitterUpdateConsumerProperties` properties.
 
-- `Consumer<Message<?>> twitterStatusUpdateConsumer` - composes `messageToStatusUpdateFunction` and `updateStatus` to update the twitter status from Message text.
+- `Consumer<Message<?>> twitterUpdateStatusConsumer` - composes `messageToStatusUpdateFunction` and `updateStatus` to update the twitter status from Message text.
 
 Note: the Message content is expected to be in text format. Consider using the `byteArrayTextToString` utility `Function`.
 
-You can use `twitterStatusUpdateConsumer` as a qualifier when injecting.
+You can use `twitterUpdateStatusConsumer` as a qualifier when injecting.
 
 ### 1.2 Configuration Options
 
@@ -58,11 +58,11 @@ SpEL expressions are used to compute the request parameters from the input messa
 
 The `TwitterMessageConsumerConfiguration` auto-configuration provides this beans:
 
-- `Consumer<Message<?>> sendDirectMessageConsumer`
+- `Consumer<Message<?>> twitterSendMessageConsumer`
 
 Note: the Message content is expected to be in text format. Consider using the `byteArrayTextToString` utility `Function`.
 
-You can use `twitterStatusUpdateConsumer` as a qualifier when injecting.
+You can use `twitterSendMessageConsumer` as a qualifier when injecting.
 
 ### 2.2 Configuration Options
 
@@ -94,11 +94,11 @@ Every operation type has its own parameters.
 
 The `TwitterFriendshipsConsumerConfiguration` auto-configuration provides this beans:
 
-- `Consumer<Message<?>> friendshipConsumer`
+- `Consumer<Message<?>> twitterFriendshipConsumer`
 
 Note: the Message content is expected to be in text format. Consider using the `byteArrayTextToString` utility `Function`.
 
-You can use `friendshipConsumer` as a qualifier when injecting.
+You can use `twitterFriendshipConsumer` as a qualifier when injecting.
 
 ### 3.2 Configuration Options
 

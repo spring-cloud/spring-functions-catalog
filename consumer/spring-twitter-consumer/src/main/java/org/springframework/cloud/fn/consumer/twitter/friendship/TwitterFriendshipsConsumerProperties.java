@@ -16,15 +16,11 @@
 
 package org.springframework.cloud.fn.consumer.twitter.friendship;
 
-import jakarta.validation.constraints.AssertTrue;
-import jakarta.validation.constraints.NotNull;
-
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.expression.Expression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.expression.ValueExpression;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
 
 /**
  * The Twitter friendships properties.
@@ -34,7 +30,6 @@ import org.springframework.validation.annotation.Validated;
  */
 @Component
 @ConfigurationProperties("twitter.friendships.update")
-@Validated
 public class TwitterFriendshipsConsumerProperties {
 
 	public enum OperationType {
@@ -101,17 +96,11 @@ public class TwitterFriendshipsConsumerProperties {
 		return this.update;
 	}
 
-	@AssertTrue(message = "Either userId or screenName must be provided")
-	public boolean isUserProvided() {
-		return this.userId != null || this.screenName != null;
-	}
-
 	public static class Create {
 
 		/**
 		 * The ID of the user to follow (boolean).
 		 */
-		@NotNull
 		private Expression follow = new ValueExpression<>(true);
 
 		public Expression getFollow() {
@@ -129,13 +118,11 @@ public class TwitterFriendshipsConsumerProperties {
 		/**
 		 * Enable/disable device notifications from the target user.
 		 */
-		@NotNull
 		private Expression device = new ValueExpression<>(true);
 
 		/**
 		 * Enable/disable Retweets from the target user.
 		 */
-		@NotNull
 		private Expression retweets = new ValueExpression<>(true);
 
 		public Expression getDevice() {

@@ -38,6 +38,7 @@ import org.springframework.messaging.Message;
  * Auto-configuration for Twitter Trend function.
  *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
 @ConditionalOnProperty(prefix = "twitter.trend", name = "trend-query-type")
 @AutoConfiguration(after = TwitterConnectionConfiguration.class)
@@ -47,7 +48,17 @@ public class TwitterTrendFunctionConfiguration {
 	private static final Log LOGGER = LogFactory.getLog(TwitterTrendFunctionConfiguration.class);
 
 	@Bean
-	public Function<Message<?>, Trends> trend(TwitterTrendFunctionProperties properties, Twitter twitter) {
+	public Function<Message<?>, Message<byte[]>> twitterTrendFunction(TwitterTrendFunctionProperties properties,
+			Twitter twitter, Function<Object, Message<byte[]>> managedJson) {
+
+		Function<Message<?>, Trends> trendsFunction = trendsFunction(properties, twitter);
+		Function<Message<?>, List<Location>> closestOrAvailableTrends = closestOrAvailableTrends(properties, twitter);
+
+		return (properties.getTrendQueryType() == TwitterTrendFunctionProperties.TrendQueryType.trend)
+				? trendsFunction.andThen(managedJson) : closestOrAvailableTrends.andThen(managedJson);
+	}
+
+	private Function<Message<?>, Trends> trendsFunction(TwitterTrendFunctionProperties properties, Twitter twitter) {
 		return (message) -> {
 			try {
 				int woeid = properties.getLocationId().getValue(message, int.class);
@@ -60,8 +71,7 @@ public class TwitterTrendFunctionConfiguration {
 		};
 	}
 
-	@Bean
-	public Function<Message<?>, List<Location>> closestOrAvailableTrends(TwitterTrendFunctionProperties properties,
+	private Function<Message<?>, List<Location>> closestOrAvailableTrends(TwitterTrendFunctionProperties properties,
 			Twitter twitter) {
 
 		return (message) -> {
@@ -80,15 +90,6 @@ public class TwitterTrendFunctionConfiguration {
 			}
 			return null;
 		};
-	}
-
-	@Bean
-	public Function<Message<?>, Message<byte[]>> twitterTrendFunction(Function<Object, Message<byte[]>> managedJson,
-			Function<Message<?>, Trends> trend, TwitterTrendFunctionProperties properties,
-			Function<Message<?>, List<Location>> closestOrAvailableTrends) {
-
-		return (properties.getTrendQueryType() == TwitterTrendFunctionProperties.TrendQueryType.trend)
-				? trend.andThen(managedJson) : closestOrAvailableTrends.andThen(managedJson);
 	}
 
 }
