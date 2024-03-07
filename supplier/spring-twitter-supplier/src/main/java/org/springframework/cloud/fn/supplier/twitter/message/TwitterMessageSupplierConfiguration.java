@@ -143,7 +143,7 @@ public class TwitterMessageSupplierConfiguration {
 	}
 
 	@SuppressWarnings("serial")
-	private static class DirectMessageAdapter implements DirectMessage {
+	private static final class DirectMessageAdapter implements DirectMessage {
 
 		private final DirectMessage delegate;
 
