@@ -1,6 +1,5 @@
 = Spring Functions Catalog
 
-
 In this repository, you will find a collection of components that can meet various data integration use cases and requirements.
 
 The repository's primary focus is to provide a set of standalone Java functions that can be useful in the end-user applications as-is.
@@ -9,6 +8,19 @@ Most of these functions are, essentially, auto-configurations for specific https
 These functions can be consumed in the target project any possible way, for example, the `FunctionFlowBuilder` from https://docs.spring.io/spring-cloud-function/docs/current/reference/html/spring-integration.html#spring-integration[Spring Cloud Function Integration] module can be used to compose an `IntegrationFlow` for any complex solution.
 
 This functions catalog is also a foundation for https://spring.io/projects/spring-cloud-stream-applications[Spring Cloud Stream Applications] project.
+
+This BOM is needed to be included into dependency management:
+
+[source,xml]
+----
+<dependency>
+    <groupId>org.springframework.cloud.fn</groupId>
+    <artifactId>spring-functions-catalog-bom</artifactId>
+    <version>5.0.0-SNAPSHOT</version>
+    <type>pom</type>
+    <scope>import</scope>
+</dependency>
+----
 
 == Reusable Functions
 

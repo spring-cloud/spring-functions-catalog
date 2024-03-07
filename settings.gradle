@@ -5,7 +5,7 @@ plugins {
 
 rootProject.name = 'spring-functions-catalog'
 
-include 'spring-function-dependencies'
+include 'spring-functions-catalog-bom'
 
 ['common', 'consumer', 'function', 'supplier'].each { group ->
     def groupDir = file(group)

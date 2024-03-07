@@ -14,7 +14,7 @@ plugins {
 description = 'Spring Functions Catlog'
 
 ext {
-	javaProjects = subprojects - project(':spring-function-dependencies')
+	javaProjects = subprojects - project(':spring-functions-catalog-bom')
 }
 
 apply from: 'dependencies.gradle'
