@@ -75,7 +75,7 @@ public class FileSupplierConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(prefix = "file.supplier", name = "tail", matchIfMissing = true)
+	@ConditionalOnExpression("environment['file.supplier.tail'] == null")
 	public ChainFileListFilter<File> filter(ConcurrentMetadataStore metadataStore) {
 		ChainFileListFilter<File> chainFilter = new ChainFileListFilter<>();
 		if (StringUtils.hasText(this.fileSupplierProperties.getFilenamePattern())) {
@@ -94,7 +94,7 @@ public class FileSupplierConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(prefix = "file.supplier", name = "tail", matchIfMissing = true)
+	@ConditionalOnExpression("environment['file.supplier.tail'] == null")
 	public FileInboundChannelAdapterSpec fileMessageSource(FileListFilter<File> fileListFilter,
 			@Nullable ComponentCustomizer<FileInboundChannelAdapterSpec> fileInboundChannelAdapterSpecCustomizer) {
 
@@ -107,7 +107,7 @@ public class FileSupplierConfiguration {
 	}
 
 	@Bean
-	@ConditionalOnProperty(prefix = "file.supplier", name = "tail", matchIfMissing = true)
+	@ConditionalOnExpression("environment['file.supplier.tail'] == null")
 	public Flux<Message<File>> fileMessageFlux(FileReadingMessageSource fileReadingMessageSource) {
 		return IntegrationReactiveUtils.messageSourceToFlux(fileReadingMessageSource)
 			.contextWrite(Context.of(IntegrationReactiveUtils.DELAY_WHEN_EMPTY_KEY,
@@ -160,8 +160,8 @@ public class FileSupplierConfiguration {
 			return () -> Flux.from(fileTailingFlow);
 		}
 		else {
-			throw new BeanInitializationException(
-					"Cannot creat 'fileSupplier' bean: no 'fileReadingFlow' or 'fileTailingFlow' dependency and is not 'FileReadingMode.ref'.");
+			throw new BeanInitializationException("Cannot creat 'fileSupplier' bean: no 'fileReadingFlow', "
+					+ "or 'fileTailingFlow' dependency, and is not 'FileReadingMode.ref'.");
 		}
 	}
 
