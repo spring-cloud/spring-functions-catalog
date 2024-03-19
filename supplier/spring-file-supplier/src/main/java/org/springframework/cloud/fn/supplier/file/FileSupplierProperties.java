@@ -21,6 +21,7 @@ import java.time.Duration;
 import java.util.regex.Pattern;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.integration.file.tail.FileTailingMessageProducerSupport;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -42,6 +43,11 @@ public class FileSupplierProperties {
 	private File directory = new File(DEFAULT_DIR);
 
 	/**
+	 * The file to tail.
+	 */
+	private File tail;
+
+	/**
 	 * Set to true to include an AcceptOnceFileListFilter which prevents duplicates.
 	 */
 	private boolean preventDuplicates = true;
@@ -60,6 +66,11 @@ public class FileSupplierProperties {
 	 * Duration of delay when no new files are detected.
 	 */
 	private Duration delayWhenEmpty = Duration.ofSeconds(1);
+
+	/**
+	 * File tailing options.
+	 */
+	private final Tailer tailer = new Tailer();
 
 	public File getDirectory() {
 		return this.directory;
@@ -105,6 +116,115 @@ public class FileSupplierProperties {
 
 	public void setDelayWhenEmpty(Duration delayWhenEmpty) {
 		this.delayWhenEmpty = delayWhenEmpty;
+	}
+
+	public File getTail() {
+		return this.tail;
+	}
+
+	public void setTail(File tail) {
+		this.tail = tail;
+	}
+
+	public Tailer getTailer() {
+		return this.tailer;
+	}
+
+	public static class Tailer {
+
+		/**
+		 * Options string for native tail command.
+		 */
+		private String nativeOptions;
+
+		/**
+		 * Whether to capture stderr output in the separate thread.
+		 */
+		private boolean statusReader;
+
+		/**
+		 * Delay between attempts to tail a non-existent file, or between attempts to
+		 * execute a process if it fails for any reason.
+		 */
+		private Duration attemptsDelay = Duration
+			.ofMillis(FileTailingMessageProducerSupport.DEFAULT_TAIL_ATTEMPTS_DELAY);
+
+		/**
+		 * How often to emit FileTailingIdleEvents.
+		 */
+		private Duration idleEventInterval;
+
+		/**
+		 * Delay between checks of the file for new content.
+		 */
+		private Duration pollingDelay;
+
+		/**
+		 * Whether to tail from the end of the file.
+		 */
+		private Boolean end;
+
+		/**
+		 * Whether to close and reopen the file between reading chunks.
+		 */
+		private Boolean reopen;
+
+		public String getNativeOptions() {
+			return this.nativeOptions;
+		}
+
+		public void setNativeOptions(String nativeOptions) {
+			this.nativeOptions = nativeOptions;
+		}
+
+		public boolean isStatusReader() {
+			return this.statusReader;
+		}
+
+		public void setStatusReader(boolean statusReader) {
+			this.statusReader = statusReader;
+		}
+
+		public Duration getAttemptsDelay() {
+			return this.attemptsDelay;
+		}
+
+		public void setAttemptsDelay(Duration attemptsDelay) {
+			this.attemptsDelay = attemptsDelay;
+		}
+
+		public Duration getIdleEventInterval() {
+			return this.idleEventInterval;
+		}
+
+		public void setIdleEventInterval(Duration idleEventInterval) {
+			this.idleEventInterval = idleEventInterval;
+		}
+
+		public Duration getPollingDelay() {
+			return this.pollingDelay;
+		}
+
+		public void setPollingDelay(Duration pollingDelay) {
+			this.pollingDelay = pollingDelay;
+		}
+
+		public Boolean isEnd() {
+			return this.end;
+		}
+
+		public void setEnd(Boolean end) {
+			this.end = end;
+		}
+
+		public Boolean isReopen() {
+			return this.reopen;
+		}
+
+		public void setReopen(Boolean reopen) {
+			this.reopen = reopen;
+		}
+
 	}
 
 }
