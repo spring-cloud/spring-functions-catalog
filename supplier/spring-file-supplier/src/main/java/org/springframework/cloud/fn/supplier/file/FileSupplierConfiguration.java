@@ -33,6 +33,7 @@ import org.springframework.cloud.fn.common.file.FileConsumerProperties;
 import org.springframework.cloud.fn.common.file.FileReadingMode;
 import org.springframework.cloud.fn.common.file.FileUtils;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.integration.JavaUtils;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.dsl.IntegrationFlowBuilder;
@@ -61,72 +62,11 @@ import org.springframework.util.StringUtils;
 @EnableConfigurationProperties({ FileSupplierProperties.class, FileConsumerProperties.class })
 public class FileSupplierConfiguration {
 
-	private static final String METADATA_STORE_PREFIX = "local-file-system-metadata-";
-
-	private final FileSupplierProperties fileSupplierProperties;
-
-	private final FileConsumerProperties fileConsumerProperties;
-
-	public FileSupplierConfiguration(FileSupplierProperties fileSupplierProperties,
-			FileConsumerProperties fileConsumerProperties) {
-
-		this.fileSupplierProperties = fileSupplierProperties;
-		this.fileConsumerProperties = fileConsumerProperties;
-	}
-
-	@Bean
-	@ConditionalOnExpression("environment['file.supplier.tail'] == null")
-	public ChainFileListFilter<File> filter(ConcurrentMetadataStore metadataStore) {
-		ChainFileListFilter<File> chainFilter = new ChainFileListFilter<>();
-		if (StringUtils.hasText(this.fileSupplierProperties.getFilenamePattern())) {
-			chainFilter.addFilter(new SimplePatternFileListFilter(this.fileSupplierProperties.getFilenamePattern()));
-		}
-		else if (this.fileSupplierProperties.getFilenameRegex() != null) {
-			chainFilter.addFilter(new RegexPatternFileListFilter(this.fileSupplierProperties.getFilenameRegex()));
-		}
-
-		if (this.fileSupplierProperties.isPreventDuplicates()) {
-			chainFilter
-				.addFilter(new FileSystemPersistentAcceptOnceFileListFilter(metadataStore, METADATA_STORE_PREFIX));
-		}
-
-		return chainFilter;
-	}
-
-	@Bean
-	@ConditionalOnExpression("environment['file.supplier.tail'] == null")
-	public FileInboundChannelAdapterSpec fileMessageSource(FileListFilter<File> fileListFilter,
-			@Nullable ComponentCustomizer<FileInboundChannelAdapterSpec> fileInboundChannelAdapterSpecCustomizer) {
-
-		FileInboundChannelAdapterSpec adapterSpec = Files.inboundAdapter(this.fileSupplierProperties.getDirectory())
-			.filter(fileListFilter);
-		if (fileInboundChannelAdapterSpecCustomizer != null) {
-			fileInboundChannelAdapterSpecCustomizer.customize(adapterSpec);
-		}
-		return adapterSpec;
-	}
-
-	@Bean
-	@ConditionalOnExpression("environment['file.supplier.tail'] == null")
-	public Flux<Message<File>> fileMessageFlux(FileReadingMessageSource fileReadingMessageSource) {
-		return IntegrationReactiveUtils.messageSourceToFlux(fileReadingMessageSource)
-			.contextWrite(Context.of(IntegrationReactiveUtils.DELAY_WHEN_EMPTY_KEY,
-					this.fileSupplierProperties.getDelayWhenEmpty()))
-			.doOnRequest((r) -> fileReadingMessageSource.start());
-	}
-
-	@Bean
-	@ConditionalOnExpression("environment['file.consumer.mode'] != 'ref' and environment['file.supplier.tail'] == null")
-	public Publisher<Message<Object>> fileReadingFlow(Flux<Message<?>> fileMessageFlux) {
-		IntegrationFlowBuilder flowBuilder = IntegrationFlow.from(fileMessageFlux);
-		return FileUtils.enhanceFlowForReadingMode(flowBuilder, this.fileConsumerProperties).toReactivePublisher(true);
-	}
-
 	@Bean
 	@ConditionalOnProperty(prefix = "file.supplier", name = "tail")
-	public Publisher<Message<String>> fileTailingFlow() {
-		FileSupplierProperties.Tailer tail = this.fileSupplierProperties.getTailer();
-		TailAdapterSpec tailAdapterSpec = Files.tailAdapter(this.fileSupplierProperties.getTail())
+	public Publisher<Message<String>> fileTailingFlow(FileSupplierProperties fileSupplierProperties) {
+		FileSupplierProperties.Tailer tail = fileSupplierProperties.getTailer();
+		TailAdapterSpec tailAdapterSpec = Files.tailAdapter(fileSupplierProperties.getTail())
 			// TODO until Spring Integration 6.2.3
 			.autoStartup(false)
 			.fileDelay(tail.getAttemptsDelay().toMillis())
@@ -146,11 +86,11 @@ public class FileSupplierConfiguration {
 	}
 
 	@Bean
-	public Supplier<Flux<Message<?>>> fileSupplier(@Nullable Flux<Message<?>> fileMessageFlux,
-			@Nullable Publisher<Message<Object>> fileReadingFlow,
+	public Supplier<Flux<Message<?>>> fileSupplier(FileConsumerProperties fileConsumerProperties,
+			@Nullable Flux<Message<?>> fileMessageFlux, @Nullable Publisher<Message<Object>> fileReadingFlow,
 			@Nullable Publisher<Message<String>> fileTailingFlow) {
 
-		if (this.fileConsumerProperties.getMode() == FileReadingMode.ref) {
+		if (fileConsumerProperties.getMode() == FileReadingMode.ref) {
 			return () -> fileMessageFlux;
 		}
 		else if (fileReadingFlow != null) {
@@ -163,6 +103,72 @@ public class FileSupplierConfiguration {
 			throw new BeanInitializationException("Cannot creat 'fileSupplier' bean: no 'fileReadingFlow', "
 					+ "or 'fileTailingFlow' dependency, and is not 'FileReadingMode.ref'.");
 		}
+	}
+
+	@Configuration(proxyBeanMethods = false)
+	@ConditionalOnExpression("environment['file.supplier.tail'] == null")
+	protected static class FileMessageSourceConfiguration {
+
+		private static final String METADATA_STORE_PREFIX = "local-file-system-metadata-";
+
+		private final FileSupplierProperties fileSupplierProperties;
+
+		private final FileConsumerProperties fileConsumerProperties;
+
+		FileMessageSourceConfiguration(FileSupplierProperties fileSupplierProperties,
+				FileConsumerProperties fileConsumerProperties) {
+
+			this.fileSupplierProperties = fileSupplierProperties;
+			this.fileConsumerProperties = fileConsumerProperties;
+		}
+
+		@Bean
+		public ChainFileListFilter<File> filter(ConcurrentMetadataStore metadataStore) {
+			ChainFileListFilter<File> chainFilter = new ChainFileListFilter<>();
+			if (StringUtils.hasText(this.fileSupplierProperties.getFilenamePattern())) {
+				chainFilter
+					.addFilter(new SimplePatternFileListFilter(this.fileSupplierProperties.getFilenamePattern()));
+			}
+			else if (this.fileSupplierProperties.getFilenameRegex() != null) {
+				chainFilter.addFilter(new RegexPatternFileListFilter(this.fileSupplierProperties.getFilenameRegex()));
+			}
+
+			if (this.fileSupplierProperties.isPreventDuplicates()) {
+				chainFilter
+					.addFilter(new FileSystemPersistentAcceptOnceFileListFilter(metadataStore, METADATA_STORE_PREFIX));
+			}
+
+			return chainFilter;
+		}
+
+		@Bean
+		public FileInboundChannelAdapterSpec fileMessageSource(FileListFilter<File> fileListFilter,
+				@Nullable ComponentCustomizer<FileInboundChannelAdapterSpec> fileInboundChannelAdapterSpecCustomizer) {
+
+			FileInboundChannelAdapterSpec adapterSpec = Files.inboundAdapter(this.fileSupplierProperties.getDirectory())
+				.filter(fileListFilter);
+			if (fileInboundChannelAdapterSpecCustomizer != null) {
+				fileInboundChannelAdapterSpecCustomizer.customize(adapterSpec);
+			}
+			return adapterSpec;
+		}
+
+		@Bean
+		public Flux<Message<File>> fileMessageFlux(FileReadingMessageSource fileReadingMessageSource) {
+			return IntegrationReactiveUtils.messageSourceToFlux(fileReadingMessageSource)
+				.contextWrite(Context.of(IntegrationReactiveUtils.DELAY_WHEN_EMPTY_KEY,
+						this.fileSupplierProperties.getDelayWhenEmpty()))
+				.doOnRequest((r) -> fileReadingMessageSource.start());
+		}
+
+		@Bean
+		@ConditionalOnExpression("environment['file.consumer.mode'] != 'ref'")
+		public Publisher<Message<Object>> fileReadingFlow(Flux<Message<?>> fileMessageFlux) {
+			IntegrationFlowBuilder flowBuilder = IntegrationFlow.from(fileMessageFlux);
+			return FileUtils.enhanceFlowForReadingMode(flowBuilder, this.fileConsumerProperties)
+				.toReactivePublisher(true);
+		}
+
 	}
 
 }
