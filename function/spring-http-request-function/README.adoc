@@ -1,11 +1,11 @@
-# HTTP Request Function
+= HTTP Request Function
 
 This module provides an HTTP request function that can be reused and composed in other applications.
 The `Function` uses the reactive `WebClient` from `Spring WebFlux` and is implemented as a `java.util.function.Function`.
 This function gives you a reactive stream of `ResponseEntity` given a stream of request messages as the function a signature of `Function<Message<?>,ResponseEntity>`.
 Users have to subscribe to the returned `Flux` to receive the data.
 
-## Beans for injection
+== Beans for injection
 
 The `HttpRequestFunction` auto-configuration provides the following bean:
 
@@ -17,16 +17,16 @@ You can use `httpRequestFunction` as a qualifier when injecting.
 
 Once injected, you can use the `apply` method of the `Function` to invoke it and then subscribe to the returned `Flux`.
 
-## Configuration Options
+== Configuration Options
 
 All configuration properties are prefixed with `http.request`.
 
 For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/http/request/HttpRequestFunctionProperties.java[HttpRequestFunctionProperties.java]
 
-## Examples
+== Examples
 
 See this link:src/test/java/org/springframework/cloud/fn/http/request/HttpRequestFunctionTests.java[test suite] for examples of how this function is used.
 
-## Other usage
+== Other usage
 
-See this link:../../../applications/processor/http-request-processor/README.adoc[README] where this function is used to create a Spring Cloud Stream application to process HTTP requests.
+See this https://github.com/spring-cloud/stream-applications/blob/main/applications/processor/http-request-processor/README.adoc[README] where this function is used to create a Spring Cloud Stream application to process HTTP requests.

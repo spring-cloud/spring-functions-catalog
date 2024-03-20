@@ -1,11 +1,11 @@
-# Twitter Suppliers
+= Twitter Suppliers
 
 This module provides a Twitter Status, Message, Friendship suppliers that can be reused and composed in various applications.
 
 `java.util.function.Supplier`
 
 
-## 1. Twitter Status Search
+== 1. Twitter Status Search
 
 The Twitter's https://developer.twitter.com/en/docs/tweets/search/api-reference/get-search-tweets.html[Standard search API] (search/tweets) allows simple queries against the indices of recent or popular Tweets. This `Source` provides continuous searches against a sampling of recent Tweets published in the past 7 days. Part of the 'public' set of APIs.
 
@@ -13,7 +13,7 @@ Returns a collection of relevant Tweets matching a specified query.
 
 To enable this supplier, the `twitter.search.enabled` must be set to `true`.
 
-### 1.1 Beans for injection
+=== 1.1 Beans for injection
 
 The `TwitterSearchSupplierConfiguration` auto-configuration provides the following bean:
 
@@ -25,7 +25,7 @@ You can use `twitterSearchSupplier` as a qualifier when injecting.
 
 Once injected, you can use the `get` method of the `Supplier` to invoke it.
 
-### 1.2 Configuration Options
+=== 1.2 Configuration Options
 
 The configuration properties prefixed with `twitter.search`.
 There are also properties that need to be used with the prefix `twitter.connection`.
@@ -35,11 +35,11 @@ The `spring.integration.poller` properties control the interval between consecut
 For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/supplier/twitter/status/search/TwitterSearchSupplierProperties.java[TwitterSearchSupplierProperties].
 See `TwitterConnectionProperties` also.
 
-### 1.3 Other usage
+=== 1.3 Other usage
 
 See this https://github.com/spring-cloud/stream-applications/blob/master/applications/source/twitter-search-source/README.adoc[README] where this supplier is used to create a Spring Cloud Stream application where it makes a Twitter Search Source.
 
-## 2. Twitter Status Real-time Retrieval
+== 2. Twitter Status Real-time Retrieval
 
 Provides real-time, Tweet streaming based on the https://developer.twitter.com/en/docs/tweets/filter-realtime/api-reference/post-statuses-filter.html[Filter] and https://developer.twitter.com/en/docs/tweets/sample-realtime/overview/GET_statuse_sample[Sample] APIs.
 The `Filter API` flavor returns public statuses that match one or more filter predicates.
@@ -52,7 +52,7 @@ The default access level allows up to 400 track keywords, 5,000 follow user Ids 
 
 To enable this supplier, the `twitter.stream.enabled` must be set to `true`.
 
-### 2.1 Beans for injection
+=== 2.1 Beans for injection
 
 The `TwitterStreamSupplierConfiguration` auto-configuration provides the following bean:
 
@@ -64,7 +64,7 @@ You can use `twitterStreamSupplier` as a qualifier when injecting.
 
 Once injected, you can use the `get` method of the `Supplier` to invoke it and then subscribe to the returned `Flux`.
 
-### 2.2 Configuration Options
+=== 2.2 Configuration Options
 
 All configuration properties are prefixed with `twitter.stream`.
 There are also properties that need to be used with the prefix `twitter.connection`.
@@ -73,11 +73,11 @@ For more information on the various options available, please see link:src/main/
 See `TwitterConnectionProperties` also.
 
 
-### 2.3 Other usage
+=== 2.3 Other usage
 
 See this https://github.com/spring-cloud/stream-applications/blob/master/applications/source/twitter-stream-source/README.adoc[README] where this supplier is used to create a Spring Cloud Stream application where it makes a Twitter Stream Source.
 
-## 3. Twitter Direct Message Supplier
+== 3. Twitter Direct Message Supplier
 
 To enable this supplier, the `twitter.message.source.enabled` must be set to `true`.
 
@@ -90,7 +90,7 @@ The `twitter.message.source.count` controls the number or returned messages.
 The `spring.integration.poller` properties control the message poll interval.
 Must be aligned with used APIs rate limit
 
-### 3.1 Beans for injection
+=== 3.1 Beans for injection
 
 The `TwitterMessageSupplierConfiguration` auto-configuration provides the following bean:
 
@@ -102,7 +102,7 @@ You can use `twitterMessageSupplier` as a qualifier when injecting.
 
 Once injected, you can use the `get` method of the `Supplier` to invoke it.
 
-### 3.2 Configuration Options
+=== 3.2 Configuration Options
 
 The configuration properties prefixed with `twitter.search`.
 There are also properties that need to be used with the prefix `twitter.connection`.
@@ -112,11 +112,11 @@ The `spring.integration.poller` properties control the interval between consecut
 For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/supplier/twitter/message/TwitterMessageSupplierProperties.java[TwitterMessageSupplierProperties].
 See `TwitterConnectionProperties` also.
 
-### 3.3 Other usage
+=== 3.3 Other usage
 
 See this https://github.com/spring-cloud/stream-applications/blob/master/applications/source/twitter-message-source/README.adoc[README] where this supplier is used to create a Spring Cloud Stream application where it makes a Twitter Message Source.
 
-## 4. Twitter Friendships Supplier
+== 4. Twitter Friendships Supplier
 
 To enable this supplier, the `twitter.friendships.source.enabled` must be set to `true`.
 
@@ -126,7 +126,7 @@ The `twitter.friendships.source.type` property allow to select between both type
 
 TIP: Rate limit: 15 requests per 30-min window. ~ 1 req/ 2 min
 
-### 4.1 Beans for injection
+=== 4.1 Beans for injection
 
 The `TwitterFriendshipsSupplierConfiguration` auto-configuration provides the following beans:
 
@@ -140,7 +140,7 @@ Both suppliers expose `Supplier<List<User>>`.
 encoded as JSON `Message` payloads. You need to inject this as `Supplier<Message<byte[]>>`.
 
 
-### 4.2 Configuration Options
+=== 4.2 Configuration Options
 
 The configuration properties prefixed with `twitter.friendships.source`.
 There are also properties that need to be used with the prefix `twitter.connection`.

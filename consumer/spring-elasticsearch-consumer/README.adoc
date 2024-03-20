@@ -1,8 +1,8 @@
-# Elasticsearch Consumer
+= Elasticsearch Consumer
 
 A consumer that allows you to index document records into Elasticsearch.
 
-## Beans for injection
+== Beans for injection
 
 The `ElasticsearchConsumerConfiguration` auto-configuration provides the following bean:
 
@@ -16,7 +16,7 @@ The JSON document can be provided using one of the following methods.
 * `java.util.Map`
 * `XContentBuilder` provided by Elasticsearch
 
-## Configuration Options
+== Configuration Options
 
 All configuration properties are prefixed with `elasticsearch.consumer`.
 
@@ -26,10 +26,10 @@ In addition to these options, the consumer makes use of Spring Boot autoconfigur
 Therefore, you need to use https://github.com/spring-projects/spring-boot/blob/master/spring-boot-project/spring-boot-autoconfigure/src/main/java/org/springframework/boot/autoconfigure/elasticsearch/ElasticsearchRestClientProperties.java[these properties] for configuration Elasticsearch.
 See this https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-elasticsearch[section] from Spring Boot docs.
 
-## Examples
+== Examples
 
 See this link:src/test/java/org/springframework/cloud/fn/consumer/elasticsearch/ElasticsearchConsumerApplicationTests.java[test suite] for seeing the Elasticsearch consumer in action.
 
-## Other usage
+== Other usage
 
 See this https://github.com/spring-cloud/stream-applications/blob/master/applications/sink/elasticsearch-sink/README.adoc[README] where this consumer is used for creating an Elasticsearch sink.

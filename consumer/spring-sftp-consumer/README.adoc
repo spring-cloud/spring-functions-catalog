@@ -1,8 +1,8 @@
-# SFTP Consumer
+= SFTP Consumer
 
 A consumer that allows you to SFTP files.
 
-## Beans for injection
+== Beans for injection
 
 The `SftpConsumerConfiguration` auto-configuration provides the following bean:
 
@@ -10,7 +10,7 @@ The `SftpConsumerConfiguration` auto-configuration provides the following bean:
 
 You can use `sftpConsumer` as a qualifier when injecting.
 
-## Configuration Options
+== Configuration Options
 
 All configuration properties are prefixed with `sftp.consumer`.
 
@@ -18,10 +18,10 @@ For more information on the various options available, please see link:src/main/
 
 A `ComponentCustomizer<SftpMessageHandlerSpec>` bean can be added in the target project to provide any custom options for the `SftpMessageHandlerSpec` configuration used by the `sftpConsumer`.
 
-## Tests
+== Tests
 
 See this link:src/test/java/org/springframework/cloud/fn/consumer/sftp[test suite] for the various ways, this consumer is used.
 
-## Other usage
+== Other usage
 
 See this https://github.com/spring-cloud/stream-applications/blob/master/applications/sink/sftp-sink/README.adoc[README] where this consumer is used to create a Spring Cloud Stream application where it makes a SFTP sink.

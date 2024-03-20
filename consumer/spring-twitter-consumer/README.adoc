@@ -1,7 +1,7 @@
-# Twitter Consumers
+= Twitter Consumers
 
 
-## 1. Twitter Status Update Consumer.
+== 1. Twitter Status Update Consumer.
 
 Updates the authenticating user's current text (e.g. Tweeting).
 
@@ -16,7 +16,7 @@ If the number of updates posted by the user reaches the current allowed limit th
 You can find details for the Update API here: https://developer.twitter.com/en/docs/tweets/post-and-engage/api-reference/post-statuses-update
 
 
-### 1.1 Beans for injection
+=== 1.1 Beans for injection
 
 The `TwitterUpdateConsumerConfiguration` auto-configuration provides this beans:
 
@@ -30,7 +30,7 @@ Note: the Message content is expected to be in text format. Consider using the `
 
 You can use `twitterUpdateStatusConsumer` as a qualifier when injecting.
 
-### 1.2 Configuration Options
+=== 1.2 Configuration Options
 
 All configuration properties are prefixed with `twitter.update`.
 
@@ -38,11 +38,11 @@ For more information on the various options available, please see link:src/main/
 
 The twitter function makes uses of link:../spel-function/README.adoc[SpEL function].
 
-### 1.3 Other usage
+=== 1.3 Other usage
 
 See this https://github.com/spring-cloud/stream-applications/blob/master/applications/sink/twitter-update-sink/README.adoc[README] where this consumer is used to create a Spring Cloud Stream application where it makes a Twitter Update sink.
 
-## 2. Twitter Message Consumer.
+== 2. Twitter Message Consumer.
 
 Send Direct Messages to a specified user from the authenticating user.
 Requires a JSON POST body and `Content-Type` header to be set to `application/json`.
@@ -54,7 +54,7 @@ This behavior only applies when using the POST direct_messages/events/new endpoi
 
 SpEL expressions are used to compute the request parameters from the input message.
 
-### 2.1 Beans for injection
+=== 2.1 Beans for injection
 
 The `TwitterMessageConsumerConfiguration` auto-configuration provides this beans:
 
@@ -64,7 +64,7 @@ Note: the Message content is expected to be in text format. Consider using the `
 
 You can use `twitterSendMessageConsumer` as a qualifier when injecting.
 
-### 2.2 Configuration Options
+=== 2.2 Configuration Options
 
 All configuration properties are prefixed with `twitter.message.update`.
 
@@ -72,11 +72,11 @@ For more information on the various options available, please see link:src/main/
 
 The twitter function makes uses of link:../spel-function/README.adoc[SpEL function].
 
-### 2.3 Other usage
+=== 2.3 Other usage
 
 See this https://github.com/spring-cloud/stream-applications/blob/master/applications/sink/twitter-message-sink/README.adoc[README] where this consumer is used to create a Spring Cloud Stream application where it makes a Twitter Message sink.
 
-## 3. Twitter Friendship Consumer.
+== 3. Twitter Friendship Consumer.
 
 Allows creating `follow`, `unfollow` and `update` relationships with specified `userId` or `screenName`.
 The `twitter.friendships.sink.type` property allows to select the desired friendship operation.
@@ -90,7 +90,7 @@ Changes will be eventually consistent.
 SpEL expressions are used to compute the request parameters from the input message.
 Every operation type has its own parameters.
 
-### 3.1 Beans for injection
+=== 3.1 Beans for injection
 
 The `TwitterFriendshipsConsumerConfiguration` auto-configuration provides this beans:
 
@@ -100,7 +100,7 @@ Note: the Message content is expected to be in text format. Consider using the `
 
 You can use `twitterFriendshipConsumer` as a qualifier when injecting.
 
-### 3.2 Configuration Options
+=== 3.2 Configuration Options
 
 All configuration properties are prefixed with `twitter.friendships.update`.
 

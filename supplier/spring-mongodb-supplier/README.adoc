@@ -1,11 +1,11 @@
-# MongoDB Supplier
+= MongoDB Supplier
 
 This module provides a MongoDB supplier that can be reused and composed in other applications.
 The `Supplier` uses the `MongoDBMessageSource` from Spring Integration.
 `MongoDBSupplier` is implemented as a `java.util.function.Supplier`.
 When you have use-cases such as periodical execution of querying MongoDB, based on some external trigger such as a REST endpoint call for example, then you can use this `Supplier` to query.
 
-## Beans for injection
+== Beans for injection
 
 The `MongoDBSupplierConfiguration` auto-configuration provides the following bean:
 
@@ -19,7 +19,7 @@ You can use `mongoDBSupplier` as a qualifier when injecting.
 Once injected, you can use the `get` method of the `Supplier` to invoke it.
 In the case of splitting you get a `Flux` which you have to subscribe in your applications.
 
-## Configuration Options
+== Configuration Options
 
 All configuration properties are prefixed with `mongodb.supplier`.
 
@@ -30,10 +30,10 @@ The `updateExpression` is optional and ca use an item from query result as a roo
 
 A `ComponentCustomizer<MongoDbMessageSource>` bean can be added in the target project to provide any custom options for the `MongoDbMessageSource` configuration used by the `mongodbSupplier`.
 
-## Tests
+== Tests
 
 See this link:src/test/java/org/springframework/cloud/fn/supplier/mongo/MongodbSupplierApplicationTests.java[test suite] for the various ways, this supplier is used.
 
-## Other usage
+== Other usage
 
 See this https://github.com/spring-cloud/stream-applications/blob/master/applications/source/mongodb-source/README.adoc[README] where this supplier is used to create a Spring Cloud Stream application where it makes a MongoDB Source.

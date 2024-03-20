@@ -1,9 +1,9 @@
 === `MetadataStore` Common Module
 
-This artifact contains a Spring Boot auto-configuration for the `MetadataStore`which can be used in various Spring Integration scenarios, like file polling, idempotent receiver, offset management etc.
-See Spring Integration "`https://docs.spring.io/spring-integration/docs/5.0.6.RELEASE/reference/html/system-management-chapter.html#metadata-store[Reference Manual]`" for more information.
+This artifact contains a Spring Boot auto-configuration for the `MetadataStore` which can be used in various Spring Integration scenarios, like file polling, idempotent receiver, offset management etc.
+See Spring Integration https://docs.spring.io/spring-integration/reference/meta-data-store.html[Reference Manual] for more information.
 
-In addition to the standard Spring Boot configuration properties this module exposes a `MetadataStoreProperties` with the `metadata.store` prefix.
+In addition to the standard Spring Boot configuration properties this module exposes a link:src/main/java/org/springframework/cloud/fn/common/metadata/store/MetadataStoreProperties.java[MetadataStoreProperties] class with the `metadata.store` prefix.
 
 To auto-configure particular `MetadataStore` you need to set `metadata.store.type` and include the respective dependencies into the target app starter:
 
@@ -29,7 +29,7 @@ $$metadata.store.redis.key$$:: $$Redis key for metadata.$$ *($$String$$, default
 
 ==== MongoDb
 
-The `MongoDbMetadataStore` requires regular Spring Boot auto-configuration for https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-mongodb[Spring Data MongoDB] and minimal set of dependencies is like this:
+The `MongoDbMetadataStore` requires regular Spring Boot auto-configuration for https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#data.nosql.mongodb[Spring Data MongoDB] and minimal set of dependencies is like this:
 
 [source,xml]
 ----
@@ -49,7 +49,7 @@ $$metadata.store.mongo-db.collection$$:: $$MongoDB collection name for metadata.
 
 ==== Hazelcast
 
-The `HazelcastMetadataStore` requires regular Spring Boot auto-configuration for https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-caching-provider-hazelcast[Hazelcast] and minimal set of dependencies is like this:
+The `HazelcastMetadataStore` requires regular Spring Boot auto-configuration for https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#io.caching.provider.hazelcast[Hazelcast] and minimal set of dependencies is like this:
 
 [source,xml]
 ----
@@ -81,11 +81,11 @@ $$metadata.store.zookeeper.encoding$$:: $$Encoding to use when storing data in Z
 $$metadata.store.zookeeper.root$$:: $$Root node - store entries are children of this node.$$ *($$String$$, default: `$$/SpringIntegration-MetadataStore$$`)*
 
 In addition, for the `ZookeeperMetadataStore`, a `MetadataStoreListener` bean can be configured in the application context to react to the `MetadataStore` events.
-Also a `CuratorFramework` bean can be provided to override a default auto-configured one.
+Also, a `CuratorFramework` bean can be provided to override a default auto-configured one.
 
 ==== AWS DymanoDb
 
-The `DynamoDbMetadataStore` requires regular Spring Cloud AWS auto-configuration for https://cloud.spring.io/spring-cloud-static/spring-cloud-aws/2.0.0.RELEASE/single/spring-cloud-aws.html#_spring_boot_auto_configuration[Spring Boot] and minimal set of dependencies is like this:
+The `DynamoDbMetadataStore` requires regular Spring Cloud AWS auto-configuration for https://docs.awspring.io/spring-cloud-aws/docs/3.1.0/reference/html/index.html#spring-cloud-aws-dynamoDb[Spring Boot] and minimal set of dependencies is like this:
 
 [source,xml]
 ----
@@ -112,7 +112,7 @@ A default, auto-configured `AmazonDynamoDBAsync` bean can be overridden in the t
 
 ==== JDBC
 
-The `JdbcMetadataStore` requires regular Spring Boot auto-configuration for https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#boot-features-sql[JDBC DataSource] and minimal set of dependencies is like this:
+The `JdbcMetadataStore` requires regular Spring Boot auto-configuration for https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#data.sql[JDBC DataSource] and minimal set of dependencies is like this:
 
 [source,xml]
 ----

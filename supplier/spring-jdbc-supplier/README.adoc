@@ -1,11 +1,11 @@
-# JDBC Supplier
+= JDBC Supplier
 
 This module provides a JDBC supplier that can be reused and composed in other applications.
 The `Supplier` uses the `JdbcPollingChannelAdapter` from Spring Integration.
 `JdbcSupplier` is implemented as a `java.util.function.Supplier`.
 When you have use-cases such as periodical execution of a Database query, based on some external trigger such as a REST endpoint call for example, then you can use this `Supplier` to query the underlying relational database.
 
-## Beans for injection
+== Beans for injection
 
 The `JdbcSupplierConfiguration` auto-configuration provides the following bean:
 
@@ -19,7 +19,7 @@ You can use `jdbcSupplier` as a qualifier when injecting.
 Once injected, you can use the `get` method of the `Supplier` to invoke it.
 In the case of splitting you get a `Flux` which you have to subscribe in your applications.
 
-## Configuration Options
+== Configuration Options
 
 All configuration properties are prefixed with `jdbc.supplier`.
 
@@ -27,10 +27,10 @@ For more information on the various options available, please see link:src/main/
 
 A `ComponentCustomizer<JdbcPollingChannelAdapter>` bean can be added in the target project to provide any custom options for the `JdbcPollingChannelAdapter` configuration used by the `jdbcSupplier`.
 
-## Tests
+== Tests
 
 See this link:src/test/java/org/springframework/cloud/fn/supplier/jdbc[test suite] for the various ways, this supplier is used.
 
-## Other usage
+== Other usage
 
 See this https://github.com/spring-cloud/stream-applications/blob/master/applications/source/jdbc-source/README.adoc[README] where this supplier is used to create a Spring Cloud Stream application where it makes a JDBC Source.

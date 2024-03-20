@@ -22,4 +22,4 @@ See this link:src/test/java/org/springframework/cloud/fn/header/filter/HeaderFil
 
 == Other usage
 
-See this link:../../../applications/processor/header-filter-processor/README.adoc[README] where this function is used to create a Spring Cloud Stream application.
+See this https://github.com/spring-cloud/stream-applications/blob/main/applications/processor/header-filter-processor/README.adoc[README] where this function is used to create a Spring Cloud Stream application.

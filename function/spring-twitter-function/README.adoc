@@ -1,4 +1,4 @@
-# Twitter Functions
+= Twitter Functions
 
 This module provides couple of twitter functions that can be reused and composed in other applications.
 
@@ -10,7 +10,7 @@ This module exposes auto-configurations for the following beans:
 
 Each of them are conditional by specific configuration properties.
 
-## 1. Twitter Trend Function
+== 1. Twitter Trend Function
 
 Function can return either Trends topics or the Locations of the trending topics.
 The `twitter.trend.trend-query-type` property allows choosing between both types.
@@ -25,22 +25,22 @@ If the `latitude`, `longitude` parameters are provided the processor performs th
 
 Response is an array of `locations` that encode the location's WOEID and some other human-readable information such as a canonical name and country the location belongs in.
 
-### 1.1 Beans for injection
+=== 1.1 Beans for injection
 
 You can use `Function<Message<?>, Message<byte[]>> twitterTrendFunction` as a qualifier when injecting.
 
 Once injected, you can use the `apply` method of the `Function` to invoke it and get the result.
 
-### 1.2 Configuration Options
+=== 1.2 Configuration Options
 
 TIP: For `SpEL` expression properties wrap the literal values in single quotes (`'`).
 
 For more information on the various options available, please see link:../twitter-function/src/main/java/org/springframework/cloud/fn/twitter/trend/TwitterTrendFunctionProperties.java[TwitterTrendFunctionProperties.java]
 
-### 1.3 Tests
+=== 1.3 Tests
 See this link:src/test/java/org/springframework/cloud/fn/twitter/trend/TwitterTrendFunctionTests.java[test suite] for examples of how this function is used.
 
-### 1.4 Other usage
+=== 1.4 Other usage
 
 Leveraging the Spring Cloud Function "composability", you can compose the Trend function in your boot app like this:
 
@@ -56,7 +56,7 @@ public class MyTwitterTrendBootApp {
 }
 ----
 
-## 2. Twitter Geo Function.
+== 2. Twitter Geo Function.
 
 Function based on the https://developer.twitter.com/en/docs/geo/places-near-location/overview[Geo API] that retrieves Twitter place information based on query parameters such as (`latitude`, `longitude`) pair, an `IP` address, or a place `name`.
 
@@ -77,22 +77,22 @@ NOTE: Limits: 15 requests / 15-min window (user auth).
 
 This function auto-configuration is conditional on `twitter.geo.search.ip != null || (twitter.geo.location.lat != null && twitter.geo.location.lon != null)`
 
-### 2.1 Beans for injection
+=== 2.1 Beans for injection
 
 You can use `Function<Message<?>, Message<byte[]>> twitterGeoFunction` as a qualifier when injecting.
 Once injected, you can use the `apply` method of the `Function` to invoke it and get the result.
 
-### 2.2 Configuration Options
+=== 2.2 Configuration Options
 
 TIP: For `SpEL` expression properties wrap the literal values in single quotes (`'`).
 
 For more information on the various options available, please see link:../twitter-function/src/main/java/org/springframework/cloud/fn/twitter/geo/TwitterGeoFunctionProperties.java[TwitterGeoFunctionProperties.java]
 
-### 2.3 Tests
+=== 2.3 Tests
 
 See this link:src/test/java/org/springframework/cloud/fn/twitter/geo/TwitterGeoFunctionTests.java[test suite] for examples of how this function is used.
 
-### 2.4 Other usage
+=== 2.4 Other usage
 
 Leveraging the Spring Cloud Function composability, you can compose the Geo function in your boot app like this:
 
@@ -108,7 +108,7 @@ public class MyTwitterGeoProcessorBootApp {
 }
 ----
 
-## 3. Twitter Users Function
+== 3. Twitter Users Function
 
 Retrieves users either by list of use ids and/or screen-names (https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-lookup[Users Lookup API]) or by text search query (https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-search[Users Search API]).
 Uses SpEL expressions to compute the query parameters from the input message.
@@ -121,19 +121,17 @@ This property is required to trigger the `twitterUsersFunction` auto-configurati
 * https://developer.twitter.com/en/docs/accounts-and-users/follow-search-get-users/api-reference/get-users-search[Users Search API] - Relevance-based search interface to public user accounts on Twitter.
 Querying by topical interest, full name, company name, location, or other criteria. Exact match searches are not supported. Only the first 1,000 matching results are available. Rate limits:(900 requests / 15-min window)
 
-### 3.1 Beans for injection
+=== 3.1 Beans for injection
 
 You can use `Function<Message<?>, Message<byte[]>> twitterUsersFunction` as a qualifier when injecting.
 Once injected, you can use the `apply` method of the `Function` to invoke it and get the result.
 
 
-### 3.2 Configuration Options
+=== 3.2 Configuration Options
 
 TIP: For `SpEL` expression properties wrap the literal values in single quotes (`'`).
 
 For more information on the various options available, please see link:../twitter-function/src/main/java/org/springframework/cloud/fn/twitter/users/TwitterUsersFunctionProperties.java[TwitterUsersFunctionProperties.java]
 
-### 3.3 Tests
+=== 3.3 Tests
 See this link:src/test/java/org/springframework/cloud/fn/twitter/users/TwitterUsersFunctionTests.java[test suite] for examples of how this function is used.
-
-### 3.4 Other usage

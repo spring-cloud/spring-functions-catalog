@@ -23,9 +23,7 @@ Once injected, you can use the `get` method of the `Supplier` to invoke it and t
 All configuration properties are prefixed with `s3.supplier`.
 There are also properties that need to be used with the prefix `s3.common` and `file.consumer`.
 
-For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/supplier/s3/AwsS3SupplierProperties.java[AwsS3SupplierProperties],
-link:../../common/file-common/src/main/java/org/springframework/cloud/fn/common/file/FileConsumerProperties.java[FileConsumerProperties], and
-`io.awspring.cloud.autoconfigure.s3.properties.S3Properties` from Spring Cloud AWS auto-configuration..
+For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/supplier/s3/AwsS3SupplierProperties.java[AwsS3SupplierProperties], link:../../common/file-common/src/main/java/org/springframework/cloud/fn/common/file/FileConsumerProperties.java[FileConsumerProperties], and `io.awspring.cloud.autoconfigure.s3.properties.S3Properties` from Spring Cloud AWS auto-configuration.
 
 A `ComponentCustomizer<S3InboundFileSynchronizingMessageSource>` bean can be added in the target project to provide any custom options for the `S3InboundFileSynchronizingMessageSource` configuration used by the `s3Supplier`.
 
@@ -35,4 +33,4 @@ See this link:src/test/java/org/springframework/cloud/fn/supplier/s3[test suite]
 
 == Other usage
 
-See this https://github.com/spring-cloud/stream-applications/blob/master/applications/source/s3-source/README.adoc[README] where this supplier is used to create a Spring Cloud Stream application where it makes an AWS S3 Source.
+See this https://github.com/spring-cloud/stream-applications/blob/main/applications/source/s3-source/README.adoc[README] where this supplier is used to create a Spring Cloud Stream application where it makes an AWS S3 Source.

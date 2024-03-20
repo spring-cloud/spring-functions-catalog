@@ -1,8 +1,8 @@
-# Wavefront Consumer
+= Wavefront Consumer
 
 This module provides a Wavefront Consumer that can be reused and composed in other applications.
 
-## Beans for injection
+== Beans for injection
 
 You can import the `WavefrontConsumerConfiguration` in the application and then inject the following bean.
 
@@ -14,16 +14,16 @@ Type for injection: `Consumer<Message<?>>`
 
 You can ignore the return value from the function as this is a consumer and simply will send the data to Wavefront.
 
-## Configuration Options
+== Configuration Options
 
 All configuration properties are prefixed with `wavefront`.
 
 For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/consumer/wavefront/WavefrontConsumerProperties.java[WavefrontConsumerProperties].
 
-## Tests
+== Tests
 
 See this link:src/test/java/org/springframework/cloud/fn/consumer/wavefront[test suite] for the various ways, this consumer is used.
 
-## Other usage
+== Other usage
 
 See this https://github.com/spring-cloud/stream-applications/blob/master/applications/sink/wavefront-sink/README.adoc[README] where this consumer is used to create a Spring Cloud Stream application where it makes a Wavefront sink.

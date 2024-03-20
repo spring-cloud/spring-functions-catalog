@@ -1,8 +1,8 @@
-# RabbitMQ Consumer
+= RabbitMQ Consumer
 
 A consumer that allows you to send messages to RabbitMQ. 
 
-## Beans for injection
+== Beans for injection
 
 The `RabbitConsumerConfiguration` auto-configuration provides the following bean:
 
@@ -10,7 +10,7 @@ The `RabbitConsumerConfiguration` auto-configuration provides the following bean
 
 You can use `rabbitConsumer` as a qualifier when injecting.
 
-## Configuration Options
+== Configuration Options
 
 All configuration properties are prefixed with `rabbit.consumer`.
 
@@ -18,9 +18,6 @@ For more information on the various options available, please see link:src/main/
 
 A `ComponentCustomizer<AmqpOutboundChannelAdapterSpec>` bean can be added in the target project to provide any custom options for the `AmqpOutboundChannelAdapterSpec` configuration used by the `rabbitConsumer`.
 
-## Tests
-
-
-## Other usage
+== Other usage
 
 See this https://github.com/spring-cloud/stream-applications/blob/master/applications/sink/rabbit-sink/README.adoc[README] where this consumer is used to create a Spring Cloud Stream application where it makes a RabbitMQ sink.

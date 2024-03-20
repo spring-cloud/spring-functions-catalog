@@ -1,8 +1,8 @@
-# XMPP Supplier
+= XMPP Supplier
 
 A supplier that allows you to receive messages through a XMPP server.
 
-## Beans for injection
+== Beans for injection
 
 You can import the `XmppSupplierConfiguration` in the application and then inject the following bean.
 
@@ -15,16 +15,16 @@ You can use `xmppSupplier` as a qualifier when injecting.
 **NOTE:** This is a functional endpoint. One will need to subscribe to this endpoint in order to start accepting data
 on it.
 
-## Configuration Options
+== Configuration Options
 
 All configuration properties are prefixed with `xmpp.supplier`.
 
-For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/consumer/xmpp/XmppSupplierProperties.java[XmppSupplierProperties].
+For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/supplier/xmpp/XmppSupplierProperties.java[XmppSupplierProperties].
 
-## Tests
+== Tests
 
-See this link:src/test/java/org/springframework/cloud/fn/consumer/xmpp/[test suite] for the various ways, this supplier is used.
+See this link:src/test/java/org/springframework/cloud/fn/supplier/xmpp/[test suite] for the various ways, this supplier is used.
 
-## Other usage
+== Other usage
 
 See this https://github.com/spring-cloud/stream-applications/blob/master/applications/source/xmpp-source/README.adoc[README] where this supplier is used to create a Spring Cloud Stream application where it makes a XMPP Source.

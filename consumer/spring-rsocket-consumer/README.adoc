@@ -1,9 +1,9 @@
-# RSocket Consumer
+= RSocket Consumer
 
 A consumer that allows you to communicate to an RSocket route using its fire and forget strategy of execution.
-The consumer uses the RSocket support from https://docs.spring.io/spring/docs/current/spring-framework-reference/web-reactive.html#rsocket-requester[Spring Framework].
+The consumer uses the RSocket support from https://docs.spring.io/spring-framework/reference/rsocket.html#rsocket-requester[Spring Framework].
 
-## Beans for injection
+== Beans for injection
 
 The `RSocketConsumerConfiguration` auto-configuration provides the following beans:
 
@@ -14,16 +14,16 @@ You can use `rsocketFunctionsConsumer` as a qualifier when injecting.
 The returned `Mono` has to be subscribed.
 Or `Consumer<Flux<Message<?>>> rsocketConsumer` can be used instead which just does a `Mono.block()` before returning.
 
-## Configuration Options
+== Configuration Options
 
 All configuration properties are prefixed with `rsocket.consumer`.
 
 For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/consumer/rsocket/RsocketConsumerProperties.java[RsocketConsumerProperties].
 
-## Examples
+== Examples
 
 See this link:src/test/java/org/springframework/cloud/fn/consumer/rsocket/RsocketConsumerTests.java[test suite] for learning more about this consumer.
 
-## Other usage
+== Other usage
 
 See this https://github.com/spring-cloud/stream-applications/blob/master/applications/sink/rsocket-sink/README.adoc[README] where this consumer is used to create a Spring Cloud Stream based RSocket Sink application.

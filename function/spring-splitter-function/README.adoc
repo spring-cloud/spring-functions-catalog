@@ -1,8 +1,8 @@
-# Splitter Function
+= Splitter Function
 
 This module provides a splitter function that can be reused and composed in other applications.
 
-## Beans for injection
+== Beans for injection
 
 The `SpliiterFunctionConfiguration` auto-configuration provides the following bean:
 
@@ -12,14 +12,14 @@ You can use `splitterFunction` as a qualifier when injecting.
 
 Once injected, you can use the `apply` method of the `Function` to invoke it and get the result.
 
-## Configuration Options
+== Configuration Options
 
 For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/splitter/SplitterFunctionProperties.java[SplitterFunctionProperties.java]
 
-## Tests
+== Tests
 
 See this link:src/test/java/org/springframework/cloud/fn/splitter/SplitterFunctionApplicationTests.java[test suite] for examples of how this function is used.
 
-## Other usage
+== Other usage
 
-See this link:../../../applications/processor/splitter-processor/README.adoc[README] where this function is used to create a Spring Cloud Stream application.
+See this https://github.com/spring-cloud/stream-applications/blob/main/applications/processor/splitter-processor/README.adoc[README] where this function is used to create a Spring Cloud Stream application.
