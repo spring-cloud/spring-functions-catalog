@@ -35,7 +35,7 @@ Once injected, you can use the `apply` method of the `Function` to invoke it and
 
 TIP: For `SpEL` expression properties wrap the literal values in single quotes (`'`).
 
-For more information on the various options available, please see link:../twitter-function/src/main/java/org/springframework/cloud/fn/twitter/trend/TwitterTrendFunctionProperties.java[TwitterTrendFunctionProperties.java]
+For more information on the various options available, please see link:../spring-twitter-function/src/main/java/org/springframework/cloud/fn/twitter/trend/TwitterTrendFunctionProperties.java[TwitterTrendFunctionProperties.java]
 
 === 1.3 Tests
 See this link:src/test/java/org/springframework/cloud/fn/twitter/trend/TwitterTrendFunctionTests.java[test suite] for examples of how this function is used.
@@ -86,7 +86,7 @@ Once injected, you can use the `apply` method of the `Function` to invoke it and
 
 TIP: For `SpEL` expression properties wrap the literal values in single quotes (`'`).
 
-For more information on the various options available, please see link:../twitter-function/src/main/java/org/springframework/cloud/fn/twitter/geo/TwitterGeoFunctionProperties.java[TwitterGeoFunctionProperties.java]
+For more information on the various options available, please see link:../spring-twitter-function/src/main/java/org/springframework/cloud/fn/twitter/geo/TwitterGeoFunctionProperties.java[TwitterGeoFunctionProperties.java]
 
 === 2.3 Tests
 
@@ -131,7 +131,7 @@ Once injected, you can use the `apply` method of the `Function` to invoke it and
 
 TIP: For `SpEL` expression properties wrap the literal values in single quotes (`'`).
 
-For more information on the various options available, please see link:../twitter-function/src/main/java/org/springframework/cloud/fn/twitter/users/TwitterUsersFunctionProperties.java[TwitterUsersFunctionProperties.java]
+For more information on the various options available, please see link:../spring-twitter-function/src/main/java/org/springframework/cloud/fn/twitter/users/TwitterUsersFunctionProperties.java[TwitterUsersFunctionProperties.java]
 
 === 3.3 Tests
 See this link:src/test/java/org/springframework/cloud/fn/twitter/users/TwitterUsersFunctionTests.java[test suite] for examples of how this function is used.
