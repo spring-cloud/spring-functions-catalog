@@ -1,10 +1,10 @@
-= Header Enricher Function
+= Header Filter Function
 
-This module provides a header enricher function that can be reused and composed in other applications.
+This module provides a header filter function that can be reused and composed in other applications.
 
 == Beans for injection
 
-The `HeaderEnricherFunctionConfiguration` auto-configuration provides the following bean:
+The `HeaderFilterFunctionConfiguration` auto-configuration provides the following bean:
 
 `headerFilterFunction`
 
