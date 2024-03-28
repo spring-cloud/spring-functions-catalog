@@ -1,6 +1,6 @@
 plugins {
     id 'com.gradle.enterprise' version '3.16.2'
-    id 'io.spring.ge.conventions' version '0.0.15' apply false
+    id 'io.spring.ge.conventions' version '0.0.16' apply false
 }
 
 startParameter.noBuildScan = startParameter.taskNames.contains('format')
