@@ -32,6 +32,7 @@ import org.springframework.integration.test.util.TestUtils;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.util.FileCopyUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.atLeastOnce;
@@ -46,7 +47,7 @@ public class AmazonS3UploadFileTests extends AbstractAwsS3ConsumerMockTests {
 				S3AsyncClient.class);
 
 		File file = new File(temporaryRemoteFolder.toFile(), "foo.mp3");
-		file.createNewFile();
+		FileCopyUtils.copy(new byte[] { 1 }, file);
 		Message<?> message = MessageBuilder.withPayload(file).build();
 
 		this.s3Consumer.accept(message);
@@ -60,13 +61,13 @@ public class AmazonS3UploadFileTests extends AbstractAwsS3ConsumerMockTests {
 		assertThat(putObjectRequest.bucket()).isEqualTo(S3_BUCKET);
 		assertThat(putObjectRequest.key()).isEqualTo("foo.mp3");
 		assertThat(putObjectRequest.contentMD5()).isEqualTo(Md5Utils.md5AsBase64(file));
-		assertThat(putObjectRequest.contentLength()).isEqualTo(0L);
+		assertThat(putObjectRequest.contentLength()).isEqualTo(1L);
 		assertThat(putObjectRequest.contentType()).isEqualTo("audio/mpeg");
 		assertThat(putObjectRequest.acl()).isEqualTo(ObjectCannedACL.PUBLIC_READ_WRITE);
 
 		AsyncRequestBody asyncRequestBody = asyncRequestBodyArgumentCaptor.getValue();
 		StepVerifier.create(asyncRequestBody)
-			.assertNext((buffer) -> assertThat(TestUtils.getPropertyValue(buffer, "hb", byte[].class)).isEmpty())
+			.assertNext((buffer) -> assertThat(buffer.limit()).isEqualTo(1))
 			.expectComplete()
 			.verify();
 
