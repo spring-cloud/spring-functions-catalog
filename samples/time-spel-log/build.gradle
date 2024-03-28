@@ -17,14 +17,14 @@ repositories {
 }
 
 ext {
-    springCloudVersion = '2023.0.0'
+    springCloudVersion = '2023.0.1'
     springFunctionsCatalogVersion = '5.0.0-SNAPSHOT'
 }
 
 dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
-        mavenBom "org.springframework.cloud.fn:spring-function-dependencies:$springFunctionsCatalogVersion"
+        mavenBom "org.springframework.cloud.fn:spring-functions-catalog-bom:$springFunctionsCatalogVersion"
     }
 }
 
