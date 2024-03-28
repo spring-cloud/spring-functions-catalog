@@ -46,4 +46,4 @@ jobs:
           sed -i "1,/springFunctionsCatalogVersion.*/s/springFunctionsCatalogVersion.*/springFunctionsCatalogVersion='${{ inputs.releaseVersion }}'/" build.gradle  
 
       - name: Verify time-spel-log sample against staged release
-        run: gradle check --init-script staging-repo-init.gradle
+        run: cd samples/time-spel-log && gradle check --init-script staging-repo-init.gradle
