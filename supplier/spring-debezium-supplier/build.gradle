@@ -4,6 +4,12 @@ repositories {
 
 dependencies {
     api project(':spring-debezium-autoconfigure')
+
+    // TODO until Debezium upgrades them to non-vulnerable versions
+    api 'org.apache.commons:commons-compress:1.26.1'
+    api 'org.apache.avro:avro:1.11.3'
+    api 'org.json:json:20240303'
+
     api 'org.springframework.integration:spring-integration-debezium'
     api 'io.debezium:debezium-connector-mysql'
     api 'io.debezium:debezium-connector-mongodb'
@@ -12,7 +18,6 @@ dependencies {
     api 'io.debezium:debezium-connector-sqlserver'
     api 'io.debezium:debezium-connector-db2'
     api 'io.debezium:debezium-connector-vitess'
-    api 'io.debezium:debezium-connector-spanner'
     api 'io.debezium:debezium-connector-spanner'
 
     testImplementation 'com.zaxxer:HikariCP'
