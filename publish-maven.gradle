@@ -5,8 +5,8 @@ publishing {
 		mavenJava(MavenPublication) {
 			pom {
 				afterEvaluate {
-					name = project.description
-					description = project.description
+					name = project.name
+					description = project.name
 				}
 				url = 'https://github.com/spring-cloud/spring-functions-catalog'
 				organization {
