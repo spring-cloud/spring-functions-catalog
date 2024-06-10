@@ -44,7 +44,7 @@ public class DebeziumProperties {
 		/**
 		 * ProtoBuf change event format.
 		 */
-		PROTOBUF("application/x-protobuf"),;
+		PROTOBUF("application/x-protobuf");
 
 		private final String contentType;
 
@@ -103,7 +103,7 @@ public class DebeziumProperties {
 		/**
 		 * Uses the default Debezium engine policy (PERIODIC).
 		 */
-		DEFAULT;
+		DEFAULT
 
 	}
 
@@ -121,7 +121,7 @@ public class DebeziumProperties {
 	 * @return the properties for Debezium native configuration
 	 */
 	public Properties getDebeziumNativeConfiguration() {
-		Properties outProps = new java.util.Properties();
+		Properties outProps = new Properties();
 		outProps.putAll(getProperties());
 		return outProps;
 	}
