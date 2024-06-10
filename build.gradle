@@ -1,6 +1,6 @@
 buildscript {
 	ext.isCI = System.getenv('GITHUB_ACTION')
-	ext.javaFormatVersion = '0.0.41'
+	ext.javaFormatVersion = '0.0.42'
 }
 
 plugins {
