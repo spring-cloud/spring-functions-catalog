@@ -11,7 +11,7 @@ ext {
     ftpserverCore = 'org.apache.ftpserver:ftpserver-core:1.2.0'
     mockserverNetty = 'org.mock-server:mockserver-netty:5.15.0'
     twitter4jStream = 'org.twitter4j:twitter4j-stream:4.0.7'
-    greenmail = 'com.icegreen:greenmail:2.1.0-alpha-4'
+    greenmail = 'com.icegreen:greenmail:2.1.0-rc-1'
     apacheCuratorTest = 'org.apache.curator:curator-test:5.5.0'
     djlSpringAutoconfigure = "ai.djl.spring:djl-spring-boot-starter-autoconfigure:$djlSpringVersion"
 }
