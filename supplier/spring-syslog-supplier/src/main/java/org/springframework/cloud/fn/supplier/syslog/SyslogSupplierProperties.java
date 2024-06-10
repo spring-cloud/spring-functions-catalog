@@ -144,7 +144,7 @@ public class SyslogSupplierProperties {
 		/**
 		 * Represents both TCP and UDP.
 		 */
-		both;
+		both
 
 	}
 
