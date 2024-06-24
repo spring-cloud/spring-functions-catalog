@@ -19,6 +19,7 @@ package org.springframework.cloud.fn.aggregator;
 import java.util.function.Function;
 
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -67,8 +68,9 @@ public class AggregatorFunctionConfiguration {
 	@Bean
 	public Function<Flux<Message<?>>, Flux<Message<?>>> aggregatorFunction(FluxMessageChannel aggregatorInputChannel) {
 		return (input) -> Flux.from(this.outputChannel)
-			.doOnRequest((request) -> aggregatorInputChannel.subscribeTo(input.map((
-					inputMessage) -> MessageBuilder.fromMessage(inputMessage).removeHeader("kafka_consumer").build())));
+			.doOnRequest((request) -> aggregatorInputChannel.subscribeTo(input
+				.map((inputMessage) -> MessageBuilder.fromMessage(inputMessage).removeHeader("kafka_consumer").build())
+				.publishOn(Schedulers.boundedElastic())));
 	}
 
 	@Bean
