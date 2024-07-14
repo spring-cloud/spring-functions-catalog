@@ -1,6 +1,6 @@
 ext {
     springBootVersion = '3.2.7'
-    springCloudVersion = '2023.0.2'
+    springCloudVersion = '2023.0.3'
     springCloudAwsVersion = '3.0.4'
 
     debeziumVersion = '2.6.2.Final'
