@@ -1,10 +1,11 @@
 plugins {
-    id 'com.gradle.develocity' version '3.17.6'
+    id 'com.gradle.develocity' version '3.17.6' apply false
     id 'io.spring.ge.conventions' version '0.0.17' apply false
 }
 
 startParameter.noBuildScan = startParameter.taskNames.contains('format')
 
+apply plugin: 'com.gradle.develocity'
 apply plugin: 'io.spring.ge.conventions'
 
 rootProject.name = 'spring-functions-catalog'

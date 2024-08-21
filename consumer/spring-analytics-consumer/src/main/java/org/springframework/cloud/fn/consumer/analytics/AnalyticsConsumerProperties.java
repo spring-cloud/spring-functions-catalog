@@ -156,6 +156,7 @@ public class AnalyticsConsumerProperties {
 		 * fixed Tags is: <code>
 		 *   analytics.tag.fixed.[tag-name]=[tag-value]
 		 * </code>
+		 * @deprecated in favor of {@link #expression}
 		 */
 		@Deprecated
 		private Map<String, String> fixed;
@@ -168,10 +169,12 @@ public class AnalyticsConsumerProperties {
 		 */
 		private Map<String, Expression> expression;
 
+		@Deprecated
 		public Map<String, String> getFixed() {
 			return this.fixed;
 		}
 
+		@Deprecated
 		public void setFixed(Map<String, String> fixed) {
 			this.fixed = fixed;
 		}
@@ -186,7 +189,7 @@ public class AnalyticsConsumerProperties {
 
 		@Override
 		public String toString() {
-			return "MetricsTag{" + "fixed=" + this.fixed + ", expression=" + this.expression + '}';
+			return "MetricsTag{expression=" + this.expression + '}';
 		}
 
 	}

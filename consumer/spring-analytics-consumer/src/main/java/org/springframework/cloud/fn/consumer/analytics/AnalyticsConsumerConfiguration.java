@@ -65,6 +65,7 @@ public class AnalyticsConsumerConfiguration {
 			CharSequence meterNameRaw = properties.getComputedNameExpression().getValue(message, CharSequence.class);
 			String meterName = StringUtils.hasText(meterNameRaw) ? meterNameRaw.toString() : "empty";
 
+			@SuppressWarnings("deprecation")
 			// All fixed tags together are passed with every meter update.
 			Tags fixedTags = this.toTags(properties.getTag().getFixed());
 
