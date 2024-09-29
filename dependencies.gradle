@@ -7,7 +7,7 @@ ext {
     djlVersion = '0.26.0'
     djlSpringVersion = '0.26'
 
-    springIntegrationAws = 'org.springframework.integration:spring-integration-aws:3.0.7'
+    springIntegrationAws = 'org.springframework.integration:spring-integration-aws:3.0.8'
     ftpserverCore = 'org.apache.ftpserver:ftpserver-core:1.2.0'
     mockserverNetty = 'org.mock-server:mockserver-netty:5.15.0'
     twitter4jStream = 'org.twitter4j:twitter4j-stream:4.0.7'
