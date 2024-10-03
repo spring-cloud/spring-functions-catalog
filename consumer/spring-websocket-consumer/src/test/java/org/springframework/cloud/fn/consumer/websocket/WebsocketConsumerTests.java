@@ -49,7 +49,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 public class WebsocketConsumerTests {
 
-	public static final int TIMEOUT = 10000;
+	public static final int TIMEOUT = 20000;
 
 	public static final int MESSAGE_COUNT = 100;
 
@@ -80,7 +80,7 @@ public class WebsocketConsumerTests {
 		doHandshake(handler);
 
 		List<String> messagesToSend = submitMultipleMessages(MESSAGE_COUNT);
-		handler.await();
+		assertThat(handler.await()).isTrue();
 
 		assertThat(handler.getReceivedMessages().size()).isEqualTo(MESSAGE_COUNT);
 		messagesToSend.forEach((s) -> assertThat(handler.getReceivedMessages().contains(s)).isTrue());
