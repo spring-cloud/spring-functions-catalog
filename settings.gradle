@@ -6,7 +6,7 @@ pluginManagement {
 }
 
 plugins {
-    id 'io.spring.develocity.conventions' version '0.0.21' apply false
+    id 'io.spring.develocity.conventions' version '0.0.22' apply false
 }
 
 startParameter.noBuildScan = startParameter.taskNames.contains('format')
