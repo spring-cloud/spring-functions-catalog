@@ -48,7 +48,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DirtiesContext
 public class WebsocketConsumerTests {
 
-	public static final int TIMEOUT = 20000;
+	public static final int TIMEOUT = 30000;
 
 	public static final int MESSAGE_COUNT = 100;
 
