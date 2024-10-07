@@ -23,7 +23,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -73,7 +72,6 @@ public class WebsocketConsumerTests {
 	}
 
 	@Test
-	@Timeout(TIMEOUT)
 	public void testMultipleMessageSingleSubscriber() throws Exception {
 		WebsocketConsumerClientHandler handler = new WebsocketConsumerClientHandler("handler_0", MESSAGE_COUNT,
 				TIMEOUT);
@@ -87,7 +85,6 @@ public class WebsocketConsumerTests {
 	}
 
 	@Test
-	@Timeout(TIMEOUT)
 	public void testSingleMessageMultipleSubscribers() throws Exception {
 
 		// create multiple handlers
@@ -99,14 +96,13 @@ public class WebsocketConsumerTests {
 
 		// await completion on each handler
 		for (WebsocketConsumerClientHandler handler : handlers) {
-			handler.await();
+			assertThat(handler.await()).isTrue();
 			assertThat(handler.getReceivedMessages().size()).isEqualTo(1);
 			assertThat(handler.getReceivedMessages().get(0)).isEqualTo(payload);
 		}
 	}
 
 	@Test
-	@Timeout(TIMEOUT)
 	public void testMultipleMessagesMultipleSubscribers() throws Exception {
 
 		// create multiple handlers
@@ -117,7 +113,7 @@ public class WebsocketConsumerTests {
 
 		// wait on each handle
 		for (WebsocketConsumerClientHandler handler : handlers) {
-			handler.await();
+			assertThat(handler.await()).isTrue();
 			assertThat(handler.getReceivedMessages().size()).isEqualTo(messagesReceived.size());
 			assertThat(handler.getReceivedMessages()).isEqualTo(messagesReceived);
 		}
@@ -150,7 +146,7 @@ public class WebsocketConsumerTests {
 			WebsocketConsumerClientHandler handler = new WebsocketConsumerClientHandler("handler_" + i, messageCount,
 					TIMEOUT);
 			WebSocketSession session = doHandshake(handler);
-			assertThat(session.isOpen());
+			assertThat(session.isOpen()).isTrue();
 			handlers.add(handler);
 		}
 		return handlers;
