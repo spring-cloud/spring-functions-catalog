@@ -6,7 +6,7 @@ dependencies {
     api project(':spring-debezium-autoconfigure')
 
     // TODO until Debezium upgrades them to non-vulnerable versions
-    api 'org.apache.commons:commons-compress:1.26.1'
+    api 'org.apache.commons:commons-compress:1.26.2'
     api 'org.apache.avro:avro:1.11.4'
     api 'org.json:json:20240303'
 
