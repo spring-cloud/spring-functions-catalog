@@ -1,5 +1,9 @@
+ext {
+    djlSpringVersion = '0.26'
+}
+
 dependencies {
-    api djlSpringAutoconfigure
+    api "ai.djl.spring:djl-spring-boot-starter-autoconfigure:$djlSpringVersion"
     api "ai.djl.spring:djl-spring-boot-starter-tensorflow-auto:$djlSpringVersion"
     api "ai.djl.spring:djl-spring-boot-starter-pytorch-auto:$djlSpringVersion"
     api "ai.djl.spring:djl-spring-boot-starter-mxnet-auto:$djlSpringVersion"
