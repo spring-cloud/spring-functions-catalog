@@ -120,8 +120,8 @@ public class WebsocketConsumerServerHandler extends SimpleChannelInboundHandler<
 			WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
 		}
 		else {
-			this.handshaker.handshake(ctx.channel(), req);
 			WebsocketConsumerServer.CHANNELS.add(ctx.channel());
+			this.handshaker.handshake(ctx.channel(), req);
 		}
 	}
 

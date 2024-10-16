@@ -140,9 +140,6 @@ configure(javaProjects) { subproject ->
 		testImplementation 'org.awaitility:awaitility'
 		testImplementation 'org.testcontainers:junit-jupiter'
 
-		testRuntimeOnly 'org.apache.logging.log4j:log4j-core'
-		testRuntimeOnly 'org.apache.logging.log4j:log4j-jcl'
-
 		// NOTE: We explicitly specify checkstyle dep before javaformat checkstyle due to antlr class mismatch
 		checkstyle("com.puppycrawl.tools:checkstyle:${checkstyle.toolVersion}")
 		checkstyle("io.spring.javaformat:spring-javaformat-checkstyle:${javaFormatVersion}")
