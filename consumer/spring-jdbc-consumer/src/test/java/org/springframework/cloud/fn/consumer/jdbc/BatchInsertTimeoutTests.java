@@ -45,7 +45,8 @@ public class BatchInsertTimeoutTests extends JdbcConsumerApplicationTests {
 			final Message<Payload> message = MessageBuilder.withPayload(sent).build();
 			jdbcConsumer.accept(message);
 		}
-		Awaitility.await().atMost(Duration.ofSeconds(30))
+		Awaitility.await()
+			.atMost(Duration.ofSeconds(30))
 			.until(() -> jdbcOperations.queryForObject("select count(*) from messages", Integer.class),
 					(value) -> value == numberOfInserts);
 	}
