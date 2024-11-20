@@ -16,6 +16,8 @@
 
 package org.springframework.cloud.fn.consumer.jdbc;
 
+import java.time.Duration;
+
 import org.awaitility.Awaitility;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +45,7 @@ public class BatchInsertTimeoutTests extends JdbcConsumerApplicationTests {
 			final Message<Payload> message = MessageBuilder.withPayload(sent).build();
 			jdbcConsumer.accept(message);
 		}
-		Awaitility.await()
+		Awaitility.await().atMost(Duration.ofSeconds(30))
 			.until(() -> jdbcOperations.queryForObject("select count(*) from messages", Integer.class),
 					(value) -> value == numberOfInserts);
 	}
