@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * A repository for {@link Trace}s.
@@ -41,13 +43,19 @@ public class InMemoryTraceRepository {
 
 	private final List<Trace> traces = new LinkedList<>();
 
+	private final Lock tracesLock = new ReentrantLock();
+
 	/**
 	 * Flag to say that the repository lists traces in reverse order.
 	 * @param reverse flag value (default true)
 	 */
 	public void setReverse(boolean reverse) {
-		synchronized (this.traces) {
+		try {
+			this.tracesLock.lock();
 			this.reverse = reverse;
+		}
+		finally {
+			this.tracesLock.unlock();
 		}
 	}
 
@@ -56,20 +64,29 @@ public class InMemoryTraceRepository {
 	 * @param capacity the capacity
 	 */
 	public void setCapacity(int capacity) {
-		synchronized (this.traces) {
+		try {
+			this.tracesLock.lock();
 			this.capacity = capacity;
+		}
+		finally {
+			this.tracesLock.unlock();
 		}
 	}
 
 	public List<Trace> findAll() {
-		synchronized (this.traces) {
+		try {
+			this.tracesLock.lock();
 			return Collections.unmodifiableList(this.traces);
+		}
+		finally {
+			this.tracesLock.unlock();
 		}
 	}
 
 	public void add(Map<String, Object> map) {
 		Trace trace = new Trace(new Date(), map);
-		synchronized (this.traces) {
+		try {
+			this.tracesLock.lock();
 			while (this.traces.size() >= this.capacity) {
 				this.traces.remove(this.reverse ? this.capacity - 1 : 0);
 			}
@@ -79,6 +96,9 @@ public class InMemoryTraceRepository {
 			else {
 				this.traces.add(trace);
 			}
+		}
+		finally {
+			this.tracesLock.unlock();
 		}
 	}
 
