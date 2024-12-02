@@ -33,6 +33,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @author Dave Syer
  * @author Olivier Bourgain
  * @author Artem Bilan
+ * @author Omer Celik
  * @since 2.0
  */
 public class InMemoryTraceRepository {
@@ -50,8 +51,8 @@ public class InMemoryTraceRepository {
 	 * @param reverse flag value (default true)
 	 */
 	public void setReverse(boolean reverse) {
+		this.tracesLock.lock();
 		try {
-			this.tracesLock.lock();
 			this.reverse = reverse;
 		}
 		finally {
@@ -64,8 +65,8 @@ public class InMemoryTraceRepository {
 	 * @param capacity the capacity
 	 */
 	public void setCapacity(int capacity) {
+		this.tracesLock.lock();
 		try {
-			this.tracesLock.lock();
 			this.capacity = capacity;
 		}
 		finally {
@@ -74,8 +75,8 @@ public class InMemoryTraceRepository {
 	}
 
 	public List<Trace> findAll() {
+		this.tracesLock.lock();
 		try {
-			this.tracesLock.lock();
 			return Collections.unmodifiableList(this.traces);
 		}
 		finally {
@@ -85,8 +86,8 @@ public class InMemoryTraceRepository {
 
 	public void add(Map<String, Object> map) {
 		Trace trace = new Trace(new Date(), map);
+		this.tracesLock.lock();
 		try {
-			this.tracesLock.lock();
 			while (this.traces.size() >= this.capacity) {
 				this.traces.remove(this.reverse ? this.capacity - 1 : 0);
 			}

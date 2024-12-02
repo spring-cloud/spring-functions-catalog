@@ -64,6 +64,7 @@ import org.springframework.util.StringUtils;
  * @author Thomas Risberg
  * @author Ashu Gairola
  * @author Akos Ratku
+ * @author Omer Celik
  */
 @AutoConfiguration(after = CassandraReactiveDataAutoConfiguration.class)
 @EnableConfigurationProperties(CassandraConsumerProperties.class)
@@ -174,8 +175,8 @@ public class CassandraConsumerConfiguration {
 							Object value = entity.get(column);
 							if (value instanceof String string) {
 								if (this.dateFormat.looksLikeISO8601(string)) {
+									this.dateLock.lock();
 									try {
-										this.dateLock.lock();
 										value = new Date(this.dateFormat.parse(string).getTime()).toLocalDate();
 									}
 									finally {
