@@ -51,13 +51,7 @@ public class InMemoryTraceRepository {
 	 * @param reverse flag value (default true)
 	 */
 	public void setReverse(boolean reverse) {
-		this.tracesLock.lock();
-		try {
-			this.reverse = reverse;
-		}
-		finally {
-			this.tracesLock.unlock();
-		}
+		this.reverse = reverse;
 	}
 
 	/**
@@ -65,23 +59,11 @@ public class InMemoryTraceRepository {
 	 * @param capacity the capacity
 	 */
 	public void setCapacity(int capacity) {
-		this.tracesLock.lock();
-		try {
-			this.capacity = capacity;
-		}
-		finally {
-			this.tracesLock.unlock();
-		}
+		this.capacity = capacity;
 	}
 
 	public List<Trace> findAll() {
-		this.tracesLock.lock();
-		try {
-			return Collections.unmodifiableList(this.traces);
-		}
-		finally {
-			this.tracesLock.unlock();
-		}
+		return Collections.unmodifiableList(this.traces);
 	}
 
 	public void add(Map<String, Object> map) {
