@@ -1,0 +1,20 @@
+spring:
+  application:
+    name: zip-split-rabbit-binder
+
+  cloud:
+    function:
+      definition: fileSupplier|unzipFunction|splitterFunction|flattenFunction
+
+    stream:
+      bindings:
+        fileSupplier|unzipFunction|splitterFunction|flattenFunction-out-0:
+          destination: unzipped_data_exchange
+
+file:
+  supplier:
+    directory: # Set some real dir with zips to process
+    filename-pattern: '*.zip'
+
+splitter:
+  charset: UTF-8
