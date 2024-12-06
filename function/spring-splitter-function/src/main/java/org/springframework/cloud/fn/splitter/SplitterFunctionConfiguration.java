@@ -18,11 +18,13 @@ package org.springframework.cloud.fn.splitter;
 
 import java.nio.charset.Charset;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.AnyNestedCondition;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -49,9 +51,15 @@ import org.springframework.messaging.MessageChannel;
 public class SplitterFunctionConfiguration {
 
 	@Bean
-	public Function<Message<?>, List<Message<?>>> splitterFunction(AbstractMessageSplitter messageSplitter,
+	public Function<Message<?>, List<Message<?>>> splitterFunction(
+			@Qualifier("expressionSplitter") Optional<AbstractMessageSplitter> expressionSplitter,
+			@Qualifier("fileSplitter") Optional<AbstractMessageSplitter> fileSplitter,
+			@Qualifier("defaultSplitter") Optional<AbstractMessageSplitter> defaultSplitter,
 			SplitterFunctionProperties splitterFunctionProperties) {
 
+		AbstractMessageSplitter messageSplitter = expressionSplitter.or(() -> fileSplitter)
+			.or(() -> defaultSplitter)
+			.get();
 		messageSplitter.setApplySequence(splitterFunctionProperties.isApplySequence());
 		ThreadLocalFluxSinkMessageChannel outputChannel = new ThreadLocalFluxSinkMessageChannel();
 		messageSplitter.setOutputChannel(outputChannel);
