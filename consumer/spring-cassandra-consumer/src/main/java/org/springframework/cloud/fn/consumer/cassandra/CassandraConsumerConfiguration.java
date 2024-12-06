@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -62,6 +64,7 @@ import org.springframework.util.StringUtils;
  * @author Thomas Risberg
  * @author Ashu Gairola
  * @author Akos Ratku
+ * @author Omer Celik
  */
 @AutoConfiguration(after = CassandraReactiveDataAutoConfiguration.class)
 @EnableConfigurationProperties(CassandraConsumerProperties.class)
@@ -147,6 +150,8 @@ public class CassandraConsumerConfiguration {
 
 		private final ISO8601StdDateFormat dateFormat = new ISO8601StdDateFormat();
 
+		private final Lock dateLock = new ReentrantLock();
+
 		PayloadToMatrixTransformer(ObjectMapper objectMapper, String query, ColumnNameExtractor columnNameExtractor) {
 			this.jsonObjectMapper = new Jackson2JsonObjectMapper(objectMapper);
 			this.columns.addAll(columnNameExtractor.extract(query));
@@ -170,8 +175,12 @@ public class CassandraConsumerConfiguration {
 							Object value = entity.get(column);
 							if (value instanceof String string) {
 								if (this.dateFormat.looksLikeISO8601(string)) {
-									synchronized (this.dateFormat) {
+									this.dateLock.lock();
+									try {
 										value = new Date(this.dateFormat.parse(string).getTime()).toLocalDate();
+									}
+									finally {
+										this.dateLock.unlock();
 									}
 								}
 								if (isUuid(string)) {
