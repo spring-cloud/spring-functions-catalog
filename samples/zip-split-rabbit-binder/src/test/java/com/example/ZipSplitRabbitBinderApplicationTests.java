@@ -9,6 +9,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.RabbitMQContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
 import org.springframework.amqp.core.ExchangeTypes;
@@ -18,28 +20,22 @@ import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Import;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Import(ZipSplitRabbitBinderApplicationTests.TestConfiguration.class)
-@SpringBootTest
+@SpringBootTest(properties = "file.supplier.directory=classpath:/dirWithZips")
 @DirtiesContext
+@Testcontainers(disabledWithoutDocker = true)
 class ZipSplitRabbitBinderApplicationTests {
 
 	static Log LOG = LogFactory.getLog(ZipSplitRabbitBinderApplicationTests.class);
 
 	static BlockingQueue<String> DATA_SINK = new LinkedBlockingQueue<>();
 
-	@DynamicPropertySource
-	static void testProperties(DynamicPropertyRegistry registry) {
-		registry.add("file.supplier.directory", () -> new ClassPathResource("/dirWithZips").getPath());
-	}
+	@Container
+	@ServiceConnection
+	static RabbitMQContainer rabbitContainer = new RabbitMQContainer(DockerImageName.parse("rabbitmq:latest"));
 
 	@Test
 	void zippedFilesAreSplittedToRabbitBinding() throws InterruptedException {
@@ -51,22 +47,11 @@ class ZipSplitRabbitBinderApplicationTests {
 		}
 	}
 
-	@org.springframework.boot.test.context.TestConfiguration(proxyBeanMethods = false)
-	static class TestConfiguration {
-
-		@Bean
-		@ServiceConnection
-		RabbitMQContainer rabbitContainer() {
-			return new RabbitMQContainer(DockerImageName.parse("rabbitmq:latest"));
-		}
-
-		@RabbitListener(bindings = @QueueBinding(value = @Queue,
-				exchange = @Exchange(value = "unzipped_data_exchange", type = ExchangeTypes.TOPIC), key = "#"))
-		void receiveDataFromSplittedZips(String payload) {
-			LOG.info("A line from zip entry: " + payload);
-			DATA_SINK.offer(payload);
-		}
-
+	@RabbitListener(bindings = @QueueBinding(value = @Queue,
+			exchange = @Exchange(value = "unzipped_data_exchange", type = ExchangeTypes.TOPIC), key = "#"))
+	void receiveDataFromSplittedZips(String payload) {
+		LOG.info("A line from zip entry: " + payload);
+		DATA_SINK.offer(payload);
 	}
 
 }

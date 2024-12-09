@@ -1,6 +1,6 @@
 = Split unzipped content into Rabbit Binder destination
 
-This sample demonstrates how out of the box from catalog and custom functions can be composed, and how the final result can be bound to RabbitMQ destination by the https://spring.io/projects/spring-cloud-function[Spring Cloud Stream] framework.
+This sample demonstrates how out of the box catalog functions and custom functions can be composed, and how the final result can be bound to RabbitMQ destination by the https://spring.io/projects/spring-cloud-function[Spring Cloud Stream] framework.
 The goal of this sample is to poll zip files, unzip them, and emit messages to RabbitMQ for every line of text from those zip entries.
 
 The sample uses these dependencies:
@@ -20,7 +20,7 @@ Essentially, we are splitting twice: zip entries, and content of each file.
 
 The composition is like this: `fileSupplier|unzipFunction|splitterFunction|flattenFunction`.
 (The `flattenFunction` will be explained latter).
-This becomes a `Supplier<Flux<Mesage<?>>>` and we bind it into a RabbitMQ `unzipped_data_exchange` using Spring Cloud Stream.
+The result of this composition is a `Supplier<Flux<Mesage<?>>>` and we bind it into a RabbitMQ `unzipped_data_exchange` using Spring Cloud Stream.
 
 For `fileSupplier` we provide these configuration properties:
 
@@ -38,9 +38,10 @@ Or this `fileSupplier` could be replaced with any other file-based supplier.
 
 The `splitterFunction` comes with this property:
 
-[source,properties]
+[source,yaml]
 ----
-splitter.charset=UTF-8
+splitter:
+  charset: UTF-8
 ----
 
 Which is a trigger for that function to use a `FileSplitter` for zip entries to emit their lines of text as individual messages.
