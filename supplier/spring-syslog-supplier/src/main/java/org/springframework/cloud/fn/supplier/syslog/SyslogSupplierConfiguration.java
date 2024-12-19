@@ -20,7 +20,6 @@ import java.util.function.Supplier;
 
 import reactor.core.publisher.Flux;
 
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -41,6 +40,7 @@ import org.springframework.integration.syslog.inbound.RFC6587SyslogDeserializer;
 import org.springframework.integration.syslog.inbound.SyslogReceivingChannelAdapterSupport;
 import org.springframework.integration.syslog.inbound.TcpSyslogReceivingChannelAdapter;
 import org.springframework.integration.syslog.inbound.UdpSyslogReceivingChannelAdapter;
+import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**
@@ -59,28 +59,26 @@ public class SyslogSupplierConfiguration {
 
 	@Bean
 	public Supplier<Flux<Message<?>>> syslogSupplier(
-			ObjectProvider<UdpSyslogReceivingChannelAdapter> udpAdapterProvider,
-			ObjectProvider<TcpSyslogReceivingChannelAdapter> tcpAdapterProvider) {
+			@Nullable UdpSyslogReceivingChannelAdapter udpSyslogReceivingChannelAdapter,
+			@Nullable TcpSyslogReceivingChannelAdapter tcpSyslogReceivingChannelAdapter) {
 
-		return () -> Flux.from(this.syslogInputChannel).doOnSubscribe((subscription) -> {
-			UdpSyslogReceivingChannelAdapter udpAdapter = udpAdapterProvider.getIfAvailable();
-			TcpSyslogReceivingChannelAdapter tcpAdapter = tcpAdapterProvider.getIfAvailable();
-			if (udpAdapter != null) {
-				udpAdapter.start();
+		return () -> Flux.from(this.syslogInputChannel).doOnRequest((l) -> {
+			if (udpSyslogReceivingChannelAdapter != null) {
+				udpSyslogReceivingChannelAdapter.start();
 			}
-			if (tcpAdapter != null) {
-				tcpAdapter.start();
+			if (tcpSyslogReceivingChannelAdapter != null) {
+				tcpSyslogReceivingChannelAdapter.start();
 			}
 		});
 	}
 
-	@Bean
+	@Bean("udpSyslogReceivingChannelAdapter")
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "udp")
 	public UdpSyslogReceivingChannelAdapter udpAdapter(MessageConverter syslogConverter) {
 		return createUdpAdapter(syslogConverter);
 	}
 
-	@Bean
+	@Bean("udpSyslogReceivingChannelAdapter")
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "both")
 	public UdpSyslogReceivingChannelAdapter udpBothAdapter(MessageConverter syslogConverter) {
 		return createUdpAdapter(syslogConverter);
@@ -92,7 +90,7 @@ public class SyslogSupplierConfiguration {
 		return adapter;
 	}
 
-	@Bean
+	@Bean("tcpSyslogReceivingChannelAdapter")
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "tcp", matchIfMissing = true)
 	public TcpSyslogReceivingChannelAdapter tcpAdapter(
 			@Qualifier("syslogSupplierConnectionFactory") AbstractServerConnectionFactory connectionFactory,
@@ -101,7 +99,7 @@ public class SyslogSupplierConfiguration {
 		return createTcpAdapter(connectionFactory, syslogConverter);
 	}
 
-	@Bean
+	@Bean("tcpSyslogReceivingChannelAdapter")
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "both")
 	public TcpSyslogReceivingChannelAdapter tcpBothAdapter(
 			@Qualifier("syslogSupplierConnectionFactory") AbstractServerConnectionFactory connectionFactory,
