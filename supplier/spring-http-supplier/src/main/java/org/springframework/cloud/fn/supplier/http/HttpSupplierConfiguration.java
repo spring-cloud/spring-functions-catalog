@@ -35,7 +35,6 @@ import org.springframework.integration.expression.ValueExpression;
 import org.springframework.integration.http.support.DefaultHttpHeaderMapper;
 import org.springframework.integration.mapping.HeaderMapper;
 import org.springframework.integration.webflux.dsl.WebFlux;
-import org.springframework.integration.webflux.inbound.WebFluxInboundEndpoint;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
 
