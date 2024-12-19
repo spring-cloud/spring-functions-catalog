@@ -1,5 +1,5 @@
 /*
- * Copyright 2020-2022 the original author or authors.
+ * Copyright 2020-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class DefaultFileSupplierTests extends AbstractFileSupplierTests {
 
 	@Autowired
-	@Qualifier("fileMessageSource")
+	@Qualifier("fileReadingMessageSource")
 	private FileReadingMessageSource fileMessageSource;
 
 	@Autowired

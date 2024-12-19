@@ -67,8 +67,6 @@ public class FileSupplierConfiguration {
 	public Publisher<Message<String>> fileTailingFlow(FileSupplierProperties fileSupplierProperties) {
 		FileSupplierProperties.Tailer tail = fileSupplierProperties.getTailer();
 		TailAdapterSpec tailAdapterSpec = Files.tailAdapter(fileSupplierProperties.getTail())
-			// TODO until Spring Integration 6.2.3
-			.autoStartup(false)
 			.fileDelay(tail.getAttemptsDelay().toMillis())
 			// OS native tail command
 			.nativeOptions(tail.getNativeOptions())
@@ -123,7 +121,7 @@ public class FileSupplierConfiguration {
 		}
 
 		@Bean
-		public ChainFileListFilter<File> filter(ConcurrentMetadataStore metadataStore) {
+		public ChainFileListFilter<File> fileListFilter(ConcurrentMetadataStore metadataStore) {
 			ChainFileListFilter<File> chainFilter = new ChainFileListFilter<>();
 			if (StringUtils.hasText(this.fileSupplierProperties.getFilenamePattern())) {
 				chainFilter
@@ -141,7 +139,7 @@ public class FileSupplierConfiguration {
 			return chainFilter;
 		}
 
-		@Bean
+		@Bean("fileReadingMessageSource")
 		public FileInboundChannelAdapterSpec fileMessageSource(FileListFilter<File> fileListFilter,
 				@Nullable ComponentCustomizer<FileInboundChannelAdapterSpec> fileInboundChannelAdapterSpecCustomizer) {
 
