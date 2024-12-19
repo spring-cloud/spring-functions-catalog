@@ -27,6 +27,7 @@ import twitter4j.StatusUpdate;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionConfiguration;
@@ -37,6 +38,7 @@ import org.springframework.messaging.Message;
  * The auto-configuration for Twitter messages.
  *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
 @AutoConfiguration(after = TwitterConnectionConfiguration.class)
 @EnableConfigurationProperties(TwitterUpdateConsumerProperties.class)
@@ -104,8 +106,9 @@ public class TwitterUpdateConsumerConfiguration {
 	}
 
 	@Bean
-	public Consumer<Message<?>> twitterStatusUpdateConsumer(Function<Message<?>, StatusUpdate> statusUpdateQuery,
-			Consumer<StatusUpdate> updateStatus) {
+	public Consumer<Message<?>> twitterStatusUpdateConsumer(
+			@Qualifier("messageToStatusUpdateFunction") Function<Message<?>, StatusUpdate> statusUpdateQuery,
+			@Qualifier("twitterUpdateStatusConsumer") Consumer<StatusUpdate> updateStatus) {
 
 		return (message) -> updateStatus.accept(statusUpdateQuery.apply(message));
 	}
