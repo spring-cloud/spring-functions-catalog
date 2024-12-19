@@ -38,14 +38,15 @@ import org.springframework.messaging.Message;
  * @author Gary Russell
  * @author Christian Tzolov
  * @author Chris Bono
+ * @author Artem Bilan
  */
 @AutoConfiguration
 @EnableConfigurationProperties({ TcpConsumerProperties.class, TcpConnectionFactoryProperties.class })
 public class TcpConsumerConfiguration {
 
-	private TcpConsumerProperties properties;
+	private final TcpConsumerProperties properties;
 
-	private TcpConnectionFactoryProperties tcpConnectionProperties;
+	private final TcpConnectionFactoryProperties tcpConnectionProperties;
 
 	public TcpConsumerConfiguration(TcpConsumerProperties properties,
 			TcpConnectionFactoryProperties tcpConnectionProperties) {
@@ -55,12 +56,12 @@ public class TcpConsumerConfiguration {
 	}
 
 	@Bean
-	public Consumer<Message<?>> tcpConsumer(TcpSendingMessageHandlerSmartLifeCycle handler) {
-		return handler::handleMessage;
+	public Consumer<Message<?>> tcpConsumer(TcpSendingMessageHandler tcpConsumerMessageHandler) {
+		return tcpConsumerMessageHandler::handleMessage;
 	}
 
 	@Bean
-	public TcpSendingMessageHandlerSmartLifeCycle handler(
+	public TcpSendingMessageHandler tcpConsumerMessageHandler(
 			@Qualifier("tcpSinkConnectionFactory") AbstractConnectionFactory connectionFactory) {
 
 		TcpSendingMessageHandlerSmartLifeCycle tcpMessageHandler = new TcpSendingMessageHandlerSmartLifeCycle();
