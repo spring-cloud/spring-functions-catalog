@@ -19,6 +19,7 @@ package org.springframework.cloud.fn.consumer.kafka;
 import java.time.Duration;
 import java.util.function.Consumer;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -52,11 +53,13 @@ public class KafkaPublisherConfiguration {
 	 * @return the consumer for accepting message for producing to Kafka.
 	 */
 	@Bean
-	public Consumer<Message<?>> kafkaPublisher(KafkaProducerMessageHandler<?, ?> kafkaProducerMessageHandler) {
+	public Consumer<Message<?>> kafkaPublisher(
+			@Qualifier("kafkaProducerMessageHandler") KafkaProducerMessageHandler<?, ?> kafkaProducerMessageHandler) {
+
 		return kafkaProducerMessageHandler::handleMessage;
 	}
 
-	@Bean
+	@Bean("kafkaProducerMessageHandler")
 	public KafkaProducerMessageHandlerSpec<?, ?, ?> kafkaProducerMessageHandlerSpec(KafkaTemplate<?, ?> kafkaTemplate,
 			KafkaPublisherProperties kafkaPublisherProperties, PublishSubscribeChannel kafkaPublisherSuccessChannel,
 			PublishSubscribeChannel kafkaPublisherFailureChannel, PublishSubscribeChannel kafkaPublisherFuturesChannel,
