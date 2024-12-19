@@ -68,23 +68,18 @@ public class HttpSupplierConfiguration {
 				.codecConfigurer(serverCodecConfigurer)
 				.crossOrigin((crossOrigin) -> crossOrigin.origin(httpSupplierProperties.getCors().getAllowedOrigins())
 					.allowedHeaders(httpSupplierProperties.getCors().getAllowedHeaders())
-					.allowCredentials(httpSupplierProperties.getCors().getAllowCredentials()))
-				.autoStartup(false))
+					.allowCredentials(httpSupplierProperties.getCors().getAllowCredentials())))
 			.enrichHeaders((headers) -> headers.headerFunction(MessageHeaders.CONTENT_TYPE,
 					(message) -> (MediaType.APPLICATION_FORM_URLENCODED
 						.equals(message.getHeaders().get(MessageHeaders.CONTENT_TYPE, MediaType.class)))
 								? MediaType.APPLICATION_JSON : null,
 					true))
-			.toReactivePublisher();
+			.toReactivePublisher(true);
 	}
 
 	@Bean
-	public Supplier<Flux<Message<byte[]>>> httpSupplier(Publisher<Message<byte[]>> httpRequestPublisher,
-			WebFluxInboundEndpoint webFluxInboundEndpoint) {
-
-		return () -> Flux.from(httpRequestPublisher)
-			.doOnSubscribe((subscription) -> webFluxInboundEndpoint.start())
-			.doOnTerminate(webFluxInboundEndpoint::stop);
+	public Supplier<Flux<Message<byte[]>>> httpSupplier(Publisher<Message<byte[]>> httpSupplierFlow) {
+		return () -> Flux.from(httpSupplierFlow);
 	}
 
 }
