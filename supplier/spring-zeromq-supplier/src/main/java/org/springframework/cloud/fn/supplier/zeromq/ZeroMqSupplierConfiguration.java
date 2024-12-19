@@ -19,6 +19,7 @@ package org.springframework.cloud.fn.supplier.zeromq;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.reactivestreams.Publisher;
 import org.zeromq.SocketType;
 import org.zeromq.ZContext;
 import org.zeromq.ZMQ;
@@ -28,7 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.channel.FluxMessageChannel;
+import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.zeromq.inbound.ZeroMqMessageProducer;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
@@ -37,13 +38,11 @@ import org.springframework.messaging.support.GenericMessage;
  * A supplier auto-configuration that receives data from ZeroMQ.
  *
  * @author Daniel Frey
- * @since 3.1.0
+ * @author Artem Bilan
  */
 @AutoConfiguration
 @EnableConfigurationProperties(ZeroMqSupplierProperties.class)
 public class ZeroMqSupplierConfiguration {
-
-	private FluxMessageChannel output = new FluxMessageChannel();
 
 	@Bean
 	public ZContext zContext() {
@@ -51,7 +50,7 @@ public class ZeroMqSupplierConfiguration {
 	}
 
 	@Bean
-	public ZeroMqMessageProducer adapter(ZeroMqSupplierProperties properties, ZContext zContext,
+	public ZeroMqMessageProducer zeroMqSupplierMessageProducer(ZeroMqSupplierProperties properties, ZContext zContext,
 			@Autowired(required = false) Consumer<ZMQ.Socket> socketConfigurer) {
 
 		ZeroMqMessageProducer zeroMqMessageProducer = new ZeroMqMessageProducer(zContext, properties.getSocketType());
@@ -70,15 +69,17 @@ public class ZeroMqSupplierConfiguration {
 		if (socketConfigurer != null) {
 			zeroMqMessageProducer.setSocketConfigurer(socketConfigurer);
 		}
-		zeroMqMessageProducer.setOutputChannel(this.output);
-		zeroMqMessageProducer.setAutoStartup(false);
-
 		return zeroMqMessageProducer;
 	}
 
 	@Bean
-	public Supplier<Flux<Message<?>>> zeromqSupplier(ZeroMqMessageProducer adapter) {
-		return () -> Flux.from(this.output).doOnSubscribe((subscription) -> adapter.start());
+	Publisher<Message<Object>> zeroMqSupplierFlow(ZeroMqMessageProducer zeroMqSupplierMessageProducer) {
+		return IntegrationFlow.from(zeroMqSupplierMessageProducer).toReactivePublisher(true);
+	}
+
+	@Bean
+	public Supplier<Flux<Message<?>>> zeromqSupplier(Publisher<Message<Object>> zeroMqSupplierFlow) {
+		return () -> Flux.from(zeroMqSupplierFlow);
 	}
 
 }
