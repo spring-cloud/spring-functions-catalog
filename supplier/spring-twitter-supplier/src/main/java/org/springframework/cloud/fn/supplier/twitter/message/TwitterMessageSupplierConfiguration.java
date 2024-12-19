@@ -118,9 +118,9 @@ public class TwitterMessageSupplierConfiguration {
 	@Bean
 	public Supplier<Message<byte[]>> twitterMessageSupplier(
 			Function<List<DirectMessage>, List<DirectMessage>> messageDeduplicate,
-			Function<Object, Message<byte[]>> managedJson, Supplier<List<DirectMessage>> directMessagesSupplier) {
+			Function<Object, Message<byte[]>> managedJson, Supplier<List<DirectMessage>> twitterMessagesSupplier) {
 
-		return () -> messageDeduplicate.andThen(managedJson).apply(directMessagesSupplier.get());
+		return () -> messageDeduplicate.andThen(managedJson).apply(twitterMessagesSupplier.get());
 	}
 
 	public static class MessageCursor {
@@ -142,14 +142,7 @@ public class TwitterMessageSupplierConfiguration {
 
 	}
 
-	@SuppressWarnings("serial")
-	private static final class DirectMessageAdapter implements DirectMessage {
-
-		private final DirectMessage delegate;
-
-		private DirectMessageAdapter(DirectMessage delegate) {
-			this.delegate = delegate;
-		}
+	private record DirectMessageAdapter(DirectMessage delegate) implements DirectMessage {
 
 		@Override
 		public long getId() {

@@ -64,7 +64,7 @@ public class TwitterFriendshipsSupplierConfiguration {
 		return new Cursor();
 	}
 
-	@Bean
+	@Bean("userRetriever")
 	@ConditionalOnProperty(name = "twitter.friendships.source.type", havingValue = "followers")
 	public Supplier<List<User>> followersSupplier(TwitterFriendshipsSupplierProperties properties, Twitter twitter,
 			Cursor cursorState) {
@@ -98,7 +98,7 @@ public class TwitterFriendshipsSupplierConfiguration {
 		};
 	}
 
-	@Bean
+	@Bean("userRetriever")
 	@ConditionalOnProperty(name = "twitter.friendships.source.type", havingValue = "friends")
 	public Supplier<List<User>> friendsSupplier(TwitterFriendshipsSupplierProperties properties, Twitter twitter,
 			Cursor cursorState) {
@@ -147,10 +147,10 @@ public class TwitterFriendshipsSupplierConfiguration {
 	}
 
 	@Bean
-	public Supplier<Message<byte[]>> deduplicatedFriendsJsonSupplier(Function<List<User>, List<User>> userDeduplication,
+	public Supplier<Message<byte[]>> deduplicatedFriendsJsonSupplier(Function<List<User>, List<User>> userDeduplicate,
 			Supplier<List<User>> userRetriever, Function<Object, Message<byte[]>> managedJson) {
 
-		return () -> userDeduplication.andThen(managedJson).apply(userRetriever.get());
+		return () -> userDeduplicate.andThen(managedJson).apply(userRetriever.get());
 	}
 
 }
