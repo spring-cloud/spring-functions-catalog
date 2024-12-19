@@ -66,8 +66,8 @@ public class MailSupplierConfiguration {
 	}
 
 	@Bean
-	public Publisher<Message<Object>> mailInboundFlow(MessageProducerSupport messageProducer) {
-		return IntegrationFlow.from(messageProducer)
+	public Publisher<Message<Object>> mailInboundFlow(MessageProducerSupport mailChannelAdapter) {
+		return IntegrationFlow.from(mailChannelAdapter)
 			.transform(Mail.toStringTransformer(this.properties.getCharset()))
 			.enrichHeaders((h) -> h.defaultOverwrite(true)
 				.header(MailHeaders.TO, arrayToListProcessor(MailHeaders.TO))
@@ -76,12 +76,7 @@ public class MailSupplierConfiguration {
 			.toReactivePublisher(true);
 	}
 
-	@Bean
-	public Supplier<Flux<Message<?>>> mailSupplier(Publisher<Message<Object>> messagePublisher) {
-		return () -> Flux.from(messagePublisher);
-	}
-
-	private HeaderValueMessageProcessor<?> arrayToListProcessor(String header) {
+	private static HeaderValueMessageProcessor<?> arrayToListProcessor(String header) {
 		return new AbstractHeaderValueMessageProcessor<List<String>>() {
 
 			@Override
@@ -90,6 +85,11 @@ public class MailSupplierConfiguration {
 			}
 
 		};
+	}
+
+	@Bean
+	public Supplier<Flux<Message<?>>> mailSupplier(Publisher<Message<Object>> mailInboundFlow) {
+		return () -> Flux.from(mailInboundFlow);
 	}
 
 	@Bean("mailChannelAdapter")
@@ -103,8 +103,7 @@ public class MailSupplierConfiguration {
 			.userFlag(this.properties.getUserFlag())
 			.javaMailProperties(getJavaMailProperties(urlName))
 			.selectorExpression(this.properties.getExpression())
-			.shouldMarkMessagesAsRead(this.properties.isMarkAsRead())
-			.autoStartup(false);
+			.shouldMarkMessagesAsRead(this.properties.isMarkAsRead());
 
 		if (imapIdleChannelAdapterSpecCustomizer != null) {
 			imapIdleChannelAdapterSpecCustomizer.customize(imapIdleChannelAdapterSpec);
@@ -139,10 +138,7 @@ public class MailSupplierConfiguration {
 	@Bean("mailChannelAdapter")
 	@ConditionalOnProperty(value = "mail.supplier.idle-imap", matchIfMissing = true, havingValue = "false")
 	MessageProducerSupport mailMessageProducer(MessageSource<?> mailMessageSource) {
-		ReactiveMessageSourceProducer reactiveMessageSourceProducer = new ReactiveMessageSourceProducer(
-				mailMessageSource);
-		reactiveMessageSourceProducer.setAutoStartup(false);
-		return reactiveMessageSourceProducer;
+		return new ReactiveMessageSourceProducer(mailMessageSource);
 	}
 
 	private Pop3MailInboundChannelAdapterSpec getPop3ChannelAdapterSpec(URLName urlName) {
