@@ -19,27 +19,26 @@ package org.springframework.cloud.fn.supplier.xmpp;
 import java.util.function.Supplier;
 
 import org.jivesoftware.smack.XMPPConnection;
+import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.xmpp.XmppConnectionFactoryConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.channel.FluxMessageChannel;
+import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.xmpp.inbound.ChatMessageListeningEndpoint;
 import org.springframework.messaging.Message;
 
 /**
- * A source module that receives data from ZeroMQ.
+ * A auto-configuration for XMPP supplier.
  *
  * @author Daniel Frey
- * @since 4.0.0
+ * @author Artem Bilan
  */
 @AutoConfiguration(after = XmppConnectionFactoryConfiguration.class)
 @EnableConfigurationProperties(XmppSupplierProperties.class)
 public class XmppSupplierConfiguration {
-
-	private final FluxMessageChannel output = new FluxMessageChannel();
 
 	@Bean
 	public ChatMessageListeningEndpoint chatMessageListeningEndpoint(XMPPConnection xmppConnection,
@@ -52,15 +51,17 @@ public class XmppSupplierConfiguration {
 		}
 
 		chatMessageListeningEndpoint.setStanzaFilter(properties.getStanzaFilter());
-		chatMessageListeningEndpoint.setOutputChannel(this.output);
-		chatMessageListeningEndpoint.setAutoStartup(false);
-
 		return chatMessageListeningEndpoint;
 	}
 
 	@Bean
-	public Supplier<Flux<Message<?>>> xmppSupplier(ChatMessageListeningEndpoint chatMessageListeningEndpoint) {
-		return () -> Flux.from(this.output).doOnSubscribe((subscription) -> chatMessageListeningEndpoint.start());
+	Publisher<Message<Object>> xmppSupplierFlow(ChatMessageListeningEndpoint chatMessageListeningEndpoint) {
+		return IntegrationFlow.from(chatMessageListeningEndpoint).toReactivePublisher(true);
+	}
+
+	@Bean
+	public Supplier<Flux<Message<?>>> xmppSupplier(Publisher<Message<Object>> xmppSupplierFlow) {
+		return () -> Flux.from(xmppSupplierFlow);
 	}
 
 }
