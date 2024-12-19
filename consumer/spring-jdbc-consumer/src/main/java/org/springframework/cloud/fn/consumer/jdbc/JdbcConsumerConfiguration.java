@@ -51,7 +51,6 @@ import org.springframework.integration.expression.ValueExpression;
 import org.springframework.integration.gateway.AnnotationGatewayProxyFactoryBean;
 import org.springframework.integration.jdbc.JdbcMessageHandler;
 import org.springframework.integration.jdbc.SqlParameterSourceFactory;
-import org.springframework.integration.store.MessageGroupStore;
 import org.springframework.integration.store.SimpleMessageStore;
 import org.springframework.integration.support.MutableMessage;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -120,8 +119,8 @@ public class JdbcConsumerConfiguration {
 	}
 
 	@Bean
-	IntegrationFlow jdbcConsumerFlow(@Qualifier("aggregator") MessageHandler aggregator,
-			JdbcMessageHandler jdbcMessageHandler) {
+	IntegrationFlow jdbcConsumerFlow(@Qualifier("jdbcConsumerAggregator") MessageHandler aggregator,
+			@Qualifier("jdbcConsumerMessageHandler") JdbcMessageHandler jdbcMessageHandler) {
 
 		return (flow) -> {
 			if (this.properties.getBatchSize() > 1 || this.properties.getIdleTimeout() > 0) {
@@ -140,13 +139,16 @@ public class JdbcConsumerConfiguration {
 	}
 
 	@Bean
-	FactoryBean<MessageHandler> aggregator(MessageGroupStore messageGroupStore) {
+	FactoryBean<MessageHandler> jdbcConsumerAggregator() {
 		AggregatorFactoryBean aggregatorFactoryBean = new AggregatorFactoryBean();
 		aggregatorFactoryBean.setCorrelationStrategy((message) -> message.getPayload().getClass().getName());
 		aggregatorFactoryBean.setReleaseStrategy(new MessageCountReleaseStrategy(this.properties.getBatchSize()));
 		if (this.properties.getIdleTimeout() >= 0) {
 			aggregatorFactoryBean.setGroupTimeoutExpression(new ValueExpression<>(this.properties.getIdleTimeout()));
 		}
+		SimpleMessageStore messageGroupStore = new SimpleMessageStore();
+		messageGroupStore.setTimeoutOnIdle(true);
+		messageGroupStore.setCopyOnGet(false);
 		aggregatorFactoryBean.setMessageStore(messageGroupStore);
 		aggregatorFactoryBean.setProcessorBean(new DefaultAggregatingMessageGroupProcessor());
 		aggregatorFactoryBean.setExpireGroupsUponCompletion(true);
@@ -155,15 +157,7 @@ public class JdbcConsumerConfiguration {
 	}
 
 	@Bean
-	MessageGroupStore messageGroupStore() {
-		SimpleMessageStore messageGroupStore = new SimpleMessageStore();
-		messageGroupStore.setTimeoutOnIdle(true);
-		messageGroupStore.setCopyOnGet(false);
-		return messageGroupStore;
-	}
-
-	@Bean
-	public JdbcMessageHandler jdbcMessageHandler(DataSource dataSource,
+	public JdbcMessageHandler jdbcConsumerMessageHandler(DataSource dataSource,
 			@Qualifier(IntegrationContextUtils.INTEGRATION_EVALUATION_CONTEXT_BEAN_NAME) EvaluationContext evaluationContext) {
 
 		final MultiValueMap<String, Expression> columnExpressionVariations = new LinkedMultiValueMap<>();
