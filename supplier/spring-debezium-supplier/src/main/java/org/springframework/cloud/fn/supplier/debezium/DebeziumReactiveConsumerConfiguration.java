@@ -59,9 +59,7 @@ public class DebeziumReactiveConsumerConfiguration {
 
 		DebeziumMessageProducerSpec debeziumMessageProducerSpec = Debezium.inboundChannelAdapter(debeziumEngineBuilder)
 			.enableEmptyPayload(supplierProperties.isEnableEmptyPayload())
-			.headerNames(supplierProperties.getHeaderNamesToMap())
-			// TODO until Spring Integration 6.3.0-M2
-			.autoStartup(false);
+			.headerNames(supplierProperties.getHeaderNamesToMap());
 
 		if (debeziumMessageProducerSpecComponentCustomizer != null) {
 			debeziumMessageProducerSpecComponentCustomizer.customize(debeziumMessageProducerSpec);

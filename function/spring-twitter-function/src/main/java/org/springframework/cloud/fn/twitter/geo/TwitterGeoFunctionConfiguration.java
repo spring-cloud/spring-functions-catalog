@@ -107,8 +107,7 @@ public class TwitterGeoFunctionConfiguration {
 	@Bean
 	public Function<Message<?>, Message<byte[]>> twitterGeoFunction(
 			Function<Message<?>, GeoQuery> messageToGeoQueryFunction,
-			Function<GeoQuery, List<Place>> twitterPlacesFunction,
-			Function<Object, Message<byte[]>> managedJson) {
+			Function<GeoQuery, List<Place>> twitterPlacesFunction, Function<Object, Message<byte[]>> managedJson) {
 
 		return messageToGeoQueryFunction.andThen(twitterPlacesFunction).andThen(managedJson);
 	}
