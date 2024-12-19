@@ -18,13 +18,14 @@ package org.springframework.cloud.fn.consumer.file;
 
 import java.util.function.Consumer;
 
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.expression.Expression;
 import org.springframework.integration.file.DefaultFileNameGenerator;
-import org.springframework.integration.file.FileNameGenerator;
 import org.springframework.integration.file.FileWritingMessageHandler;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
@@ -47,12 +48,14 @@ public class FileConsumerConfiguration {
 	}
 
 	@Bean
-	public Consumer<Message<?>> fileConsumer(FileWritingMessageHandler fileWritingMessageHandler) {
+	public Consumer<Message<?>> fileConsumer(
+			@Qualifier("fileConsumerWritingMessageHandler") FileWritingMessageHandler fileWritingMessageHandler) {
+
 		return fileWritingMessageHandler::handleMessage;
 	}
 
 	@Bean
-	public FileWritingMessageHandler fileWritingMessageHandler(FileNameGenerator fileNameGenerator,
+	public FileWritingMessageHandler fileConsumerWritingMessageHandler(BeanFactory beanFactory,
 			@Nullable ComponentCustomizer<FileWritingMessageHandler> fileWritingMessageHandlerCustomizer) {
 
 		Expression directoryExpression = this.properties.getDirectoryExpression();
@@ -64,19 +67,15 @@ public class FileConsumerConfiguration {
 		handler.setCharset(this.properties.getCharset());
 		handler.setExpectReply(false);
 		handler.setFileExistsMode(this.properties.getMode());
+		DefaultFileNameGenerator fileNameGenerator = new DefaultFileNameGenerator();
+		fileNameGenerator.setExpression(this.properties.getNameExpression());
+		fileNameGenerator.setBeanFactory(beanFactory);
 		handler.setFileNameGenerator(fileNameGenerator);
 
 		if (fileWritingMessageHandlerCustomizer != null) {
 			fileWritingMessageHandlerCustomizer.customize(handler);
 		}
 		return handler;
-	}
-
-	@Bean
-	public FileNameGenerator fileNameGenerator() {
-		DefaultFileNameGenerator fileNameGenerator = new DefaultFileNameGenerator();
-		fileNameGenerator.setExpression(this.properties.getNameExpression());
-		return fileNameGenerator;
 	}
 
 }
