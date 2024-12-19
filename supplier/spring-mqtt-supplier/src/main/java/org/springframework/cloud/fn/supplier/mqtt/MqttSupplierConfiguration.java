@@ -39,6 +39,7 @@ import org.springframework.messaging.Message;
  *
  * @author Janne Valkealahti
  * @author Soby Chacko
+ * @author Artem Bilan
  */
 @EnableConfigurationProperties(MqttSupplierProperties.class)
 @AutoConfiguration(after = MqttConfiguration.class)
@@ -58,7 +59,6 @@ public class MqttSupplierConfiguration {
 				mqttClientFactory, properties.getTopics());
 		adapter.setQos(properties.getQos());
 		adapter.setConverter(pahoMessageConverter(properties, beanFactory));
-		adapter.setAutoStartup(false);
 
 		if (mqttMessageProducerCustomizer != null) {
 			mqttMessageProducerCustomizer.customize(adapter);
@@ -72,8 +72,9 @@ public class MqttSupplierConfiguration {
 		return IntegrationFlow.from(mqttInbound).toReactivePublisher(true);
 	}
 
-	private DefaultPahoMessageConverter pahoMessageConverter(MqttSupplierProperties properties,
+	private static DefaultPahoMessageConverter pahoMessageConverter(MqttSupplierProperties properties,
 			BeanFactory beanFactory) {
+
 		DefaultPahoMessageConverter converter = new DefaultPahoMessageConverter(properties.getCharset());
 		converter.setPayloadAsBytes(properties.isBinary());
 		converter.setBeanFactory(beanFactory);
