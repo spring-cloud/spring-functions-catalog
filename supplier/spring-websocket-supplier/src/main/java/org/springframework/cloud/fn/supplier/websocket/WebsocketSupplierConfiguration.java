@@ -22,7 +22,6 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -47,30 +46,22 @@ import org.springframework.messaging.Message;
 @EnableConfigurationProperties(WebsocketSupplierProperties.class)
 public class WebsocketSupplierConfiguration {
 
-	@Autowired
-	WebsocketSupplierProperties properties;
+	@Bean
+	public Supplier<Flux<Message<?>>> websocketSupplier(Publisher<Message<?>> websocketPublisher) {
+		return () -> Flux.from(websocketPublisher);
+	}
 
 	@Bean
-	public Supplier<Flux<Message<?>>> websocketSupplier(Publisher<Message<?>> websocketPublisher,
+	public Publisher<Message<byte[]>> websocketPublisher(
 			WebSocketInboundChannelAdapter webSocketInboundChannelAdapter) {
-
-		return () -> Flux.from(websocketPublisher)
-			.doOnSubscribe((subscription) -> webSocketInboundChannelAdapter.start())
-			.doOnTerminate(webSocketInboundChannelAdapter::stop);
+		return IntegrationFlow.from(webSocketInboundChannelAdapter).toReactivePublisher(true);
 	}
 
 	@Bean
-	public Publisher<Message<byte[]>> websocketPublisher(IntegrationWebSocketContainer serverWebSocketContainer) {
-		return IntegrationFlow.from(webSocketInboundChannelAdapter(serverWebSocketContainer)).toReactivePublisher();
-	}
-
-	private WebSocketInboundChannelAdapter webSocketInboundChannelAdapter(
+	public WebSocketInboundChannelAdapter webSocketInboundChannelAdapter(
 			IntegrationWebSocketContainer serverWebSocketContainer) {
 
-		WebSocketInboundChannelAdapter webSocketInboundChannelAdapter = new WebSocketInboundChannelAdapter(
-				serverWebSocketContainer);
-		webSocketInboundChannelAdapter.setAutoStartup(false);
-		return webSocketInboundChannelAdapter;
+		return new WebSocketInboundChannelAdapter(serverWebSocketContainer);
 	}
 
 	@Bean
@@ -82,11 +73,10 @@ public class WebsocketSupplierConfiguration {
 	}
 
 	@Bean
-	public IntegrationWebSocketContainer serverWebSocketContainer(
+	public IntegrationWebSocketContainer serverWebSocketContainer(WebsocketSupplierProperties properties,
 			ObjectProvider<ServerWebSocketContainer.SockJsServiceOptions> sockJsServiceOptions) {
 
-		return new ServerWebSocketContainer(this.properties.getPath())
-			.setAllowedOrigins(this.properties.getAllowedOrigins())
+		return new ServerWebSocketContainer(properties.getPath()).setAllowedOrigins(properties.getAllowedOrigins())
 			.withSockJs(sockJsServiceOptions.getIfAvailable());
 	}
 
