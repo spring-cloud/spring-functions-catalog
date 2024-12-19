@@ -39,6 +39,7 @@ import org.springframework.messaging.Message;
  * Auto-configuration for Twitter Geo function.
  *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
 @ConditionalOnExpression("environment['twitter.geo.search.ip'] != null || (environment['twitter.geo.location.lat'] != null && environment['twitter.geo.location.lon'] != null)")
 @AutoConfiguration(after = TwitterConnectionConfiguration.class)
@@ -75,7 +76,7 @@ public class TwitterGeoFunctionConfiguration {
 		};
 	}
 
-	@Bean
+	@Bean("twitterPlacesFunction")
 	@ConditionalOnProperty(name = "twitter.geo.search.type", havingValue = "search", matchIfMissing = true)
 	public Function<GeoQuery, List<Place>> twitterSearchPlacesFunction(Twitter twitter) {
 		return (geoQuery) -> {
@@ -89,7 +90,7 @@ public class TwitterGeoFunctionConfiguration {
 		};
 	}
 
-	@Bean
+	@Bean("twitterPlacesFunction")
 	@ConditionalOnProperty(name = "twitter.geo.search.type", havingValue = "reverse")
 	public Function<GeoQuery, List<Place>> twitterReverseGeocodeFunction(Twitter twitter) {
 		return (geoQuery) -> {
@@ -104,10 +105,12 @@ public class TwitterGeoFunctionConfiguration {
 	}
 
 	@Bean
-	public Function<Message<?>, Message<byte[]>> twitterGeoFunction(Function<Message<?>, GeoQuery> toGeoQuery,
-			Function<GeoQuery, List<Place>> places, Function<Object, Message<byte[]>> managedJson) {
+	public Function<Message<?>, Message<byte[]>> twitterGeoFunction(
+			Function<Message<?>, GeoQuery> messageToGeoQueryFunction,
+			Function<GeoQuery, List<Place>> twitterPlacesFunction,
+			Function<Object, Message<byte[]>> managedJson) {
 
-		return toGeoQuery.andThen(places).andThen(managedJson);
+		return messageToGeoQueryFunction.andThen(twitterPlacesFunction).andThen(managedJson);
 	}
 
 }

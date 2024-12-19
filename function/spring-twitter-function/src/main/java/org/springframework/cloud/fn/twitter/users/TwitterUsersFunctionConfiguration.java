@@ -44,7 +44,7 @@ public class TwitterUsersFunctionConfiguration {
 
 	private static final Log LOGGER = LogFactory.getLog(TwitterUsersFunctionConfiguration.class);
 
-	@Bean
+	@Bean("queryUsers")
 	@ConditionalOnProperty(name = "twitter.users.type", havingValue = "search")
 	public Function<Message<?>, List<User>> userSearch(Twitter twitter, TwitterUsersFunctionProperties properties) {
 
@@ -60,7 +60,7 @@ public class TwitterUsersFunctionConfiguration {
 		};
 	}
 
-	@Bean
+	@Bean("queryUsers")
 	@ConditionalOnProperty(name = "twitter.users.type", havingValue = "lookup")
 	public Function<Message<?>, List<User>> userLookup(Twitter twitter, TwitterUsersFunctionProperties properties) {
 

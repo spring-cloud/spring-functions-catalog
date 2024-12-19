@@ -32,6 +32,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.twitter.TwitterConnectionConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.expression.Expression;
 import org.springframework.messaging.Message;
 
 /**
@@ -76,9 +77,12 @@ public class TwitterTrendFunctionConfiguration {
 
 		return (message) -> {
 			try {
-				if (properties.getClosest().getLat() != null && properties.getClosest().getLon() != null) {
-					double lat = properties.getClosest().getLat().getValue(message, double.class);
-					double lon = properties.getClosest().getLon().getValue(message, double.class);
+				TwitterTrendFunctionProperties.Closest closest = properties.getClosest();
+				Expression latExpression = closest.getLat();
+				Expression lonExpression = closest.getLon();
+				if (latExpression != null && lonExpression != null) {
+					double lat = latExpression.getValue(message, double.class);
+					double lon = lonExpression.getValue(message, double.class);
 					return twitter.getClosestTrends(new GeoLocation(lat, lon));
 				}
 				else {
