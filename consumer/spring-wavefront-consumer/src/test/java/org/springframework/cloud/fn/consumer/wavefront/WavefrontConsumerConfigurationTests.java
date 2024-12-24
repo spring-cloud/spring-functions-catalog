@@ -27,13 +27,14 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.cloud.fn.consumer.wavefront.service.WavefrontService;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 /**
  * @author Timo Salm
+ * @author Artem Bilan
  */
 @SpringBootTest(properties = { "wavefront.metric-name=vehicle-location", "wavefront.source=vehicle-api",
 		"wavefront.metric-expression=#jsonPath(payload,'$.mileage')",
@@ -45,7 +46,7 @@ public class WavefrontConsumerConfigurationTests {
 	@Autowired
 	private Consumer<Message<?>> wavefrontConsumer;
 
-	@MockBean
+	@MockitoBean
 	private WavefrontService wavefrontServiceMock;
 
 	@BeforeEach
