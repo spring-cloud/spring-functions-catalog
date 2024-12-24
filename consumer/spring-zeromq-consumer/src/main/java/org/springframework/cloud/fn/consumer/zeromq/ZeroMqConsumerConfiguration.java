@@ -36,7 +36,7 @@ import org.springframework.messaging.Message;
  * The auto-configuration for ZeroMQ consumer.
  *
  * @author Daniel Frey
- * @since 3.1.0
+ * @author Artem Bilan
  */
 @AutoConfiguration
 @EnableConfigurationProperties(ZeroMqConsumerProperties.class)
@@ -72,7 +72,9 @@ public class ZeroMqConsumerConfiguration {
 
 	@Bean
 	public Function<Flux<Message<?>>, Mono<Void>> zeromqConsumer(ZeroMqMessageHandler zeromqMessageHandler) {
-		return (input) -> input.flatMap(zeromqMessageHandler::handleMessage).ignoreElements();
+		return (input) -> input.doOnSubscribe((sub) -> zeromqMessageHandler.start())
+			.flatMap(zeromqMessageHandler::handleMessage)
+			.ignoreElements();
 	}
 
 }

@@ -1,3 +1,8 @@
+ext{
+    // Starting with Hazelcast 5.5 CP subsystem is a commercial feature
+    set('hazelcast.version', '5.4.0')
+}
+
 dependencies {
     optionalApi 'org.springframework.integration:spring-integration-redis'
     optionalApi 'org.springframework.boot:spring-boot-starter-data-redis'
@@ -12,5 +17,5 @@ dependencies {
     optionalApi 'software.amazon.awssdk:dynamodb'
 
     testImplementation 'org.hsqldb:hsqldb'
-    testImplementation 'org.apache.curator:curator-test:5.5.0'
+    testImplementation 'org.apache.curator:curator-test:5.7.1'
 }

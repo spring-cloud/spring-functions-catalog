@@ -17,7 +17,7 @@
 package org.springframework.cloud.fn.consumer.cassandra;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.testcontainers.containers.CassandraContainer;
+import org.testcontainers.cassandra.CassandraContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
@@ -33,7 +33,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @Testcontainers(disabledWithoutDocker = true)
 public interface CassandraTestContainer {
 
-	CassandraContainer<?> CASSANDRA_CONTAINER = new CassandraContainer<>("cassandra:4.1");
+	CassandraContainer CASSANDRA_CONTAINER = new CassandraContainer("cassandra");
 
 	@BeforeAll
 	static void startContainer() {

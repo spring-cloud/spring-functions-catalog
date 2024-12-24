@@ -1,16 +1,6 @@
-repositories {
-    maven { url 'https://maven.scijava.org/content/repositories/public/' }
-}
-
 dependencies {
     api project(':spring-debezium-autoconfigure')
 
-    // TODO until Debezium upgrades them to non-vulnerable versions
-    api 'org.apache.commons:commons-compress:1.26.2'
-    api 'org.apache.avro:avro:1.11.4'
-    api 'org.json:json:20240303'
-
-    api 'org.springframework.integration:spring-integration-debezium'
     api 'io.debezium:debezium-connector-mysql'
     api 'io.debezium:debezium-connector-mongodb'
     api 'io.debezium:debezium-connector-postgres'
