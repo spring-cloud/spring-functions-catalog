@@ -32,6 +32,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
+import org.springframework.integration.channel.FluxMessageChannel;
 import org.springframework.integration.channel.ReactiveStreamsSubscribableChannel;
 import org.springframework.integration.file.splitter.FileSplitter;
 import org.springframework.integration.splitter.AbstractMessageSplitter;
@@ -51,7 +52,7 @@ import org.springframework.messaging.MessageChannel;
 public class SplitterFunctionConfiguration {
 
 	@Bean
-	public Function<Message<?>, List<Message<?>>> splitterFunction(
+	public Function<Flux<Message<?>>, Flux<Message<?>>> splitterFunction(
 			@Qualifier("expressionSplitter") Optional<AbstractMessageSplitter> expressionSplitter,
 			@Qualifier("fileSplitter") Optional<AbstractMessageSplitter> fileSplitter,
 			@Qualifier("defaultSplitter") Optional<AbstractMessageSplitter> defaultSplitter,
@@ -60,13 +61,13 @@ public class SplitterFunctionConfiguration {
 		AbstractMessageSplitter messageSplitter = expressionSplitter.or(() -> fileSplitter)
 			.or(() -> defaultSplitter)
 			.get();
+
 		messageSplitter.setApplySequence(splitterFunctionProperties.isApplySequence());
-		ThreadLocalFluxSinkMessageChannel outputChannel = new ThreadLocalFluxSinkMessageChannel();
+		FluxMessageChannel inputChannel = new FluxMessageChannel();
+		inputChannel.subscribe(messageSplitter);
+		FluxMessageChannel outputChannel = new FluxMessageChannel();
 		messageSplitter.setOutputChannel(outputChannel);
-		return (message) -> {
-			messageSplitter.handleMessage(message);
-			return outputChannel.publisherThreadLocal.get();
-		};
+		return (messageFlux) -> Flux.from(outputChannel).doOnRequest((l) -> inputChannel.subscribeTo(messageFlux));
 	}
 
 	@Bean
