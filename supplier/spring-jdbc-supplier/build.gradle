@@ -2,7 +2,6 @@ dependencies {
     api project(':spring-splitter-function')
     api 'org.springframework.integration:spring-integration-jdbc'
     api 'org.springframework.boot:spring-boot-starter-jdbc'
-    api 'org.springframework.cloud:spring-cloud-function-context'
 
     runtimeOnly 'org.hsqldb:hsqldb'
     runtimeOnly 'com.h2database:h2'
