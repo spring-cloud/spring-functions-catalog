@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2024 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.fn.supplier.mongo;
 
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -28,7 +27,6 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.cloud.fn.splitter.SplitterFunctionConfiguration;
-import org.springframework.cloud.function.context.PollableBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.expression.Expression;
@@ -59,21 +57,16 @@ public class MongodbSupplierConfiguration {
 	}
 
 	@Bean(name = "mongodbSupplier")
-	@PollableBean
 	@ConditionalOnProperty(prefix = "mongodb", name = "split", matchIfMissing = true)
 	public Supplier<Flux<Message<?>>> splittedSupplier(MongoDbMessageSource mongoDbSource,
-			Function<Message<?>, List<Message<?>>> splitterFunction) {
+			Function<Flux<Message<?>>, Flux<Message<?>>> splitterFunction) {
 
-		return () -> {
+		return () -> Flux.<Message<?>>create(sink -> {
 			Message<?> received = mongoDbSource.receive();
 			if (received != null) {
-				// multiple Message<Map<String, Object>>
-				return Flux.fromIterable(splitterFunction.apply(received));
+				sink.next(received);
 			}
-			else {
-				return Flux.empty();
-			}
-		};
+		}).transform(splitterFunction);
 	}
 
 	@Bean
