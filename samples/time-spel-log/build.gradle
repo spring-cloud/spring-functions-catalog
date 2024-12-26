@@ -12,13 +12,12 @@ java {
 }
 
 repositories {
-    mavenLocal()
     mavenCentral()
     maven { url 'https://repo.spring.io/snapshot' }
 }
 
 ext {
-    springCloudVersion = '2024.0.0'
+    springCloudVersion = '2024.0.1-SNAPSHOT'
     springFunctionsCatalogVersion = '5.1.0-SNAPSHOT'
 }
 
