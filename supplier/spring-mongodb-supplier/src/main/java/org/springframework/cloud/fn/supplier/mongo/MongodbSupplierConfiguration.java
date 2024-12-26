@@ -61,7 +61,7 @@ public class MongodbSupplierConfiguration {
 	public Supplier<Flux<Message<?>>> splittedSupplier(MongoDbMessageSource mongoDbSource,
 			Function<Flux<Message<?>>, Flux<Message<?>>> splitterFunction) {
 
-		return () -> Flux.<Message<?>>create(sink -> {
+		return () -> Flux.<Message<?>>create((sink) -> {
 			Message<?> received = mongoDbSource.receive();
 			if (received != null) {
 				sink.next(received);

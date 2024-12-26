@@ -73,7 +73,7 @@ public class JdbcSupplierConfiguration {
 	public Supplier<Flux<Message<?>>> splittedSupplier(MessageSource<Object> jdbcMessageSource,
 			Function<Flux<Message<?>>, Flux<Message<?>>> splitterFunction) {
 
-		return () -> Flux.<Message<?>>create(sink -> {
+		return () -> Flux.<Message<?>>create((sink) -> {
 			Message<?> received = jdbcMessageSource.receive();
 			if (received != null) {
 				sink.next(received);
