@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.fn.supplier.jdbc;
 
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -30,10 +29,10 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.cloud.fn.splitter.SplitterFunctionConfiguration;
-import org.springframework.cloud.function.context.PollableBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.jdbc.JdbcPollingChannelAdapter;
+import org.springframework.integration.util.IntegrationReactiveUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
@@ -57,7 +56,7 @@ public class JdbcSupplierConfiguration {
 	}
 
 	@Bean
-	public MessageSource<Object> jdbcMessageSource(
+	public JdbcPollingChannelAdapter jdbcMessageSource(
 			@Nullable ComponentCustomizer<JdbcPollingChannelAdapter> jdbcPollingChannelAdapterCustomizer) {
 
 		JdbcPollingChannelAdapter jdbcPollingChannelAdapter = new JdbcPollingChannelAdapter(this.dataSource,
@@ -71,21 +70,11 @@ public class JdbcSupplierConfiguration {
 	}
 
 	@Bean(name = "jdbcSupplier")
-	@PollableBean
 	@ConditionalOnProperty(prefix = "jdbc.supplier", name = "split", matchIfMissing = true)
-	public Supplier<Flux<Message<?>>> splittedSupplier(MessageSource<Object> jdbcMessageSource,
-			Function<Message<?>, List<Message<?>>> splitterFunction) {
+	public Supplier<Flux<Message<?>>> splittedSupplier(JdbcPollingChannelAdapter jdbcMessageSource,
+			Function<Flux<Message<Object>>, Flux<Message<?>>> splitterFunction) {
 
-		return () -> {
-			Message<?> received = jdbcMessageSource.receive();
-			if (received != null) {
-				// multiple Message<Map<String, Object>>
-				return Flux.fromIterable(splitterFunction.apply(received));
-			}
-			else {
-				return Flux.empty();
-			}
-		};
+		return () -> IntegrationReactiveUtils.messageSourceToFlux(jdbcMessageSource).transform(splitterFunction);
 	}
 
 	@Bean
