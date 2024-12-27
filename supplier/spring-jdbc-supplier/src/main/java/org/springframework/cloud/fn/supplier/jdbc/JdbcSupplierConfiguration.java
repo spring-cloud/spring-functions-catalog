@@ -32,6 +32,7 @@ import org.springframework.cloud.fn.splitter.SplitterFunctionConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.jdbc.JdbcPollingChannelAdapter;
+import org.springframework.integration.util.IntegrationReactiveUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
@@ -55,7 +56,7 @@ public class JdbcSupplierConfiguration {
 	}
 
 	@Bean
-	public MessageSource<Object> jdbcMessageSource(
+	public JdbcPollingChannelAdapter jdbcMessageSource(
 			@Nullable ComponentCustomizer<JdbcPollingChannelAdapter> jdbcPollingChannelAdapterCustomizer) {
 
 		JdbcPollingChannelAdapter jdbcPollingChannelAdapter = new JdbcPollingChannelAdapter(this.dataSource,
@@ -70,15 +71,10 @@ public class JdbcSupplierConfiguration {
 
 	@Bean(name = "jdbcSupplier")
 	@ConditionalOnProperty(prefix = "jdbc.supplier", name = "split", matchIfMissing = true)
-	public Supplier<Flux<Message<?>>> splittedSupplier(MessageSource<Object> jdbcMessageSource,
-			Function<Flux<Message<?>>, Flux<Message<?>>> splitterFunction) {
+	public Supplier<Flux<Message<?>>> splittedSupplier(JdbcPollingChannelAdapter jdbcMessageSource,
+			Function<Flux<Message<Object>>, Flux<Message<?>>> splitterFunction) {
 
-		return () -> Flux.<Message<?>>create((sink) -> {
-			Message<?> received = jdbcMessageSource.receive();
-			if (received != null) {
-				sink.next(received);
-			}
-		}).transform(splitterFunction);
+		return () -> IntegrationReactiveUtils.messageSourceToFlux(jdbcMessageSource).transform(splitterFunction);
 	}
 
 	@Bean

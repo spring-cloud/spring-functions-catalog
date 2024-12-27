@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2025 the original author or authors.
+ * Copyright 2019-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,6 +32,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.expression.Expression;
 import org.springframework.expression.common.LiteralExpression;
 import org.springframework.integration.mongodb.inbound.MongoDbMessageSource;
+import org.springframework.integration.util.IntegrationReactiveUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
@@ -59,14 +60,9 @@ public class MongodbSupplierConfiguration {
 	@Bean(name = "mongodbSupplier")
 	@ConditionalOnProperty(prefix = "mongodb", name = "split", matchIfMissing = true)
 	public Supplier<Flux<Message<?>>> splittedSupplier(MongoDbMessageSource mongoDbSource,
-			Function<Flux<Message<?>>, Flux<Message<?>>> splitterFunction) {
+			Function<Flux<Message<Object>>, Flux<Message<?>>> splitterFunction) {
 
-		return () -> Flux.<Message<?>>create((sink) -> {
-			Message<?> received = mongoDbSource.receive();
-			if (received != null) {
-				sink.next(received);
-			}
-		}).transform(splitterFunction);
+		return () -> IntegrationReactiveUtils.messageSourceToFlux(mongoDbSource).transform(splitterFunction);
 	}
 
 	@Bean
