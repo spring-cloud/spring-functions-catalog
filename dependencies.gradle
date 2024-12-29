@@ -3,7 +3,7 @@ ext {
     springCloudVersion = '2024.0.0'
     springCloudAwsVersion = '3.2.1'
 
-    debeziumVersion = '3.0.5.Final'
+    debeziumVersion = '3.0.6.Final'
     djlVersion = '0.26.0'
 
     springIntegrationAws = 'org.springframework.integration:spring-integration-aws:3.0.8'
