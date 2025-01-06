@@ -44,7 +44,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Daniel Frey
  * @author Artem Bilan
- *
  * @since 3.1.0
  */
 @SpringBootTest(properties = { "zeromq.supplier.topics=test-topic" })
