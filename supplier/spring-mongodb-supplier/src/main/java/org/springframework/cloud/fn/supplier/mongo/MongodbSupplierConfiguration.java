@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.fn.supplier.mongo;
 
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -28,12 +27,12 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.cloud.fn.splitter.SplitterFunctionConfiguration;
-import org.springframework.cloud.function.context.PollableBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.expression.Expression;
 import org.springframework.expression.common.LiteralExpression;
 import org.springframework.integration.mongodb.inbound.MongoDbMessageSource;
+import org.springframework.integration.util.IntegrationReactiveUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
@@ -59,21 +58,11 @@ public class MongodbSupplierConfiguration {
 	}
 
 	@Bean(name = "mongodbSupplier")
-	@PollableBean
 	@ConditionalOnProperty(prefix = "mongodb", name = "split", matchIfMissing = true)
 	public Supplier<Flux<Message<?>>> splittedSupplier(MongoDbMessageSource mongoDbSource,
-			Function<Message<?>, List<Message<?>>> splitterFunction) {
+			Function<Flux<Message<Object>>, Flux<Message<?>>> splitterFunction) {
 
-		return () -> {
-			Message<?> received = mongoDbSource.receive();
-			if (received != null) {
-				// multiple Message<Map<String, Object>>
-				return Flux.fromIterable(splitterFunction.apply(received));
-			}
-			else {
-				return Flux.empty();
-			}
-		};
+		return () -> IntegrationReactiveUtils.messageSourceToFlux(mongoDbSource).transform(splitterFunction);
 	}
 
 	@Bean
