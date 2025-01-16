@@ -35,7 +35,7 @@ publishing {
 					developer {
 						id = 'corneil'
 						name = 'Corneil du Plessis'
-						email = 'corneil.du-plessis@broadcom.com'
+						email = 'corneil.duplessis@gmail.com'
 					}
 					developer {
 						id = 'sobychacko'
