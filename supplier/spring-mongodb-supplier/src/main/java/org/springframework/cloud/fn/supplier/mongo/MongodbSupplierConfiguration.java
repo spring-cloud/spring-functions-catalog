@@ -1,5 +1,5 @@
 /*
- * Copyright 2019-2024 the original author or authors.
+ * Copyright 2019-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,6 @@
 
 package org.springframework.cloud.fn.supplier.mongo;
 
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -28,12 +27,12 @@ import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.cloud.fn.splitter.SplitterFunctionConfiguration;
-import org.springframework.cloud.function.context.PollableBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.expression.Expression;
 import org.springframework.expression.common.LiteralExpression;
 import org.springframework.integration.mongodb.inbound.MongoDbMessageSource;
+import org.springframework.integration.util.IntegrationReactiveUtils;
 import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
@@ -49,31 +48,12 @@ import org.springframework.messaging.Message;
 @EnableConfigurationProperties({ MongodbSupplierProperties.class })
 public class MongodbSupplierConfiguration {
 
-	private final MongodbSupplierProperties properties;
-
-	private final MongoTemplate mongoTemplate;
-
-	public MongodbSupplierConfiguration(MongodbSupplierProperties properties, MongoTemplate mongoTemplate) {
-		this.properties = properties;
-		this.mongoTemplate = mongoTemplate;
-	}
-
 	@Bean(name = "mongodbSupplier")
-	@PollableBean
 	@ConditionalOnProperty(prefix = "mongodb", name = "split", matchIfMissing = true)
 	public Supplier<Flux<Message<?>>> splittedSupplier(MongoDbMessageSource mongoDbSource,
-			Function<Message<?>, List<Message<?>>> splitterFunction) {
+			Function<Flux<Message<Object>>, Flux<Message<?>>> splitterFunction) {
 
-		return () -> {
-			Message<?> received = mongoDbSource.receive();
-			if (received != null) {
-				// multiple Message<Map<String, Object>>
-				return Flux.fromIterable(splitterFunction.apply(received));
-			}
-			else {
-				return Flux.empty();
-			}
-		};
+		return () -> IntegrationReactiveUtils.messageSourceToFlux(mongoDbSource).transform(splitterFunction);
 	}
 
 	@Bean
@@ -83,15 +63,18 @@ public class MongodbSupplierConfiguration {
 	}
 
 	@Bean
-	public MongoDbMessageSource mongoDbSource(
+	public MongoDbMessageSource mongoDbSource(MongodbSupplierProperties properties, MongoTemplate mongoTemplate,
 			@Nullable ComponentCustomizer<MongoDbMessageSource> mongoDbMessageSourceCustomizer) {
 
-		Expression queryExpression = (this.properties.getQueryExpression() != null)
-				? this.properties.getQueryExpression() : new LiteralExpression(this.properties.getQuery());
-		MongoDbMessageSource mongoDbMessageSource = new MongoDbMessageSource(this.mongoTemplate, queryExpression);
-		mongoDbMessageSource.setCollectionNameExpression(new LiteralExpression(this.properties.getCollection()));
+		Expression queryExpression = properties.getQueryExpression();
+		if (queryExpression == null) {
+			queryExpression = new LiteralExpression(properties.getQuery());
+		}
+
+		MongoDbMessageSource mongoDbMessageSource = new MongoDbMessageSource(mongoTemplate, queryExpression);
+		mongoDbMessageSource.setCollectionNameExpression(new LiteralExpression(properties.getCollection()));
 		mongoDbMessageSource.setEntityClass(String.class);
-		mongoDbMessageSource.setUpdateExpression(this.properties.getUpdateExpression());
+		mongoDbMessageSource.setUpdateExpression(properties.getUpdateExpression());
 
 		if (mongoDbMessageSourceCustomizer != null) {
 			mongoDbMessageSourceCustomizer.customize(mongoDbMessageSource);

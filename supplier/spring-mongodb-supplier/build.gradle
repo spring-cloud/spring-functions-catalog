@@ -2,7 +2,6 @@ dependencies {
     api project(':spring-splitter-function')
     api 'org.springframework.integration:spring-integration-mongodb'
     api 'org.mongodb:mongodb-driver-sync'
-    api 'org.springframework.cloud:spring-cloud-function-context'
 
     testImplementation 'org.testcontainers:mongodb'
     testImplementation project(':spring-mongodb-consumer').sourceSets.test.output

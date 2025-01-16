@@ -18,8 +18,7 @@ The second one is for `UnZipTransformer`, which we use for a custom function to 
 The `splitterFunction` is used in a `FileSplitter` mode to read lines from unzipped entries and emit each of them as an individual message.
 Essentially, we are splitting twice: zip entries, and content of each file.
 
-The composition is like this: `fileSupplier|unzipFunction|splitterFunction|flattenFunction`.
-(The `flattenFunction` will be explained latter).
+The composition is like this: `fileSupplier|unzipFunction|splitterFunction.
 The result of this composition is a `Supplier<Flux<Mesage<?>>>` and we bind it into a RabbitMQ `unzipped_data_exchange` using Spring Cloud Stream.
 
 For `fileSupplier` we provide these configuration properties:
@@ -48,8 +47,6 @@ Which is a trigger for that function to use a `FileSplitter` for zip entries to 
 
 The custom `ZipSplitRabbitBinderApplication.unzipFunction()` (might be a candidate for the future Functions Catalog version) uses `Flux` API to unzip polled files via `UnZipTransformer` and then `flatMapIterable()` for zip entries.
 Then those entries are fed into a `splitterFunction` for `FileSplitter` mode.
-
-The mention `ZipSplitRabbitBinderApplication.flattenFunction()` is needed for now here since `splitterFucntion` produces a `List<Message>` which cannot be https://docs.spring.io/spring-cloud-stream/reference/spring-cloud-stream/producing-and-consuming-messages.html#batch-producers[de-batched] by Spring Cloud Stream since our final product of the composition is, essentially, `Supplier<Flux<Message<?>>>`.
 
 To run the application from main `ZipSplitRabbitBinderApplication` class (`./gradlew bootRun`), the RabbitMQ broker must be supplied on the target environment.
 

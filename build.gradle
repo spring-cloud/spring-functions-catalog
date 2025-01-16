@@ -58,7 +58,6 @@ allprojects {
 			mavenBom "io.debezium:debezium-bom:$debeziumVersion"
 			mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:$springCloudAwsVersion"
 			mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
-			mavenBom "org.springframework.cloud:spring-cloud-dependencies:$springCloudVersion"
 			mavenBom "ai.djl:bom:$djlVersion"
 		}
 	}

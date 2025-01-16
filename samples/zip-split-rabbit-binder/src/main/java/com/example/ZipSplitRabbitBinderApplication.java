@@ -1,7 +1,6 @@
 package com.example;
 
 import java.io.File;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -32,12 +31,6 @@ public class ZipSplitRabbitBinderApplication {
 			.map(Message::getPayload)
 			.map(map -> (Map<String, File>) map) // The result of UnZipTransformer
 			.flatMapIterable(Map::values);
-	}
-
-	// TODO until 'splitterFunction' is fixed this way: https://github.com/spring-cloud/spring-functions-catalog/issues/107
-	@Bean
-	Function<Flux<Message<List<Message<?>>>>, Flux<Message<?>>> flattenFunction() {
-		return messageFlux -> messageFlux.map(Message::getPayload).flatMapIterable(Function.identity());
 	}
 
 }

@@ -19,6 +19,7 @@ import org.springframework.amqp.rabbit.annotation.Queue;
 import org.springframework.amqp.rabbit.annotation.QueueBinding;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -47,11 +48,16 @@ class ZipSplitRabbitBinderApplicationTests {
 		}
 	}
 
-	@RabbitListener(bindings = @QueueBinding(value = @Queue,
-			exchange = @Exchange(value = "unzipped_data_exchange", type = ExchangeTypes.TOPIC), key = "#"))
-	void receiveDataFromSplittedZips(String payload) {
-		LOG.info("A line from zip entry: " + payload);
-		DATA_SINK.offer(payload);
+	@TestConfiguration
+	static class RabbitListenerTestConfiguration {
+
+		@RabbitListener(bindings = @QueueBinding(value = @Queue,
+				exchange = @Exchange(value = "unzipped_data_exchange", type = ExchangeTypes.TOPIC), key = "#"))
+		void receiveDataFromSplittedZips(String payload) {
+			LOG.info("A line from zip entry: " + payload);
+			DATA_SINK.offer(payload);
+		}
+
 	}
 
 }

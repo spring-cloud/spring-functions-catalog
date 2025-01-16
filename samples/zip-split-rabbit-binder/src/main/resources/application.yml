@@ -4,11 +4,11 @@ spring:
 
   cloud:
     function:
-      definition: fileSupplier|unzipFunction|splitterFunction|flattenFunction
+      definition: fileSupplier|unzipFunction|splitterFunction
 
     stream:
       bindings:
-        fileSupplier|unzipFunction|splitterFunction|flattenFunction-out-0:
+        fileSupplier|unzipFunction|splitterFunction-out-0:
           destination: unzipped_data_exchange
 
 file:
