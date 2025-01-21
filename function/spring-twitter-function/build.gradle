@@ -1,5 +1,5 @@
 dependencies {
     api project(':spring-twitter-common')
 
-    testImplementation mockserverNetty
+    testImplementation mockServerNetty
 }

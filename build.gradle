@@ -7,11 +7,11 @@ plugins {
 	id 'base'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'io.spring.javaformat' version "${javaFormatVersion}"
-	id 'com.github.spotbugs' version '6.0.28'
-	id 'org.ajoberstar.grgit' version '5.2.2'
+	id 'com.github.spotbugs' version '6.1.2'
+	id 'org.ajoberstar.grgit' version '5.3.0'
 }
 
-description = 'Spring Functions Catlog'
+description = 'Spring Functions Catalog'
 
 ext {
 	javaProjects = subprojects - project(':spring-functions-catalog-bom')
@@ -159,7 +159,6 @@ configure(javaProjects) { subproject ->
 	tasks.register('updateCopyrights') {
 		onlyIf { !isCI }
 		inputs.files(modifiedFiles.filter { f -> f.path.contains(subproject.name) })
-		outputs.dir('build/classes')
 
 		doLast {
 			def now = Calendar.instance.get(Calendar.YEAR) as String
@@ -194,8 +193,8 @@ configure(javaProjects) { subproject ->
 					'Created-By': "JDK ${System.properties['java.version']} (${System.properties['java.specification.vendor']})",
 					'Implementation-Title': subproject.name,
 					'Implementation-Vendor-Id': subproject.group,
-					'Implementation-Vendor': 'VMware, Inc.',
-					'Implementation-URL': 'https://spring.io/projects/spring-functions-catalog',
+					'Implementation-Vendor': 'Broadcom Inc.',
+					'Implementation-URL': 'https://github.com/spring-cloud/spring-functions-catalog',
 					'Automatic-Module-Name': subproject.name.replace('-', '.')
 			)
 		}

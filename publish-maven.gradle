@@ -11,7 +11,7 @@ publishing {
 				url = 'https://github.com/spring-cloud/spring-functions-catalog'
 				organization {
 					name = 'Spring IO'
-					url = 'https://spring.io/projects/spring-functions-catalog'
+					url = 'https://github.com/spring-cloud/spring-functions-catalog'
 				}
 				licenses {
 					license {

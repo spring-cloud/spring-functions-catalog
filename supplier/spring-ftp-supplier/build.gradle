@@ -4,5 +4,5 @@ dependencies {
     api project(':spring-metadata-store-common')
 
     testImplementation project(':spring-function-test-support')
-    testImplementation ftpserverCore
+    testImplementation ftpServerCore
 }

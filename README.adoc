@@ -16,7 +16,7 @@ This BOM is needed to be included into dependency management:
 <dependency>
     <groupId>org.springframework.cloud.fn</groupId>
     <artifactId>spring-functions-catalog-bom</artifactId>
-    <version>5.0.0-SNAPSHOT</version>
+    <version>5.1.0-SNAPSHOT</version>
     <type>pom</type>
     <scope>import</scope>
 </dependency>

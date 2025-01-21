@@ -1,4 +1,4 @@
-description = 'Spring Functions Catlog (Bill of Materials)'
+description = 'Spring Functions Catalog (Bill of Materials)'
 
 apply plugin: 'java-platform'
 apply from: "${rootDir}/publish-maven.gradle"
