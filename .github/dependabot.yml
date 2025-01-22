@@ -26,6 +26,7 @@ updates:
           - com.icegreen:greenmail
           - org.mock-server*
           - org.apache.curator*
+          - com.squareup.okhttp3*
 
   - package-ecosystem: github-actions
     directory: /
