@@ -5,7 +5,7 @@ ext {
     debeziumVersion = '3.0.7.Final'
     djlVersion = '0.26.0'
 
-    springIntegrationAws = 'org.springframework.integration:spring-integration-aws:3.0.8'
+    springIntegrationAws = 'org.springframework.integration:spring-integration-aws:3.0.9'
     ftpServerCore = 'org.apache.ftpserver:ftpserver-core:1.2.1'
     mockServerNetty = 'org.mock-server:mockserver-netty:5.15.0'
 }
