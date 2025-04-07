@@ -1,5 +1,5 @@
 /*
- * Copyright 2016-2024 the original author or authors.
+ * Copyright 2016-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,6 @@ import static org.awaitility.Awaitility.await;
 /**
  * @author Daniel Frey
  * @author Artem Bilan
- * @since 3.1
  */
 @SpringBootTest(properties = "zeromq.consumer.topic='test-topic'")
 @DirtiesContext
@@ -61,7 +60,7 @@ public class ZeroMqConsumerConfigurationTests {
 	@BeforeAll
 	static void setup() {
 		socket = CONTEXT.createSocket(SocketType.SUB);
-		socket.setReceiveTimeOut(10_000);
+		socket.setReceiveTimeOut(1000);
 		bindPort = socket.bindToRandomPort("tcp://*");
 	}
 
@@ -82,13 +81,14 @@ public class ZeroMqConsumerConfigurationTests {
 
 		await().atMost(Duration.ofSeconds(20)).pollDelay(Duration.ofMillis(100)).untilAsserted(() -> {
 			socket.subscribe("test-topic");
+			// Give it a chance to subscribe
+			Thread.sleep(200);
 			subject.apply(Flux.just(testMessage)).subscribe();
 			String topic = socket.recvStr();
 			assertThat(topic).isEqualTo("test-topic");
 			assertThat(socket.recvStr()).isEmpty();
 			assertThat(socket.recvStr()).isEqualTo("test");
 		});
-
 	}
 
 	@SpringBootApplication
