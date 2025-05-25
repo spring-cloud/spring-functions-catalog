@@ -1,13 +1,13 @@
 buildscript {
 	ext.isCI = System.getenv('GITHUB_ACTION')
-	ext.javaFormatVersion = '0.0.44'
+	ext.javaFormatVersion = '0.0.45'
 }
 
 plugins {
 	id 'base'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'io.spring.javaformat' version "${javaFormatVersion}"
-	id 'com.github.spotbugs' version '6.1.11'
+	id 'com.github.spotbugs' version '6.1.12'
 	id 'org.ajoberstar.grgit' version '5.3.0'
 }
 
