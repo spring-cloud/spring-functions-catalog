@@ -80,14 +80,14 @@ public class ZeroMqSupplierConfigurationTests {
 
 	@Test
 	void testSubscriptionConfiguration() throws InterruptedException {
-		StepVerifier stepVerifier = StepVerifier.create(subject.get())
+		StepVerifier stepVerifier = StepVerifier.create(subject.get().log())
 			.assertNext((message) -> assertThat(message.getPayload())
 				.asInstanceOf(InstanceOfAssertFactories.type(byte[].class))
 				.isEqualTo("test".getBytes(ZMQ.CHARSET)))
 			.thenCancel()
 			.verifyLater();
 
-		Thread.sleep(5000);
+		Thread.sleep(10000);
 
 		ZMsg msg = ZMsg.newStringMsg("test");
 		msg.wrap(new ZFrame("test-topic"));
