@@ -19,7 +19,7 @@ repositories {
 }
 
 ext {
-	springCloudVersion = '2024.0.1'
+	springCloudVersion = '2024.0.2'
 	springFunctionsCatalogVersion = '5.1.0'
 }
 
