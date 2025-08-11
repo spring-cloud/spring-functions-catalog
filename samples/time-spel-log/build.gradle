@@ -8,16 +8,17 @@ group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
 java {
-    sourceCompatibility = '17'
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
 }
 
 repositories {
     mavenCentral()
-    maven { url 'https://repo.spring.io/snapshot' }
 }
 
 ext {
-    springCloudVersion = '2024.0.2-SNAPSHOT'
+    springCloudVersion = '2024.0.2'
     springFunctionsCatalogVersion = '5.1.0'
 }
 

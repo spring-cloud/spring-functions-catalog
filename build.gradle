@@ -76,6 +76,9 @@ configure(javaProjects) { subproject ->
 	}
 
 	java {
+		toolchain {
+			languageVersion = JavaLanguageVersion.of(17)
+		}
 		withJavadocJar()
 		withSourcesJar()
 		registerFeature('optional') {
