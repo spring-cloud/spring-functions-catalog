@@ -18,7 +18,7 @@ jobs:
     steps:
 
       - name: Checkout Sample Directory
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: ${{ github.ref_name }}
           sparse-checkout: 'samples/time-spel-log'
