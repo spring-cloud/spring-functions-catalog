@@ -22,6 +22,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -47,19 +48,22 @@ import org.springframework.messaging.Message;
 public class WebsocketSupplierConfiguration {
 
 	@Bean
-	public Supplier<Flux<Message<?>>> websocketSupplier(Publisher<Message<?>> websocketPublisher) {
+	public Supplier<Flux<Message<?>>> websocketSupplier(
+			@Qualifier("websocketPublisher") Publisher<Message<byte[]>> websocketPublisher) {
+
 		return () -> Flux.from(websocketPublisher);
 	}
 
 	@Bean
 	public Publisher<Message<byte[]>> websocketPublisher(
-			WebSocketInboundChannelAdapter webSocketInboundChannelAdapter) {
+			@Qualifier("webSocketInboundChannelAdapter") WebSocketInboundChannelAdapter webSocketInboundChannelAdapter) {
+
 		return IntegrationFlow.from(webSocketInboundChannelAdapter).toReactivePublisher(true);
 	}
 
 	@Bean
 	public WebSocketInboundChannelAdapter webSocketInboundChannelAdapter(
-			IntegrationWebSocketContainer serverWebSocketContainer) {
+			@Qualifier("serverWebSocketContainer") IntegrationWebSocketContainer serverWebSocketContainer) {
 
 		return new WebSocketInboundChannelAdapter(serverWebSocketContainer);
 	}

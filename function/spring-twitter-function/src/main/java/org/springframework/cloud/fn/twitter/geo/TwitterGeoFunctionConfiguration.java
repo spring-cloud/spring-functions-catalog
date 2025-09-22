@@ -27,6 +27,7 @@ import twitter4j.Place;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -106,8 +107,9 @@ public class TwitterGeoFunctionConfiguration {
 
 	@Bean
 	public Function<Message<?>, Message<byte[]>> twitterGeoFunction(
-			Function<Message<?>, GeoQuery> messageToGeoQueryFunction,
-			Function<GeoQuery, List<Place>> twitterPlacesFunction, Function<Object, Message<byte[]>> managedJson) {
+			@Qualifier("messageToGeoQueryFunction") Function<Message<?>, GeoQuery> messageToGeoQueryFunction,
+			@Qualifier("twitterPlacesFunction") Function<GeoQuery, List<Place>> twitterPlacesFunction,
+			Function<Object, Message<byte[]>> managedJson) {
 
 		return messageToGeoQueryFunction.andThen(twitterPlacesFunction).andThen(managedJson);
 	}

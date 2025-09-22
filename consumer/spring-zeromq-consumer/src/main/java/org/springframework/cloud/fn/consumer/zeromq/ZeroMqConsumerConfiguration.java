@@ -25,9 +25,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.integration.JavaUtils;
 import org.springframework.integration.mapping.OutboundMessageMapper;
 import org.springframework.integration.zeromq.outbound.ZeroMqMessageHandler;
 import org.springframework.messaging.Message;
@@ -55,23 +57,17 @@ public class ZeroMqConsumerConfiguration {
 		ZeroMqMessageHandler zeroMqMessageHandler = new ZeroMqMessageHandler(zContext, properties.getConnectUrl(),
 				properties.getSocketType());
 
-		if (properties.getTopic() != null) {
-			zeroMqMessageHandler.setTopicExpression(properties.getTopic());
-		}
-
-		if (socketConfigurer != null) {
-			zeroMqMessageHandler.setSocketConfigurer(socketConfigurer);
-		}
-
-		if (messageMapper != null) {
-			zeroMqMessageHandler.setMessageMapper(messageMapper);
-		}
+		JavaUtils.INSTANCE.acceptIfNotNull(properties.getTopic(), zeroMqMessageHandler::setTopicExpression)
+			.acceptIfNotNull(socketConfigurer, zeroMqMessageHandler::setSocketConfigurer)
+			.acceptIfNotNull(messageMapper, zeroMqMessageHandler::setMessageMapper);
 
 		return zeroMqMessageHandler;
 	}
 
 	@Bean
-	public Function<Flux<Message<?>>, Mono<Void>> zeromqConsumer(ZeroMqMessageHandler zeromqMessageHandler) {
+	public Function<Flux<Message<?>>, Mono<Void>> zeromqConsumer(
+			@Qualifier("zeromqMessageHandler") ZeroMqMessageHandler zeromqMessageHandler) {
+
 		return (input) -> input.doOnSubscribe((sub) -> zeromqMessageHandler.start())
 			.flatMap(zeromqMessageHandler::handleMessage)
 			.ignoreElements();

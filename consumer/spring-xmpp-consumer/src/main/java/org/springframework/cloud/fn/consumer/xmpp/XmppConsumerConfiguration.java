@@ -20,6 +20,7 @@ import java.util.function.Consumer;
 
 import org.jivesoftware.smack.XMPPConnection;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.xmpp.XmppConnectionFactoryConfiguration;
@@ -45,7 +46,8 @@ public class XmppConsumerConfiguration {
 	}
 
 	@Bean
-	public Consumer<Message<?>> xmppConsumer(ChatMessageSendingMessageHandler chatMessageSendingMessageHandler,
+	public Consumer<Message<?>> xmppConsumer(
+			@Qualifier("chatMessageSendingMessageHandler") ChatMessageSendingMessageHandler chatMessageSendingMessageHandler,
 			XmppConsumerProperties properties) {
 
 		return (message) -> {

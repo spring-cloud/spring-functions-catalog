@@ -37,6 +37,7 @@ import twitter4j.URLEntity;
 import twitter4j.User;
 import twitter4j.UserMentionEntity;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -117,8 +118,9 @@ public class TwitterMessageSupplierConfiguration {
 
 	@Bean
 	public Supplier<Message<byte[]>> twitterMessageSupplier(
-			Function<List<DirectMessage>, List<DirectMessage>> messageDeduplicate,
-			Function<Object, Message<byte[]>> managedJson, Supplier<List<DirectMessage>> twitterMessagesSupplier) {
+			@Qualifier("messageDeduplicate") Function<List<DirectMessage>, List<DirectMessage>> messageDeduplicate,
+			Function<Object, Message<byte[]>> managedJson,
+			@Qualifier("twitterMessagesSupplier") Supplier<List<DirectMessage>> twitterMessagesSupplier) {
 
 		return () -> messageDeduplicate.andThen(managedJson).apply(twitterMessagesSupplier.get());
 	}

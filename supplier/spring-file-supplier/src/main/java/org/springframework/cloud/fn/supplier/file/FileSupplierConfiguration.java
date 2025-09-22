@@ -24,6 +24,7 @@ import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
 
 import org.springframework.beans.factory.BeanInitializationException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -85,11 +86,12 @@ public class FileSupplierConfiguration {
 
 	@Bean
 	public Supplier<Flux<Message<?>>> fileSupplier(FileConsumerProperties fileConsumerProperties,
-			@Nullable Flux<Message<?>> fileMessageFlux, @Nullable Publisher<Message<Object>> fileReadingFlow,
-			@Nullable Publisher<Message<String>> fileTailingFlow) {
+			@Qualifier("fileMessageFlux") @Nullable Flux<Message<File>> fileMessageFlux,
+			@Qualifier("fileReadingFlow") @Nullable Publisher<Message<Object>> fileReadingFlow,
+			@Qualifier("fileTailingFlow") @Nullable Publisher<Message<String>> fileTailingFlow) {
 
-		if (fileConsumerProperties.getMode() == FileReadingMode.ref) {
-			return () -> fileMessageFlux;
+		if (fileConsumerProperties.getMode() == FileReadingMode.ref && fileMessageFlux != null) {
+			return () -> Flux.from(fileMessageFlux);
 		}
 		else if (fileReadingFlow != null) {
 			return () -> Flux.from(fileReadingFlow);

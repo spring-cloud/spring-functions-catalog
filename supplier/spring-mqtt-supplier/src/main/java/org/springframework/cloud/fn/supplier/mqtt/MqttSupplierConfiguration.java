@@ -22,6 +22,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
@@ -46,7 +47,9 @@ import org.springframework.messaging.Message;
 public class MqttSupplierConfiguration {
 
 	@Bean
-	public Supplier<Flux<Message<?>>> mqttSupplier(Publisher<Message<?>> mqttPublisher) {
+	public Supplier<Flux<Message<?>>> mqttSupplier(
+			@Qualifier("mqttPublisher") Publisher<Message<byte[]>> mqttPublisher) {
+
 		return () -> Flux.from(mqttPublisher);
 	}
 
@@ -68,7 +71,9 @@ public class MqttSupplierConfiguration {
 	}
 
 	@Bean
-	public Publisher<Message<byte[]>> mqttPublisher(MqttPahoMessageDrivenChannelAdapter mqttInbound) {
+	public Publisher<Message<byte[]>> mqttPublisher(
+			@Qualifier("mqttInbound") MqttPahoMessageDrivenChannelAdapter mqttInbound) {
+
 		return IntegrationFlow.from(mqttInbound).toReactivePublisher(true);
 	}
 

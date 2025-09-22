@@ -22,6 +22,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.xmpp.XmppConnectionFactoryConfiguration;
@@ -55,12 +56,16 @@ public class XmppSupplierConfiguration {
 	}
 
 	@Bean
-	Publisher<Message<Object>> xmppSupplierFlow(ChatMessageListeningEndpoint chatMessageListeningEndpoint) {
+	Publisher<Message<Object>> xmppSupplierFlow(
+			@Qualifier("chatMessageListeningEndpoint") ChatMessageListeningEndpoint chatMessageListeningEndpoint) {
+
 		return IntegrationFlow.from(chatMessageListeningEndpoint).toReactivePublisher(true);
 	}
 
 	@Bean
-	public Supplier<Flux<Message<?>>> xmppSupplier(Publisher<Message<Object>> xmppSupplierFlow) {
+	public Supplier<Flux<Message<?>>> xmppSupplier(
+			@Qualifier("xmppSupplierFlow") Publisher<Message<Object>> xmppSupplierFlow) {
+
 		return () -> Flux.from(xmppSupplierFlow);
 	}
 

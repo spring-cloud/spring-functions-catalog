@@ -71,7 +71,7 @@ public class TcpSupplierConfiguration {
 	}
 
 	@Bean
-	public TcpReceivingChannelAdapter adapter(
+	public TcpReceivingChannelAdapter tcpReceivingChannelAdapter(
 			@Qualifier("tcpSourceConnectionFactory") AbstractConnectionFactory connectionFactory) {
 
 		TcpReceivingChannelAdapter adapter = new TcpReceivingChannelAdapter();
@@ -81,12 +81,16 @@ public class TcpSupplierConfiguration {
 	}
 
 	@Bean
-	public Publisher<Message<Object>> tcpSupplierFlow(TcpReceivingChannelAdapter adapter) {
+	public Publisher<Message<Object>> tcpSupplierFlow(
+			@Qualifier("tcpReceivingChannelAdapter") TcpReceivingChannelAdapter adapter) {
+
 		return IntegrationFlow.from(adapter).headerFilter(IpHeaders.LOCAL_ADDRESS).toReactivePublisher(true);
 	}
 
 	@Bean
-	public Supplier<Flux<Message<Object>>> tcpSupplier(Publisher<Message<Object>> tcpSupplierFlow) {
+	public Supplier<Flux<Message<Object>>> tcpSupplier(
+			@Qualifier("tcpSupplierFlow") Publisher<Message<Object>> tcpSupplierFlow) {
+
 		return () -> Flux.from(tcpSupplierFlow);
 	}
 

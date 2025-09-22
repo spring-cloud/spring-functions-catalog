@@ -61,8 +61,10 @@ public class KafkaPublisherConfiguration {
 
 	@Bean("kafkaProducerMessageHandler")
 	public KafkaProducerMessageHandlerSpec<?, ?, ?> kafkaProducerMessageHandlerSpec(KafkaTemplate<?, ?> kafkaTemplate,
-			KafkaPublisherProperties kafkaPublisherProperties, PublishSubscribeChannel kafkaPublisherSuccessChannel,
-			PublishSubscribeChannel kafkaPublisherFailureChannel, PublishSubscribeChannel kafkaPublisherFuturesChannel,
+			KafkaPublisherProperties kafkaPublisherProperties,
+			@Qualifier("kafkaPublisherSuccessChannel") PublishSubscribeChannel kafkaPublisherSuccessChannel,
+			@Qualifier("kafkaPublisherFailureChannel") PublishSubscribeChannel kafkaPublisherFailureChannel,
+			@Qualifier("kafkaPublisherFuturesChannel") PublishSubscribeChannel kafkaPublisherFuturesChannel,
 			@Nullable ComponentCustomizer<KafkaProducerMessageHandlerSpec<?, ?, ?>> kafkaProducerSpecComponentCustomizer) {
 
 		var kafkaProducerMessageHandlerSpec = Kafka.outboundChannelAdapter(kafkaTemplate);

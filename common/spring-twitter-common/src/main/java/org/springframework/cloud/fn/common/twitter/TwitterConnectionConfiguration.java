@@ -31,6 +31,7 @@ import twitter4j.TwitterStream;
 import twitter4j.TwitterStreamFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -53,7 +54,7 @@ public class TwitterConnectionConfiguration {
 
 	@Bean
 	public twitter4j.conf.Configuration twitterConfiguration(TwitterConnectionProperties properties,
-			Function<TwitterConnectionProperties, ConfigurationBuilder> toConfigurationBuilder) {
+			@Qualifier("toConfigurationBuilder") Function<TwitterConnectionProperties, ConfigurationBuilder> toConfigurationBuilder) {
 
 		return toConfigurationBuilder.apply(properties).build();
 	}
@@ -79,7 +80,7 @@ public class TwitterConnectionConfiguration {
 	}
 
 	@Bean
-	public Function<Object, Message<byte[]>> json(ObjectMapper mapper) {
+	public Function<Object, Message<byte[]>> twitterJson(ObjectMapper mapper) {
 		return (objects) -> {
 			try {
 				String json = mapper.writeValueAsString(objects);
@@ -98,12 +99,12 @@ public class TwitterConnectionConfiguration {
 	/**
 	 * Retrieves the raw JSON form of the provided object. Note that raw JSON forms can be
 	 * retrieved only from the same thread invoked the last method call and will become
-	 * inaccessible once another method call.
+	 * inaccessible once another method invocation.
 	 * @return function that can retrieve the raw JSON object from the objects returned by
 	 * the Twitter4J's APIs.
 	 */
 	@Bean
-	public Function<Object, Object> rawJsonExtractor() {
+	public Function<Object, Object> twitterRawJsonExtractor() {
 		return (response) -> {
 			if (response instanceof List<?> responses) {
 				List<String> rawJsonList = new ArrayList<>();
@@ -120,7 +121,8 @@ public class TwitterConnectionConfiguration {
 
 	@Bean
 	public Function<Object, Message<byte[]>> managedJson(TwitterConnectionProperties properties,
-			Function<Object, Object> rawJsonExtractor, Function<Object, Message<byte[]>> json) {
+			@Qualifier("twitterRawJsonExtractor") Function<Object, Object> rawJsonExtractor,
+			@Qualifier("twitterJson") Function<Object, Message<byte[]>> json) {
 
 		return (list) -> (properties.isRawJson()) ? rawJsonExtractor.andThen(json).apply(list) : json.apply(list);
 	}

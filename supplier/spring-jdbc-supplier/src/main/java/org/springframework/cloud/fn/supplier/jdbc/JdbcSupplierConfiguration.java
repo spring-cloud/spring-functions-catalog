@@ -23,6 +23,7 @@ import javax.sql.DataSource;
 
 import reactor.core.publisher.Flux;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -70,7 +71,7 @@ public class JdbcSupplierConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(prefix = "jdbc.supplier", name = "split", havingValue = "false")
-	public Supplier<Message<?>> jdbcSupplier(MessageSource<Object> jdbcMessageSource) {
+	public Supplier<Message<?>> jdbcSupplier(@Qualifier("jdbcMessageSource") MessageSource<Object> jdbcMessageSource) {
 		return jdbcMessageSource::receive;
 	}
 

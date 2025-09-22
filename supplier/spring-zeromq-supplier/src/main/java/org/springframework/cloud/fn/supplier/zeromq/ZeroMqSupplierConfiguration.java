@@ -26,6 +26,7 @@ import org.zeromq.ZMQ;
 import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -73,12 +74,16 @@ public class ZeroMqSupplierConfiguration {
 	}
 
 	@Bean
-	Publisher<Message<Object>> zeroMqSupplierFlow(ZeroMqMessageProducer zeroMqSupplierMessageProducer) {
+	Publisher<Message<Object>> zeroMqSupplierFlow(
+			@Qualifier("zeroMqSupplierMessageProducer") ZeroMqMessageProducer zeroMqSupplierMessageProducer) {
+
 		return IntegrationFlow.from(zeroMqSupplierMessageProducer).toReactivePublisher(true);
 	}
 
 	@Bean
-	public Supplier<Flux<Message<?>>> zeromqSupplier(Publisher<Message<Object>> zeroMqSupplierFlow) {
+	public Supplier<Flux<Message<?>>> zeromqSupplier(
+			@Qualifier("zeroMqSupplierFlow") Publisher<Message<Object>> zeroMqSupplierFlow) {
+
 		return () -> Flux.from(zeroMqSupplierFlow);
 	}
 

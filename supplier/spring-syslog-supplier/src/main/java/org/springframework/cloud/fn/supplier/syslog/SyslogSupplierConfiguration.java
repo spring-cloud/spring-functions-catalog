@@ -59,8 +59,8 @@ public class SyslogSupplierConfiguration {
 
 	@Bean
 	public Supplier<Flux<Message<?>>> syslogSupplier(
-			@Nullable UdpSyslogReceivingChannelAdapter udpSyslogReceivingChannelAdapter,
-			@Nullable TcpSyslogReceivingChannelAdapter tcpSyslogReceivingChannelAdapter) {
+			@Qualifier("udpSyslogReceivingChannelAdapter") @Nullable UdpSyslogReceivingChannelAdapter udpSyslogReceivingChannelAdapter,
+			@Qualifier("tcpSyslogReceivingChannelAdapter") @Nullable TcpSyslogReceivingChannelAdapter tcpSyslogReceivingChannelAdapter) {
 
 		return () -> Flux.from(this.syslogInputChannel).doOnRequest((l) -> {
 			if (udpSyslogReceivingChannelAdapter != null) {
@@ -74,13 +74,14 @@ public class SyslogSupplierConfiguration {
 
 	@Bean("udpSyslogReceivingChannelAdapter")
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "udp")
-	public UdpSyslogReceivingChannelAdapter udpAdapter(MessageConverter syslogConverter) {
+	public UdpSyslogReceivingChannelAdapter udpAdapter(@Qualifier("syslogConverter") MessageConverter syslogConverter) {
 		return createUdpAdapter(syslogConverter);
 	}
 
 	@Bean("udpSyslogReceivingChannelAdapter")
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "both")
-	public UdpSyslogReceivingChannelAdapter udpBothAdapter(MessageConverter syslogConverter) {
+	public UdpSyslogReceivingChannelAdapter udpBothAdapter(
+			@Qualifier("syslogConverter") MessageConverter syslogConverter) {
 		return createUdpAdapter(syslogConverter);
 	}
 
@@ -94,7 +95,7 @@ public class SyslogSupplierConfiguration {
 	@ConditionalOnProperty(name = "syslog.supplier.protocol", havingValue = "tcp", matchIfMissing = true)
 	public TcpSyslogReceivingChannelAdapter tcpAdapter(
 			@Qualifier("syslogSupplierConnectionFactory") AbstractServerConnectionFactory connectionFactory,
-			MessageConverter syslogConverter) {
+			@Qualifier("syslogConverter") MessageConverter syslogConverter) {
 
 		return createTcpAdapter(connectionFactory, syslogConverter);
 	}

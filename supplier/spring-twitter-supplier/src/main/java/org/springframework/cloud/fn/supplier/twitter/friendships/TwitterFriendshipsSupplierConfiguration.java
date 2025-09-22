@@ -28,6 +28,7 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.User;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -147,8 +148,10 @@ public class TwitterFriendshipsSupplierConfiguration {
 	}
 
 	@Bean
-	public Supplier<Message<byte[]>> deduplicatedFriendsJsonSupplier(Function<List<User>, List<User>> userDeduplicate,
-			Supplier<List<User>> userRetriever, Function<Object, Message<byte[]>> managedJson) {
+	public Supplier<Message<byte[]>> deduplicatedFriendsJsonSupplier(
+			@Qualifier("userDeduplicate") Function<List<User>, List<User>> userDeduplicate,
+			@Qualifier("userRetriever") Supplier<List<User>> userRetriever,
+			Function<Object, Message<byte[]>> managedJson) {
 
 		return () -> userDeduplicate.andThen(managedJson).apply(userRetriever.get());
 	}

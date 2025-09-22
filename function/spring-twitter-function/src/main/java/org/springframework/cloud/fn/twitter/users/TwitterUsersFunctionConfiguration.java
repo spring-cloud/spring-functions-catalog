@@ -25,6 +25,7 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.User;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -85,7 +86,8 @@ public class TwitterUsersFunctionConfiguration {
 	}
 
 	@Bean
-	public Function<Message<?>, Message<byte[]>> twitterUsersFunction(Function<Message<?>, List<User>> queryUsers,
+	public Function<Message<?>, Message<byte[]>> twitterUsersFunction(
+			@Qualifier("queryUsers") Function<Message<?>, List<User>> queryUsers,
 			Function<Object, Message<byte[]>> managedJson) {
 
 		return queryUsers.andThen(managedJson);

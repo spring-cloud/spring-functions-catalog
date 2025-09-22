@@ -24,6 +24,7 @@ import reactor.core.scheduler.Schedulers;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -66,7 +67,9 @@ public class AggregatorFunctionConfiguration {
 	private BeanFactory beanFactory;
 
 	@Bean
-	public Function<Flux<Message<?>>, Flux<Message<?>>> aggregatorFunction(FluxMessageChannel aggregatorInputChannel) {
+	public Function<Flux<Message<?>>, Flux<Message<?>>> aggregatorFunction(
+			@Qualifier("aggregatorInputChannel") FluxMessageChannel aggregatorInputChannel) {
+
 		return (input) -> Flux.from(this.outputChannel)
 			.doOnRequest((request) -> aggregatorInputChannel.subscribeTo(input
 				.map((inputMessage) -> MessageBuilder.fromMessage(inputMessage).removeHeader("kafka_consumer").build())

@@ -18,6 +18,7 @@ package org.springframework.cloud.fn.spel;
 
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -35,7 +36,7 @@ public class SpelFunctionConfiguration {
 
 	@Bean
 	public Function<Message<?>, Message<?>> spelFunction(
-			ExpressionEvaluatingTransformer expressionEvaluatingTransformer) {
+			@Qualifier("expressionEvaluatingTransformer") ExpressionEvaluatingTransformer expressionEvaluatingTransformer) {
 
 		return expressionEvaluatingTransformer::transform;
 	}

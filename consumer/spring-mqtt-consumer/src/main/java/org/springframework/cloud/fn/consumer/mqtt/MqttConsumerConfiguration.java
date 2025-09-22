@@ -19,6 +19,7 @@ package org.springframework.cloud.fn.consumer.mqtt;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
@@ -42,7 +43,7 @@ import org.springframework.messaging.MessageHandler;
 public class MqttConsumerConfiguration {
 
 	@Bean
-	public Consumer<Message<?>> mqttConsumer(MessageHandler mqttOutbound) {
+	public Consumer<Message<?>> mqttConsumer(@Qualifier("mqttOutbound") MessageHandler mqttOutbound) {
 		return mqttOutbound::handleMessage;
 	}
 
@@ -63,6 +64,7 @@ public class MqttConsumerConfiguration {
 
 	private DefaultPahoMessageConverter pahoMessageConverter(MqttConsumerProperties properties,
 			BeanFactory beanFactory) {
+
 		DefaultPahoMessageConverter converter = new DefaultPahoMessageConverter(properties.getQos(),
 				properties.isRetained(), properties.getCharset());
 		converter.setBeanFactory(beanFactory);

@@ -23,6 +23,7 @@ import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.jms.AcknowledgeMode;
 import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
@@ -61,12 +62,13 @@ public class JmsSupplierConfiguration {
 	private ConnectionFactory connectionFactory;
 
 	@Bean
-	public Supplier<Flux<Message<?>>> jmsSupplier(Publisher<Message<?>> jmsPublisher) {
+	public Supplier<Flux<Message<?>>> jmsSupplier(@Qualifier("jmsPublisher") Publisher<Message<byte[]>> jmsPublisher) {
 		return () -> Flux.from(jmsPublisher);
 	}
 
 	@Bean
-	public Publisher<Message<byte[]>> jmsPublisher(AbstractMessageListenerContainer container,
+	public Publisher<Message<byte[]>> jmsPublisher(
+			@Qualifier("jmsContainer") AbstractMessageListenerContainer container,
 			@Nullable ComponentCustomizer<JmsMessageDrivenChannelAdapterSpec<?>> jmsMessageDrivenChannelAdapterSpecCustomizer) {
 
 		JmsMessageDrivenChannelAdapterSpec<?> messageProducerSpec = Jms.messageDrivenChannelAdapter(container);
@@ -79,7 +81,7 @@ public class JmsSupplierConfiguration {
 	}
 
 	@Bean
-	public AbstractMessageListenerContainer container() {
+	public AbstractMessageListenerContainer jmsContainer() {
 		AbstractMessageListenerContainer container;
 
 		JmsProperties.Listener listenerProperties = this.jmsProperties.getListener();

@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration;
@@ -77,7 +78,9 @@ public class HttpSupplierConfiguration {
 	}
 
 	@Bean
-	public Supplier<Flux<Message<byte[]>>> httpSupplier(Publisher<Message<byte[]>> httpSupplierFlow) {
+	public Supplier<Flux<Message<byte[]>>> httpSupplier(
+			@Qualifier("httpSupplierFlow") Publisher<Message<byte[]>> httpSupplierFlow) {
+
 		return () -> Flux.from(httpSupplierFlow);
 	}
 

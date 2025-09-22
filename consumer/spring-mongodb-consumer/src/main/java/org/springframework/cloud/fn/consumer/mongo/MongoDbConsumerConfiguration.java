@@ -21,6 +21,7 @@ import java.util.function.Function;
 
 import reactor.core.publisher.Mono;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -56,13 +57,15 @@ public class MongoDbConsumerConfiguration {
 	}
 
 	@Bean
-	public Consumer<Message<?>> mongodbConsumer(Function<Message<?>, Mono<Void>> mongodbConsumerFunction) {
+	public Consumer<Message<?>> mongodbConsumer(
+			@Qualifier("mongodbConsumerFunction") Function<Message<?>, Mono<Void>> mongodbConsumerFunction) {
+
 		return (message) -> mongodbConsumerFunction.apply(message).subscribe();
 	}
 
 	@Bean
 	public Function<Message<?>, Mono<Void>> mongodbConsumerFunction(
-			ReactiveMessageHandler mongoConsumerMessageHandler) {
+			@Qualifier("mongoConsumerMessageHandler") ReactiveMessageHandler mongoConsumerMessageHandler) {
 
 		return mongoConsumerMessageHandler::handleMessage;
 	}

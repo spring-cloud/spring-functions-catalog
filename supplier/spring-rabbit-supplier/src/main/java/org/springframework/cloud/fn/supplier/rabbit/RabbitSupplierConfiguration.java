@@ -31,6 +31,7 @@ import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.retry.RejectAndDontRequeueRecoverer;
 import org.springframework.amqp.rabbit.support.DefaultMessagePropertiesConverter;
 import org.springframework.amqp.rabbit.support.MessagePropertiesConverter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
@@ -71,9 +72,9 @@ public class RabbitSupplierConfiguration {
 	};
 
 	@Bean
-	public SimpleMessageListenerContainer container(RabbitProperties rabbitProperties,
+	public SimpleMessageListenerContainer rabbitContainer(RabbitProperties rabbitProperties,
 			RabbitSupplierProperties rabbitSupplierProperties, ConnectionFactory connectionFactory,
-			RetryOperationsInterceptor rabbitSourceRetryInterceptor) {
+			@Qualifier("rabbitSourceRetryInterceptor") RetryOperationsInterceptor rabbitSourceRetryInterceptor) {
 
 		SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(connectionFactory);
 		container.setAutoStartup(false);
@@ -113,7 +114,8 @@ public class RabbitSupplierConfiguration {
 	}
 
 	@Bean
-	public Publisher<Message<byte[]>> rabbitPublisher(SimpleMessageListenerContainer container,
+	public Publisher<Message<byte[]>> rabbitPublisher(
+			@Qualifier("rabbitContainer") SimpleMessageListenerContainer container,
 			RabbitSupplierProperties rabbitSupplierProperties,
 			@Nullable ComponentCustomizer<AmqpInboundChannelAdapterSMLCSpec> amqpMessageProducerCustomizer) {
 
@@ -128,7 +130,9 @@ public class RabbitSupplierConfiguration {
 	}
 
 	@Bean
-	public Supplier<Flux<Message<byte[]>>> rabbitSupplier(Publisher<Message<byte[]>> rabbitPublisher) {
+	public Supplier<Flux<Message<byte[]>>> rabbitSupplier(
+			@Qualifier("rabbitPublisher") Publisher<Message<byte[]>> rabbitPublisher) {
+
 		return () -> Flux.from(rabbitPublisher);
 	}
 

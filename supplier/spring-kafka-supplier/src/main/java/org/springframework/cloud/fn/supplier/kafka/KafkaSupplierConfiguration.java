@@ -24,6 +24,7 @@ import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -58,7 +59,9 @@ import org.springframework.messaging.Message;
 public class KafkaSupplierConfiguration {
 
 	@Bean
-	public Supplier<Flux<Message<?>>> kafkaSupplier(Publisher<Message<?>> kafkaSupplierPublisher) {
+	public Supplier<Flux<Message<?>>> kafkaSupplier(
+			@Qualifier("kafkaSupplierPublisher") Publisher<Message<Object>> kafkaSupplierPublisher) {
+
 		return () -> Flux.from(kafkaSupplierPublisher);
 	}
 

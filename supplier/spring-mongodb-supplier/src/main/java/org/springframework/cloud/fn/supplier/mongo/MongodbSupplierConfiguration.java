@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 
 import reactor.core.publisher.Flux;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
@@ -50,7 +51,7 @@ public class MongodbSupplierConfiguration {
 
 	@Bean(name = "mongodbSupplier")
 	@ConditionalOnProperty(prefix = "mongodb", name = "split", matchIfMissing = true)
-	public Supplier<Flux<Message<?>>> splittedSupplier(MongoDbMessageSource mongoDbSource,
+	public Supplier<Flux<Message<?>>> splittedSupplier(@Qualifier("mongoDbSource") MongoDbMessageSource mongoDbSource,
 			Function<Flux<Message<Object>>, Flux<Message<?>>> splitterFunction) {
 
 		return () -> IntegrationReactiveUtils.messageSourceToFlux(mongoDbSource).transform(splitterFunction);
@@ -58,7 +59,7 @@ public class MongodbSupplierConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(prefix = "mongodb", name = "split", havingValue = "false")
-	public Supplier<Message<?>> mongodbSupplier(MongoDbMessageSource mongoDbSource) {
+	public Supplier<Message<?>> mongodbSupplier(@Qualifier("mongoDbSource") MongoDbMessageSource mongoDbSource) {
 		return mongoDbSource::receive;
 	}
 

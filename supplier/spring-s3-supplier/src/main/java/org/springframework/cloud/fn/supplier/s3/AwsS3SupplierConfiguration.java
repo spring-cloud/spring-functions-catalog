@@ -29,6 +29,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -90,7 +91,7 @@ public class AwsS3SupplierConfiguration {
 	static class SynchronizingConfiguration extends AwsS3SupplierConfiguration {
 
 		@Bean
-		Supplier<Flux<Message<?>>> s3Supplier(Publisher<Message<?>> s3SupplierFlow) {
+		Supplier<Flux<Message<?>>> s3Supplier(@Qualifier("s3SupplierFlow") Publisher<Message<Object>> s3SupplierFlow) {
 			return () -> Flux.from(s3SupplierFlow);
 		}
 
@@ -118,7 +119,9 @@ public class AwsS3SupplierConfiguration {
 		}
 
 		@Bean
-		Publisher<Message<Object>> s3SupplierFlow(S3InboundFileSynchronizingMessageSource s3MessageSource) {
+		Publisher<Message<Object>> s3SupplierFlow(
+				@Qualifier("s3MessageSource") S3InboundFileSynchronizingMessageSource s3MessageSource) {
+
 			return FileUtils
 				.enhanceFlowForReadingMode(
 						IntegrationFlow.from(IntegrationReactiveUtils.messageSourceToFlux(s3MessageSource)
@@ -128,7 +131,9 @@ public class AwsS3SupplierConfiguration {
 		}
 
 		@Bean
-		S3InboundFileSynchronizer s3InboundFileSynchronizer(ChainFileListFilter<S3Object> s3SupplierFileListFilter) {
+		S3InboundFileSynchronizer s3InboundFileSynchronizer(
+				@Qualifier("s3SupplierFileListFilter") ChainFileListFilter<S3Object> s3SupplierFileListFilter) {
+
 			S3InboundFileSynchronizer synchronizer = new S3InboundFileSynchronizer(this.s3SessionFactory);
 			synchronizer.setDeleteRemoteFiles(this.awsS3SupplierProperties.isDeleteRemoteFiles());
 			synchronizer.setPreserveTimestamp(this.awsS3SupplierProperties.isPreserveTimestamp());
@@ -141,7 +146,8 @@ public class AwsS3SupplierConfiguration {
 		}
 
 		@Bean
-		S3InboundFileSynchronizingMessageSource s3MessageSource(S3InboundFileSynchronizer s3InboundFileSynchronizer,
+		S3InboundFileSynchronizingMessageSource s3MessageSource(
+				@Qualifier("s3InboundFileSynchronizer") S3InboundFileSynchronizer s3InboundFileSynchronizer,
 				@Nullable ComponentCustomizer<S3InboundFileSynchronizingMessageSource> s3MessageSourceCustomizer) {
 
 			S3InboundFileSynchronizingMessageSource s3MessageSource = new S3InboundFileSynchronizingMessageSource(
@@ -170,12 +176,16 @@ public class AwsS3SupplierConfiguration {
 		}
 
 		@Bean
-		Supplier<Flux<Message<Object>>> s3Supplier(Publisher<Message<Object>> s3SupplierFlow) {
+		Supplier<Flux<Message<Object>>> s3Supplier(
+				@Qualifier("s3SupplierFlow") Publisher<Message<Object>> s3SupplierFlow) {
+
 			return () -> Flux.from(s3SupplierFlow);
 		}
 
 		@Bean
-		Publisher<Message<Object>> s3SupplierFlow(ReactiveMessageSourceProducer s3ListingMessageProducer) {
+		Publisher<Message<Object>> s3SupplierFlow(
+				@Qualifier("s3ListingMessageProducer") ReactiveMessageSourceProducer s3ListingMessageProducer) {
+
 			return IntegrationFlow.from(s3ListingMessageProducer).split().toReactivePublisher(true);
 		}
 
@@ -207,7 +217,9 @@ public class AwsS3SupplierConfiguration {
 
 		@Bean
 		ReactiveMessageSourceProducer s3ListingMessageProducer(S3Client amazonS3, ObjectMapper objectMapper,
-				AwsS3SupplierProperties awsS3SupplierProperties, Predicate<S3Object> listOnlyFilter) {
+				AwsS3SupplierProperties awsS3SupplierProperties,
+				@Qualifier("listOnlyFilter") Predicate<S3Object> listOnlyFilter) {
+
 			return new ReactiveMessageSourceProducer((MessageSource<List<String>>) () -> {
 				List<String> summaryList = amazonS3
 					.listObjects(ListObjectsRequest.builder().bucket(awsS3SupplierProperties.getRemoteDir()).build())

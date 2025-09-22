@@ -25,6 +25,7 @@ import jakarta.mail.URLName;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -66,7 +67,9 @@ public class MailSupplierConfiguration {
 	}
 
 	@Bean
-	public Publisher<Message<Object>> mailInboundFlow(MessageProducerSupport mailChannelAdapter) {
+	public Publisher<Message<Object>> mailInboundFlow(
+			@Qualifier("mailChannelAdapter") MessageProducerSupport mailChannelAdapter) {
+
 		return IntegrationFlow.from(mailChannelAdapter)
 			.transform(Mail.toStringTransformer(this.properties.getCharset()))
 			.enrichHeaders((h) -> h.defaultOverwrite(true)
@@ -88,7 +91,9 @@ public class MailSupplierConfiguration {
 	}
 
 	@Bean
-	public Supplier<Flux<Message<?>>> mailSupplier(Publisher<Message<Object>> mailInboundFlow) {
+	public Supplier<Flux<Message<?>>> mailSupplier(
+			@Qualifier("mailInboundFlow") Publisher<Message<Object>> mailInboundFlow) {
+
 		return () -> Flux.from(mailInboundFlow);
 	}
 
@@ -137,7 +142,7 @@ public class MailSupplierConfiguration {
 
 	@Bean("mailChannelAdapter")
 	@ConditionalOnProperty(value = "mail.supplier.idle-imap", matchIfMissing = true, havingValue = "false")
-	MessageProducerSupport mailMessageProducer(MessageSource<?> mailMessageSource) {
+	MessageProducerSupport mailMessageProducer(@Qualifier("mailMessageSource") MessageSource<?> mailMessageSource) {
 		return new ReactiveMessageSourceProducer(mailMessageSource);
 	}
 

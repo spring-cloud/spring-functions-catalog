@@ -56,12 +56,13 @@ public class TcpConsumerConfiguration {
 	}
 
 	@Bean
-	public Consumer<Message<?>> tcpConsumer(TcpSendingMessageHandler tcpConsumerMessageHandler) {
+	public Consumer<Message<?>> tcpConsumer(TcpSendingMessageHandlerSmartLifeCycle tcpConsumerMessageHandler) {
+
 		return tcpConsumerMessageHandler::handleMessage;
 	}
 
 	@Bean
-	public TcpSendingMessageHandler tcpConsumerMessageHandler(
+	public TcpSendingMessageHandlerSmartLifeCycle tcpConsumerMessageHandler(
 			@Qualifier("tcpSinkConnectionFactory") AbstractConnectionFactory connectionFactory) {
 
 		TcpSendingMessageHandlerSmartLifeCycle tcpMessageHandler = new TcpSendingMessageHandlerSmartLifeCycle();

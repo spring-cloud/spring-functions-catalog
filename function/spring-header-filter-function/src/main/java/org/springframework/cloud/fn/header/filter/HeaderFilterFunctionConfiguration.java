@@ -19,6 +19,7 @@ package org.springframework.cloud.fn.header.filter;
 import java.util.HashSet;
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -40,7 +41,8 @@ public class HeaderFilterFunctionConfiguration {
 
 	@Bean
 	public Function<Message<?>, Message<?>> headerFilterFunction(HeaderFilterFunctionProperties properties,
-			HeaderFilter headerFilter) {
+			@Qualifier("headerFilter") HeaderFilter headerFilter) {
+
 		if (properties.isDeleteAll()) {
 			return (message) -> {
 				var accessor = new IntegrationMessageHeaderAccessor(message);

@@ -18,6 +18,7 @@ package org.springframework.cloud.fn.filter;
 
 import java.util.function.Function;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -36,7 +37,7 @@ public class FilterFunctionConfiguration {
 
 	@Bean
 	public Function<Message<?>, Message<?>> filterFunction(
-			ExpressionEvaluatingTransformer filterExpressionEvaluatingTransformer) {
+			@Qualifier("filterExpressionEvaluatingTransformer") ExpressionEvaluatingTransformer filterExpressionEvaluatingTransformer) {
 
 		return (message) -> {
 			if ((Boolean) filterExpressionEvaluatingTransformer.transform(message).getPayload()) {

@@ -24,6 +24,7 @@ import io.debezium.engine.DebeziumEngine.Builder;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -48,7 +49,9 @@ import org.springframework.messaging.Message;
 public class DebeziumReactiveConsumerConfiguration {
 
 	@Bean
-	public Supplier<Flux<Message<?>>> debeziumSupplier(Publisher<Message<?>> debeziumPublisher) {
+	public Supplier<Flux<Message<?>>> debeziumSupplier(
+			@Qualifier("debeziumPublisher") Publisher<Message<?>> debeziumPublisher) {
+
 		return () -> Flux.from(debeziumPublisher);
 	}
 

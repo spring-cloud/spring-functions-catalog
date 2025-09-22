@@ -191,8 +191,10 @@ public class SftpSupplierConfiguration {
 		 * @return a {@link MessageSource}.
 		 */
 		@Bean
-		SftpStreamingInboundChannelAdapterSpec targetMessageSource(SftpRemoteFileTemplate sftpTemplate,
-				SftpSupplierProperties sftpSupplierProperties, FileListFilter<SftpClient.DirEntry> fileListFilter) {
+		SftpStreamingInboundChannelAdapterSpec targetMessageSource(
+				@Qualifier("sftpTemplate") SftpRemoteFileTemplate sftpTemplate,
+				SftpSupplierProperties sftpSupplierProperties,
+				@Qualifier("chainFilter") FileListFilter<SftpClient.DirEntry> fileListFilter) {
 
 			return Sftp.inboundStreamingAdapter(sftpTemplate)
 				.remoteDirectory(remoteDirectory(sftpSupplierProperties))
@@ -216,7 +218,8 @@ public class SftpSupplierConfiguration {
 
 		@Bean
 		@ConditionalOnProperty(prefix = "sftp.supplier", value = "delete-remote-files")
-		RemoteFileDeletingAdvice remoteFileDeletingAdvice(SftpRemoteFileTemplate sftpTemplate,
+		RemoteFileDeletingAdvice remoteFileDeletingAdvice(
+				@Qualifier("sftpTemplate") SftpRemoteFileTemplate sftpTemplate,
 				SftpSupplierProperties sftpSupplierProperties) {
 
 			return new RemoteFileDeletingAdvice(sftpTemplate, sftpSupplierProperties.getRemoteFileSeparator());
@@ -224,7 +227,8 @@ public class SftpSupplierConfiguration {
 
 		@Bean
 		@ConditionalOnProperty(prefix = "sftp.supplier", value = "rename-remote-files-to")
-		RemoteFileRenamingAdvice remoteFileRenamingAdvice(SftpRemoteFileTemplate sftpTemplate,
+		RemoteFileRenamingAdvice remoteFileRenamingAdvice(
+				@Qualifier("sftpTemplate") SftpRemoteFileTemplate sftpTemplate,
 				SftpSupplierProperties sftpSupplierProperties) {
 
 			return new RemoteFileRenamingAdvice(sftpTemplate, sftpSupplierProperties.getRemoteFileSeparator(),
@@ -278,7 +282,7 @@ public class SftpSupplierConfiguration {
 		@Bean
 		SftpInboundChannelAdapterSpec targetMessageSource(SftpSupplierProperties sftpSupplierProperties,
 				SftpSupplierFactoryConfiguration.DelegatingFactoryWrapper delegatingFactoryWrapper,
-				FileListFilter<SftpClient.DirEntry> fileListFilter) {
+				@Qualifier("chainFilter") FileListFilter<SftpClient.DirEntry> fileListFilter) {
 
 			return Sftp.inboundAdapter(delegatingFactoryWrapper.getFactory())
 				.preserveTimestamp(sftpSupplierProperties.isPreserveTimestamp())
@@ -310,7 +314,7 @@ public class SftpSupplierConfiguration {
 	}
 
 	/*
-	 * List only configuration
+	 * List-only configuration
 	 */
 	@Configuration(proxyBeanMethods = false)
 	@ConditionalOnProperty(prefix = "sftp.supplier", name = "list-only")
@@ -351,9 +355,10 @@ public class SftpSupplierConfiguration {
 		}
 
 		@Bean
-		IntegrationFlow listingFlow(MessageProducerSupport listingMessageProducer,
-				MessageProcessor<?> lsEntryToStringTransformer, GenericSelector<Message<?>> duplicateFilter,
-				GenericSelector<String> listOnlyFilter) {
+		IntegrationFlow listingFlow(SftpListingMessageProducer listingMessageProducer,
+				@Qualifier("lsEntryToStringTransformer") MessageProcessor<?> lsEntryToStringTransformer,
+				@Qualifier("duplicateFilter") GenericSelector<Message<?>> duplicateFilter,
+				@Qualifier("listOnlyFilter") GenericSelector<String> listOnlyFilter) {
 
 			return IntegrationFlow.from(listingMessageProducer)
 				.split()

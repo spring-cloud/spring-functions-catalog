@@ -67,7 +67,8 @@ public class TaskLaunchRequestFunctionConfiguration {
 	 * @return a {@code TaskLaunchRequest} Message.
 	 */
 	@Bean(name = TASK_LAUNCH_REQUEST_FUNCTION_NAME)
-	TaskLaunchRequestFunction taskLaunchRequest(TaskLaunchRequestMessageProcessor taskLaunchRequestMessageProcessor) {
+	TaskLaunchRequestFunction taskLaunchRequest(
+			@Qualifier("taskLaunchRequestMessageProcessor") TaskLaunchRequestMessageProcessor taskLaunchRequestMessageProcessor) {
 
 		return taskLaunchRequestMessageProcessor::postProcessMessage;
 	}

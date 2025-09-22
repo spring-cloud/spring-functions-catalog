@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -45,7 +46,9 @@ public class WavefrontConsumerConfiguration {
 	private static final Log logger = LogFactory.getLog(WavefrontConsumerConfiguration.class);
 
 	@Bean
-	public Consumer<Message<?>> wavefrontConsumer(WavefrontConsumerProperties properties, WavefrontService service) {
+	public Consumer<Message<?>> wavefrontConsumer(WavefrontConsumerProperties properties,
+			@Qualifier("wavefrontService") WavefrontService service) {
+
 		return (message) -> {
 			WavefrontFormat wavefrontFormat = new WavefrontFormat(properties, message);
 			String formattedString = wavefrontFormat.getFormattedString();

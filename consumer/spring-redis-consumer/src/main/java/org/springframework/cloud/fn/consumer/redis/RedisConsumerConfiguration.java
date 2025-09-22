@@ -18,6 +18,7 @@ package org.springframework.cloud.fn.consumer.redis;
 
 import java.util.function.Consumer;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -43,7 +44,9 @@ import org.springframework.messaging.MessageHandler;
 public class RedisConsumerConfiguration {
 
 	@Bean
-	public Consumer<Message<?>> redisConsumer(MessageHandler redisConsumerMessageHandler) {
+	public Consumer<Message<?>> redisConsumer(
+			@Qualifier("redisConsumerMessageHandler") MessageHandler redisConsumerMessageHandler) {
+
 		return redisConsumerMessageHandler::handleMessage;
 	}
 

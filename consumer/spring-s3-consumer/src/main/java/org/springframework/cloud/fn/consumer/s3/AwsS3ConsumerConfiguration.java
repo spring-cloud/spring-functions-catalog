@@ -26,6 +26,7 @@ import software.amazon.awssdk.transfer.s3.S3TransferManager;
 import software.amazon.awssdk.transfer.s3.progress.TransferListener;
 
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -51,13 +52,13 @@ import org.springframework.util.Assert;
 public class AwsS3ConsumerConfiguration {
 
 	@Bean
-	public Consumer<Message<?>> s3Consumer(IntegrationFlow s3ConsumerFlow) {
+	public Consumer<Message<?>> s3Consumer(@Qualifier("s3ConsumerFlow") IntegrationFlow s3ConsumerFlow) {
 		return s3ConsumerFlow.getInputChannel()::send;
 	}
 
 	@Bean
 	public IntegrationFlow s3ConsumerFlow(@Nullable TransferListener transferListener,
-			MessageHandler amazonS3MessageHandler) {
+			@Qualifier("amazonS3MessageHandler") MessageHandler amazonS3MessageHandler) {
 
 		return (flow) -> flow.enrichHeaders((headers) -> headers.header(AwsHeaders.TRANSFER_LISTENER, transferListener))
 			.handle(amazonS3MessageHandler);

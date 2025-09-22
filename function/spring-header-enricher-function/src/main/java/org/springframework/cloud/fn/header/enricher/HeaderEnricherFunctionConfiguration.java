@@ -23,6 +23,7 @@ import java.util.Properties;
 import java.util.function.Function;
 
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -45,7 +46,9 @@ import org.springframework.messaging.Message;
 public class HeaderEnricherFunctionConfiguration {
 
 	@Bean
-	public Function<Message<?>, Message<?>> headerEnricherFunction(HeaderEnricher headerEnricher) {
+	public Function<Message<?>, Message<?>> headerEnricherFunction(
+			@Qualifier("headerEnricher") HeaderEnricher headerEnricher) {
+
 		return headerEnricher::transform;
 	}
 

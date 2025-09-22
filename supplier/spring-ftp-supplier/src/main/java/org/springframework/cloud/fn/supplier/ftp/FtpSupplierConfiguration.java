@@ -143,9 +143,12 @@ public class FtpSupplierConfiguration {
 	}
 
 	@Bean
-	public Supplier<Flux<Message<?>>> ftpSupplier(@Nullable Publisher<Message<Object>> ftpReadingFlow) {
+	public Supplier<Flux<Message<?>>> ftpSupplier(
+			@Qualifier("ftpMessageFlux") @Nullable Flux<Message<?>> ftpMessageFlux,
+			@Qualifier("ftpReadingFlow") @Nullable Publisher<Message<Object>> ftpReadingFlow) {
+
 		if (this.fileConsumerProperties.getMode() == FileReadingMode.ref) {
-			return this::ftpMessageFlux;
+			return () -> ftpMessageFlux;
 		}
 		else if (ftpReadingFlow != null) {
 			return () -> Flux.from(ftpReadingFlow);
