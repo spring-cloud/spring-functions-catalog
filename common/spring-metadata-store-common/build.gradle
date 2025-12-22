@@ -17,5 +17,5 @@ dependencies {
     optionalApi 'software.amazon.awssdk:dynamodb'
 
     testImplementation 'org.hsqldb:hsqldb'
-    testImplementation 'org.apache.curator:curator-test:5.7.1'
+    testImplementation 'org.apache.curator:curator-test:5.9.0'
 }

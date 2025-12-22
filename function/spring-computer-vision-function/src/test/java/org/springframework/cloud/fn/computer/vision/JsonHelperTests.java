@@ -28,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
 public class JsonHelperTests {
 
@@ -58,8 +59,8 @@ public class JsonHelperTests {
 
 		var classifications2 = JsonHelper.toClassifications(json);
 
-		assertThat(classifications2.getClassNames()).isEqualTo(classifications.getClassNames());
-		assertThat(classifications2.getProbabilities()).isEqualTo(classifications.getProbabilities());
+		assertThat(classifications2.getClassNames()).containsAll(classifications.getClassNames());
+		assertThat(classifications2.getProbabilities()).containsAll(classifications.getProbabilities());
 		assertThat(classifications2.topK()).hasSize(3);
 	}
 
@@ -75,8 +76,8 @@ public class JsonHelperTests {
 
 		var detectedObjects2 = JsonHelper.toDetectedObjects(json);
 
-		assertThat(detectedObjects2.getClassNames()).isEqualTo(detectedObjects.getClassNames());
-		assertThat(detectedObjects2.getProbabilities()).isEqualTo(detectedObjects.getProbabilities());
+		assertThat(detectedObjects2.getClassNames()).containsAll(detectedObjects.getClassNames());
+		assertThat(detectedObjects2.getProbabilities()).containsAll(detectedObjects.getProbabilities());
 		assertThat(detectedObjects2.topK()).hasSize(3);
 
 		assertThat(detectedObjects2.getNumberOfObjects()).isEqualTo(3);

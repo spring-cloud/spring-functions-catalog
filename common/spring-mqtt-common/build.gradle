@@ -1,3 +1,4 @@
 dependencies {
     api 'org.springframework.integration:spring-integration-mqtt'
+	api 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.5'
 }

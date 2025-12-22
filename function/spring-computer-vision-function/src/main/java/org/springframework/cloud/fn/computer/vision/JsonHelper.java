@@ -17,6 +17,7 @@
 package org.springframework.cloud.fn.computer.vision;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.List;
 
 import ai.djl.modality.Classifications;
@@ -39,6 +40,7 @@ import com.google.gson.JsonSerializer;
  * {@link Classifications}, {@link CategoryMask} and {@link Joints} to/from JSON.
  *
  * @author Christian Tzolov
+ * @author Artem Bilan
  */
 public final class JsonHelper {
 
@@ -68,7 +70,10 @@ public final class JsonHelper {
 	}
 
 	public static Classifications toClassifications(String json) {
-		return GSON.fromJson(json, Classifications.class);
+		Classifications.Classification[] classifications = GSON.fromJson(json, Classifications.Classification[].class);
+		return new Classifications(
+				Arrays.stream(classifications).map(Classifications.Classification::getClassName).toList(),
+				Arrays.stream(classifications).map(Classifications.Classification::getProbability).toList());
 	}
 
 	private static final Gson GSON2 = JsonUtils.builder()
@@ -80,7 +85,11 @@ public final class JsonHelper {
 	}
 
 	public static DetectedObjects toDetectedObjects(String json) {
-		return GSON2.fromJson(json, DetectedObjects.class);
+		DetectedObjects.DetectedObject[] detectedObjects = GSON2.fromJson(json, DetectedObjects.DetectedObject[].class);
+		return new DetectedObjects(
+				Arrays.stream(detectedObjects).map(DetectedObjects.DetectedObject::getClassName).toList(),
+				Arrays.stream(detectedObjects).map(DetectedObjects.DetectedObject::getProbability).toList(),
+				Arrays.stream(detectedObjects).map(DetectedObjects.DetectedObject::getBoundingBox).toList());
 	}
 
 	public record Mask(List<String> classes, int[][] mask) {

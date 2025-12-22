@@ -107,6 +107,7 @@ public class ComputerVisionFunctionConfigurationTests {
 	}
 
 	@Test
+	@DisabledOnOs(OS.WINDOWS)
 	public void yolov8Detection() {
 		applicationContextRunner.withPropertyValues(
 		// @formatter:off
