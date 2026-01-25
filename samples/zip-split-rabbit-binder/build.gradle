@@ -21,7 +21,7 @@ repositories {
 
 ext {
 	springCloudVersion = '2025.0.1'
-	springFunctionsCatalogVersion = '5.2.0-SNAPSHOT'
+	springFunctionsCatalogVersion = '5.2.1-SNAPSHOT'
 }
 
 dependencyManagement {
