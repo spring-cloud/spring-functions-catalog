@@ -16,10 +16,6 @@
 
 package org.springframework.cloud.fn.consumer.websocket;
 
-import java.security.cert.CertificateException;
-
-import javax.net.ssl.SSLException;
-
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.socket.SocketChannel;
@@ -27,7 +23,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpServerCodec;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
-import io.netty.handler.ssl.util.SelfSignedCertificate;
+import io.netty.pkitesting.CertificateBuilder;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -80,10 +76,10 @@ public class WebsocketConsumerServerInitializer extends ChannelInitializer<Socke
 		pipeline.addLast(new WebsocketConsumerServerHandler(this.traceRepository, this.properties, this.traceEnabled));
 	}
 
-	private SslContext configureSslContext() throws CertificateException, SSLException {
+	private SslContext configureSslContext() throws Exception {
 		if (this.properties.isSsl()) {
-			SelfSignedCertificate ssc = new SelfSignedCertificate();
-			return SslContextBuilder.forServer(ssc.certificate(), ssc.privateKey()).build();
+			return SslContextBuilder.forServer(new CertificateBuilder().buildSelfSigned().toKeyManagerFactory())
+				.build();
 		}
 		else {
 			return null;

@@ -19,7 +19,6 @@ updates:
         update-types:
           - patch
         patterns:
-          - com.github.spotbugs
           - io.spring.*
           - com.icegreen:greenmail
           - org.mock-server*

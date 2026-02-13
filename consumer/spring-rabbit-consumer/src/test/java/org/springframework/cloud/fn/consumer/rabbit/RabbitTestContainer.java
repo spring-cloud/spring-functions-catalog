@@ -19,8 +19,8 @@ package org.springframework.cloud.fn.consumer.rabbit;
 import java.io.IOException;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.testcontainers.containers.RabbitMQContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.rabbitmq.RabbitMQContainer;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;

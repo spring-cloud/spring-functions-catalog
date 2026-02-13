@@ -22,7 +22,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.MultiThreadIoEventLoopGroup;
+import io.netty.channel.nio.NioIoHandler;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
@@ -70,8 +71,8 @@ public class WebsocketConsumerServer {
 
 	@PostConstruct
 	public void init() {
-		this.bossGroup = new NioEventLoopGroup(this.properties.getThreads());
-		this.workerGroup = new NioEventLoopGroup();
+		this.bossGroup = new MultiThreadIoEventLoopGroup(this.properties.getThreads(), NioIoHandler.newFactory());
+		this.workerGroup = new MultiThreadIoEventLoopGroup(NioIoHandler.newFactory());
 	}
 
 	@PreDestroy
