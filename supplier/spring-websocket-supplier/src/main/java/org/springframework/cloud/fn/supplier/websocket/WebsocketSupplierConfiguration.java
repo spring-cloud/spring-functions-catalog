@@ -26,15 +26,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.boot.autoconfigure.websocket.servlet.WebSocketServletAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.security.autoconfigure.SecurityAutoConfiguration;
+import org.springframework.boot.websocket.autoconfigure.servlet.WebSocketMessagingAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.websocket.IntegrationWebSocketContainer;
 import org.springframework.integration.websocket.ServerWebSocketContainer;
 import org.springframework.integration.websocket.inbound.WebSocketInboundChannelAdapter;
 import org.springframework.messaging.Message;
+import org.springframework.web.socket.server.support.DefaultHandshakeHandler;
 
 /**
  * Auto-configuration for supplier that receives data over WebSocket.
@@ -43,7 +44,7 @@ import org.springframework.messaging.Message;
  * @author Artem Bilan
  *
  */
-@AutoConfiguration(before = { WebSocketServletAutoConfiguration.class, SecurityAutoConfiguration.class })
+@AutoConfiguration(before = { WebSocketMessagingAutoConfiguration.class, SecurityAutoConfiguration.class })
 @EnableConfigurationProperties(WebsocketSupplierProperties.class)
 public class WebsocketSupplierConfiguration {
 
@@ -81,7 +82,8 @@ public class WebsocketSupplierConfiguration {
 			ObjectProvider<ServerWebSocketContainer.SockJsServiceOptions> sockJsServiceOptions) {
 
 		return new ServerWebSocketContainer(properties.getPath()).setAllowedOrigins(properties.getAllowedOrigins())
-			.withSockJs(sockJsServiceOptions.getIfAvailable());
+			.withSockJs(sockJsServiceOptions.getIfAvailable())
+			.setHandshakeHandler(new DefaultHandshakeHandler());
 	}
 
 }

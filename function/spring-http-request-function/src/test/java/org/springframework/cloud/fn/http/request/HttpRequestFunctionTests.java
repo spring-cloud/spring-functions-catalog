@@ -49,7 +49,7 @@ public class HttpRequestFunctionTests {
 	private ApplicationContextRunner runner;
 
 	@BeforeEach
-	void setup() {
+	void setup() throws IOException {
 		this.runner = new ApplicationContextRunner().withUserConfiguration(HttpRequestFunctionTestApplication.class)
 			.withPropertyValues("http.request.reply-expression=#root", "http.request.url-expression='" + url() + "'");
 	}
@@ -203,7 +203,7 @@ public class HttpRequestFunctionTests {
 			}
 		});
 		runner
-			.withPropertyValues("http.request..http-method-expression='POST'",
+			.withPropertyValues("http.request.http-method-expression='POST'",
 					"http.request.headers-expression={'Content-Type':'application/octet-stream'}",
 					"http.request.expected-response-type=byte[]")
 			.run((context) -> {

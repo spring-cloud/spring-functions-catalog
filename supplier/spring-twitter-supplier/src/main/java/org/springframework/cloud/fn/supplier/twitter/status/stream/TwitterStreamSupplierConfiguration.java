@@ -18,11 +18,10 @@ package org.springframework.cloud.fn.supplier.twitter.status.stream;
 
 import java.util.function.Supplier;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import reactor.core.publisher.Flux;
+import tools.jackson.databind.json.JsonMapper;
 import twitter4j.StallWarning;
 import twitter4j.Status;
 import twitter4j.StatusDeletionNotice;
@@ -56,7 +55,7 @@ public class TwitterStreamSupplierConfiguration {
 	private final FluxMessageChannel twitterStatusInputChannel = new FluxMessageChannel();
 
 	@Bean
-	public StatusListener twitterStatusListener(TwitterStream twitterStream, ObjectMapper objectMapper) {
+	public StatusListener twitterStatusListener(TwitterStream twitterStream, JsonMapper objectMapper) {
 
 		StatusListener statusListener = new StatusListener() {
 
@@ -84,19 +83,11 @@ public class TwitterStreamSupplierConfiguration {
 
 			@Override
 			public void onStatus(Status status) {
-
-				try {
-					String json = objectMapper.writeValueAsString(status);
-					Message<byte[]> message = MessageBuilder.withPayload(json.getBytes())
-						.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE)
-						.build();
-					TwitterStreamSupplierConfiguration.this.twitterStatusInputChannel.send(message);
-				}
-				catch (JsonProcessingException ex) {
-					String errorMessage = "Status to JSON conversion error!";
-					LOGGER.error(errorMessage, ex);
-					throw new RuntimeException(errorMessage, ex);
-				}
+				String json = objectMapper.writeValueAsString(status);
+				Message<byte[]> message = MessageBuilder.withPayload(json.getBytes())
+					.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE)
+					.build();
+				TwitterStreamSupplierConfiguration.this.twitterStatusInputChannel.send(message);
 			}
 
 			@Override

@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -29,6 +28,7 @@ import org.mockserver.client.MockServerClient;
 import org.mockserver.integration.ClientAndServer;
 import org.mockserver.model.Header;
 import org.mockserver.model.HttpRequest;
+import tools.jackson.databind.json.JsonMapper;
 import twitter4j.conf.ConfigurationBuilder;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,7 +73,7 @@ public abstract class TwitterUsersFunctionTests {
 	private static HttpRequest lookupUsersRequest2;
 
 	@Autowired
-	protected ObjectMapper mapper;
+	protected JsonMapper mapper;
 
 	@Autowired
 	Function<Message<?>, Message<byte[]>> twitterUsersFunction;

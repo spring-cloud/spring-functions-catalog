@@ -20,30 +20,30 @@ import java.util.function.Supplier;
 
 import com.rabbitmq.client.AMQP;
 import com.rabbitmq.client.Envelope;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.MessageProperties;
 import org.springframework.amqp.rabbit.config.RetryInterceptorBuilder;
+import org.springframework.amqp.rabbit.config.StatelessRetryOperationsInterceptor;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.retry.RejectAndDontRequeueRecoverer;
 import org.springframework.amqp.rabbit.support.DefaultMessagePropertiesConverter;
 import org.springframework.amqp.rabbit.support.MessagePropertiesConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration;
+import org.springframework.boot.amqp.autoconfigure.RabbitProperties;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
-import org.springframework.boot.autoconfigure.amqp.RabbitProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.amqp.dsl.Amqp;
 import org.springframework.integration.amqp.dsl.AmqpInboundChannelAdapterSMLCSpec;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
-import org.springframework.retry.interceptor.RetryOperationsInterceptor;
 import org.springframework.util.Assert;
 
 /**
@@ -74,7 +74,7 @@ public class RabbitSupplierConfiguration {
 	@Bean
 	public SimpleMessageListenerContainer rabbitContainer(RabbitProperties rabbitProperties,
 			RabbitSupplierProperties rabbitSupplierProperties, ConnectionFactory connectionFactory,
-			@Qualifier("rabbitSourceRetryInterceptor") RetryOperationsInterceptor rabbitSourceRetryInterceptor) {
+			@Qualifier("rabbitSourceRetryInterceptor") StatelessRetryOperationsInterceptor rabbitSourceRetryInterceptor) {
 
 		SimpleMessageListenerContainer container = new SimpleMessageListenerContainer(connectionFactory);
 		container.setAutoStartup(false);
@@ -137,9 +137,11 @@ public class RabbitSupplierConfiguration {
 	}
 
 	@Bean
-	public RetryOperationsInterceptor rabbitSourceRetryInterceptor(RabbitSupplierProperties rabbitSupplierProperties) {
+	public StatelessRetryOperationsInterceptor rabbitSourceRetryInterceptor(
+			RabbitSupplierProperties rabbitSupplierProperties) {
+
 		return RetryInterceptorBuilder.stateless()
-			.maxAttempts(rabbitSupplierProperties.getMaxAttempts())
+			.maxRetries(rabbitSupplierProperties.getMaxAttempts())
 			.backOffOptions(rabbitSupplierProperties.getInitialRetryInterval(),
 					rabbitSupplierProperties.getRetryMultiplier(), rabbitSupplierProperties.getMaxRetryInterval())
 			.recoverer(new RejectAndDontRequeueRecoverer())

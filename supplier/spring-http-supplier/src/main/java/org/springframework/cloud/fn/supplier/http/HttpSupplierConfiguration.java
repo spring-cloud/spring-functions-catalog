@@ -24,8 +24,8 @@ import reactor.core.publisher.Flux;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.web.reactive.WebFluxAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.webflux.autoconfigure.WebFluxAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -69,11 +69,14 @@ public class HttpSupplierConfiguration {
 				.crossOrigin((crossOrigin) -> crossOrigin.origin(httpSupplierProperties.getCors().getAllowedOrigins())
 					.allowedHeaders(httpSupplierProperties.getCors().getAllowedHeaders())
 					.allowCredentials(httpSupplierProperties.getCors().getAllowCredentials())))
-			.enrichHeaders((headers) -> headers.headerFunction(MessageHeaders.CONTENT_TYPE,
-					(message) -> (MediaType.APPLICATION_FORM_URLENCODED
-						.equals(message.getHeaders().get(MessageHeaders.CONTENT_TYPE, MediaType.class)))
-								? MediaType.APPLICATION_JSON : null,
-					true))
+			.enrichHeaders((headers) -> headers
+				// TODO until Spring Integration 7.0.3
+				.shouldSkipNulls(true)
+				.headerFunction(MessageHeaders.CONTENT_TYPE,
+						(message) -> (MediaType.APPLICATION_FORM_URLENCODED
+							.equals(message.getHeaders().get(MessageHeaders.CONTENT_TYPE, MediaType.class)))
+									? MediaType.APPLICATION_JSON : null,
+						true))
 			.toReactivePublisher(true);
 	}
 

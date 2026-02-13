@@ -18,13 +18,15 @@ package org.springframework.cloud.fn.consumer.rabbit;
 
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
@@ -32,7 +34,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.expression.Expression;
 import org.springframework.integration.amqp.dsl.Amqp;
 import org.springframework.integration.amqp.dsl.AmqpOutboundChannelAdapterSpec;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 
@@ -43,6 +44,7 @@ import org.springframework.messaging.MessageHandler;
  * @author Soby Chako
  * @author Nicolas Labrot
  * @author Chris Bono
+ * @author Artem Bilan
  */
 @EnableConfigurationProperties(RabbitConsumerProperties.class)
 @AutoConfiguration(after = RabbitAutoConfiguration.class)
@@ -58,8 +60,7 @@ public class RabbitConsumerConfiguration {
 
 	@Bean
 	public AmqpOutboundChannelAdapterSpec amqpChannelAdapter(RabbitTemplate rabbitTemplate,
-			@Nullable ComponentCustomizer<AmqpOutboundChannelAdapterSpec> amqpOutboundChannelAdapterSpecCustomizer)
-			throws Exception {
+			@Nullable ComponentCustomizer<AmqpOutboundChannelAdapterSpec> amqpOutboundChannelAdapterSpecCustomizer) {
 
 		AmqpOutboundChannelAdapterSpec handler = Amqp.outboundAdapter(rabbitTemplate)
 			.mappedRequestHeaders(this.properties.getMappedRequestHeaders())
@@ -92,8 +93,8 @@ public class RabbitConsumerConfiguration {
 
 	@Bean
 	@ConditionalOnProperty(name = "rabbit.converterBeanName", havingValue = RabbitConsumerProperties.JSON_CONVERTER)
-	public Jackson2JsonMessageConverter jsonConverter() {
-		return new Jackson2JsonMessageConverter();
+	public JacksonJsonMessageConverter jsonConverter() {
+		return new JacksonJsonMessageConverter();
 	}
 
 }

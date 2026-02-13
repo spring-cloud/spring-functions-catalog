@@ -23,6 +23,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import io.awspring.cloud.dynamodb.DynamoDbMetadataStore;
 import org.apache.curator.test.TestingServer;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -39,7 +40,6 @@ import org.springframework.boot.test.context.FilteredClassLoader;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.aws.metadata.DynamoDbMetadataStore;
 import org.springframework.integration.hazelcast.metadata.HazelcastMetadataStore;
 import org.springframework.integration.jdbc.metadata.JdbcMetadataStore;
 import org.springframework.integration.metadata.ConcurrentMetadataStore;
@@ -72,7 +72,7 @@ public class MetadataStoreAutoConfigurationTests {
 			.withPropertyValues("metadata.store.type=" + classToInclude.getSimpleName()
 				.replaceFirst("MetadataStore", "")
 				.toLowerCase()
-				.replaceFirst("simple", "memory"))
+				.replaceFirst("simple", "memory"), "spring.cloud.aws.dynamodb.enabled=false")
 			.withClassLoader(filteredClassLoaderBut(classToInclude));
 		contextRunner.run((context) -> {
 			assertThat(context.getBeansOfType(MetadataStore.class)).hasSize(1);
@@ -113,7 +113,7 @@ public class MetadataStoreAutoConfigurationTests {
 
 			@Bean
 			public static DynamoDbAsyncClient dynamoDB() {
-				DynamoDbAsyncClient dynamoDb = mock(DynamoDbAsyncClient.class);
+				DynamoDbAsyncClient dynamoDb = mock();
 				willReturn(CompletableFuture.completedFuture(DescribeTableResponse.builder().build())).given(dynamoDb)
 					.describeTable(ArgumentMatchers.<Consumer<DescribeTableRequest.Builder>>any());
 
@@ -122,12 +122,12 @@ public class MetadataStoreAutoConfigurationTests {
 
 			@Bean
 			public static AwsCredentialsProvider awsCredentialsProvider() {
-				return mock(AwsCredentialsProvider.class);
+				return mock();
 			}
 
 			@Bean
 			public static AwsRegionProvider regionProvider() {
-				return mock(AwsRegionProvider.class);
+				return mock();
 			}
 
 		}

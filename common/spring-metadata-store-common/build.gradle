@@ -10,11 +10,10 @@ dependencies {
     optionalApi 'org.springframework.boot:spring-boot-starter-data-mongodb'
     optionalApi 'org.springframework.integration:spring-integration-jdbc'
     optionalApi 'org.springframework.boot:spring-boot-starter-data-jdbc'
-    optionalApi 'io.awspring.cloud:spring-cloud-aws-starter'
-    optionalApi 'org.springframework.integration:spring-integration-zookeeper'
-    optionalApi 'org.springframework.integration:spring-integration-hazelcast'
-    optionalApi springIntegrationAws
-    optionalApi 'software.amazon.awssdk:dynamodb'
+    optionalApi 'io.awspring.cloud:spring-cloud-aws-starter-integration-dynamodb'
+	optionalApi 'org.springframework.integration:spring-integration-zookeeper'
+	optionalApi 'org.springframework.boot:spring-boot-starter-hazelcast'
+	optionalApi 'org.springframework.integration:spring-integration-hazelcast'
 
     testImplementation 'org.hsqldb:hsqldb'
     testImplementation 'org.apache.curator:curator-test:5.9.0'

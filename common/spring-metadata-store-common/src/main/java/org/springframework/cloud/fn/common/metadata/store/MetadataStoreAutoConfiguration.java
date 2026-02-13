@@ -18,6 +18,7 @@ package org.springframework.cloud.fn.common.metadata.store;
 
 import com.hazelcast.core.HazelcastInstance;
 import io.awspring.cloud.autoconfigure.core.AwsClientBuilderConfigurer;
+import io.awspring.cloud.dynamodb.DynamoDbMetadataStore;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryForever;
@@ -28,15 +29,10 @@ import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.boot.autoconfigure.hazelcast.HazelcastAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.JdbcTemplateAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.integration.aws.metadata.DynamoDbMetadataStore;
 import org.springframework.integration.hazelcast.metadata.HazelcastMetadataStore;
 import org.springframework.integration.jdbc.metadata.JdbcMetadataStore;
 import org.springframework.integration.metadata.ConcurrentMetadataStore;
@@ -55,10 +51,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * @author Corneil du Plessis
  * @since 2.0.2
  */
-@AutoConfiguration(
-		after = { RedisAutoConfiguration.class, MongoAutoConfiguration.class, HazelcastAutoConfiguration.class,
-				JdbcTemplateAutoConfiguration.class },
-		afterName = "io.awspring.cloud.autoconfigure.dynamodb.DynamoDbAutoConfiguration")
+@AutoConfiguration(afterName = { "org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration",
+		"org.springframework.boot.mongodb.autoconfigure.MongoAutoConfiguration",
+		"org.springframework.boot.hazelcast.autoconfigure.HazelcastAutoConfiguration",
+		"org.springframework.boot.jdbc.autoconfigure.JdbcTemplateAutoConfiguration",
+		"io.awspring.cloud.autoconfigure.core.AwsAutoConfiguration" })
 @ConditionalOnClass(ConcurrentMetadataStore.class)
 @EnableConfigurationProperties(MetadataStoreProperties.class)
 public class MetadataStoreAutoConfiguration {

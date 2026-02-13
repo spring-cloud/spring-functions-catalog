@@ -19,6 +19,7 @@ package org.springframework.cloud.fn.consumer.sftp;
 import java.util.function.Consumer;
 
 import org.apache.sshd.sftp.client.SftpClient;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -31,7 +32,6 @@ import org.springframework.integration.gateway.AnnotationGatewayProxyFactoryBean
 import org.springframework.integration.sftp.dsl.Sftp;
 import org.springframework.integration.sftp.dsl.SftpMessageHandlerSpec;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**

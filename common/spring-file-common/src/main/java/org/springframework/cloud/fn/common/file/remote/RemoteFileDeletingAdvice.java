@@ -16,11 +16,12 @@
 
 package org.springframework.cloud.fn.common.file.remote;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.integration.aop.MessageSourceMutator;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.file.FileHeaders;
 import org.springframework.integration.file.remote.RemoteFileTemplate;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**
@@ -46,9 +47,8 @@ public class RemoteFileDeletingAdvice implements MessageSourceMutator {
 		this.remoteFileSeparator = remoteFileSeparator;
 	}
 
-	@Nullable
 	@Override
-	public Message<?> afterReceive(@Nullable Message<?> result, MessageSource<?> source) {
+	public @Nullable Message<?> afterReceive(@Nullable Message<?> result, MessageSource<?> source) {
 		if (result != null) {
 			String remoteDir = (String) result.getHeaders().get(FileHeaders.REMOTE_DIRECTORY);
 			String remoteFile = (String) result.getHeaders().get(FileHeaders.REMOTE_FILE);

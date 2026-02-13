@@ -19,9 +19,13 @@ package org.springframework.cloud.fn.supplier.jms;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.integration.jms.JmsMessageDrivenEndpoint;
+import org.springframework.integration.jms.inbound.JmsMessageDrivenEndpoint;
 import org.springframework.test.annotation.DirtiesContext;
 
+/**
+ * @author Soby Chacko
+ * @author Artem Bilan
+ */
 @SpringBootTest
 @DirtiesContext
 public class AbstractJmsSupplierTests {

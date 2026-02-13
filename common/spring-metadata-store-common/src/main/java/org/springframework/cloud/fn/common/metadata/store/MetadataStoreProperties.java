@@ -19,8 +19,9 @@ package org.springframework.cloud.fn.common.metadata.store;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import io.awspring.cloud.dynamodb.DynamoDbMetadataStore;
+
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.integration.aws.metadata.DynamoDbMetadataStore;
 import org.springframework.integration.jdbc.metadata.JdbcMetadataStore;
 import org.springframework.integration.redis.metadata.RedisMetadataStore;
 

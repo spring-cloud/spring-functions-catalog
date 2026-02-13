@@ -16,9 +16,10 @@
 
 package org.springframework.cloud.fn.consumer.mongo;
 
+import org.bson.UuidRepresentation;
 import org.junit.jupiter.api.BeforeAll;
-import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.mongodb.MongoDBContainer;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -40,8 +41,9 @@ public interface MongoDbTestContainerSupport {
 
 	@DynamicPropertySource
 	static void mongoDbProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.data.mongodb.port", MONGO_CONTAINER::getFirstMappedPort);
-		registry.add("spring.data.mongodb.database", () -> "test");
+		registry.add("spring.mongodb.port", MONGO_CONTAINER::getFirstMappedPort);
+		registry.add("spring.mongodb.database", () -> "test");
+		registry.add("spring.mongodb.representation.uuid", () -> UuidRepresentation.STANDARD);
 	}
 
 	static String mongoDbUri() {

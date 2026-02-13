@@ -21,12 +21,12 @@ import java.net.URI;
 import io.awspring.cloud.autoconfigure.s3.S3AutoConfiguration;
 import io.awspring.cloud.autoconfigure.s3.S3CrtAsyncClientAutoConfiguration;
 import io.awspring.cloud.autoconfigure.s3.properties.S3Properties;
+import io.awspring.cloud.s3.integration.S3SessionFactory;
 import software.amazon.awssdk.services.s3.S3Client;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.aws.support.S3SessionFactory;
 
 /**
  * The auto-configuration for {@link S3SessionFactory}.

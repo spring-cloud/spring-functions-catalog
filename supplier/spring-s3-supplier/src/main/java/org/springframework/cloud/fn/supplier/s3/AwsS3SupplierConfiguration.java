@@ -21,13 +21,19 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import io.awspring.cloud.s3.integration.S3InboundFileSynchronizer;
+import io.awspring.cloud.s3.integration.S3InboundFileSynchronizingMessageSource;
+import io.awspring.cloud.s3.integration.S3PersistentAcceptOnceFileListFilter;
+import io.awspring.cloud.s3.integration.S3RegexPatternFileListFilter;
+import io.awspring.cloud.s3.integration.S3SessionFactory;
+import io.awspring.cloud.s3.integration.S3SimplePatternFileListFilter;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
+import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -39,19 +45,12 @@ import org.springframework.cloud.fn.common.file.FileConsumerProperties;
 import org.springframework.cloud.fn.common.file.FileUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.integration.aws.inbound.S3InboundFileSynchronizer;
-import org.springframework.integration.aws.inbound.S3InboundFileSynchronizingMessageSource;
-import org.springframework.integration.aws.support.S3SessionFactory;
-import org.springframework.integration.aws.support.filters.S3PersistentAcceptOnceFileListFilter;
-import org.springframework.integration.aws.support.filters.S3RegexPatternFileListFilter;
-import org.springframework.integration.aws.support.filters.S3SimplePatternFileListFilter;
 import org.springframework.integration.core.MessageSource;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.endpoint.ReactiveMessageSourceProducer;
 import org.springframework.integration.file.filters.ChainFileListFilter;
 import org.springframework.integration.metadata.ConcurrentMetadataStore;
 import org.springframework.integration.util.IntegrationReactiveUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
 import org.springframework.util.StringUtils;
@@ -216,7 +215,7 @@ public class AwsS3SupplierConfiguration {
 		}
 
 		@Bean
-		ReactiveMessageSourceProducer s3ListingMessageProducer(S3Client amazonS3, ObjectMapper objectMapper,
+		ReactiveMessageSourceProducer s3ListingMessageProducer(S3Client amazonS3, JsonMapper objectMapper,
 				AwsS3SupplierProperties awsS3SupplierProperties,
 				@Qualifier("listOnlyFilter") Predicate<S3Object> listOnlyFilter) {
 
@@ -226,14 +225,7 @@ public class AwsS3SupplierConfiguration {
 					.contents()
 					.stream()
 					.filter(listOnlyFilter)
-					.map((s3Object) -> {
-						try {
-							return objectMapper.writeValueAsString(s3Object.toBuilder());
-						}
-						catch (JsonProcessingException ex) {
-							throw new RuntimeException(ex);
-						}
-					})
+					.map((s3Object) -> objectMapper.writeValueAsString(s3Object.toBuilder()))
 					.toList();
 				return summaryList.isEmpty() ? null : new GenericMessage<>(summaryList);
 			});

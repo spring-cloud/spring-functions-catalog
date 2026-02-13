@@ -17,9 +17,8 @@
 package org.springframework.cloud.fn.consumer.wavefront.service;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.web.client.RestTemplate;
 
 import static org.mockito.ArgumentMatchers.eq;
@@ -29,24 +28,23 @@ import static org.mockito.Mockito.verify;
 
 /**
  * @author Timo Salm
+ * @author Artem Bilan
  */
 public class ProxyConnectionWavefrontServiceTests {
 
 	@Test
 	void testSendMetricInWavefrontFormat() {
-		final RestTemplateBuilder restTemplateBuilderMock = mock(RestTemplateBuilder.class);
-		final RestTemplate restTemplateMock = mock(RestTemplate.class);
+		RestTemplateBuilder restTemplateBuilderMock = mock();
+		RestTemplate restTemplateMock = mock();
 		given(restTemplateBuilderMock.build()).willReturn(restTemplateMock);
 
-		final String metricInWavefrontFormat = "testMetric";
-		final String wavefrontProxyUrl = "testWavefrontProxyUrl";
+		String metricInWavefrontFormat = "testMetric";
+		String wavefrontProxyUrl = "testWavefrontProxyUrl";
 
-		final WavefrontService service = new ProxyConnectionWavefrontService(restTemplateBuilderMock,
-				wavefrontProxyUrl);
+		WavefrontService service = new ProxyConnectionWavefrontService(restTemplateBuilderMock, wavefrontProxyUrl);
 		service.send(metricInWavefrontFormat);
 
-		verify(restTemplateMock, Mockito.times(1)).postForEntity(eq(wavefrontProxyUrl), eq(metricInWavefrontFormat),
-				eq(Void.class));
+		verify(restTemplateMock).postForEntity(eq(wavefrontProxyUrl), eq(metricInWavefrontFormat), eq(Void.class));
 	}
 
 }

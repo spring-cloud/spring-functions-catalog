@@ -20,9 +20,8 @@ import java.util.Objects;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
@@ -41,24 +40,24 @@ public class DirectConnectionWavefrontServiceTests {
 
 	@Test
 	void testSendMetricInWavefrontFormat() {
-		final RestTemplateBuilder restTemplateBuilderMock = mock(RestTemplateBuilder.class);
-		final RestTemplate restTemplateMock = mock(RestTemplate.class);
+		RestTemplateBuilder restTemplateBuilderMock = mock();
+		RestTemplate restTemplateMock = mock();
 		given(restTemplateBuilderMock.build()).willReturn(restTemplateMock);
 
-		final String metricInWavefrontFormat = "testMetric";
-		final String wavefrontServerUri = "testWavefrontDomain";
-		final String wavefrontApiToken = "testWavefrontToken";
+		String metricInWavefrontFormat = "testMetric";
+		String wavefrontServerUri = "testWavefrontDomain";
+		String wavefrontApiToken = "testWavefrontToken";
 
-		final WavefrontService service = new DirectConnectionWavefrontService(restTemplateBuilderMock,
-				wavefrontServerUri, wavefrontApiToken);
+		WavefrontService service = new DirectConnectionWavefrontService(restTemplateBuilderMock, wavefrontServerUri,
+				wavefrontApiToken);
 		service.send(metricInWavefrontFormat);
 
 		ArgumentCaptor<HttpEntity<?>> argument = ArgumentCaptor.captor();
-		verify(restTemplateMock, Mockito.times(1)).exchange(eq(wavefrontServerUri + "/report"), eq(HttpMethod.POST),
-				argument.capture(), eq(Void.class));
+		verify(restTemplateMock).exchange(eq(wavefrontServerUri + "/report"), eq(HttpMethod.POST), argument.capture(),
+				eq(Void.class));
 		assertThat(Objects.requireNonNull(argument.getValue().getHeaders().get("Authorization")).get(0))
 			.isEqualTo("Bearer " + wavefrontApiToken);
-		assertThat(Objects.requireNonNull(argument.getValue().getBody())).isEqualTo(metricInWavefrontFormat);
+		assertThat(argument.getValue().getBody()).isEqualTo(metricInWavefrontFormat);
 	}
 
 }

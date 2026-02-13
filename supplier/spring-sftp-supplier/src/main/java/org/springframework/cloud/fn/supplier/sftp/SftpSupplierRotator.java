@@ -41,11 +41,11 @@ public class SftpSupplierRotator extends RotatingServerAdvice {
 	}
 
 	public String getCurrentKey() {
-		return this.rotationPolicy.getCurrent().getKey().toString();
+		return this.rotationPolicy.getCurrent().key().toString();
 	}
 
 	public String getCurrentDirectory() {
-		return this.rotationPolicy.getCurrent().getDirectory();
+		return this.rotationPolicy.getCurrent().directory();
 	}
 
 	@Override

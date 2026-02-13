@@ -19,16 +19,17 @@ package org.springframework.cloud.fn.supplier.jms;
 import java.util.function.Supplier;
 
 import jakarta.jms.ConnectionFactory;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.jms.AcknowledgeMode;
-import org.springframework.boot.autoconfigure.jms.JmsAutoConfiguration;
-import org.springframework.boot.autoconfigure.jms.JmsProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jms.autoconfigure.AcknowledgeMode;
+import org.springframework.boot.jms.autoconfigure.JmsAutoConfiguration;
+import org.springframework.boot.jms.autoconfigure.JmsProperties;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.JavaUtils;
@@ -38,7 +39,6 @@ import org.springframework.integration.jms.dsl.JmsMessageDrivenChannelAdapterSpe
 import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.listener.SimpleMessageListenerContainer;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**
@@ -113,7 +113,7 @@ public class JmsSupplierConfiguration {
 
 		String messageSelector = this.properties.getMessageSelector();
 		AcknowledgeMode acknowledgeMode = listenerProperties.getSession().getAcknowledgeMode();
-		if (messageSelector != null && acknowledgeMode != null) {
+		if (messageSelector != null) {
 			container.setSessionAcknowledgeMode(acknowledgeMode.getMode());
 		}
 

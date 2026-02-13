@@ -23,9 +23,9 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.web.client.RestTemplateAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
+import org.springframework.boot.restclient.autoconfigure.RestTemplateAutoConfiguration;
 import org.springframework.cloud.fn.consumer.wavefront.service.DirectConnectionWavefrontService;
 import org.springframework.cloud.fn.consumer.wavefront.service.ProxyConnectionWavefrontService;
 import org.springframework.cloud.fn.consumer.wavefront.service.WavefrontService;

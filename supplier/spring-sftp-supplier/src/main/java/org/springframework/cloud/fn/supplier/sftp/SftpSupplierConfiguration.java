@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import org.apache.sshd.sftp.client.SftpClient;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 import reactor.util.context.Context;
@@ -45,7 +46,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
-import org.springframework.http.MediaType;
 import org.springframework.integration.aop.ReceiveMessageAdvice;
 import org.springframework.integration.channel.QueueChannel;
 import org.springframework.integration.core.GenericSelector;
@@ -69,7 +69,6 @@ import org.springframework.integration.sftp.filters.SftpRegexPatternFileListFilt
 import org.springframework.integration.sftp.filters.SftpSimplePatternFileListFilter;
 import org.springframework.integration.sftp.session.SftpRemoteFileTemplate;
 import org.springframework.integration.util.IntegrationReactiveUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessageHeaders;
@@ -77,6 +76,7 @@ import org.springframework.messaging.MessagingException;
 import org.springframework.messaging.PollableChannel;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -95,7 +95,7 @@ import org.springframework.util.StringUtils;
 @Import({ SftpSupplierFactoryConfiguration.class })
 public class SftpSupplierConfiguration {
 
-	private static final String METADATA_STORE_PREFIX = "sftpSource/";
+	private static final String METADATA_STORE_PREFIX = "sftpSource:";
 
 	private static final String FILE_MODIFIED_TIME_HEADER = "FILE_MODIFIED_TIME";
 
@@ -169,7 +169,7 @@ public class SftpSupplierConfiguration {
 
 	private static String remoteDirectory(SftpSupplierProperties sftpSupplierProperties) {
 		return (sftpSupplierProperties.isMultiSource())
-				? SftpSupplierProperties.keyDirectories(sftpSupplierProperties).get(0).getDirectory()
+				? SftpSupplierProperties.keyDirectories(sftpSupplierProperties).get(0).directory()
 				: sftpSupplierProperties.getRemoteDir();
 	}
 
@@ -379,7 +379,7 @@ public class SftpSupplierConfiguration {
 				return MessageBuilder.withPayload(fileName)
 					.copyHeaders(message.getHeaders())
 					.setHeader(FILE_MODIFIED_TIME_HEADER, String.valueOf(dirEntry.getAttributes().getModifyTime()))
-					.setHeader(MessageHeaders.CONTENT_TYPE, MediaType.TEXT_PLAIN)
+					.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.TEXT_PLAIN)
 					.build();
 			};
 

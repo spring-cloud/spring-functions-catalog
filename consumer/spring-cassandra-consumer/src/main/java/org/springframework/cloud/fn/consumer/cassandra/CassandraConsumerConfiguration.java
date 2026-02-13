@@ -29,16 +29,16 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import com.datastax.oss.driver.api.core.ConsistencyLevel;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.util.StdDateFormat;
 import reactor.core.publisher.Mono;
+import tools.jackson.databind.DeserializationFeature;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.util.StdDateFormat;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.data.cassandra.CassandraReactiveDataAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.data.cassandra.autoconfigure.DataCassandraReactiveAutoConfiguration;
 import org.springframework.cloud.fn.consumer.cassandra.query.ColumnNameExtractor;
 import org.springframework.cloud.fn.consumer.cassandra.query.InsertQueryColumnNameExtractor;
 import org.springframework.cloud.fn.consumer.cassandra.query.UpdateQueryColumnNameExtractor;
@@ -52,7 +52,7 @@ import org.springframework.integration.JavaUtils;
 import org.springframework.integration.cassandra.outbound.CassandraMessageHandler;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.gateway.AnnotationGatewayProxyFactoryBean;
-import org.springframework.integration.support.json.Jackson2JsonObjectMapper;
+import org.springframework.integration.support.json.JacksonJsonObjectMapper;
 import org.springframework.integration.transformer.AbstractPayloadTransformer;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.util.StringUtils;
@@ -66,7 +66,7 @@ import org.springframework.util.StringUtils;
  * @author Akos Ratku
  * @author Omer Celik
  */
-@AutoConfiguration(after = CassandraReactiveDataAutoConfiguration.class)
+@AutoConfiguration(after = DataCassandraReactiveAutoConfiguration.class)
 @EnableConfigurationProperties(CassandraConsumerProperties.class)
 public class CassandraConsumerConfiguration {
 
@@ -80,12 +80,12 @@ public class CassandraConsumerConfiguration {
 
 	@Bean
 	public IntegrationFlow cassandraConsumerFlow(
-			@Qualifier("cassandraMessageHandler") MessageHandler cassandraMessageHandler, ObjectMapper objectMapper) {
+			@Qualifier("cassandraMessageHandler") MessageHandler cassandraMessageHandler, JsonMapper jsonMapper) {
 
 		return (flow) -> {
 			String ingestQuery = this.cassandraSinkProperties.getIngestQuery();
 			if (StringUtils.hasText(ingestQuery)) {
-				flow.transform(new PayloadToMatrixTransformer(objectMapper, ingestQuery,
+				flow.transform(new PayloadToMatrixTransformer(jsonMapper, ingestQuery,
 						(CassandraMessageHandler.Type.UPDATE == this.cassandraSinkProperties.getQueryType())
 								? new UpdateQueryColumnNameExtractor() : new InsertQueryColumnNameExtractor()));
 			}
@@ -144,7 +144,7 @@ public class CassandraConsumerConfiguration {
 
 	private static class PayloadToMatrixTransformer extends AbstractPayloadTransformer<Object, List<List<Object>>> {
 
-		private final Jackson2JsonObjectMapper jsonObjectMapper;
+		private final JacksonJsonObjectMapper jsonObjectMapper;
 
 		private final List<String> columns = new LinkedList<>();
 
@@ -152,11 +152,12 @@ public class CassandraConsumerConfiguration {
 
 		private final Lock dateLock = new ReentrantLock();
 
-		PayloadToMatrixTransformer(ObjectMapper objectMapper, String query, ColumnNameExtractor columnNameExtractor) {
-			this.jsonObjectMapper = new Jackson2JsonObjectMapper(objectMapper);
+		PayloadToMatrixTransformer(JsonMapper objectMapper, String query, ColumnNameExtractor columnNameExtractor) {
+			JsonMapper jsonMapper = objectMapper.rebuild()
+				.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY)
+				.build();
+			this.jsonObjectMapper = new JacksonJsonObjectMapper(jsonMapper);
 			this.columns.addAll(columnNameExtractor.extract(query));
-			this.jsonObjectMapper.getObjectMapper()
-				.configure(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY, true);
 		}
 
 		@Override
@@ -197,6 +198,11 @@ public class CassandraConsumerConfiguration {
 					throw new IllegalArgumentException("Cannot parse json into matrix", ex);
 				}
 			}
+		}
+
+		@Override
+		public String getComponentType() {
+			return "payload-to-matrix-transformer";
 		}
 
 	}

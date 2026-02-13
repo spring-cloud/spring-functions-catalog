@@ -26,9 +26,9 @@ import org.springframework.cloud.fn.common.tcp.TcpConnectionFactoryProperties;
 import org.springframework.context.SmartLifecycle;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.ip.config.TcpConnectionFactoryFactoryBean;
-import org.springframework.integration.ip.tcp.TcpSendingMessageHandler;
 import org.springframework.integration.ip.tcp.connection.AbstractConnectionFactory;
 import org.springframework.integration.ip.tcp.connection.TcpMessageMapper;
+import org.springframework.integration.ip.tcp.outbound.TcpSendingMessageHandler;
 import org.springframework.integration.ip.tcp.serializer.AbstractByteArraySerializer;
 import org.springframework.messaging.Message;
 
@@ -56,13 +56,13 @@ public class TcpConsumerConfiguration {
 	}
 
 	@Bean
-	public Consumer<Message<?>> tcpConsumer(TcpSendingMessageHandlerSmartLifeCycle tcpConsumerMessageHandler) {
+	Consumer<Message<?>> tcpConsumer(TcpSendingMessageHandlerSmartLifeCycle tcpConsumerMessageHandler) {
 
 		return tcpConsumerMessageHandler::handleMessage;
 	}
 
 	@Bean
-	public TcpSendingMessageHandlerSmartLifeCycle tcpConsumerMessageHandler(
+	TcpSendingMessageHandlerSmartLifeCycle tcpConsumerMessageHandler(
 			@Qualifier("tcpSinkConnectionFactory") AbstractConnectionFactory connectionFactory) {
 
 		TcpSendingMessageHandlerSmartLifeCycle tcpMessageHandler = new TcpSendingMessageHandlerSmartLifeCycle();
@@ -102,11 +102,6 @@ public class TcpConsumerConfiguration {
 	}
 
 	static class TcpSendingMessageHandlerSmartLifeCycle extends TcpSendingMessageHandler implements SmartLifecycle {
-
-		@Override
-		public boolean isAutoStartup() {
-			return true;
-		}
 
 		@Override
 		public int getPhase() {

@@ -28,7 +28,7 @@ import reactor.test.StepVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.integration.file.FileHeaders;
-import org.springframework.integration.file.FileReadingMessageSource;
+import org.springframework.integration.file.inbound.FileReadingMessageSource;
 import org.springframework.integration.jdbc.metadata.JdbcMetadataStore;
 import org.springframework.integration.metadata.ConcurrentMetadataStore;
 import org.springframework.integration.test.util.TestUtils;

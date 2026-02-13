@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PropertiesPopulatedTests extends AbstractSyslogSupplierTests {
 
 	@Test
-	public void test() throws Exception {
+	public void test() {
 		assertThat(this.connectionFactory).isInstanceOf(TcpNioServerConnectionFactory.class);
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "lookupHost", Boolean.class)).isTrue();
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(123);

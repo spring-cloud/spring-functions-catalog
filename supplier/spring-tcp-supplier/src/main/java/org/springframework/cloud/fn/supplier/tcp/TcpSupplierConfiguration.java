@@ -30,8 +30,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.ip.IpHeaders;
 import org.springframework.integration.ip.config.TcpConnectionFactoryFactoryBean;
-import org.springframework.integration.ip.tcp.TcpReceivingChannelAdapter;
 import org.springframework.integration.ip.tcp.connection.AbstractConnectionFactory;
+import org.springframework.integration.ip.tcp.inbound.TcpReceivingChannelAdapter;
 import org.springframework.integration.ip.tcp.serializer.AbstractByteArraySerializer;
 import org.springframework.messaging.Message;
 

@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 import io.debezium.engine.ChangeEvent;
 import io.debezium.engine.DebeziumEngine;
 import io.debezium.engine.DebeziumEngine.Builder;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
@@ -34,7 +35,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.integration.debezium.dsl.Debezium;
 import org.springframework.integration.debezium.dsl.DebeziumMessageProducerSpec;
 import org.springframework.integration.dsl.IntegrationFlow;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**

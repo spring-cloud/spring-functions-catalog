@@ -19,6 +19,7 @@ package org.springframework.cloud.fn.consumer.ftp;
 import java.util.function.Consumer;
 
 import org.apache.commons.net.ftp.FTPFile;
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -32,7 +33,6 @@ import org.springframework.integration.file.remote.session.SessionFactory;
 import org.springframework.integration.ftp.dsl.Ftp;
 import org.springframework.integration.ftp.dsl.FtpMessageHandlerSpec;
 import org.springframework.integration.ftp.session.FtpRemoteFileTemplate;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 @EnableConfigurationProperties(FtpConsumerProperties.class)

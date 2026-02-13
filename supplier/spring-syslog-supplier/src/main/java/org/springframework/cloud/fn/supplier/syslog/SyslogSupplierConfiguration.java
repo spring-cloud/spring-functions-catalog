@@ -18,6 +18,7 @@ package org.springframework.cloud.fn.supplier.syslog;
 
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +41,6 @@ import org.springframework.integration.syslog.inbound.RFC6587SyslogDeserializer;
 import org.springframework.integration.syslog.inbound.SyslogReceivingChannelAdapterSupport;
 import org.springframework.integration.syslog.inbound.TcpSyslogReceivingChannelAdapter;
 import org.springframework.integration.syslog.inbound.UdpSyslogReceivingChannelAdapter;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**

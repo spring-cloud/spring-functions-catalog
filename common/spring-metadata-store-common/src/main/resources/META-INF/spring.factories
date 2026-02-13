@@ -1,0 +1,2 @@
+org.springframework.boot.EnvironmentPostProcessor=\
+  org.springframework.cloud.fn.common.metadata.store.DisableDynamoDbAutoConfigurationEnvironmentPostProcessor

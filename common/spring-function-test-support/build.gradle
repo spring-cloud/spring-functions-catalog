@@ -1,6 +1,6 @@
 dependencies {
     api 'org.junit.jupiter:junit-jupiter-api'
-    api 'org.testcontainers:junit-jupiter'
+    api 'org.testcontainers:testcontainers-junit-jupiter'
 
     optionalApi ftpServerCore
     optionalApi 'org.springframework.integration:spring-integration-sftp'

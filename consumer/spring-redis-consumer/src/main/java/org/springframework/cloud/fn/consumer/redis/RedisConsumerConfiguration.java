@@ -20,8 +20,8 @@ import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.integration.redis.outbound.RedisPublishingMessageHandler;
@@ -39,7 +39,7 @@ import org.springframework.messaging.MessageHandler;
  * @author Soby Chacko
  * @author Artem Bilan
  */
-@AutoConfiguration(after = RedisAutoConfiguration.class)
+@AutoConfiguration(after = DataRedisAutoConfiguration.class)
 @EnableConfigurationProperties(RedisConsumerProperties.class)
 public class RedisConsumerConfiguration {
 

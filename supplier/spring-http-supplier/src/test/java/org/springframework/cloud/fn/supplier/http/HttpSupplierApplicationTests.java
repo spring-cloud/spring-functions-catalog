@@ -38,8 +38,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.http.codec.AbstractJacksonDecoder;
 import org.springframework.http.codec.ServerCodecConfigurer;
-import org.springframework.http.codec.json.AbstractJackson2Decoder;
 import org.springframework.integration.http.HttpHeaders;
 import org.springframework.integration.test.util.TestUtils;
 import org.springframework.integration.webflux.inbound.WebFluxInboundEndpoint;
@@ -58,7 +58,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
 		properties = { "server.ssl.key-store=classpath:test.jks", "server.ssl.key-password=password",
 				"server.ssl.trust-store=classpath:test.jks", "server.ssl.client-auth=want",
-				"spring.codec.max-in-memory-size=10MB" })
+				"spring.http.codecs.max-in-memory-size=10MB" })
 @DirtiesContext
 public class HttpSupplierApplicationTests {
 
@@ -80,10 +80,10 @@ public class HttpSupplierApplicationTests {
 		assertThat(TestUtils.getPropertyValue(serverDefaultCodecs, "maxInMemorySize", Integer.class))
 			.isEqualTo(1024 * 1024 * 10);
 
-		AbstractJackson2Decoder jackson2JsonDecoder = TestUtils.getPropertyValue(serverDefaultCodecs,
-				"jackson2JsonDecoder", AbstractJackson2Decoder.class);
+		AbstractJacksonDecoder<?> jacksonJsonDecoder = TestUtils.getPropertyValue(serverDefaultCodecs,
+				"jacksonJsonDecoder", AbstractJacksonDecoder.class);
 
-		assertThat(jackson2JsonDecoder).isNotNull().extracting("maxInMemorySize").isEqualTo(1024 * 1024 * 10);
+		assertThat(jacksonJsonDecoder).isNotNull().extracting("maxInMemorySize").isEqualTo(1024 * 1024 * 10);
 
 		Flux<Message<byte[]>> messageFlux = this.httpSupplier.get();
 

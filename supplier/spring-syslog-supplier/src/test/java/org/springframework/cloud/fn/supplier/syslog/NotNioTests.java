@@ -26,7 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class NotNioTests extends AbstractSyslogSupplierTests {
 
 	@Test
-	public void test() throws Exception {
+	public void test() {
 		assertThat(this.connectionFactory).isInstanceOf(TcpNetServerConnectionFactory.class);
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "lookupHost", Boolean.class)).isFalse();
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(0);

@@ -30,8 +30,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.integration.file.FileReadingMessageSource;
 import org.springframework.integration.file.dsl.FileInboundChannelAdapterSpec;
+import org.springframework.integration.file.inbound.FileReadingMessageSource;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
 

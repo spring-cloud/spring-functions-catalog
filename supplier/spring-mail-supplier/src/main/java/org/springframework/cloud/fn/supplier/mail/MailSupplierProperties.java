@@ -22,7 +22,7 @@ import jakarta.mail.URLName;
 import jakarta.validation.constraints.NotNull;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.integration.mail.AbstractMailReceiver;
+import org.springframework.integration.mail.inbound.AbstractMailReceiver;
 import org.springframework.validation.annotation.Validated;
 
 /**

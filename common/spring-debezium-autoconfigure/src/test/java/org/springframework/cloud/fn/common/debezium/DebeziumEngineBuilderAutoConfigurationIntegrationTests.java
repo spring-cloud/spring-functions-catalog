@@ -41,10 +41,10 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
+import org.springframework.boot.mongodb.autoconfigure.MongoAutoConfiguration;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
@@ -54,7 +54,7 @@ import org.springframework.test.jdbc.JdbcTestUtils;
 import static org.awaitility.Awaitility.await;
 
 /**
- * This test illustrate how to leverage the DebeziumEngineAutoConfiguration to build a
+ * This test illustrates how to leverage the DebeziumEngineAutoConfiguration to build a
  * consumer function with a custom change event Consumer.
  *
  * @author Christian Tzolov

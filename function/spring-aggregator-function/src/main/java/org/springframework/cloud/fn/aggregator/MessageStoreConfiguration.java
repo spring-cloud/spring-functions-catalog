@@ -20,11 +20,11 @@ import java.util.Arrays;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoAutoConfiguration;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.mongodb.autoconfigure.MongoAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Primary;
@@ -53,7 +53,7 @@ class MessageStoreConfiguration {
 	@ConditionalOnClass(ConfigurableMongoDbMessageStore.class)
 	@ConditionalOnProperty(prefix = AggregatorFunctionProperties.PREFIX, name = "message-store-type",
 			havingValue = AggregatorFunctionProperties.MessageStoreType.MONGODB)
-	@Import({ MongoAutoConfiguration.class, MongoDataAutoConfiguration.class })
+	@Import({ MongoAutoConfiguration.class, DataMongoAutoConfiguration.class })
 	static class Mongo {
 
 		@Bean
@@ -78,7 +78,7 @@ class MessageStoreConfiguration {
 	@ConditionalOnClass(RedisMessageStore.class)
 	@ConditionalOnProperty(prefix = AggregatorFunctionProperties.PREFIX, name = "message-store-type",
 			havingValue = AggregatorFunctionProperties.MessageStoreType.REDIS)
-	@Import(RedisAutoConfiguration.class)
+	@Import(DataRedisAutoConfiguration.class)
 	static class Redis {
 
 		@Bean

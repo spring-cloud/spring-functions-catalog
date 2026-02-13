@@ -19,7 +19,6 @@ package org.springframework.cloud.fn.aggregator;
 import java.time.Duration;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
@@ -36,7 +35,6 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Artem Bilan
  * @author Corneil du Plessis
  */
-@Disabled("Fails on CI sporadically")
 @TestPropertySource(properties = "aggregator.message-store-type=simple")
 public class DefaultAggregatorTests extends AbstractAggregatorFunctionTests {
 

@@ -40,17 +40,21 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.assertj.AssertableApplicationContext;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.cloud.fn.test.support.sftp.SftpTestSupport;
-import org.springframework.http.MediaType;
 import org.springframework.integration.file.splitter.FileSplitter;
 import org.springframework.integration.json.JsonPathUtils;
 import org.springframework.integration.metadata.MetadataStore;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHeaders;
+import org.springframework.util.MimeTypeUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.awaitility.Awaitility.await;
 
+/**
+ * @author David Turanski
+ * @author Artem Bilan
+ */
 public class SftpSupplierApplicationTests extends SftpTestSupport {
 
 	ApplicationContextRunner defaultApplicationContextRunner;
@@ -82,10 +86,10 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 			StepVerifier.create(sftpSupplier.get()).assertNext((message) -> {
 				assertThat(expectedFileNames.get()).contains(message.getPayload());
 				expectedFileNames.get().remove(message.getPayload());
-				assertThat(message.getHeaders().get(MessageHeaders.CONTENT_TYPE)).isEqualTo(MediaType.TEXT_PLAIN);
+				assertThat(message.getHeaders()).containsEntry(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.TEXT_PLAIN);
 			}).assertNext((message) -> {
 				assertThat(expectedFileNames.get()).contains(message.getPayload());
-				assertThat(message.getHeaders().get(MessageHeaders.CONTENT_TYPE)).isEqualTo(MediaType.TEXT_PLAIN);
+				assertThat(message.getHeaders()).containsEntry(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.TEXT_PLAIN);
 			}).thenCancel().verify(Duration.ofSeconds(30));
 
 		});
@@ -124,10 +128,12 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 				final AtomicReference<List<String>> expectedFileNames = new AtomicReference<>(fileNames);
 				StepVerifier.create(sftpSupplier.get()).assertNext((message) -> {
 					assertThat(message.getPayload()).isEqualTo(expectedFileNames.get().get(0));
-					assertThat(message.getHeaders().get(MessageHeaders.CONTENT_TYPE)).isEqualTo(MediaType.TEXT_PLAIN);
+					assertThat(message.getHeaders()).containsEntry(MessageHeaders.CONTENT_TYPE,
+							MimeTypeUtils.TEXT_PLAIN);
 				}).assertNext((message) -> {
 					assertThat(message.getPayload()).isEqualTo(expectedFileNames.get().get(1));
-					assertThat(message.getHeaders().get(MessageHeaders.CONTENT_TYPE)).isEqualTo(MediaType.TEXT_PLAIN);
+					assertThat(message.getHeaders()).containsEntry(MessageHeaders.CONTENT_TYPE,
+							MimeTypeUtils.TEXT_PLAIN);
 				}).thenCancel().verify(Duration.ofSeconds(30));
 
 			});
@@ -150,10 +156,12 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 				final AtomicReference<List<String>> expectedFileNames = new AtomicReference<>(fileNames);
 				StepVerifier.create(sftpSupplier.get()).assertNext((message) -> {
 					assertThat(message.getPayload()).isEqualTo(expectedFileNames.get().get(0));
-					assertThat(message.getHeaders().get(MessageHeaders.CONTENT_TYPE)).isEqualTo(MediaType.TEXT_PLAIN);
+					assertThat(message.getHeaders()).containsEntry(MessageHeaders.CONTENT_TYPE,
+							MimeTypeUtils.TEXT_PLAIN);
 				}).assertNext((message) -> {
 					assertThat(message.getPayload()).isEqualTo(expectedFileNames.get().get(1));
-					assertThat(message.getHeaders().get(MessageHeaders.CONTENT_TYPE)).isEqualTo(MediaType.TEXT_PLAIN);
+					assertThat(message.getHeaders()).containsEntry(MessageHeaders.CONTENT_TYPE,
+							MimeTypeUtils.TEXT_PLAIN);
 				}).thenCancel().verify(Duration.ofSeconds(30));
 
 			});
@@ -183,8 +191,8 @@ public class SftpSupplierApplicationTests extends SftpTestSupport {
 					.thenCancel()
 					.verify(Duration.ofSeconds(30));
 
-				assertThat(metadataStore.get("sftpSource/sftpSource1.txt")).isNotNull();
-				assertThat(metadataStore.get("sftpSource/sftpSource2.txt")).isNotNull();
+				assertThat(metadataStore.get("sftpSource:/sftpSource/sftpSource1.txt")).isNotNull();
+				assertThat(metadataStore.get("sftpSource:/sftpSource/sftpSource2.txt")).isNotNull();
 				assertThat(Files.exists(Paths.get(getTargetLocalDirectory().getAbsolutePath(), "sftpSource1.txt")))
 					.isTrue();
 				assertThat(Files.exists(Paths.get(getTargetLocalDirectory().getAbsolutePath(), "sftpSource2.txt")))

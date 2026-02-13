@@ -16,10 +16,11 @@
 
 package org.springframework.cloud.fn.aggregator;
 
+import java.time.Duration;
 import java.util.function.Function;
 
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -45,7 +46,6 @@ import org.springframework.integration.channel.FluxMessageChannel;
 import org.springframework.integration.config.AggregatorFactoryBean;
 import org.springframework.integration.store.MessageGroupStore;
 import org.springframework.integration.support.MessageBuilder;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**
@@ -66,14 +66,23 @@ public class AggregatorFunctionConfiguration {
 	@Autowired
 	private BeanFactory beanFactory;
 
+	public AggregatorFunctionConfiguration() {
+		this.outputChannel.setBeanName("aggregatorOutputChannel");
+	}
+
 	@Bean
 	public Function<Flux<Message<?>>, Flux<Message<?>>> aggregatorFunction(
 			@Qualifier("aggregatorInputChannel") FluxMessageChannel aggregatorInputChannel) {
 
-		return (input) -> Flux.from(this.outputChannel)
-			.doOnRequest((request) -> aggregatorInputChannel.subscribeTo(input
+		return (input) -> {
+			Flux<? extends Message<?>> messageFlux = input
 				.map((inputMessage) -> MessageBuilder.fromMessage(inputMessage).removeHeader("kafka_consumer").build())
-				.publishOn(Schedulers.boundedElastic())));
+				.delaySubscription(Duration.ZERO);
+
+			aggregatorInputChannel.subscribeTo(messageFlux);
+
+			return Flux.from(this.outputChannel);
+		};
 	}
 
 	@Bean

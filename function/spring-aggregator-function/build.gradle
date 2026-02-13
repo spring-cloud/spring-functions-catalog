@@ -1,18 +1,19 @@
 dependencies {
-    api project(':spring-payload-converter-function')
-    api 'org.springframework.integration:spring-integration-mongodb'
-    api 'org.springframework.integration:spring-integration-redis'
-    api 'org.springframework.integration:spring-integration-jdbc'
+	api project(':spring-payload-converter-function')
+	api 'org.springframework.integration:spring-integration-mongodb'
+	api 'org.springframework.integration:spring-integration-redis'
+	api 'org.springframework.integration:spring-integration-jdbc'
+	api 'org.springframework.boot:spring-boot-starter-data-redis'
+	api 'org.springframework.boot:spring-boot-starter-data-mongodb'
+	api 'org.springframework.boot:spring-boot-starter-jdbc'
 
-    runtimeOnly 'org.springframework.boot:spring-boot-starter-data-redis'
-    runtimeOnly 'org.springframework.boot:spring-boot-starter-data-mongodb'
-    runtimeOnly 'org.springframework.boot:spring-boot-starter-jdbc'
-    runtimeOnly 'org.hsqldb:hsqldb'
-    runtimeOnly 'com.h2database:h2'
-    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
-    runtimeOnly 'org.postgresql:postgresql'
+	runtimeOnly 'org.hsqldb:hsqldb'
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
+	runtimeOnly 'org.postgresql:postgresql'
 
-    testImplementation 'org.testcontainers:mongodb'
-    testImplementation project(':spring-mongodb-consumer').sourceSets.test.output
-    testImplementation project(':spring-redis-consumer').sourceSets.test.output
+	testImplementation 'org.springframework.boot:spring-boot-data-mongodb-test'
+	testImplementation 'org.testcontainers:testcontainers-mongodb'
+	testImplementation project(':spring-mongodb-consumer').sourceSets.test.output
+	testImplementation project(':spring-redis-consumer').sourceSets.test.output
 }

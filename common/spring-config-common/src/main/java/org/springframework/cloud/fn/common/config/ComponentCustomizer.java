@@ -18,7 +18,7 @@ package org.springframework.cloud.fn.common.config;
 
 /**
  * The customizer contract to apply to beans in the application context which type is
- * matching to generic type of the instance of this interface.
+ * matching to a generic type of the instance of this interface.
  *
  * @param <T> the target component (bean) type in the application context to customize.
  * @author Artem Bilan

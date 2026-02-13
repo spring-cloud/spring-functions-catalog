@@ -20,12 +20,12 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Chris Schaefer
  * @author David Turanski
+ * @author Artem Bilan
  */
 public class KeyValueListParserTests {
 
@@ -33,10 +33,7 @@ public class KeyValueListParserTests {
 	public void testParseSimpleDeploymentProperty() {
 		Map<String, String> deploymentProperties = KeyValueListParser
 			.parseCommaDelimitedKeyValuePairs("app.sftp.param=value");
-		assertTrue("Invalid number of deployment properties: " + deploymentProperties.size(),
-				deploymentProperties.size() == 1);
-		assertTrue("Expected deployment key not found", deploymentProperties.containsKey("app.sftp.param"));
-		assertEquals("Invalid deployment value", "value", deploymentProperties.get("app.sftp.param"));
+		assertThat(deploymentProperties).hasSize(1).containsEntry("app.sftp.param", "value");
 	}
 
 	@Test
@@ -44,10 +41,7 @@ public class KeyValueListParserTests {
 		Map<String, String> deploymentProperties = KeyValueListParser
 			.parseCommaDelimitedKeyValuePairs("app.sftp.param=value1,value2,value3");
 
-		assertTrue("Invalid number of deployment properties: " + deploymentProperties.size(),
-				deploymentProperties.size() == 1);
-		assertTrue("Expected deployment key not found", deploymentProperties.containsKey("app.sftp.param"));
-		assertEquals("Invalid deployment value", "value1,value2,value3", deploymentProperties.get("app.sftp.param"));
+		assertThat(deploymentProperties).hasSize(1).containsEntry("app.sftp.param", "value1,value2,value3");
 	}
 
 	@Test
@@ -55,15 +49,10 @@ public class KeyValueListParserTests {
 		Map<String, String> argExpressions = KeyValueListParser.parseCommaDelimitedKeyValuePairs(
 				"arg1=payload.substr(0,2),arg2=headers['foo'],arg3=headers['bar']==false");
 
-		assertTrue("Invalid number of deployment properties: " + argExpressions.size(), argExpressions.size() == 3);
-		assertTrue("Expected deployment key not found", argExpressions.containsKey("arg1"));
-		assertEquals("Invalid deployment value", "payload.substr(0,2)", argExpressions.get("arg1"));
-
-		assertTrue("Expected deployment key not found", argExpressions.containsKey("arg2"));
-		assertEquals("Invalid deployment value", "headers['foo']", argExpressions.get("arg2"));
-
-		assertTrue("Expected deployment key not found", argExpressions.containsKey("arg3"));
-		assertEquals("Invalid deployment value", "headers['bar']==false", argExpressions.get("arg3"));
+		assertThat(argExpressions).hasSize(3)
+			.containsEntry("arg1", "payload.substr(0,2)")
+			.containsEntry("arg2", "headers['foo']")
+			.containsEntry("arg3", "headers['bar']==false");
 	}
 
 	@Test
@@ -71,12 +60,9 @@ public class KeyValueListParserTests {
 		Map<String, String> deploymentProperties = KeyValueListParser
 			.parseCommaDelimitedKeyValuePairs("app.sftp.param=value1,app.sftp.other.param=value2");
 
-		assertTrue("Invalid number of deployment properties: " + deploymentProperties.size(),
-				deploymentProperties.size() == 2);
-		assertTrue("Expected deployment key not found", deploymentProperties.containsKey("app.sftp.param"));
-		assertEquals("Invalid deployment value", "value1", deploymentProperties.get("app.sftp.param"));
-		assertTrue("Expected deployment key not found", deploymentProperties.containsKey("app.sftp.other.param"));
-		assertEquals("Invalid deployment value", "value2", deploymentProperties.get("app.sftp.other.param"));
+		assertThat(deploymentProperties).hasSize(2)
+			.containsEntry("app.sftp.param", "value1")
+			.containsEntry("app.sftp.other.param", "value2");
 	}
 
 	@Test
@@ -86,12 +72,9 @@ public class KeyValueListParserTests {
 		Map<String, String> deploymentProperties = KeyValueListParser
 			.parseCommaDelimitedKeyValuePairs("app.sftp.param=value1,value2,app.sftp.other.param=other1,other2");
 
-		assertTrue("Invalid number of deployment properties: " + deploymentProperties.size(),
-				deploymentProperties.size() == 2);
-		assertTrue("Expected deployment key not found", deploymentProperties.containsKey("app.sftp.param"));
-		assertEquals("Invalid deployment value", "value1,value2", deploymentProperties.get("app.sftp.param"));
-		assertTrue("Expected deployment key not found", deploymentProperties.containsKey("app.sftp.other.param"));
-		assertEquals("Invalid deployment value", "other1,other2", deploymentProperties.get("app.sftp.other.param"));
+		assertThat(deploymentProperties).hasSize(2)
+			.containsEntry("app.sftp.param", "value1,value2")
+			.containsEntry("app.sftp.other.param", "other1,other2");
 	}
 
 }

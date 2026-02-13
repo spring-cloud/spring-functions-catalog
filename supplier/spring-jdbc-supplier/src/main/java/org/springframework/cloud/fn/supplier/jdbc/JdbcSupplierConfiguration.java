@@ -21,20 +21,20 @@ import java.util.function.Supplier;
 
 import javax.sql.DataSource;
 
+import org.jspecify.annotations.Nullable;
 import reactor.core.publisher.Flux;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.cloud.fn.splitter.SplitterFunctionConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.core.MessageSource;
-import org.springframework.integration.jdbc.JdbcPollingChannelAdapter;
+import org.springframework.integration.jdbc.inbound.JdbcPollingChannelAdapter;
 import org.springframework.integration.util.IntegrationReactiveUtils;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**

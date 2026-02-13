@@ -7,7 +7,7 @@ plugins {
 	id 'base'
 	id 'io.spring.dependency-management' version '1.1.7'
 	id 'io.spring.javaformat' version "${javaFormatVersion}"
-	id 'com.github.spotbugs' version '6.4.8'
+	id 'io.spring.nullability' version '0.0.11' apply false
 }
 
 description = 'Spring Functions Catalog'
@@ -51,10 +51,11 @@ allprojects {
 		}
 
 		imports {
-			mavenBom "io.debezium:debezium-bom:$debeziumVersion"
-			mavenBom "io.awspring.cloud:spring-cloud-aws-dependencies:$springCloudAwsVersion"
-			mavenBom "org.springframework.boot:spring-boot-dependencies:$springBootVersion"
-			mavenBom "ai.djl:bom:$djlVersion"
+			mavenBom 'io.debezium:debezium-bom:3.4.1.Final'
+			mavenBom 'io.awspring.cloud:spring-cloud-aws-dependencies:4.0.0'
+			mavenBom 'org.springframework.boot:spring-boot-dependencies:4.0.2'
+			mavenBom 'ai.djl:bom:0.36.0'
+			mavenBom 'com.squareup.okhttp3:okhttp-bom:5.3.2'
 		}
 	}
 }
@@ -65,6 +66,7 @@ configure(javaProjects) { subproject ->
 	apply plugin: 'idea'
 	apply plugin: 'checkstyle'
 	apply plugin: 'io.spring.javaformat'
+	apply plugin: 'io.spring.nullability'
 	apply from: "${rootDir}/publish-maven.gradle"
 
 	sourceSets {
@@ -77,7 +79,7 @@ configure(javaProjects) { subproject ->
 
 	java {
 		toolchain {
-			languageVersion = JavaLanguageVersion.of(17)
+			languageVersion = JavaLanguageVersion.of(25)
 		}
 		withJavadocJar()
 		withSourcesJar()
@@ -86,18 +88,10 @@ configure(javaProjects) { subproject ->
 		}
 	}
 
-	compileJava {
-		options.release = 17
-	}
-
-	compileTestJava {
-		sourceCompatibility = JavaVersion.VERSION_17
-		targetCompatibility = JavaVersion.VERSION_17
-		options.encoding = 'UTF-8'
-	}
-
 	tasks.withType(JavaCompile).configureEach {
 		options.fork = true
+		sourceCompatibility = JavaVersion.VERSION_17
+		options.encoding = 'UTF-8'
 	}
 
 	tasks.withType(Javadoc) {
@@ -115,6 +109,10 @@ configure(javaProjects) { subproject ->
 		configDirectory = rootProject.file('etc/checkstyle')
 	}
 
+	nullability {
+		requireExplicitNullMarking = false
+	}
+
 	// dependencies that are common across all java projects
 	dependencies {
 		annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
@@ -128,15 +126,11 @@ configure(javaProjects) { subproject ->
 		api 'org.springframework.boot:spring-boot-starter-integration'
 		api 'com.jayway.jsonpath:json-path'
 
-		def spotbugsAnnotations = "com.github.spotbugs:spotbugs-annotations:${spotbugs.toolVersion.get()}"
-		compileOnly spotbugsAnnotations
-		testCompileOnly spotbugsAnnotations
-
 		testImplementation 'org.springframework.boot:spring-boot-starter-test'
 		testImplementation 'org.springframework.integration:spring-integration-test'
 		testImplementation 'io.projectreactor:reactor-test'
 		testImplementation 'org.awaitility:awaitility'
-		testImplementation 'org.testcontainers:junit-jupiter'
+		testImplementation 'org.testcontainers:testcontainers-junit-jupiter'
 
 		testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
@@ -148,8 +142,6 @@ configure(javaProjects) { subproject ->
 	[compileJava, compileTestJava]*.options*.compilerArgs = ['-Xlint:all,-options,-processing', '-parameters']
 
 	test {
-		maxHeapSize = '2g'
-		jvmArgs '-XX:+HeapDumpOnOutOfMemoryError'
 		useJUnitPlatform()
 
 		enableAssertions = false

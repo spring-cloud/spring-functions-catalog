@@ -67,7 +67,6 @@ public class PropertiesPopulated3Tests extends AbstractJmsSupplierTests {
 			.assertNext((message) -> assertThat(message.getPayload()).isEqualTo("Hello, world!"))
 			.thenCancel()
 			.verifyLater();
-
 		template.convertAndSend("jmssource.test.queue", "Hello, world!");
 
 		stepVerifier.verify();

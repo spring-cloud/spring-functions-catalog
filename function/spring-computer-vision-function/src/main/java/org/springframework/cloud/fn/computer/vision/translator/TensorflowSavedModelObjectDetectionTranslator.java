@@ -19,7 +19,7 @@ package org.springframework.cloud.fn.computer.vision.translator;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,7 +104,7 @@ public final class TensorflowSavedModelObjectDetectionTranslator
 	private Map<Integer, String> loadSynset() throws IOException {
 		Map<Integer, String> map = new ConcurrentHashMap<>();
 		int maxId = 0;
-		try (InputStream is = new BufferedInputStream(new URL(this.classLabelsUrl).openStream());
+		try (InputStream is = new BufferedInputStream(URI.create(this.classLabelsUrl).toURL().openStream());
 				Scanner scanner = new Scanner(is, StandardCharsets.UTF_8)) {
 
 			scanner.useDelimiter(ITEM_DELIMITER);

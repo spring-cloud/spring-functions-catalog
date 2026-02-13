@@ -16,11 +16,11 @@
 
 package functions;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.function.Function;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.core.log.LogAccessor;
 import org.springframework.messaging.Message;
@@ -40,9 +40,9 @@ public class JsonBytesToMap implements Function<Message<?>, Message<?>> {
 
 	private static final LogAccessor logger = new LogAccessor(JsonBytesToMap.class);
 
-	private final ObjectMapper objectMapper;
+	private final JsonMapper objectMapper;
 
-	public JsonBytesToMap(ObjectMapper objectMapper) {
+	public JsonBytesToMap(JsonMapper objectMapper) {
 		this.objectMapper = objectMapper;
 	}
 
@@ -67,7 +67,7 @@ public class JsonBytesToMap implements Function<Message<?>, Message<?>> {
 		try {
 			return this.objectMapper.readValue(payload, Map.class);
 		}
-		catch (IOException ex) {
+		catch (JacksonException ex) {
 			logger.trace(ex, "Cannot deserialize to Map");
 			// Was not able to construct the map from byte[] -- returning as is
 			return payload;

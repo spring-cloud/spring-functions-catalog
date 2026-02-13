@@ -19,13 +19,14 @@ package org.springframework.cloud.fn.consumer.wavefront.service;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.web.client.RestTemplate;
 
 /**
  * The {@link WavefrontService} implementation for connection over proxy.
  *
  * @author Timo Salm
+ * @author Artem Bilan
  */
 public class ProxyConnectionWavefrontService implements WavefrontService {
 
@@ -35,9 +36,7 @@ public class ProxyConnectionWavefrontService implements WavefrontService {
 
 	private final String wavefrontProxyUrl;
 
-	public ProxyConnectionWavefrontService(final RestTemplateBuilder restTemplateBuilder,
-			final String wavefrontProxyUri) {
-
+	public ProxyConnectionWavefrontService(RestTemplateBuilder restTemplateBuilder, String wavefrontProxyUri) {
 		this.restTemplate = restTemplateBuilder.build();
 		this.wavefrontProxyUrl = wavefrontProxyUri;
 	}

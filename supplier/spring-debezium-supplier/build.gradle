@@ -11,5 +11,6 @@ dependencies {
     api 'io.debezium:debezium-connector-spanner'
 
     testImplementation 'com.zaxxer:HikariCP'
-    testImplementation 'org.springframework:spring-jdbc'
+    testImplementation 'org.springframework.boot:spring-boot-jdbc'
+    testImplementation 'org.springframework.boot:spring-boot-data-mongodb'
 }

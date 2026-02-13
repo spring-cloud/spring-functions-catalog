@@ -23,14 +23,12 @@ import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
-import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
+import org.springframework.boot.data.mongodb.test.autoconfigure.AutoConfigureDataMongo;
 import org.springframework.cloud.fn.consumer.mongo.MongoDbTestContainerSupport;
 import org.springframework.integration.mongodb.store.ConfigurableMongoDbMessageStore;
 import org.springframework.integration.test.util.TestUtils;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.GenericMessage;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,12 +43,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureDataMongo
 public class CustomPropsAndMongoMessageStoreAggregatorTests extends AbstractAggregatorFunctionTests
 		implements MongoDbTestContainerSupport {
-
-	@DynamicPropertySource
-	static void mongoDbProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.data.mongodb.port", MONGO_CONTAINER::getFirstMappedPort);
-		registry.add("spring.data.mongodb.database", () -> "test");
-	}
 
 	@Test
 	public void test() {

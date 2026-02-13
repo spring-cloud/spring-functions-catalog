@@ -18,15 +18,15 @@ package org.springframework.cloud.fn.aggregator;
 
 import java.util.Properties;
 
+import org.springframework.boot.EnvironmentPostProcessor;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.mongo.MongoRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;
-import org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
-import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoAutoConfiguration;
+import org.springframework.boot.data.mongodb.autoconfigure.DataMongoRepositoriesAutoConfiguration;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisAutoConfiguration;
+import org.springframework.boot.data.redis.autoconfigure.DataRedisRepositoriesAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration;
+import org.springframework.boot.jdbc.autoconfigure.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.mongodb.autoconfigure.MongoAutoConfiguration;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.MutablePropertySources;
 import org.springframework.core.env.PropertiesPropertySource;
@@ -39,18 +39,20 @@ import org.springframework.core.env.PropertiesPropertySource;
  * @author Artem Bilan
  * @author Corneil du Plessis
  */
-public class ExcludeStoresAutoConfigurationEnvironmentPostProcessor implements EnvironmentPostProcessor {
+class ExcludeStoresAutoConfigurationEnvironmentPostProcessor implements EnvironmentPostProcessor {
 
 	@Override
 	public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
 		MutablePropertySources propertySources = environment.getPropertySources();
 		Properties properties = new Properties();
 
-		properties.setProperty("spring.autoconfigure.exclude", DataSourceAutoConfiguration.class.getName() + ", "
-				+ DataSourceTransactionManagerAutoConfiguration.class.getName() + ", "
-				+ MongoAutoConfiguration.class.getName() + ", " + MongoDataAutoConfiguration.class.getName() + ", "
-				+ MongoRepositoriesAutoConfiguration.class.getName() + ", " + RedisAutoConfiguration.class.getName()
-				+ ", " + RedisRepositoriesAutoConfiguration.class.getName());
+		properties.setProperty("spring.autoconfigure.exclude",
+				DataSourceAutoConfiguration.class.getName() + ", "
+						+ DataSourceTransactionManagerAutoConfiguration.class.getName() + ", "
+						+ MongoAutoConfiguration.class.getName() + ", " + DataMongoAutoConfiguration.class.getName()
+						+ ", " + DataMongoRepositoriesAutoConfiguration.class.getName() + ", "
+						+ DataRedisAutoConfiguration.class.getName() + ", "
+						+ DataRedisRepositoriesAutoConfiguration.class.getName());
 
 		propertySources
 			.addLast(new PropertiesPropertySource("aggregator.exclude.stores.auto-configuration", properties));

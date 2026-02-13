@@ -22,6 +22,7 @@ import java.util.Properties;
 import java.util.function.Supplier;
 
 import jakarta.mail.URLName;
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import reactor.core.publisher.Flux;
 
@@ -45,7 +46,6 @@ import org.springframework.integration.mail.dsl.MailInboundChannelAdapterSpec;
 import org.springframework.integration.mail.dsl.Pop3MailInboundChannelAdapterSpec;
 import org.springframework.integration.transformer.support.AbstractHeaderValueMessageProcessor;
 import org.springframework.integration.transformer.support.HeaderValueMessageProcessor;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 
 /**

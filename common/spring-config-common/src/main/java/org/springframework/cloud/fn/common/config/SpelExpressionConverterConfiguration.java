@@ -33,7 +33,7 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.integration.config.IntegrationConverter;
 import org.springframework.integration.context.IntegrationContextUtils;
 import org.springframework.integration.expression.SpelPropertyAccessorRegistrar;
-import org.springframework.integration.json.JsonPropertyAccessor;
+import org.springframework.integration.json.JacksonPropertyAccessor;
 
 /**
  * The auto-configuration to register a {@link SpelConverter} for configuration
@@ -51,8 +51,9 @@ public class SpelExpressionConverterConfiguration {
 
 	@Bean
 	public static SpelPropertyAccessorRegistrar spelPropertyAccessorRegistrar() {
-		return (new SpelPropertyAccessorRegistrar())
-			.add(Introspector.decapitalize(JsonPropertyAccessor.class.getSimpleName()), new JsonPropertyAccessor());
+		return (new SpelPropertyAccessorRegistrar()).add(
+				Introspector.decapitalize(JacksonPropertyAccessor.class.getSimpleName()),
+				new JacksonPropertyAccessor());
 	}
 
 	@Bean

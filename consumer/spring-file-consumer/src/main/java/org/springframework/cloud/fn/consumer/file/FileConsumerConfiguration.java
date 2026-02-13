@@ -18,6 +18,8 @@ package org.springframework.cloud.fn.consumer.file;
 
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.Nullable;
+
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
@@ -26,8 +28,7 @@ import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.expression.Expression;
 import org.springframework.integration.file.DefaultFileNameGenerator;
-import org.springframework.integration.file.FileWritingMessageHandler;
-import org.springframework.lang.Nullable;
+import org.springframework.integration.file.outbound.FileWritingMessageHandler;
 import org.springframework.messaging.Message;
 
 /**

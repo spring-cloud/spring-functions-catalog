@@ -19,7 +19,7 @@ package org.springframework.cloud.fn.consumer.wavefront.service;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,6 +29,7 @@ import org.springframework.web.client.RestTemplate;
  * The {@link WavefrontService} implementation for direct connection.
  *
  * @author Timo Salm
+ * @author Artem Bilan
  */
 public class DirectConnectionWavefrontService implements WavefrontService {
 
@@ -40,8 +41,8 @@ public class DirectConnectionWavefrontService implements WavefrontService {
 
 	private final String wavefrontToken;
 
-	public DirectConnectionWavefrontService(final RestTemplateBuilder restTemplateBuilder,
-			final String wavefrontServerUri, final String wavefrontApiToken) {
+	public DirectConnectionWavefrontService(RestTemplateBuilder restTemplateBuilder, String wavefrontServerUri,
+			String wavefrontApiToken) {
 
 		this.restTemplate = restTemplateBuilder.build();
 		this.wavefrontDomain = wavefrontServerUri;

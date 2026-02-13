@@ -20,10 +20,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.TwitterObjectFactory;
@@ -80,7 +80,7 @@ public class TwitterConnectionConfiguration {
 	}
 
 	@Bean
-	public Function<Object, Message<byte[]>> twitterJson(ObjectMapper mapper) {
+	public Function<Object, Message<byte[]>> twitterJson(JsonMapper mapper) {
 		return (objects) -> {
 			try {
 				String json = mapper.writeValueAsString(objects);
@@ -89,7 +89,7 @@ public class TwitterConnectionConfiguration {
 					.setHeader(MessageHeaders.CONTENT_TYPE, MimeTypeUtils.APPLICATION_JSON_VALUE)
 					.build();
 			}
-			catch (JsonProcessingException ex) {
+			catch (JacksonException ex) {
 				LOGGER.error("Status to JSON conversion error!", ex);
 			}
 			return null;

@@ -17,13 +17,16 @@
 package org.springframework.cloud.fn.consumer.kafka;
 
 import java.time.Duration;
+import java.util.Objects;
 import java.util.function.Consumer;
+
+import org.jspecify.annotations.Nullable;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
-import org.springframework.boot.autoconfigure.kafka.KafkaAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.context.properties.PropertyMapper;
+import org.springframework.boot.kafka.autoconfigure.KafkaAutoConfiguration;
 import org.springframework.cloud.fn.common.config.ComponentCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.integration.channel.PublishSubscribeChannel;
@@ -32,13 +35,12 @@ import org.springframework.integration.kafka.dsl.Kafka;
 import org.springframework.integration.kafka.dsl.KafkaProducerMessageHandlerSpec;
 import org.springframework.integration.kafka.outbound.KafkaProducerMessageHandler;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.DefaultKafkaHeaderMapper;
-import org.springframework.lang.Nullable;
+import org.springframework.kafka.support.JsonKafkaHeaderMapper;
 import org.springframework.messaging.Message;
 
 /**
  * A configuration for Apache Kafka Publisher (Consumer function). Uses a
- * {@link KafkaProducerMessageHandlerSpec} to publish a message to Kafka topic.
+ * {@link KafkaProducerMessageHandlerSpec} to publish a message to the Kafka topic.
  *
  * @author Artem Bilan
  * @since 4.0
@@ -69,7 +71,14 @@ public class KafkaPublisherConfiguration {
 
 		var kafkaProducerMessageHandlerSpec = Kafka.outboundChannelAdapter(kafkaTemplate);
 
-		PropertyMapper mapper = PropertyMapper.get().alwaysApplyingWhenNonNull();
+		PropertyMapper mapper = PropertyMapper.get().alwaysApplying(new PropertyMapper.SourceOperator() {
+
+			@Override
+			public <T> PropertyMapper.Source<T> apply(PropertyMapper.Source<T> source) {
+				return source.when(Objects::nonNull);
+			}
+
+		});
 
 		mapper.from(kafkaPublisherProperties.getTopic()).to(kafkaProducerMessageHandlerSpec::topic);
 		mapper.from(kafkaPublisherProperties.getTopicExpression()).to(kafkaProducerMessageHandlerSpec::topicExpression);
@@ -91,7 +100,7 @@ public class KafkaPublisherConfiguration {
 			.to(kafkaProducerMessageHandlerSpec::useTemplateConverter);
 
 		kafkaProducerMessageHandlerSpec
-			.headerMapper(new DefaultKafkaHeaderMapper(kafkaPublisherProperties.getMappedHeaders()));
+			.headerMapper(new JsonKafkaHeaderMapper(kafkaPublisherProperties.getMappedHeaders()));
 
 		kafkaProducerMessageHandlerSpec.sendSuccessChannel(kafkaPublisherSuccessChannel);
 		kafkaProducerMessageHandlerSpec.sendFailureChannel(kafkaPublisherFailureChannel);

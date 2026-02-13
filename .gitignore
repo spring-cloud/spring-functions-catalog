@@ -7,3 +7,4 @@ bin/
 .idea/
 out/
 .vscode/
+**/hostkey.ser

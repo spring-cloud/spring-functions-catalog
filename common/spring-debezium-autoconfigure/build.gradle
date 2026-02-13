@@ -1,7 +1,9 @@
 dependencies {
-    api 'org.springframework.integration:spring-integration-debezium'
+	api 'org.springframework.integration:spring-integration-debezium'
 
-    testImplementation 'io.debezium:debezium-connector-mysql'
-    testImplementation 'org.springframework:spring-jdbc'
-    testImplementation 'com.zaxxer:HikariCP'
+	testImplementation 'org.springframework.boot:spring-boot-data-mongodb'
+	testImplementation 'org.springframework.boot:spring-boot-jdbc'
+	testImplementation 'io.debezium:debezium-connector-mysql'
+	testImplementation 'org.springframework:spring-jdbc'
+	testImplementation 'com.zaxxer:HikariCP'
 }

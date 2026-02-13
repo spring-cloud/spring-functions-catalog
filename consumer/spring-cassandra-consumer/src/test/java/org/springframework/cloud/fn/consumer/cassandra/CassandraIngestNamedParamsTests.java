@@ -18,15 +18,15 @@ package org.springframework.cloud.fn.consumer.cassandra;
 
 import java.util.List;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+import tools.jackson.databind.json.JsonMapper;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.fn.consumer.cassandra.domain.Book;
 import org.springframework.data.cassandra.core.WriteResult;
-import org.springframework.integration.support.json.Jackson2JsonObjectMapper;
+import org.springframework.integration.support.json.JacksonJsonObjectMapper;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.util.StringUtils;
 
@@ -41,10 +41,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CassandraIngestNamedParamsTests extends CassandraConsumerApplicationTests {
 
 	@Test
-	void testIngestQuery(@Autowired ObjectMapper objectMapper) throws Exception {
+	void testIngestQuery(@Autowired JsonMapper objectMapper) throws Exception {
 		List<Book> books = getBookList(5);
 
-		Jackson2JsonObjectMapper mapper = new Jackson2JsonObjectMapper(objectMapper);
+		JacksonJsonObjectMapper mapper = new JacksonJsonObjectMapper(objectMapper);
 
 		String booksJsonWithNamedParams = mapper.toJson(books);
 		booksJsonWithNamedParams = StringUtils.replace(booksJsonWithNamedParams, "isbn", "myIsbn");

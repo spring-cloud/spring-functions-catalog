@@ -28,7 +28,7 @@ import reactor.test.StepVerifier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.boot.mongodb.autoconfigure.MongoAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -67,10 +67,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 				"app.datasource.username=root", "app.datasource.password=debezium",
 				"app.datasource.driver-class-name=com.mysql.cj.jdbc.Driver",
 				"app.datasource.type=com.zaxxer.hikari.HikariDataSource" })
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 public class DebeziumSupplierIntegrationTests {
 
-	public static final String IMAGE_TAG = "2.3.3.Final";
+	public static final String IMAGE_TAG = "3.0.0.Final";
 
 	public static final String DEBEZIUM_EXAMPLE_MYSQL_IMAGE = "debezium/example-mysql:" + IMAGE_TAG;
 

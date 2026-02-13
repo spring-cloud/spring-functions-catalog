@@ -20,6 +20,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import io.awspring.cloud.autoconfigure.s3.S3TransferManagerAutoConfiguration;
+import io.awspring.cloud.s3.integration.S3MessageHandler;
+import org.jspecify.annotations.Nullable;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.transfer.s3.S3TransferManager;
@@ -32,12 +34,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.Expression;
-import org.springframework.integration.aws.outbound.S3MessageHandler;
-import org.springframework.integration.aws.support.AwsHeaders;
 import org.springframework.integration.context.IntegrationContextUtils;
 import org.springframework.integration.dsl.IntegrationFlow;
 import org.springframework.integration.expression.ValueExpression;
-import org.springframework.lang.Nullable;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageHandler;
 import org.springframework.util.Assert;
@@ -57,16 +56,15 @@ public class AwsS3ConsumerConfiguration {
 	}
 
 	@Bean
-	public IntegrationFlow s3ConsumerFlow(@Nullable TransferListener transferListener,
-			@Qualifier("amazonS3MessageHandler") MessageHandler amazonS3MessageHandler) {
+	public IntegrationFlow s3ConsumerFlow(@Qualifier("amazonS3MessageHandler") MessageHandler amazonS3MessageHandler) {
 
-		return (flow) -> flow.enrichHeaders((headers) -> headers.header(AwsHeaders.TRANSFER_LISTENER, transferListener))
-			.handle(amazonS3MessageHandler);
+		return (flow) -> flow.handle(amazonS3MessageHandler);
 	}
 
 	@Bean
 	public MessageHandler amazonS3MessageHandler(S3TransferManager s3TransferManager,
 			AwsS3ConsumerProperties s3ConsumerProperties, BeanFactory beanFactory,
+			@Nullable TransferListener transferListener,
 			@Nullable BiConsumer<PutObjectRequest.Builder, Message<?>> uploadMetadataProvider) {
 
 		Expression bucketExpression = s3ConsumerProperties.getBucketExpression();
@@ -108,6 +106,9 @@ public class AwsS3ConsumerConfiguration {
 
 		if (metadataProviderToUse != null) {
 			s3MessageHandler.setUploadMetadataProvider(metadataProviderToUse);
+		}
+		if (transferListener != null) {
+			s3MessageHandler.setTransferListener(transferListener);
 		}
 		return s3MessageHandler;
 	}
