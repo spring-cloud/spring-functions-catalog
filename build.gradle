@@ -51,7 +51,7 @@ allprojects {
 		}
 
 		imports {
-			mavenBom 'io.debezium:debezium-bom:3.4.1.Final'
+			mavenBom 'io.debezium:debezium-bom:3.4.2.Final'
 			mavenBom 'io.awspring.cloud:spring-cloud-aws-dependencies:4.0.0'
 			mavenBom 'org.springframework.boot:spring-boot-dependencies:4.0.3'
 			mavenBom 'ai.djl:bom:0.36.0'
