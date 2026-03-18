@@ -79,9 +79,7 @@ public class AggregatorFunctionConfiguration {
 				.map((inputMessage) -> MessageBuilder.fromMessage(inputMessage).removeHeader("kafka_consumer").build())
 				.delaySubscription(Duration.ZERO);
 
-			aggregatorInputChannel.subscribeTo(messageFlux);
-
-			return Flux.from(this.outputChannel);
+			return Flux.from(this.outputChannel).doOnRequest((__) -> aggregatorInputChannel.subscribeTo(messageFlux));
 		};
 	}
 
