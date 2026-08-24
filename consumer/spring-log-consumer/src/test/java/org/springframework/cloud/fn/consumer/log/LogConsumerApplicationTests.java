@@ -33,6 +33,7 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.integration.test.util.TestUtils;
 import org.springframework.messaging.Message;
 import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.util.MimeType;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +44,7 @@ import static org.mockito.Mockito.verify;
 /**
  * @author Artem Bilan
  */
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
+@DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest({ "log.consumer.name=foo", "log.consumer.level=warn", "log.consumer.expression=payload.toUpperCase()" })
 class LogConsumerApplicationTests {
 

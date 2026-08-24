@@ -54,12 +54,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.willAnswer;
 import static org.mockito.Mockito.mock;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = { "spring.cloud.aws.credentials.accessKey=" + AbstractAwsS3SupplierMockTests.AWS_ACCESS_KEY,
-				"spring.cloud.aws.credentials.secretKey=" + AbstractAwsS3SupplierMockTests.AWS_SECRET_KEY,
-				"spring.cloud.aws.region.static=" + AbstractAwsS3SupplierMockTests.AWS_REGION,
-				"spring.cloud.aws.s3.endpoint=s3://foo",
-				"s3.supplier.remoteDir=" + AbstractAwsS3SupplierMockTests.S3_BUCKET })
+@SpringBootTest(properties = {
+		"spring.cloud.aws.credentials.accessKey=" + AbstractAwsS3SupplierMockTests.AWS_ACCESS_KEY,
+		"spring.cloud.aws.credentials.secretKey=" + AbstractAwsS3SupplierMockTests.AWS_SECRET_KEY,
+		"spring.cloud.aws.region.static=" + AbstractAwsS3SupplierMockTests.AWS_REGION,
+		"spring.cloud.aws.s3.endpoint=s3://foo", "s3.supplier.remoteDir=" + AbstractAwsS3SupplierMockTests.S3_BUCKET })
 @DirtiesContext
 @SpringIntegrationTest(noAutoStartup = "*")
 public abstract class AbstractAwsS3SupplierMockTests {

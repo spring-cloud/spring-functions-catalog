@@ -35,6 +35,7 @@ import reactor.test.StepVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
@@ -55,7 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Artem Bilan
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
 		properties = { "server.ssl.key-store=classpath:test.jks", "server.ssl.key-password=password",
 				"server.ssl.trust-store=classpath:test.jks", "server.ssl.client-auth=want",
 				"spring.http.codecs.max-in-memory-size=10MB" })

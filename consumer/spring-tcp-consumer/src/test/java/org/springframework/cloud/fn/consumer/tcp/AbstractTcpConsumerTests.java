@@ -54,7 +54,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Gary Russell
  * @author Soby Chacko
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, properties = "tcp.consumer.host = localhost")
+@SpringBootTest(properties = "tcp.consumer.host = localhost")
 @DirtiesContext
 public class AbstractTcpConsumerTests {
 

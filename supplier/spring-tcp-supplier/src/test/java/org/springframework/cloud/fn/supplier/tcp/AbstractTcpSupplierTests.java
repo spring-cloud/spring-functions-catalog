@@ -40,7 +40,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Soby Chacko
  * @author Artem Bilan
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, properties = "tcp.port = 0")
+@SpringBootTest(properties = "tcp.port = 0")
 @DirtiesContext
 public class AbstractTcpSupplierTests {
 

@@ -254,7 +254,7 @@ public class SftpSupplierConfiguration {
 		@ConditionalOnExpression("environment['file.consumer.mode']!='ref' && environment['sftp.supplier.list-only']!='true'")
 		Publisher<Message<Object>> sftpReadingFlow(@Qualifier("sftpMessageSource") MessageSource<?> sftpMessageSource,
 				SftpSupplierProperties sftpSupplierProperties, FileConsumerProperties fileConsumerProperties,
-				@Nullable @Qualifier("renameRemoteFileHandler") MessageHandler renameRemoteFileHandler) {
+				@Qualifier("renameRemoteFileHandler") @Nullable MessageHandler renameRemoteFileHandler) {
 
 			IntegrationFlowBuilder flowBuilder = FileUtils.enhanceFlowForReadingMode(
 					IntegrationFlow.from(IntegrationReactiveUtils.messageSourceToFlux(sftpMessageSource)

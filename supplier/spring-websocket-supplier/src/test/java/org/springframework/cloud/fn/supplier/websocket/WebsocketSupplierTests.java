@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.security.autoconfigure.SecurityProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.integration.websocket.ClientWebSocketContainer;
@@ -40,8 +41,7 @@ import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-		properties = "websocket.supplier.path=some_websocket_path")
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, properties = "websocket.supplier.path=some_websocket_path")
 @DirtiesContext
 public class WebsocketSupplierTests {
 

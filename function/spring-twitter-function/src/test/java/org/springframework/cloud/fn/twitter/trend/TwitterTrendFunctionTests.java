@@ -51,11 +51,10 @@ import static org.mockserver.verify.VerificationTimes.once;
  * @author Christian Tzolov
  * @author Artem Bilan
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = { "twitter.connection.consumerKey=consumerKey666",
-				"twitter.connection.consumerSecret=consumerSecret666", "twitter.connection.accessToken=accessToken666",
-				"twitter.connection.accessTokenSecret=accessTokenSecret666" })
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
+@SpringBootTest(properties = { "twitter.connection.consumerKey=consumerKey666",
+		"twitter.connection.consumerSecret=consumerSecret666", "twitter.connection.accessToken=accessToken666",
+		"twitter.connection.accessTokenSecret=accessTokenSecret666" })
+@DirtiesContext
 public abstract class TwitterTrendFunctionTests {
 
 	private static ClientAndServer mockServer;

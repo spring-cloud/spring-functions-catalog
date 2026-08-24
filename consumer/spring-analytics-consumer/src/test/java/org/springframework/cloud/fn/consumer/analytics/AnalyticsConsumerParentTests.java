@@ -23,13 +23,11 @@ import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.test.annotation.DirtiesContext;
 
-@SpringBootTest(webEnvironment = WebEnvironment.NONE,
-		properties = { "management.wavefront.metrics.export.enabled=false" })
+@SpringBootTest(properties = { "management.wavefront.metrics.export.enabled=false" })
 @DirtiesContext
 public abstract class AnalyticsConsumerParentTests {
 

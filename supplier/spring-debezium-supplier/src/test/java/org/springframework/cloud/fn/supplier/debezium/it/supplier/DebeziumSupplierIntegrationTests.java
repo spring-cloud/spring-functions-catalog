@@ -38,35 +38,34 @@ import org.springframework.test.context.DynamicPropertySource;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = { "spring.cloud.function.definition=debeziumSupplier",
+@SpringBootTest(properties = { "spring.cloud.function.definition=debeziumSupplier",
 
-				// https://debezium.io/documentation/reference/transformations/event-flattening.html
-				"debezium.properties.debezium.embedded.shutdown.pause.before.interrupt.ms=500",
-				"debezium.properties.transforms=unwrap",
-				"debezium.properties.transforms.unwrap.type=io.debezium.transforms.ExtractNewRecordState",
-				"debezium.properties.transforms.unwrap.delete.tombstone.handling.mode=rewrite",
-				"debezium.properties.transforms.unwrap.add.fields=name,db,op,table",
+		// https://debezium.io/documentation/reference/transformations/event-flattening.html
+		"debezium.properties.debezium.embedded.shutdown.pause.before.interrupt.ms=500",
+		"debezium.properties.transforms=unwrap",
+		"debezium.properties.transforms.unwrap.type=io.debezium.transforms.ExtractNewRecordState",
+		"debezium.properties.transforms.unwrap.delete.tombstone.handling.mode=rewrite",
+		"debezium.properties.transforms.unwrap.add.fields=name,db,op,table",
 
-				"debezium.properties.schema.history.internal=io.debezium.relational.history.MemorySchemaHistory",
-				"debezium.properties.offset.storage=org.apache.kafka.connect.storage.MemoryOffsetBackingStore",
+		"debezium.properties.schema.history.internal=io.debezium.relational.history.MemorySchemaHistory",
+		"debezium.properties.offset.storage=org.apache.kafka.connect.storage.MemoryOffsetBackingStore",
 
-				// Drop schema from the message payload.
-				"debezium.properties.key.converter.schemas.enable=false",
-				"debezium.properties.value.converter.schemas.enable=false",
+		// Drop schema from the message payload.
+		"debezium.properties.key.converter.schemas.enable=false",
+		"debezium.properties.value.converter.schemas.enable=false",
 
-				"debezium.properties.topic.prefix=my-topic", "debezium.properties.name=my-connector",
-				"debezium.properties.database.server.id=85744",
-				"debezium.properties.connector.class=io.debezium.connector.mysql.MySqlConnector",
-				"debezium.properties.database.user=debezium", "debezium.properties.database.password=dbz",
-				"debezium.properties.database.hostname=localhost",
+		"debezium.properties.topic.prefix=my-topic", "debezium.properties.name=my-connector",
+		"debezium.properties.database.server.id=85744",
+		"debezium.properties.connector.class=io.debezium.connector.mysql.MySqlConnector",
+		"debezium.properties.database.user=debezium", "debezium.properties.database.password=dbz",
+		"debezium.properties.database.hostname=localhost",
 
-				"debezium.properties.table.include.list=inventory.customers, inventory.addresses",
+		"debezium.properties.table.include.list=inventory.customers, inventory.addresses",
 
-				// JdbcTemplate config.
-				"app.datasource.username=root", "app.datasource.password=debezium",
-				"app.datasource.driver-class-name=com.mysql.cj.jdbc.Driver",
-				"app.datasource.type=com.zaxxer.hikari.HikariDataSource" })
+		// JdbcTemplate config.
+		"app.datasource.username=root", "app.datasource.password=debezium",
+		"app.datasource.driver-class-name=com.mysql.cj.jdbc.Driver",
+		"app.datasource.type=com.zaxxer.hikari.HikariDataSource" })
 @Testcontainers(disabledWithoutDocker = true)
 public class DebeziumSupplierIntegrationTests {
 

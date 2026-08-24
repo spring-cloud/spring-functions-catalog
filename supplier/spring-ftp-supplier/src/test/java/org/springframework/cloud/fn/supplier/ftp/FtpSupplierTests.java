@@ -38,9 +38,8 @@ import org.springframework.test.annotation.DirtiesContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE,
-		properties = { "ftp.factory.username = foo", "ftp.factory.password = foo", "file.consumer.mode = ref",
-				"ftp.factory.cacheSessions = true" })
+@SpringBootTest(properties = { "ftp.factory.username = foo", "ftp.factory.password = foo", "file.consumer.mode = ref",
+		"ftp.factory.cacheSessions = true" })
 @DirtiesContext
 public class FtpSupplierTests extends FtpTestSupport {
 

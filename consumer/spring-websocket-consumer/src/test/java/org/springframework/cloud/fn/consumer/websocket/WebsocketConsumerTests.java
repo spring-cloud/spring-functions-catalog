@@ -27,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.cloud.fn.test.support.websocket.WebsocketConsumerClientHandler;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -42,7 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Artem Bilan
  * @author Corneil du Plessis
  */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT,
 		properties = { "websocket.consumer.port=0", "websocket.consumer.path=/some_websocket_path",
 				"websocket.consumer.logLevel=DEBUG", "websocket.consumer.threads=2" })
 @DirtiesContext
