@@ -35,6 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Artem Bilan
+ * @author Max Brauer
  */
 @TestPropertySource(properties = { "aggregator.correlation=T(Thread).currentThread().id",
 		"aggregator.release=!messages.?[payload == 'bar'].empty",
@@ -58,7 +59,8 @@ public class CustomPropsAndMongoMessageStoreAggregatorTests extends AbstractAggr
 			.verify(Duration.ofSeconds(10));
 
 		assertThat(this.messageGroupStore).isInstanceOf(ConfigurableMongoDbMessageStore.class);
-		assertThat(TestUtils.getPropertyValue(this.messageGroupStore, "collectionName")).isEqualTo("aggregatorTest");
+		assertThat(TestUtils.<String>getPropertyValue(this.messageGroupStore, "collectionName"))
+			.isEqualTo("aggregatorTest");
 		assertThat(this.aggregatingMessageHandler.getMessageStore()).isSameAs(this.messageGroupStore);
 	}
 

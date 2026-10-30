@@ -29,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Tests for {@link DebeziumEngineBuilderAutoConfiguration}.
  *
  * @author Christian Tzolov
+ * @author Max Brauer
  */
 public class DebeziumEngineBuilderAutoConfigurationTests {
 
@@ -53,6 +54,31 @@ public class DebeziumEngineBuilderAutoConfigurationTests {
 	void withConnectorWithProperty() {
 		this.contextRunner.withPropertyValues("debezium.properties.connector.class=Dummy")
 			.run((context) -> assertThat(context).hasSingleBean(DebeziumEngine.Builder.class));
+	}
+
+	@Test
+	void shouldUseConfiguredBootstrapServersWhenApplicationOverridesDefault() {
+		this.contextRunner
+			.withPropertyValues("debezium.properties.connector.class=Dummy",
+					"debezium.properties.bootstrap.servers=broker.example:19092")
+			.run((context) -> assertThat(context.getBean(DebeziumProperties.class)
+				.getDebeziumNativeConfiguration()
+				.getProperty("bootstrap.servers")).isEqualTo("broker.example:19092"));
+	}
+
+	@Test
+	void shouldBuildEmbeddedEngineWhenBootstrapServersAreNotConfigured() {
+		this.contextRunner
+			.withPropertyValues("debezium.properties.name=test-engine",
+					"debezium.properties.connector.class=io.debezium.connector.mysql.MySqlConnector",
+					"debezium.properties.offset.storage=org.apache.kafka.connect.storage.MemoryOffsetBackingStore")
+			.run((context) -> {
+				DebeziumEngine.Builder<?> builder = context.getBean(DebeziumEngine.Builder.class);
+				try (DebeziumEngine<?> engine = builder.notifying((event) -> {
+				}).build()) {
+					assertThat(engine).isNotNull();
+				}
+			});
 	}
 
 }
