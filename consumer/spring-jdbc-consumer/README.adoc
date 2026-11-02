@@ -1,26 +1,154 @@
-= Jdbc Consumer
+= JDBC Consumer
 
-A consumer that allows you to insert records into a relational database.
-The consumer uses the `JdbcMessageHandler` from Spring Integration.
+A consumer that writes message values to a relational database through Spring Integration's `JdbcMessageHandler`.
+By default, it generates an `INSERT` statement for each message.
+Set `jdbc.consumer.query` to execute a custom SQL statement, such as an update or an upsert.
 
 == Beans for injection
 
-The `JdbcConsumerConfiguration` auto-configuration provides the following bean:
+The `JdbcConsumerConfiguration` auto-configuration provides a `Consumer<Message<?>>` bean named `jdbcConsumer`.
+Use `jdbcConsumer` as a qualifier when injecting the consumer.
 
-`Consumer<Message<?>> jdbcConsumer`
+== Database connection
 
-You can use `jdbcConsumer` as a qualifier when injecting.
+Configure the database with Spring Boot's `spring.datasource.*` properties, including the URL, username, password, and driver class name if needed.
+The database account must have permission to execute the configured SQL.
 
-== Configuration Options
+== Mapping message values
 
-All configuration properties are prefixed with `jdbc.consumer`.
+`jdbc.consumer.columns` maps SQL parameter names to SpEL expressions.
+For example:
 
-For more information on the various options available, please see link:src/main/java/org/springframework/cloud/fn/consumer/jdbc/JdbcConsumerProperties.java[JdbcConsumerProperties].
+[source,properties]
+----
+jdbc.consumer.columns=id:payload.id,name:payload.name
+----
+
+For a message with the JSON payload `{"id":1,"name":"Josiah"}`, this supplies `id` and `name` values.
+The shorthand `id,name` tries each name as an expression and then as a property of the payload.
+Expressions can also read headers, for example `id:headers['personId'],name:payload.name`.
+An expression that cannot be resolved supplies SQL `NULL`.
+The default mapping is `payload:payload.toString()`.
+
+== Inserting rows (default)
+
+When `jdbc.consumer.query` is absent, empty, or blank, the consumer generates an `INSERT` statement from `jdbc.consumer.table-name` and `jdbc.consumer.columns`.
+The default table name is `messages`.
+For example:
+
+[source,properties]
+----
+jdbc.consumer.table-name=people
+jdbc.consumer.columns=id,name
+----
+
+This executes `INSERT INTO people(id, name) VALUES (:id, :name)` for each message.
+The table must exist and its column types must accept the mapped values.
+
+== Executing SQL
+
+If you want to update existing rows instead of inserting a new row for each message, use a custom SQL statement.
+Set `jdbc.consumer.query` to a SQL write statement with named parameters.
+Each named parameter must have a mapping in `jdbc.consumer.columns`.
+The mapped values are bound as parameters; they are not substituted into the SQL text.
+With a configured query, mapping names do not have to match database column names.
+The SQL determines the target table; `jdbc.consumer.table-name` is used only for initialization.
+
+For example, this configuration updates a row:
+
+[source,properties]
+----
+jdbc.consumer.columns=key:headers['personId'],personName:payload.name
+jdbc.consumer.query=UPDATE people SET name=:personName WHERE id=:key
+----
+
+If no row matches, the consumer does not insert a row.
+The consumer does not return query results or affected-row counts.
+Database and parameter-binding failures during a synchronous write propagate to the caller.
+An idle-timeout flush runs asynchronously; its errors do not return to an earlier consumer call.
+With the default scheduler configuration, these errors are logged.
+
+=== Example: PostgreSQL upsert
+
+An upsert inserts a row when its key is missing and updates a row when its key exists.
+The database selects the action in one statement.
+For PostgreSQL, create a table with a primary key or suitable unique constraint:
+
+[source,sql]
+----
+CREATE TABLE people (id INTEGER PRIMARY KEY, name VARCHAR(40));
+----
+
+Then configure:
+
+[source,properties]
+----
+jdbc.consumer.columns=id,name
+jdbc.consumer.query=INSERT INTO people (id,name) VALUES (:id,:name) ON CONFLICT (id) DO UPDATE SET name=EXCLUDED.name
+----
+
+For example, the message `{"id":1,"name":"Josiah"}` inserts a person.
+The next message `{"id":1,"name":"Josiah Imani"}` updates the same row with the full name Josiah Imani.
+The table contains one row with `id=1` and `name='Josiah Imani'`.
+
+=== Example: MySQL upsert
+
+MySQL uses a different SQL statement for a table with a primary key or unique constraint:
+
+[source,properties]
+----
+jdbc.consumer.columns=id,name
+jdbc.consumer.query=INSERT INTO people (id,name) VALUES (:id,:name) ON DUPLICATE KEY UPDATE name=:name
+----
+
+Both occurrences of `:name` receive the same mapped value.
+
+The consumer does not translate SQL between database types.
+Choose SQL, constraints, and update rules for the target database.
+
+== Batching and initialization
+
+`jdbc.consumer.batch-size` sets the number of messages to collect before a JDBC batch is sent.
+The default is `1`.
+`jdbc.consumer.idle-timeout` sets the idle time in milliseconds before a partial batch is sent.
+The default is `-1`, which disables the idle timeout.
+These settings apply to generated inserts and configured SQL.
+Buffered messages are held in memory.
+
+By default, the consumer does not initialize the database.
+Set `jdbc.consumer.initialize` to the location of a SQL script to initialize a schema.
+The value `true` drops and recreates `jdbc.consumer.table-name` with `VARCHAR` columns from the mapping names.
+This happens even when a configured query targets a different table.
+Check `jdbc.consumer.table-name` before enabling this option; any data in that table is deleted.
+This generated schema has no primary key or unique constraint.
+Use a database migration or a custom initialization script for an upsert schema.
+
+== Ordering and repeated messages
+
+The consumer has no built-in event deduplication or version checks.
+An assignment such as `name=:name` can tolerate a repeated message, but an update such as `total=total+:amount` applies the change again.
+A late event can overwrite a newer value unless the SQL checks a version or another ordering field.
+
+The consumer does not coordinate a database commit with acknowledgement by an external message broker.
+A failure after a commit can cause a message to be delivered again.
+Choose constraints and SQL that meet the application's requirements for retries and ordering.
+
+== Configuration options
+
+All consumer properties use the `jdbc.consumer` prefix.
+See link:src/main/java/org/springframework/cloud/fn/consumer/jdbc/JdbcConsumerProperties.java[JdbcConsumerProperties] for the full property list.
 
 == Tests
 
-See this link:src/test/java/org/springframework/cloud/fn/consumer/jdbc[test suite] for the various ways, this consumer is used.
+The link:src/test/java/org/springframework/cloud/fn/consumer/jdbc[test suite] covers generated inserts and configured SQL, including PostgreSQL and MySQL.
+The PostgreSQL and MySQL tests use Docker and run with the module's `check` task.
+They are skipped when Docker is unavailable:
+
+[source,bash]
+----
+./gradlew :spring-jdbc-consumer:check
+----
 
 == Other usage
 
-See this https://github.com/spring-cloud/stream-applications/blob/master/applications/sink/jdbc-sink/README.adoc[README] where this consumer is used to create a Spring Cloud Stream application where it makes a Jdbc sink.
+See the https://github.com/spring-cloud/stream-applications/blob/master/applications/sink/jdbc-sink/README.adoc[JDBC sink documentation] for use of this consumer in a Spring Cloud Stream application.

@@ -63,6 +63,7 @@ import org.springframework.messaging.MessageHeaders;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MimeTypeUtils;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.StringUtils;
 
 /**
  * Auto-configuration for JDBC consumer.
@@ -74,6 +75,7 @@ import org.springframework.util.MultiValueMap;
  * @author Artem Bilan
  * @author Soby Chacko
  * @author Szabolcs Stremler
+ * @author Max Brauer
  */
 @AutoConfiguration(after = DataSourceAutoConfiguration.class)
 @EnableConfigurationProperties(JdbcConsumerProperties.class)
@@ -175,8 +177,9 @@ public class JdbcConsumerConfiguration {
 				}
 			}
 		}
-		JdbcMessageHandler jdbcMessageHandler = new JdbcMessageHandler(dataSource,
-				generateSql(this.properties.getTableName(), columnExpressionVariations.keySet())) {
+		String sql = StringUtils.hasText(this.properties.getQuery()) ? this.properties.getQuery()
+				: generateSql(this.properties.getTableName(), columnExpressionVariations.keySet());
+		JdbcMessageHandler jdbcMessageHandler = new JdbcMessageHandler(dataSource, sql) {
 
 			@Override
 			protected void handleMessageInternal(final Message<?> message) {

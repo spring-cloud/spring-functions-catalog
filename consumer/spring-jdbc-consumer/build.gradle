@@ -7,4 +7,7 @@ dependencies {
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     runtimeOnly 'org.postgresql:postgresql'
     runtimeOnly 'com.microsoft.sqlserver:mssql-jdbc'
+
+    testImplementation 'org.testcontainers:testcontainers-postgresql'
+    testImplementation 'org.testcontainers:testcontainers-mysql'
 }
