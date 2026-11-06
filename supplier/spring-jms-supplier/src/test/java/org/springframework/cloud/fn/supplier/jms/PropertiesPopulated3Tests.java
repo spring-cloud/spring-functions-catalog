@@ -51,14 +51,15 @@ public class PropertiesPopulated3Tests extends AbstractJmsSupplierTests {
 		AbstractMessageListenerContainer container = TestUtils.getPropertyValue(this.endpoint, "listenerContainer",
 				AbstractMessageListenerContainer.class);
 		assertThat(container).isInstanceOf(DefaultMessageListenerContainer.class);
-		assertThat(TestUtils.getPropertyValue(container, "sessionAcknowledgeMode")).isEqualTo(Session.AUTO_ACKNOWLEDGE);
+		assertThat(TestUtils.<Integer>getPropertyValue(container, "sessionAcknowledgeMode"))
+			.isEqualTo(Session.AUTO_ACKNOWLEDGE);
 		assertThat(TestUtils.getPropertyValue(container, "sessionTransacted", Boolean.class)).isTrue();
-		assertThat(TestUtils.getPropertyValue(container, "destination")).isEqualTo("jmssource.test.queue");
-		assertThat(TestUtils.getPropertyValue(container, "messageSelector")).isEqualTo("JMSCorrelationId=foo");
+		assertThat(TestUtils.<String>getPropertyValue(container, "destination")).isEqualTo("jmssource.test.queue");
+		assertThat(TestUtils.<String>getPropertyValue(container, "messageSelector")).isEqualTo("JMSCorrelationId=foo");
 		assertThat(TestUtils.getPropertyValue(container, "subscriptionDurable", Boolean.class)).isFalse();
 		assertThat(TestUtils.getPropertyValue(container, "subscriptionShared", Boolean.class)).isFalse();
-		assertThat(TestUtils.getPropertyValue(container, "concurrentConsumers")).isEqualTo(3);
-		assertThat(TestUtils.getPropertyValue(container, "maxConcurrentConsumers")).isEqualTo(4);
+		assertThat(TestUtils.<Integer>getPropertyValue(container, "concurrentConsumers")).isEqualTo(3);
+		assertThat(TestUtils.<Integer>getPropertyValue(container, "maxConcurrentConsumers")).isEqualTo(4);
 		assertThat(TestUtils.getPropertyValue(container, "pubSubDomain", Boolean.class)).isFalse();
 
 		final Flux<Message<?>> messageFlux = jmsSupplier.get();

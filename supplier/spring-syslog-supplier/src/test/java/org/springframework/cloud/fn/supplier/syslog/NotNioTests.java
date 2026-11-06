@@ -29,8 +29,9 @@ public class NotNioTests extends AbstractSyslogSupplierTests {
 	public void test() {
 		assertThat(this.connectionFactory).isInstanceOf(TcpNetServerConnectionFactory.class);
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "lookupHost", Boolean.class)).isFalse();
-		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(0);
-		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "deserializer.maxMessageSize")).isEqualTo(2048);
+		assertThat(TestUtils.<Integer>getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(0);
+		assertThat(TestUtils.<Integer>getPropertyValue(this.connectionFactory, "deserializer.maxMessageSize"))
+			.isEqualTo(2048);
 	}
 
 }

@@ -43,6 +43,7 @@ import static org.mockito.Mockito.verify;
 
 /**
  * @author Artem Bilan
+ * @author Max Brauer
  */
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 @SpringBootTest({ "log.consumer.name=foo", "log.consumer.level=warn", "log.consumer.expression=payload.toUpperCase()" })
@@ -67,7 +68,7 @@ class LogConsumerApplicationTests {
 	private void testMessage(Message<?> message, String expectedPayload) {
 		assertThat(this.loggingHandler.getLevel()).isEqualTo(LoggingHandler.Level.WARN);
 		LogAccessor logger = TestUtils.getPropertyValue(this.loggingHandler, "messageLogger", LogAccessor.class);
-		assertThat(TestUtils.getPropertyValue(logger.getLog(), "logger.name")).isEqualTo("foo");
+		assertThat(TestUtils.<String>getPropertyValue(logger.getLog(), "logger.name")).isEqualTo("foo");
 		logger = spy(logger);
 		new DirectFieldAccessor(this.loggingHandler).setPropertyValue("messageLogger", logger);
 		this.logConsumer.accept(message);
