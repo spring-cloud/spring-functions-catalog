@@ -62,6 +62,7 @@ public class ZeroMqConsumerConfigurationTests {
 		socket = CONTEXT.createSocket(SocketType.SUB);
 		socket.setReceiveTimeOut(1000);
 		bindPort = socket.bindToRandomPort("tcp://*");
+		socket.subscribe("test-topic");
 	}
 
 	@DynamicPropertySource
@@ -79,16 +80,16 @@ public class ZeroMqConsumerConfigurationTests {
 	void testMessageHandlerConfiguration() {
 		Message<?> testMessage = MessageBuilder.withPayload("test").setHeader("topic", "test-topic").build();
 
-		await().atMost(Duration.ofSeconds(20)).pollDelay(Duration.ofMillis(100)).untilAsserted(() -> {
-			socket.subscribe("test-topic");
-			// Give it a chance to subscribe
-			Thread.sleep(200);
-			subject.apply(Flux.just(testMessage)).subscribe();
-			String topic = socket.recvStr();
-			assertThat(topic).isEqualTo("test-topic");
-			assertThat(socket.recvStr()).isEmpty();
-			assertThat(socket.recvStr()).isEqualTo("test");
-		});
+		await().atMost(Duration.ofSeconds(20))
+			.pollInSameThread()
+			.pollDelay(Duration.ofMillis(100))
+			.untilAsserted(() -> {
+				subject.apply(Flux.just(testMessage)).subscribe();
+				String topic = socket.recvStr();
+				assertThat(topic).isEqualTo("test-topic");
+				assertThat(socket.recvStr()).isEmpty();
+				assertThat(socket.recvStr()).isEqualTo("test");
+			});
 	}
 
 	@SpringBootApplication
