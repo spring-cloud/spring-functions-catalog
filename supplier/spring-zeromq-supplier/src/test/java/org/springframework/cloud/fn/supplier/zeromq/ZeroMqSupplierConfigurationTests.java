@@ -16,7 +16,8 @@
 
 package org.springframework.cloud.fn.supplier.zeromq;
 
-import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import org.assertj.core.api.InstanceOfAssertFactories;
@@ -29,7 +30,6 @@ import org.zeromq.ZFrame;
 import org.zeromq.ZMQ;
 import org.zeromq.ZMsg;
 import reactor.core.publisher.Flux;
-import reactor.test.StepVerifier;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -79,22 +79,21 @@ public class ZeroMqSupplierConfigurationTests {
 	}
 
 	@Test
-	void testSubscriptionConfiguration() throws InterruptedException {
-		StepVerifier stepVerifier = StepVerifier.create(subject.get().log())
-			.assertNext((message) -> assertThat(message.getPayload())
-				.asInstanceOf(InstanceOfAssertFactories.type(byte[].class))
-				.isEqualTo("test".getBytes(ZMQ.CHARSET)))
-			.thenCancel()
-			.verifyLater();
+	void testSubscriptionConfiguration() throws Exception {
+		CompletableFuture<Message<?>> received = this.subject.get().next().toFuture();
 
-		Thread.sleep(10000);
+		// PUB/SUB "slow joiner": keep publishing until the subscription is established
+		long deadline = System.currentTimeMillis() + 30_000;
+		while (!received.isDone() && System.currentTimeMillis() < deadline) {
+			ZMsg msg = ZMsg.newStringMsg("test");
+			msg.wrap(new ZFrame("test-topic"));
+			msg.send(socket);
+			Thread.sleep(100);
+		}
 
-		ZMsg msg = ZMsg.newStringMsg("test");
-		msg.wrap(new ZFrame("test-topic"));
-		msg.send(socket);
-
-		stepVerifier.verify(Duration.ofSeconds(30));
-
+		assertThat(received.get(10, TimeUnit.SECONDS).getPayload())
+			.asInstanceOf(InstanceOfAssertFactories.type(byte[].class))
+			.isEqualTo("test".getBytes(ZMQ.CHARSET));
 	}
 
 	@SpringBootApplication
