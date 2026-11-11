@@ -62,9 +62,9 @@ public class ZeroMqSupplierConfigurationTests {
 	@BeforeAll
 	static void setup() {
 
-		String socketAddress = "tcp://*";
-		socket = CONTEXT.createSocket(SocketType.PUB);
-		bindPort = socket.bindToRandomPort(socketAddress);
+		socket = CONTEXT.createSocket(SocketType.XPUB);
+		socket.setReceiveTimeOut(30_000);
+		bindPort = socket.bindToRandomPort("tcp://*");
 	}
 
 	@DynamicPropertySource
@@ -82,16 +82,18 @@ public class ZeroMqSupplierConfigurationTests {
 	void testSubscriptionConfiguration() throws Exception {
 		CompletableFuture<Message<?>> received = this.subject.get().next().toFuture();
 
-		// PUB/SUB "slow joiner": keep publishing until the subscription is established
-		long deadline = System.currentTimeMillis() + 30_000;
-		while (!received.isDone() && System.currentTimeMillis() < deadline) {
-			ZMsg msg = ZMsg.newStringMsg("test");
-			msg.wrap(new ZFrame("test-topic"));
-			msg.send(socket);
-			Thread.sleep(100);
-		}
+		// XPUB emits the subscription frame once the SUB is connected and subscribed,
+		// so a single publish afterward is not lost to the "slow joiner"
+		byte[] subscription = socket.recv();
+		assertThat(subscription).as("The SUB socket has not subscribed").isNotNull();
+		assertThat(subscription[0]).isEqualTo((byte) 1);
+		assertThat(new String(subscription, 1, subscription.length - 1, ZMQ.CHARSET)).isEqualTo("test-topic");
 
-		assertThat(received.get(10, TimeUnit.SECONDS).getPayload())
+		ZMsg msg = ZMsg.newStringMsg("test");
+		msg.wrap(new ZFrame("test-topic"));
+		msg.send(socket);
+
+		assertThat(received.get(30, TimeUnit.SECONDS).getPayload())
 			.asInstanceOf(InstanceOfAssertFactories.type(byte[].class))
 			.isEqualTo("test".getBytes(ZMQ.CHARSET));
 	}
