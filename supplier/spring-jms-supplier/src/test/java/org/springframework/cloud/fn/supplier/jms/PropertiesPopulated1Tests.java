@@ -38,15 +38,15 @@ public class PropertiesPopulated1Tests extends AbstractJmsSupplierTests {
 		AbstractMessageListenerContainer container = TestUtils.getPropertyValue(this.endpoint, "listenerContainer",
 				AbstractMessageListenerContainer.class);
 		assertThat(container).isInstanceOf(SimpleMessageListenerContainer.class);
-		assertThat(TestUtils.getPropertyValue(container, "sessionAcknowledgeMode"))
+		assertThat(TestUtils.<Integer>getPropertyValue(container, "sessionAcknowledgeMode"))
 			.isEqualTo(Session.DUPS_OK_ACKNOWLEDGE);
 		assertThat(TestUtils.getPropertyValue(container, "sessionTransacted", Boolean.class)).isFalse();
-		assertThat(TestUtils.getPropertyValue(container, "clientId")).isNull();
-		assertThat(TestUtils.getPropertyValue(container, "destination")).isEqualTo("topic");
-		assertThat(TestUtils.getPropertyValue(container, "messageSelector")).isEqualTo("JMSCorrelationId=foo");
+		assertThat(TestUtils.<String>getPropertyValue(container, "clientId")).isNull();
+		assertThat(TestUtils.<String>getPropertyValue(container, "destination")).isEqualTo("topic");
+		assertThat(TestUtils.<String>getPropertyValue(container, "messageSelector")).isEqualTo("JMSCorrelationId=foo");
 		assertThat(TestUtils.getPropertyValue(container, "subscriptionDurable", Boolean.class)).isFalse();
 		assertThat(TestUtils.getPropertyValue(container, "subscriptionShared", Boolean.class)).isFalse();
-		assertThat(TestUtils.getPropertyValue(container, "concurrentConsumers")).isEqualTo(3);
+		assertThat(TestUtils.<Integer>getPropertyValue(container, "concurrentConsumers")).isEqualTo(3);
 		assertThat(TestUtils.getPropertyValue(container, "pubSubDomain", Boolean.class)).isTrue();
 	}
 

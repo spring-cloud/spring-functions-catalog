@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Gary Russell
+ * @author Max Brauer
  */
 @TestPropertySource(properties = { "tcp.nio = true", "tcp.reverseLookup = true", "tcp.useDirectBuffers = true",
 		"tcp.socketTimeout = 123", "tcp.supplier.bufferSize = 5" })
@@ -36,8 +37,9 @@ public class PropertiesPopulatedTests extends AbstractTcpSupplierTests {
 		assertThat(this.connectionFactory).isInstanceOf(TcpNioServerConnectionFactory.class);
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "lookupHost", Boolean.class)).isTrue();
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "usingDirectBuffers", Boolean.class)).isTrue();
-		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(123);
-		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "deserializer.maxMessageSize")).isEqualTo(5);
+		assertThat(TestUtils.<Integer>getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(123);
+		assertThat(TestUtils.<Integer>getPropertyValue(this.connectionFactory, "deserializer.maxMessageSize"))
+			.isEqualTo(5);
 	}
 
 }

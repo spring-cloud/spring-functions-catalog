@@ -33,8 +33,9 @@ public class PropertiesPopulatedTests extends AbstractSyslogSupplierTests {
 	public void test() {
 		assertThat(this.connectionFactory).isInstanceOf(TcpNioServerConnectionFactory.class);
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "lookupHost", Boolean.class)).isTrue();
-		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(123);
-		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "deserializer.maxMessageSize")).isEqualTo(5);
+		assertThat(TestUtils.<Integer>getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(123);
+		assertThat(TestUtils.<Integer>getPropertyValue(this.connectionFactory, "deserializer.maxMessageSize"))
+			.isEqualTo(5);
 	}
 
 }

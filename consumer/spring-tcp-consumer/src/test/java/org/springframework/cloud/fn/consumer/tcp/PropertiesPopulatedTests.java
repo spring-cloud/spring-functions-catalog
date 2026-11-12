@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Gary Russell
+ * @author Max Brauer
  */
 @TestPropertySource(properties = { "tcp.consumer.host = foo", "tcp.nio = true", "tcp.reverseLookup = true",
 		"tcp.useDirectBuffers = true", "tcp.socketTimeout = 123", "tcp.consumer.close = true",
@@ -38,9 +39,9 @@ public class PropertiesPopulatedTests extends AbstractTcpConsumerTests {
 		assertThat(this.connectionFactory.getHost()).isEqualTo("foo");
 		assertThat((TestUtils.getPropertyValue(this.connectionFactory, "lookupHost", Boolean.class))).isTrue();
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "usingDirectBuffers", Boolean.class)).isTrue();
-		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(123);
+		assertThat(TestUtils.<Integer>getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(123);
 		assertThat(this.connectionFactory.isSingleUse()).isTrue();
-		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "mapper.charset")).isEqualTo("bar");
+		assertThat(TestUtils.<String>getPropertyValue(this.connectionFactory, "mapper.charset")).isEqualTo("bar");
 	}
 
 }

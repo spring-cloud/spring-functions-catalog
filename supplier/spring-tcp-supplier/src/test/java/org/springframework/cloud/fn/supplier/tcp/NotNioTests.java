@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Gary Russell
+ * @author Max Brauer
  */
 public class NotNioTests extends AbstractTcpSupplierTests {
 
@@ -32,8 +33,9 @@ public class NotNioTests extends AbstractTcpSupplierTests {
 	public void test() {
 		assertThat(this.connectionFactory).isInstanceOf(TcpNetServerConnectionFactory.class);
 		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "lookupHost", Boolean.class)).isFalse();
-		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(120000);
-		assertThat(TestUtils.getPropertyValue(this.connectionFactory, "deserializer.maxMessageSize")).isEqualTo(2048);
+		assertThat(TestUtils.<Integer>getPropertyValue(this.connectionFactory, "soTimeout")).isEqualTo(120000);
+		assertThat(TestUtils.<Integer>getPropertyValue(this.connectionFactory, "deserializer.maxMessageSize"))
+			.isEqualTo(2048);
 	}
 
 }
